@@ -1,0 +1,3 @@
+country,country_code,n_predictions,n_areas,accuracy,sensitivity,precision,r2,years_covered
+Palestinian Territory,PS,12,5,0.08333333333333333,1.0,1.0,-164.1079999999998,"[2023, 2024]"
+Mali,ML,244,49,0.3401639344262295,0.45,0.3333333333333333,-0.27410972014838175,"[2022, 2023, 2024]"

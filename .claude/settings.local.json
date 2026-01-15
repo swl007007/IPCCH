@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(chmod:*)",
+      "Bash(git fetch:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rm:*)",
+      "Bash(find:*)",
+      "Bash(git commit:*)",
+      "Bash(gh pr create --base main --title \"Update IPCCH model code and analysis\" --body \"$\\(cat <<''EOF''\n## Summary\n- Add comprehensive IPCCH forecasting model notebooks and analysis\n- Include feature importance analysis with SHAP visualizations\n- Add regional vs global model comparison experiments\n- Include Cleanlab label quality analysis framework\n- Add country-level performance analysis\n- Include error rate mapping infrastructure\n- Add supporting Python modules and configuration files\n\n## Key Changes\n- Multiple forecasting scenarios \\(main, ablation, cleanlab, rolling, phase-specific\\)\n- Feature importance notebooks with visualizations\n- Regional model comparison \\(6 and 9 regions\\)\n- Error rate mapping at point and polygon levels\n- Country performance disaggregation tools\n\n## Data Management\n- Excluded large CSV files \\(using Parquet format where available\\)\n- Updated .gitignore for better data file management\n- Removed large images and PDF outputs from version control\n\nGenerated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(gh pr create --base main --head feature/update-model-code --title \"Update IPCCH model code and analysis\" --body \"$\\(cat <<''EOF''\n## Summary\n- Add comprehensive IPCCH forecasting model notebooks and analysis\n- Include feature importance analysis with SHAP visualizations\n- Add regional vs global model comparison experiments\n- Include Cleanlab label quality analysis framework\n- Add country-level performance analysis\n- Include error rate mapping infrastructure\n- Add supporting Python modules and configuration files\n\n## Key Changes\n- Multiple forecasting scenarios \\(main, ablation, cleanlab, rolling, phase-specific\\)\n- Feature importance notebooks with visualizations\n- Regional model comparison \\(6 and 9 regions\\)\n- Error rate mapping at point and polygon levels\n- Country performance disaggregation tools\n\n## Data Management\n- Excluded large CSV files \\(using Parquet format where available\\)\n- Updated .gitignore for better data file management\n- Removed large images and PDF outputs from version control\n\nGenerated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "Bash(git merge:*)"
+    ]
+  }
+}

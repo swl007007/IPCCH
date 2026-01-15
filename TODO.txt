@@ -1,0 +1,25 @@
+
+FEWSNET:
+AI/TCI/VCI/VHI substitue possibility? send an email to Guo Zhe
+
+
+
+---------------------------------------------------------------------------------------------
+6. modify GeoRF model for regression task (in our case)
+
+
+
+---------------------------------------------------------------------------------------------
+wrap up GeoRF on FEWSNET dataset (focus on data after 2017)
+0.Chris variable/growing season variable
+0.5.lean season vs non-lean season(subnational level calender) 
+
+1. streamline AEZ-based regional grouping
+2. two-layer Phase 4+ model (conditioned on predicted crisis)
+3. crisis-change detection (replicate Andree 2020)
+4. use RMSE as metric for classification task (replication of Balashankar 2022)
+5. country level leave one out validation
+6. performance by time of the year
+
+
+---------------------------------------------------------------------------------------------

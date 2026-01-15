@@ -1,0 +1,108 @@
+================================================================================
+CLEANLAB LABEL QUALITY ANALYSIS REPORT
+IPC/CH Forecasting Model - Phase{}_worse Variables
+================================================================================
+
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Total samples analyzed: 29,621
+Number of phase models: 4 (Phase 2, 3, 4, 5)
+Critical samples (low quality in 3+ phases): 945 (3.19%)
+
+KEY FINDINGS
+--------------------------------------------------------------------------------
+1. Overall Label Quality:
+   - Phase 2: Mean quality score = 0.830, Mean error = 0.148%
+   - Phase 3: Mean quality score = 0.850, Mean error = 0.108%
+   - Phase 4: Mean quality score = 0.955, Mean error = 0.042%
+   - Phase 5: Mean quality score = 0.993, Mean error = 0.005%
+
+2. Label Quality Distribution:
+   - Phase 2: High=75.0%, Medium=15.0%, Low=10.0%
+   - Phase 3: High=75.0%, Medium=15.0%, Low=10.0%
+   - Phase 4: High=75.0%, Medium=15.0%, Low=10.0%
+   - Phase 5: High=75.0%, Medium=15.0%, Low=10.0%
+
+3. Temporal Patterns:
+   - Phase 2: Best year = 2015 (0.876), Worst year = 2017 (0.795)
+   - Phase 3: Best year = 2016 (0.880), Worst year = 2017 (0.828)
+   - Phase 4: Best year = 2014 (0.962), Worst year = 2018 (0.947)
+   - Phase 5: Best year = 2015 (1.000), Worst year = 2022 (0.989)
+
+4. Regional Patterns:
+   Top 5 regions with most critical samples:
+   - Area 4926: 7 critical samples
+   - Area 2848: 7 critical samples
+   - Area 3017: 7 critical samples
+   - Area 2641: 6 critical samples
+   - Area 2911: 6 critical samples
+
+5. Multi-Phase Quality Issues:
+   - 734 samples have low quality in 3 phases
+   - 211 samples have low quality in 4 phases
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+1. Review and validate the 945 critical samples with low quality in 3+ phases
+2. Focus data quality improvement efforts on:
+   - Phase 2: Year 2017 (quality score = 0.795)
+   - Phase 3: Year 2017 (quality score = 0.828)
+   - Phase 4: Year 2018 (quality score = 0.947)
+   - Phase 5: Year 2022 (quality score = 0.989)
+3. Investigate regions with consistently high error rates (see critical_samples.csv)
+4. Consider using label quality scores as sample weights during model training
+5. Implement automated data quality checks for new data collection
+
+================================================================================
+DETAILED STATISTICS BY PHASE
+================================================================================
+
+PHASE 2_WORSE
+----------------------------------------
+Total samples: 29,621
+Mean quality score: 0.8299 ¡À 0.1412
+High quality samples: 22,215 (75.0%)
+Medium quality samples: 4,443 (15.0%)
+Low quality samples: 2,963 (10.0%)
+Mean absolute error: 0.1485%
+Median absolute error: 0.1174%
+90th percentile error: 0.3213%
+Max absolute error: 0.8728%
+
+PHASE 3_WORSE
+----------------------------------------
+Total samples: 29,621
+Mean quality score: 0.8505 ¡À 0.1349
+High quality samples: 22,215 (75.0%)
+Medium quality samples: 4,443 (15.0%)
+Low quality samples: 2,963 (10.0%)
+Mean absolute error: 0.1075%
+Median absolute error: 0.0765%
+90th percentile error: 0.2449%
+Max absolute error: 0.7191%
+
+PHASE 4_WORSE
+----------------------------------------
+Total samples: 29,621
+Mean quality score: 0.9548 ¡À 0.0556
+High quality samples: 22,215 (75.0%)
+Medium quality samples: 4,443 (15.0%)
+Low quality samples: 2,963 (10.0%)
+Mean absolute error: 0.0423%
+Median absolute error: 0.0258%
+90th percentile error: 0.1036%
+Max absolute error: 0.9367%
+
+PHASE 5_WORSE
+----------------------------------------
+Total samples: 29,621
+Mean quality score: 0.9931 ¡À 0.0200
+High quality samples: 22,215 (75.0%)
+Medium quality samples: 4,443 (15.0%)
+Low quality samples: 2,963 (10.0%)
+Mean absolute error: 0.0048%
+Median absolute error: 0.0000%
+90th percentile error: 0.0145%
+Max absolute error: 0.6979%
+
