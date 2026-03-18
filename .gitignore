@@ -59,3 +59,6 @@ error_rate_map/figures/*.pdf
 main_results/*.png
 region_vs_global_model_comparison/**/*.png
 feature_importance/*.jpg
+
+CLAUDE.md
+nowcasting_prediction/*.csv

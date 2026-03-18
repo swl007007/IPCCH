@@ -1,0 +1,137 @@
+
+---------------------------------------
+IPC+CH 2010-2024
+with lag
+2024：
+Accuracy: 0.6942956926658905
+Sensitivity: 0.8506315211422295
+Precision: 0.7523069451189898
+Overall R²(Phase 3 or more): 0.5088573768184861
+
+2023
+Accuracy: 0.6134010152284264
+Sensitivity: 0.8305002428363283
+Precision: 0.7644166294143943
+Overall R²(Phase 3 or more): 0.5343873494233553
+
+2022
+Accuracy: 0.5310544053923929
+Sensitivity: 0.6048150322959484
+Precision: 0.767511177347243
+Overall R²(Phase 3 or more): 0.3741642202425509
+------------------------------------------------------
+NG:
+2024:
+Accuracy: 0.8383742911153119
+Sensitivity: 0.23636363636363636
+Precision: 0.78
+Overall R²(Phase 3 or more): 0.3527779599959481
+
+2023:
+Accuracy: 0.617399438727783
+Sensitivity: 0.375
+Precision: 0.6923076923076923
+Overall R²(Phase 3 or more): 0.404740464216909
+
+2022:
+Accuracy: 0.5163841807909605
+Sensitivity: 0.2911392405063291
+Precision: 0.71875
+Overall R²(Phase 3 or more): 0.3204851507992893
+----------------------------------------------------
+IPCCH 6months
+2024(6months):
+Accuracy: 0.7216538789428815
+Sensitivity: 0.8544600938967136
+Precision: 0.7738095238095238
+Overall R²(Phase 3 or more): 0.5498826178442787
+
+2023:
+Accuracy: 0.5899366085578447
+Sensitivity: 0.8266283524904214
+Precision: 0.7313559322033898
+Overall R²(Phase 3 or more): 0.5410575410275389
+
+2022:
+Accuracy: 0.5110477548111191
+Sensitivity: 0.7814166031987814
+Precision: 0.7685393258426966
+Overall R²(Phase 3 or more): 0.32374810665594467
+---------------------------------------------------
+IPC separate
+2024
+Accuracy: 0.627972027972028
+Sensitivity: 0.9348869088416724
+Precision: 0.7228404875463699
+Overall R²(Phase 3 or more): 0.16525957503356625
+
+2023
+Accuracy: 0.6205659625348745
+Sensitivity: 0.8542024013722127
+Precision: 0.7572225038013178
+Overall R²(Phase 3 or more): 0.16121433281913244
+
+2022
+Accuracy: 0.48630466122056704
+Sensitivity: 0.6504237288135594
+Precision: 0.76814011676397
+Overall R²(Phase 3 or more): -0.07085197512672115
+------------------------------------------------------
+CH separate
+2024
+Accuracy: 0.7293023255813953
+Sensitivity: 0.46685082872928174
+Precision: 0.8325123152709359
+Overall R²(Phase 3 or more): 0.5843271132814271
+
+2023
+Accuracy: 0.5968543046357616
+Sensitivity: 0.5838709677419355
+Precision: 0.8379629629629629
+Overall R²(Phase 3 or more): 0.6319746401128159
+
+2022
+Accuracy: 0.548480463096961
+Sensitivity: 0.42160278745644597
+Precision: 0.7908496732026143
+Overall R²(Phase 3 or more): 0.5415808797419699
+-------------------------------------------------------
+IPCCH Nowcasting
+2024
+Accuracy: 0.6719441210710128
+Sensitivity: 0.8314113124656782
+Precision: 0.7285851780558229
+Overall R²(Phase 3 or more): 0.47926656877458207
+
+2023
+Accuracy: 0.608730964467005
+Sensitivity: 0.8149587178241865
+Precision: 0.7561964849031095
+Overall R²(Phase 3 or more): 0.5433969365011232
+
+2022
+Accuracy: 0.5002407318247473
+Sensitivity: 0.6024662360540223
+Precision: 0.7328571428571429
+Overall R²(Phase 3 or more): 0.3304985091280823
+-----------------------------------------------------------------
+Original
+2024:
+Accuracy: 0.6726426076833527
+Sensitivity: 0.829763866007688
+Precision: 0.7264423076923077
+Overall R²(Phase 3 or more): 0.4747786496932018
+
+2023:
+Accuracy: 0.6016243654822335
+Sensitivity: 0.815444390480816
+Precision: 0.7566471383506084
+Overall R²(Phase 3 or more): 0.5411160925193786
+
+2022:
+Accuracy: 0.4978334135772749
+Sensitivity: 0.5924838520258368
+Precision: 0.7327523602033406
+Overall R²(Phase 3 or more): 0.31960077379221163
+
+
