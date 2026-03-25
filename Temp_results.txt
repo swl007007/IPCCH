@@ -133,12 +133,26 @@ Sensitivity: 0.5924838520258368
 Precision: 0.7327523602033406
 Overall R²(Phase 3 or more): 0.31960077379221163
 
+----------------------------------------------------------------------
+Two regression models(only distinguist 2-3-4):
+2024:
+Accuracy: 0.7602230483271375
+Sensitivity: 0.829763866007688
+Precision: 0.7250479846449136
+Overall R²(Phase 3 or more): 0.472545928594285
+
+2023:
+Accuracy: 0.7710696920583469
+Sensitivity: 0.815444390480816
+Precision: 0.7542677448337826
+Overall R²(Phase 3 or more): 0.5373951390663174
 
 
-
-
-
-
+2022:
+Accuracy: 0.6698292220113852
+Sensitivity: 0.5924838520258368
+Precision: 0.7156028368794326
+Overall R²(Phase 3 or more): 0.31223746076386494
 
 
 

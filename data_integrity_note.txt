@@ -1,0 +1,4 @@
+2022 merge new data(do not drop duplicate with old data, see if phase overlaps)
+all have 29 countries, 5583/5585 matched. 4573/5583 has same phase. 
+Among rows that has the same phase, 63% are P, 18% are A, 15% are C labeled by new dataset.
+(new dataset downloaded on 2025) There are 10 duplicate rows in NEW datasets based on date, area
