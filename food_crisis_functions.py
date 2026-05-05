@@ -121,44 +121,130 @@ def calculate_fine_metric(accuracy_score_list, sensitivity_list, precision_list,
     overall_r2_std = round(np.std(overall_r2_list),3)
     precision_std = round(np.std(precision_list),3)
     return accuracy_score_mean, accuracy_score_std, sensitivity_mean, sensitivity_std, precision_mean, precision_std, overall_r2_mean, overall_r2_std
-def convert_prob_to_phase(y_pred_test, th=0.2):
+def _pivot_y_pred_test(y_pred_test):
+    """Pivot long-form (phase, y_pred, y_test) into wide form with phase{i}_pred / phase{i}_test columns.
+
+    Shared between convert_prob_to_phase and convert_prob_to_phase_rank. Drops
+    rows where the predicted or true non-phase-1 shares sum to <= 0.
+    """
+    y_pred_test = y_pred_test.copy()
     y_pred_test['y_pred'] = y_pred_test['y_pred'].round(2)
     phase_list = [y_pred_test[y_pred_test['phase']==i].drop(['phase'], axis=1).rename(columns={'y_pred': 'phase{}_pred'.format(i), 'y_test': 'phase{}_test'.format(i)}) for i in range(1, 6)]
     phase_list = [phase_list[i].reset_index(drop=True) for i in range(5)]
     y_pred_test = pd.concat(phase_list, axis=1)
-    # phase1_test = 1-phase2_test-phase3_test-phase4_test-phase5_test, phase1_pred = 1-phase2_pred-phase3_pred-phase4_pred-phase5_pred
     y_pred_test = y_pred_test.drop(['phase1_test', 'phase1_pred'], axis=1)
-    #y_pred_test['phase3_pred'] = 1 - y_pred_test['phase1_pred'] - y_pred_test['phase2_pred'] - y_pred_test['phase4_pred'] - y_pred_test['phase5_pred']
-    # fillna with 0
     y_pred_test = y_pred_test.fillna(0)
-    # find row while phase1_pred+phase2_pred+phase3_pred+phase4_pred+phase5_pred<0, drop these rows
-    y_pred_test = y_pred_test.drop(y_pred_test[( y_pred_test['phase2_pred'] + y_pred_test['phase3_pred'] + y_pred_test['phase4_pred'] + y_pred_test['phase5_pred'] <= 0)].index)
-    # find row while phase1_test+phase2_test+phase3_test+phase4_test+phase5_test<0, drop these rows
+    y_pred_test = y_pred_test.drop(y_pred_test[(y_pred_test['phase2_pred'] + y_pred_test['phase3_pred'] + y_pred_test['phase4_pred'] + y_pred_test['phase5_pred'] <= 0)].index)
     y_pred_test = y_pred_test.drop(y_pred_test[(y_pred_test['phase2_test'] + y_pred_test['phase3_test'] + y_pred_test['phase4_test'] + y_pred_test['phase5_test'] <= 0)].index)
-    # set true overall_label = 5 if phase5_test >= 0.2, = 4 if phase4_test >= 0.2, = 3 if phase3_test >= 0.2, = 2 if phase2_test >= 0.2, = 1 if phase1_test >= 0.2.
+    return y_pred_test
+def convert_prob_to_phase(y_pred_test, th=0.2):
+    # th may be a scalar (current behavior, default 0.2) or a 4-tuple/list
+    # (th2, th3, th4, th5) applied per-phase. Scalar path is behaviorally
+    # identical to the original.
+    if isinstance(th, (tuple, list)):
+        th2, th3, th4, th5 = th
+    else:
+        th2 = th3 = th4 = th5 = th
+    y_pred_test = _pivot_y_pred_test(y_pred_test)
     for row, idx in zip(y_pred_test.itertuples(), y_pred_test.index):
-        if row.phase5_test >= th:
+        if row.phase5_test >= th5:
             y_pred_test.loc[idx, 'overall_phase'] = 5
-        elif row.phase4_test>= th:
+        elif row.phase4_test >= th4:
             y_pred_test.loc[idx, 'overall_phase'] = 4
-        elif row.phase3_test>= th:
+        elif row.phase3_test >= th3:
             y_pred_test.loc[idx, 'overall_phase'] = 3
-        elif row.phase2_test>= th:
+        elif row.phase2_test >= th2:
             y_pred_test.loc[idx, 'overall_phase'] = 2
         else:
             y_pred_test.loc[idx, 'overall_phase'] = 1
 
-        if row.phase5_pred >= th:
+        if row.phase5_pred >= th5:
             y_pred_test.loc[idx, 'overall_phase_pred'] = 5
-        elif row.phase4_pred>= th:
+        elif row.phase4_pred >= th4:
             y_pred_test.loc[idx, 'overall_phase_pred'] = 4
-        elif row.phase3_pred>= th:
+        elif row.phase3_pred >= th3:
             y_pred_test.loc[idx, 'overall_phase_pred'] = 3
-        elif row.phase2_pred>= th:
+        elif row.phase2_pred >= th2:
             y_pred_test.loc[idx, 'overall_phase_pred'] = 2
         else:
             y_pred_test.loc[idx, 'overall_phase_pred'] = 1
     return y_pred_test
+def convert_prob_to_phase_rank(y_pred_test, q=(0.55, 0.20, 0.05, 0.02), th_truth=0.2):
+    """Rank-based discretization for predictions; threshold rule for truth.
+
+    Ground truth overall_phase is derived via the canonical th_truth threshold
+    rule on phase{i}_test (same as convert_prob_to_phase scalar mode).
+
+    Predictions overall_phase_pred are assigned by top-down rank on phase{i}_pred:
+        for (phase, q_p) in [(5, q[3]), (4, q[2]), (3, q[1]), (2, q[0])]:
+            top ceil(q_p * total_rows) of remaining rows by phase{phase}_pred
+            -> overall_phase_pred = phase
+        remainder -> 1
+
+    q = (q2, q3, q4, q5) are top-fractions of the full pool, applied top-down.
+    """
+    import math
+    y_pred_test = _pivot_y_pred_test(y_pred_test)
+    n = len(y_pred_test)
+    q2, q3, q4, q5 = q
+
+    # Ground truth via threshold rule (vectorized; equivalent to
+    # convert_prob_to_phase scalar branch).
+    y_pred_test['overall_phase'] = 1
+    cond5 = y_pred_test['phase5_test'] >= th_truth
+    cond4 = (~cond5) & (y_pred_test['phase4_test'] >= th_truth)
+    cond3 = (~cond5) & (~cond4) & (y_pred_test['phase3_test'] >= th_truth)
+    cond2 = (~cond5) & (~cond4) & (~cond3) & (y_pred_test['phase2_test'] >= th_truth)
+    y_pred_test.loc[cond5, 'overall_phase'] = 5
+    y_pred_test.loc[cond4, 'overall_phase'] = 4
+    y_pred_test.loc[cond3, 'overall_phase'] = 3
+    y_pred_test.loc[cond2, 'overall_phase'] = 2
+
+    # Predictions via top-down rank assignment.
+    y_pred_test['overall_phase_pred'] = 1
+    remaining = pd.Index(y_pred_test.index)
+    for phase, q_p in [(5, q5), (4, q4), (3, q3), (2, q2)]:
+        if len(remaining) == 0 or q_p <= 0:
+            continue
+        k = min(int(math.ceil(q_p * n)), len(remaining))
+        col = 'phase{}_pred'.format(phase)
+        top_idx = y_pred_test.loc[remaining, col].nlargest(k).index
+        y_pred_test.loc[top_idx, 'overall_phase_pred'] = phase
+        remaining = remaining.difference(top_idx)
+    return y_pred_test
+def compute_extended_metrics(y_pred_test):
+    """Extended diagnostics distinguishing model improvement from relabeling.
+
+    Expects y_pred_test in wide form (output of convert_prob_to_phase or
+    convert_prob_to_phase_rank). Returns the four standard metrics plus
+    distribution-side diagnostics on phase 3+. AUC and AP are NaN when the
+    ground-truth phase-3+ binary has only one class.
+    """
+    from sklearn.metrics import average_precision_score, roc_auc_score
+    y_test = y_pred_test['overall_phase']
+    y_pred = y_pred_test['overall_phase_pred']
+    cm = confusion_matrix(y_test, y_pred)
+    accuracy, sensitivity, precision, r2 = all_metrics(y_test, y_pred, cm, y_pred_test)
+    truth_p3p = (y_test >= 3).astype(int)
+    pred_p3p = (y_pred >= 3).astype(int)
+    if truth_p3p.nunique() < 2:
+        auc = float('nan')
+        ap = float('nan')
+    else:
+        auc = roc_auc_score(truth_p3p, y_pred_test['phase3_pred'])
+        ap = average_precision_score(truth_p3p, y_pred_test['phase3_pred'])
+    return {
+        'accuracy': accuracy,
+        'sensitivity': sensitivity,
+        'precision': precision,
+        'r2': r2,
+        'true_phase3plus_prevalence': float(truth_p3p.mean()),
+        'pred_phase3plus_prevalence': float(pred_p3p.mean()),
+        'mean_phase3_pred': float(y_pred_test['phase3_pred'].mean()),
+        'median_phase3_pred': float(y_pred_test['phase3_pred'].median()),
+        'auc_phase3plus': auc,
+        'ap_phase3plus': ap,
+    }
 def new_function(files):
     p=re.compile(r"\b[-a-z]{2,40}\s?\r\n")
     def list_all_files(dir):
