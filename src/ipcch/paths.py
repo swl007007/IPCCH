@@ -1,0 +1,32 @@
+import json
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+CONFIG_DIR = PROJECT_ROOT / "configs"
+DATA_DIR = PROJECT_ROOT / "data"
+REFERENCE_DATA_DIR = DATA_DIR / "reference"
+RESULTS_DIR = PROJECT_ROOT / "results"
+REPORTS_DIR = PROJECT_ROOT / "reports"
+SOURCE_DATA_DIR = PROJECT_ROOT.parents[2] / "1.Source Data"
+
+DEFAULT_EXTERNAL_PATHS = {
+    "raw_data_dir": SOURCE_DATA_DIR,
+    "forecasting_dataset": SOURCE_DATA_DIR / "forecasting_subset_IPCCH_v1210.csv",
+    "processed_forecasting_dataset": SOURCE_DATA_DIR / "forecasting_subset_IPCCH_v1210_processed.csv",
+    "nowcasting_dataset": SOURCE_DATA_DIR / "nowcasting_subset_IPCCH_v0318_no_lat_lon.csv",
+    "ipcch_reference_dataset": SOURCE_DATA_DIR / "IPCCH_2017_2025_final_v12102025_with_zscores.csv",
+    "ipc_ch_geojson": SOURCE_DATA_DIR / "Outcome" / "gdf_ipc_ch_final.geojson",
+}
+
+
+def project_path(*parts: str) -> Path:
+    return PROJECT_ROOT.joinpath(*parts)
+
+
+def external_path(key: str) -> Path:
+    local_config = CONFIG_DIR / "paths.local.json"
+    if local_config.exists():
+        local_paths = json.loads(local_config.read_text(encoding="utf-8"))
+        if key in local_paths:
+            return Path(local_paths[key]).expanduser()
+    return DEFAULT_EXTERNAL_PATHS[key]

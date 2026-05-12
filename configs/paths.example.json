@@ -1,0 +1,8 @@
+{
+  "raw_data_dir": "../../../1.Source Data",
+  "forecasting_dataset": "../../../1.Source Data/forecasting_subset_IPCCH_v1210.csv",
+  "processed_forecasting_dataset": "../../../1.Source Data/forecasting_subset_IPCCH_v1210_processed.csv",
+  "nowcasting_dataset": "../../../1.Source Data/nowcasting_subset_IPCCH_v0318_no_lat_lon.csv",
+  "ipcch_reference_dataset": "../../../1.Source Data/IPCCH_2017_2025_final_v12102025_with_zscores.csv",
+  "ipc_ch_geojson": "../../../1.Source Data/Outcome/gdf_ipc_ch_final.geojson"
+}

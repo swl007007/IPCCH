@@ -5,12 +5,22 @@ This script analyzes label quality for the phase{}_worse regression targets usin
 It performs cross-validation predictions and identifies potential label errors for each phase model.
 """
 
+import argparse
+import json
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = next(path for path in Path(__file__).resolve().parents if (path / "src").exists())
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import cross_val_predict, KFold
-import json
 import warnings
+
+from ipcch.paths import CONFIG_DIR, RESULTS_DIR, external_path
+
 warnings.filterwarnings('ignore')
 
 # Import cleanlab for regression
@@ -28,18 +38,30 @@ except ImportError:
         print("pip install cleanlab")
         exit(1)
 
+parser = argparse.ArgumentParser(description="Cleanlab label quality analysis for IPC/CH phase targets")
+parser.add_argument("--dataset", default=str(external_path("processed_forecasting_dataset")),
+                    help="Path to processed forecasting dataset")
+parser.add_argument("--output-dir", default=str(RESULTS_DIR / "experiments" / "cleanlab"),
+                    help="Directory for cleanlab result CSVs")
+parser.add_argument("--hyperparams", default=str(CONFIG_DIR / "forecasting_hyperparameters.json"),
+                    help="Path to hyperparameters JSON for phases 2, 4, 5")
+parser.add_argument("--hyperparams-p3", default=str(CONFIG_DIR / "forecasting_hyperparameters_p3.json"),
+                    help="Path to hyperparameters JSON for phase 3")
+args = parser.parse_args()
+output_dir = Path(args.output_dir)
+output_dir.mkdir(parents=True, exist_ok=True)
+
 # Load hyperparameters
 print("Loading hyperparameters...")
-with open("forecasting_hyperparameters.json", "r") as file:
+with open(args.hyperparams, "r") as file:
     best_params_xgb_regressor = json.load(file)
 
-with open("forecasting_hyperparameters_p3.json", "r") as file:
+with open(args.hyperparams_p3, "r") as file:
     best_params_xgb_regressor_for_p3 = json.load(file)
 
 # Load processed data
 print("Loading processed dataset...")
-DATA_PATH = r'C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\1.Source Data\forecasting_subset_IPCCH_v1210_processed.csv'
-df = pd.read_csv(DATA_PATH)
+df = pd.read_csv(args.dataset)
 
 print(f"Dataset shape: {df.shape}")
 print(f"Columns: {df.columns.tolist()}")
@@ -195,14 +217,15 @@ print("="*80)
 
 # Save detailed results for each phase
 for phase_name, results_df in label_quality_results.items():
-    output_file = f'cleanlab_results_{phase_name}_label_quality.csv'
+    output_file = output_dir / f'cleanlab_results_{phase_name}_label_quality.csv'
     results_df.to_csv(output_file, index=False)
     print(f"Saved {phase_name} detailed results to: {output_file}")
 
 # Save summary statistics
 summary_df = pd.DataFrame(summary_stats)
-summary_df.to_csv('cleanlab_results_summary.csv', index=False)
-print(f"Saved summary statistics to: cleanlab_results_summary.csv")
+summary_file = output_dir / 'cleanlab_results_summary.csv'
+summary_df.to_csv(summary_file, index=False)
+print(f"Saved summary statistics to: {summary_file}")
 
 # Generate overall summary report
 print("\n" + "="*80)
@@ -253,8 +276,9 @@ if len(low_quality_by_phase) > 0:
             print(critical_df.head(20).to_string(index=False))
 
             # Save critical samples
-            critical_df.to_csv('cleanlab_results_critical_samples.csv', index=False)
-            print(f"\nSaved critical samples to: cleanlab_results_critical_samples.csv")
+            critical_file = output_dir / 'cleanlab_results_critical_samples.csv'
+            critical_df.to_csv(critical_file, index=False)
+            print(f"\nSaved critical samples to: {critical_file}")
 
 print("\n" + "="*80)
 print("ANALYSIS COMPLETE")

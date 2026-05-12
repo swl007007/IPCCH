@@ -21,16 +21,16 @@ conda install numpy pandas xgboost scikit-learn
 ### Required Files
 
 1. **Data files (must exist):**
-   - `forecasting_subset_IPCCH_v1210.csv` - Main dataset (29,622 rows, 225 columns)
-   - `area_id_country_region_mapping.csv` - Region mapping (area_id → region)
-   - `IPCCH_2017_2025_final_v12102025_with_zscores.csv` - Lat/lon coordinates (admin_code → lat, lon)
+   - `forecasting_subset_IPCCH_v1210.csv` - Main dataset (29,622 rows, 225 columns), usually outside this repo under `Analysis/1.Source Data/`
+   - `data/reference/area_id_country_region_mapping.csv` - Region mapping (area_id → region)
+   - `IPCCH_2017_2025_final_v12102025_with_zscores.csv` - Lat/lon coordinates (admin_code → lat, lon), usually outside this repo under `Analysis/1.Source Data/`
 
-2. **Hyperparameter files (must be in same directory as script):**
-   - `forecasting_hyperparameters.json` - XGBoost params for phases 2, 4, 5
-   - `forecasting_hyperparameters_p3.json` - XGBoost params for phase 3
+2. **Hyperparameter files:**
+   - `configs/forecasting_hyperparameters.json` - XGBoost params for phases 2, 4, 5
+   - `configs/forecasting_hyperparameters_p3.json` - XGBoost params for phase 3
 
 3. **Code dependencies:**
-   - `food_crisis_functions.py` - Must be in same directory or on PYTHONPATH
+   - `src/ipcch/food_crisis_functions.py` - Importable as `ipcch.food_crisis_functions`
      - Provides: `convert_prob_to_phase()`, `all_metrics()`
 
 ## Usage
@@ -38,10 +38,10 @@ conda install numpy pandas xgboost scikit-learn
 ### Basic Usage
 
 ```bash
-python run_region_models.py \
-    --dataset "C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\1.Source Data\forecasting_subset_IPCCH_v1210.csv" \
-    --region-map "area_id_country_region_mapping.csv" \
-    --out "output_region_models" \
+PYTHONPATH=src python scripts/modeling/run_region_models.py \
+    --dataset "../1.Source Data/forecasting_subset_IPCCH_v1210.csv" \
+    --region-map "data/reference/area_id_country_region_mapping.csv" \
+    --out "results/experiments/region_vs_global_model_comparison/output_region_models" \
     --years 2022 2023 2024 \
     --seed 42
 ```
@@ -55,20 +55,19 @@ python run_region_models.py \
 - `--out` (required): Output directory (will be created if doesn't exist)
 - `--years` (optional): Years to process (default: 2022 2023 2024)
 - `--seed` (optional): Random seed for reproducibility (default: 42)
-- `--hyperparams` (optional): Path to hyperparameters JSON for phases 2,4,5 (default: `forecasting_hyperparameters.json`)
-- `--hyperparams-p3` (optional): Path to hyperparameters JSON for phase 3 (default: `forecasting_hyperparameters_p3.json`)
-- `--lat-lon-file` (optional): Path to file with lat/lon coordinates (default: `IPCCH_2017_2025_final_v12102025_with_zscores.csv`)
+- `--hyperparams` (optional): Path to hyperparameters JSON for phases 2,4,5 (default: `configs/forecasting_hyperparameters.json`)
+- `--hyperparams-p3` (optional): Path to hyperparameters JSON for phase 3 (default: `configs/forecasting_hyperparameters_p3.json`)
+- `--lat-lon-file` (optional): Path to file with lat/lon coordinates (default resolved by `src/ipcch/paths.py` or `configs/paths.local.json`)
 
 ### Test Run (Single Region)
 
 To test with a single year and verify everything works:
 
 ```bash
-# Modify the script temporarily to only run year 2024, region 1
-python run_region_models.py \
-    --dataset "C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\1.Source Data\forecasting_subset_IPCCH_v1210.csv" \
-    --region-map "area_id_country_region_mapping.csv" \
-    --out "test_output" \
+PYTHONPATH=src python scripts/modeling/run_region_models.py \
+    --dataset "../1.Source Data/forecasting_subset_IPCCH_v1210.csv" \
+    --region-map "data/reference/area_id_country_region_mapping.csv" \
+    --out "results/experiments/region_vs_global_model_comparison/test_output" \
     --years 2024 \
     --seed 42
 ```
@@ -209,13 +208,12 @@ The script ensures reproducibility via:
 
 ### Common Issues
 
-1. **Import Error: `ModuleNotFoundError: No module named 'food_crisis_functions'`**
-   - Solution: Run script from same directory as `food_crisis_functions.py`
-   - Or: Add directory to PYTHONPATH: `export PYTHONPATH="${PYTHONPATH}:/path/to/IPCCH_model"`
+1. **Import Error: `ModuleNotFoundError: No module named 'ipcch'`**
+   - Solution: run from the repository root with `PYTHONPATH=src`, or install the project with `pip install -e .` in a virtual environment.
 
 2. **File Not Found: Hyperparameter JSON files**
-   - Solution: Ensure `forecasting_hyperparameters.json` and `forecasting_hyperparameters_p3.json` are in current directory
-   - Or: Specify full paths with `--hyperparams` and `--hyperparams-p3` arguments
+   - Solution: ensure `configs/forecasting_hyperparameters.json` and `configs/forecasting_hyperparameters_p3.json` exist.
+   - Or: specify full paths with `--hyperparams` and `--hyperparams-p3` arguments
 
 3. **Unmapped Area IDs Warning**
    - If >5% of data is unmapped, check that `area_id_country_region_mapping.csv` covers all area_ids in the dataset

@@ -29,7 +29,13 @@
       "Bash(pip3 install:*)",
       "Bash(DT5=\"/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/Food_Crisis_Cluster/other_outputs/DT_decision_tree_d5\" ls \"$DT5/dt_rules/\")",
       "Read(//mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/$DT5/dt_rules/**)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "mcp__plugin_claude-mem_mcp-search__smart_search",
+      "mcp__plugin_claude-mem_mcp-search__smart_outline",
+      "Bash(PYTHONPATH=src python3 *)",
+      "Bash(/home/swl007007/.venvs/ipcch-geo/bin/python *)",
+      "Bash(mv cleanlab_experiment/*.csv results/experiments/cleanlab/)",
+      "Bash(mv cleanlab_experiment/*.pdf reports/cleanlab/)"
     ]
   }
 }

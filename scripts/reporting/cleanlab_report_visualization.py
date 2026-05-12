@@ -4,33 +4,53 @@ Cleanlab Results Visualization and Report Generation
 This script creates visualizations and a comprehensive report from the cleanlab analysis results.
 """
 
+import argparse
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = next(path for path in Path(__file__).resolve().parents if (path / "src").exists())
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.backends.backend_pdf import PdfPages
 import warnings
+
+from ipcch.paths import REPORTS_DIR, RESULTS_DIR
+
 warnings.filterwarnings('ignore')
 
 # Set style
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 8)
 
+parser = argparse.ArgumentParser(description="Generate cleanlab label quality reports")
+parser.add_argument("--input-dir", default=str(RESULTS_DIR / "experiments" / "cleanlab"),
+                    help="Directory containing cleanlab result CSVs")
+parser.add_argument("--output-dir", default=str(REPORTS_DIR / "cleanlab"),
+                    help="Directory for generated cleanlab reports")
+args = parser.parse_args()
+input_dir = Path(args.input_dir)
+output_dir = Path(args.output_dir)
+output_dir.mkdir(parents=True, exist_ok=True)
+
 print("="*80)
 print("GENERATING CLEANLAB LABEL QUALITY REPORT AND VISUALIZATIONS")
 print("="*80)
 
 # Load summary statistics
-summary_df = pd.read_csv('cleanlab_results_summary.csv')
-critical_samples = pd.read_csv('cleanlab_results_critical_samples.csv')
+summary_df = pd.read_csv(input_dir / 'cleanlab_results_summary.csv')
+critical_samples = pd.read_csv(input_dir / 'cleanlab_results_critical_samples.csv')
 
 # Load detailed results for each phase
 phase_results = {}
 for phase in range(2, 6):
-    phase_results[phase] = pd.read_csv(f'cleanlab_results_phase{phase}_label_quality.csv')
+    phase_results[phase] = pd.read_csv(input_dir / f'cleanlab_results_phase{phase}_label_quality.csv')
 
 # Create PDF report
-pdf_filename = 'cleanlab_label_quality_report.pdf'
+pdf_filename = output_dir / 'cleanlab_label_quality_report.pdf'
 with PdfPages(pdf_filename) as pdf:
 
     # Page 1: Summary Statistics
@@ -303,7 +323,8 @@ print("\n" + "="*80)
 print("GENERATING TEXT SUMMARY REPORT")
 print("="*80)
 
-with open('cleanlab_label_quality_summary_report.txt', 'w') as f:
+summary_report = output_dir / 'cleanlab_label_quality_summary_report.txt'
+with open(summary_report, 'w') as f:
     f.write("="*80 + "\n")
     f.write("CLEANLAB LABEL QUALITY ANALYSIS REPORT\n")
     f.write("IPC/CH Forecasting Model - Phase{}_worse Variables\n")
@@ -383,7 +404,7 @@ with open('cleanlab_label_quality_summary_report.txt', 'w') as f:
         f.write(f"Max absolute error: {row['max_abs_error']:.4f}%\n")
         f.write("\n")
 
-print("Text summary report saved: cleanlab_label_quality_summary_report.txt")
+print(f"Text summary report saved: {summary_report}")
 
 print("\n" + "="*80)
 print("REPORT GENERATION COMPLETE")

@@ -14,6 +14,13 @@ Author: Weilun Shi
 Date: 2025-12-12
 """
 
+import argparse
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = next(path for path in Path(__file__).resolve().parents if (path / "src").exists())
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -22,8 +29,9 @@ import matplotlib.colors as mcolors
 import contextily as ctx
 from shapely.geometry import Point
 from sklearn.neighbors import NearestNeighbors
-from pathlib import Path
 import warnings
+
+from ipcch.paths import REPORTS_DIR, RESULTS_DIR, external_path
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -33,15 +41,13 @@ warnings.filterwarnings('ignore', category=UserWarning)
 # CONFIGURATION
 # ============================================================================
 
-# Input paths
-GEOJSON_PATH = r"C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\1.Source Data\Outcome\gdf_ipc_ch_final.geojson"
-PREDICTION_DIR = r"C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\2.source_code\Step5_Geo_RF_trial\IPCCH_model\forecasting_prediction"
-
-# Output paths
-OUTPUT_DIR = r"C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\2.source_code\Step5_Geo_RF_trial\IPCCH_model\outputs"
-POINT_LEVEL_DIR = Path(OUTPUT_DIR) / "point_level"
-POLYGON_LEVEL_DIR = Path(OUTPUT_DIR) / "polygon_level"
-FIGURES_DIR = Path(OUTPUT_DIR) / "figures"
+# Default paths
+GEOJSON_PATH = external_path("ipc_ch_geojson")
+PREDICTION_DIR = RESULTS_DIR / "predictions" / "forecasting"
+OUTPUT_DIR = RESULTS_DIR / "maps" / "error_rate"
+POINT_LEVEL_DIR = OUTPUT_DIR / "point_level"
+POLYGON_LEVEL_DIR = OUTPUT_DIR / "polygon_level"
+FIGURES_DIR = REPORTS_DIR / "figures" / "error_rate_map"
 
 # Analysis parameters
 YEARS = [2022, 2023, 2024]
@@ -635,6 +641,21 @@ def main():
     """
     Main execution pipeline.
     """
+    parser = argparse.ArgumentParser(description="IPC crisis prediction error analysis")
+    parser.add_argument("--geojson", default=str(GEOJSON_PATH), help="Path to IPC/CH polygon GeoJSON")
+    parser.add_argument("--prediction-dir", default=str(PREDICTION_DIR), help="Directory containing forecasting prediction CSVs")
+    parser.add_argument("--output-dir", default=str(OUTPUT_DIR), help="Directory for machine-readable map outputs")
+    parser.add_argument("--figures-dir", default=str(FIGURES_DIR), help="Directory for generated map figures")
+    parser.add_argument("--years", nargs="+", type=int, default=YEARS, help="Years to analyze")
+    args = parser.parse_args()
+
+    geojson_path = Path(args.geojson)
+    prediction_dir = Path(args.prediction_dir)
+    output_dir = Path(args.output_dir)
+    point_level_dir = output_dir / "point_level"
+    polygon_level_dir = output_dir / "polygon_level"
+    figures_dir = Path(args.figures_dir)
+
     print(f"\n{'#'*80}")
     print("#" + " "*78 + "#")
     print("#" + " "*20 + "IPC CRISIS PREDICTION ERROR ANALYSIS" + " "*22 + "#")
@@ -642,15 +663,15 @@ def main():
     print(f"{'#'*80}")
 
     # Create output directories
-    POINT_LEVEL_DIR.mkdir(parents=True, exist_ok=True)
-    POLYGON_LEVEL_DIR.mkdir(parents=True, exist_ok=True)
-    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    point_level_dir.mkdir(parents=True, exist_ok=True)
+    polygon_level_dir.mkdir(parents=True, exist_ok=True)
+    figures_dir.mkdir(parents=True, exist_ok=True)
 
     # Step 1: Load IPC polygons
-    polygons_gdf = load_ipc_polygons(GEOJSON_PATH)
+    polygons_gdf = load_ipc_polygons(geojson_path)
 
     # Step 2: Load predictions
-    predictions_gdf = load_predictions(PREDICTION_DIR, YEARS)
+    predictions_gdf = load_predictions(prediction_dir, args.years)
 
     # Step 3: Join points to polygons
     joined_gdf = join_points_to_polygons(
@@ -667,16 +688,16 @@ def main():
     print("SAVING POINT-LEVEL DATA")
     print(f"{'='*80}")
 
-    for year in YEARS:
+    for year in args.years:
         year_df = point_level_df[point_level_df['year'] == year]
 
         # Save as parquet (efficient)
-        parquet_path = POINT_LEVEL_DIR / f"point_level_{year}.parquet"
+        parquet_path = point_level_dir / f"point_level_{year}.parquet"
         year_df.to_parquet(parquet_path, index=False)
         print(f"Saved: {parquet_path} ({len(year_df):,} records)")
 
         # Save as CSV (for compatibility) - drop geometry column
-        csv_path = POINT_LEVEL_DIR / f"point_level_{year}.csv"
+        csv_path = point_level_dir / f"point_level_{year}.csv"
         year_df_csv = year_df.drop(columns=['geometry']) if 'geometry' in year_df.columns else year_df
         year_df_csv.to_csv(csv_path, index=False)
         print(f"Saved: {csv_path}")
@@ -689,15 +710,15 @@ def main():
     print("SAVING POLYGON-LEVEL SUMMARIES")
     print(f"{'='*80}")
 
-    for year in YEARS:
+    for year in args.years:
         year_summary = polygon_summary[polygon_summary['year'] == year]
 
-        csv_path = POLYGON_LEVEL_DIR / f"polygon_summary_{year}.csv"
+        csv_path = polygon_level_dir / f"polygon_summary_{year}.csv"
         year_summary.to_csv(csv_path, index=False)
         print(f"Saved: {csv_path} ({len(year_summary):,} polygons)")
 
     # Save combined summary
-    combined_path = POLYGON_LEVEL_DIR / "polygon_summary_all_years.csv"
+    combined_path = polygon_level_dir / "polygon_summary_all_years.csv"
     polygon_summary.to_csv(combined_path, index=False)
     print(f"Saved: {combined_path}")
 
@@ -707,11 +728,11 @@ def main():
     print(f"{'='*80}")
 
     # PNG version
-    figure_path_png = FIGURES_DIR / "error_rate_maps_2022_2024.png"
+    figure_path_png = figures_dir / "error_rate_maps_2022_2024.png"
     plot_error_maps(
         polygons_gdf,
         polygon_summary,
-        years=YEARS,
+        years=args.years,
         output_path=figure_path_png,
         cmap=COLORMAP,
         figsize=FIGURE_SIZE,
@@ -719,11 +740,11 @@ def main():
     )
 
     # PDF version
-    figure_path_pdf = FIGURES_DIR / "error_rate_maps_2022_2024.pdf"
+    figure_path_pdf = figures_dir / "error_rate_maps_2022_2024.pdf"
     plot_error_maps(
         polygons_gdf,
         polygon_summary,
-        years=YEARS,
+        years=args.years,
         output_path=figure_path_pdf,
         cmap=COLORMAP,
         figsize=FIGURE_SIZE,
@@ -736,11 +757,11 @@ def main():
     print("#" + " "*30 + "ANALYSIS COMPLETE" + " "*31 + "#")
     print("#" + " "*78 + "#")
     print(f"{'#'*80}")
-    print(f"\nAll outputs saved to: {OUTPUT_DIR}")
+    print(f"\nAll outputs saved to: {output_dir}")
     print(f"\nOutput files:")
-    print(f"  Point-level data:    {POINT_LEVEL_DIR}")
-    print(f"  Polygon summaries:   {POLYGON_LEVEL_DIR}")
-    print(f"  Visualizations:      {FIGURES_DIR}")
+    print(f"  Point-level data:    {point_level_dir}")
+    print(f"  Polygon summaries:   {polygon_level_dir}")
+    print(f"  Visualizations:      {figures_dir}")
 
 
 if __name__ == "__main__":

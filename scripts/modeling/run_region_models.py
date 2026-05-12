@@ -13,13 +13,16 @@ import sys
 from pathlib import Path
 from typing import Dict, Tuple, List, Any
 
+PROJECT_ROOT = next(path for path in Path(__file__).resolve().parents if (path / "src").exists())
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import confusion_matrix, accuracy_score, r2_score
 
-# Import functions from food_crisis_functions.py
-from food_crisis_functions import convert_prob_to_phase, all_metrics
+from ipcch.food_crisis_functions import convert_prob_to_phase, all_metrics
+from ipcch.paths import CONFIG_DIR, external_path
 
 
 # ============================================================================
@@ -807,13 +810,12 @@ def main():
                        help='Years to process (default: 2022 2023 2024)')
     parser.add_argument('--seed', type=int, default=42,
                        help='Random seed (default: 42)')
-    parser.add_argument('--hyperparams', default='forecasting_hyperparameters.json',
+    parser.add_argument('--hyperparams', default=str(CONFIG_DIR / 'forecasting_hyperparameters.json'),
                        help='Path to hyperparameters JSON (phases 2,4,5)')
-    parser.add_argument('--hyperparams-p3', default='forecasting_hyperparameters_p3.json',
+    parser.add_argument('--hyperparams-p3', default=str(CONFIG_DIR / 'forecasting_hyperparameters_p3.json'),
                        help='Path to hyperparameters JSON (phase 3)')
-    parser.add_argument('--lat-lon-file',
-                       default=r'C:\Users\swl00\IFPRI Dropbox\Weilun Shi\Google fund\Analysis\1.Source Data\IPCCH_2017_2025_final_v12102025_with_zscores.csv',
-                       help='Path to file with lat/lon coordinates (default: IPCCH_2017_2025_final_v12102025_with_zscores.csv)')
+    parser.add_argument('--lat-lon-file', default=str(external_path('ipcch_reference_dataset')),
+                       help='Path to file with lat/lon coordinates')
 
     args = parser.parse_args()
 

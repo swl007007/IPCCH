@@ -32,6 +32,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Local machine-specific config
+configs/paths.local.json
+
 # IDE
 .vscode/
 .idea/
@@ -48,17 +51,15 @@ Thumbs.db
 *.xlsx
 *.docx
 
-# Large data files - use parquet versions instead of CSV where available
-error_rate_map/point_level/*.csv
-forecasting_prediction/*.csv
-cleanlab_experiment/cleanlab_results_*.csv
-cleanlab_experiment/cleanlab_label_quality_report.pdf
+# Generated predictions and large data outputs
+results/predictions/
+results/maps/error_rate/point_level/*.csv
+results/experiments/cleanlab/cleanlab_results_*.csv
 
-# Large images and outputs
-error_rate_map/figures/*.pdf
-main_results/*.png
-region_vs_global_model_comparison/**/*.png
-feature_importance/*.jpg
+# Generated images and reports
+results/main/*.png
+results/experiments/region_vs_global_model_comparison/**/*.png
+reports/figures/
+reports/cleanlab/cleanlab_label_quality_report.pdf
 
 CLAUDE.md
-nowcasting_prediction/*.csv
