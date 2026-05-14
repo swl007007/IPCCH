@@ -35,7 +35,8 @@
       "Bash(PYTHONPATH=src python3 *)",
       "Bash(/home/swl007007/.venvs/ipcch-geo/bin/python *)",
       "Bash(mv cleanlab_experiment/*.csv results/experiments/cleanlab/)",
-      "Bash(mv cleanlab_experiment/*.pdf reports/cleanlab/)"
+      "Bash(mv cleanlab_experiment/*.pdf reports/cleanlab/)",
+      "Bash(bash .specify/extensions/git/scripts/bash/initialize-repo.sh)"
     ]
   }
 }
