@@ -16,6 +16,8 @@ DEFAULT_EXTERNAL_PATHS = {
     "nowcasting_dataset": SOURCE_DATA_DIR / "nowcasting_subset_IPCCH_v0318_no_lat_lon.csv",
     "ipcch_reference_dataset": SOURCE_DATA_DIR / "IPCCH_2017_2025_final_v12102025_with_zscores.csv",
     "ipc_ch_geojson": SOURCE_DATA_DIR / "Outcome" / "gdf_ipc_ch_final.geojson",
+    "deep_features_forecasting_dataset": SOURCE_DATA_DIR / "assembled_IPCCH" / "forecasting_subset_IPCCH_2026_target_corrected_deep_features_forecasting_ready.csv",
+    "ipcch_2026_completed_dataset": SOURCE_DATA_DIR / "assembled_IPCCH" / "IPCCH_2026_completed.csv",
 }
 
 

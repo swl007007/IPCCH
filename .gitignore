@@ -53,6 +53,7 @@ Thumbs.db
 
 # Generated predictions and large data outputs
 results/predictions/
+results/experiments/deep_feature_weight_decay_forecasting/predictions/
 results/maps/error_rate/point_level/*.csv
 results/experiments/cleanlab/cleanlab_results_*.csv
 

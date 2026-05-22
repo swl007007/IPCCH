@@ -36,7 +36,18 @@
       "Bash(/home/swl007007/.venvs/ipcch-geo/bin/python *)",
       "Bash(mv cleanlab_experiment/*.csv results/experiments/cleanlab/)",
       "Bash(mv cleanlab_experiment/*.pdf reports/cleanlab/)",
-      "Bash(bash .specify/extensions/git/scripts/bash/initialize-repo.sh)"
+      "Bash(bash .specify/extensions/git/scripts/bash/initialize-repo.sh)",
+      "Bash(.specify/extensions/git/scripts/bash/create-new-feature.sh *)",
+      "Bash(mkdir -p \"specs/001-deep-feature-weight-decay/checklists\")",
+      "Bash(cp \".specify/templates/spec-template.md\" \"specs/001-deep-feature-weight-decay/spec.md\")",
+      "Bash(grep -R '\\\\[NEEDS CLARIFICATION\\\\]\\\\|\\\\[NEEDS CLARIFICATION:\\\\|\\\\[.*\\\\]\\\\|ACTION REQUIRED\\\\|$ARGUMENTS' specs/001-deep-feature-weight-decay/spec.md specs/001-deep-feature-weight-decay/checklists/requirements.md)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh *)",
+      "Bash(grep -n 'NEEDS CLARIFICATION\\\\|undefined or zero\\\\|fixed-window\\\\|no implicit scientific default\\\\|ACTION REQUIRED\\\\|$ARGUMENTS' specs/001-deep-feature-weight-decay/spec.md)",
+      "Bash(.specify/scripts/bash/setup-plan.sh *)",
+      "mcp__plugin_claude-mem_mcp-search__smart_unfold",
+      "Bash(grep -R -n 'NEEDS CLARIFICATION\\\\|ACTION REQUIRED\\\\|\\\\[FEATURE\\\\]\\\\|\\\\[###\\\\|\\\\[REMOVE IF UNUSED\\\\]\\\\|$ARGUMENTS' specs/001-deep-feature-weight-decay)",
+      "Bash(.specify/scripts/bash/setup-tasks.sh *)",
+      "Bash(.specify/extensions/git/scripts/bash/initialize-repo.sh *)"
     ]
   }
 }
