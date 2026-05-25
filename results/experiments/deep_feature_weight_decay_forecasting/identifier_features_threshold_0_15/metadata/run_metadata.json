@@ -1,0 +1,130 @@
+{
+  "run_timestamp": "2026-05-22T05:03:04.089747+00:00",
+  "dataset_source": {
+    "key": "deep_features_forecasting_dataset",
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/forecasting_subset_IPCCH_2026_target_corrected_deep_features_forecasting_ready.csv"
+  },
+  "somalia_lookup_source": {
+    "key": "ipcch_2026_completed_dataset",
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/IPCCH_2026_completed.csv"
+  },
+  "somalia_area_id_count": 905,
+  "split_rule": "all-prior-history annual holdout: train date < January 1 of test year; test rows in test calendar year",
+  "test_years": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "target_columns": [
+    "phase2_worse",
+    "phase3_worse",
+    "phase4_worse",
+    "phase5_worse"
+  ],
+  "feature_count": 403,
+  "feature_columns_hash_or_sample": {
+    "sha256": "28ca7300ad6afd37dae6bef747bbae4f71d1095edf37c575c12dd36eb8c5236e",
+    "sample": [
+      "AEZ_32000",
+      "AEZ_34000",
+      "AEZ_36000",
+      "AEZ_38000",
+      "AEZ_42000",
+      "AEZ_7000",
+      "crop",
+      "elevation",
+      "market_access",
+      "popdensity",
+      "range",
+      "ruggedness",
+      "slope",
+      "AEZ_10000",
+      "AEZ_12000",
+      "AEZ_17000",
+      "AEZ_19000",
+      "AEZ_20000",
+      "AEZ_25000",
+      "AEZ_28000"
+    ]
+  },
+  "decay_formulation": "weight = 0.5 ** (distance_months / half_life_months)",
+  "half_life_months": 24.0,
+  "phase_threshold": 0.15,
+  "identifier_feature_source": {
+    "key": "ipcch_2026_completed_dataset",
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/IPCCH_2026_completed.csv"
+  },
+  "identifier_feature_columns": [
+    "lat",
+    "lon",
+    "month_1",
+    "month_2",
+    "month_3",
+    "month_4",
+    "month_5",
+    "month_6",
+    "month_7",
+    "month_8",
+    "month_9",
+    "month_10",
+    "month_11",
+    "month_12",
+    "year_2014",
+    "year_2015",
+    "year_2016",
+    "year_2017",
+    "year_2018",
+    "year_2019",
+    "year_2020",
+    "year_2021",
+    "year_2022",
+    "year_2023",
+    "year_2024",
+    "year_2025",
+    "year_2026"
+  ],
+  "weight_diagnostics": [
+    {
+      "test_year": 2022,
+      "weight_min": 0.0625,
+      "weight_max": 0.9715319411536059,
+      "min_distance_months": 1,
+      "max_distance_months": 96,
+      "newer_rows_have_larger_weights": true
+    },
+    {
+      "test_year": 2023,
+      "weight_min": 0.04419417382415922,
+      "weight_max": 0.9715319411536059,
+      "min_distance_months": 1,
+      "max_distance_months": 108,
+      "newer_rows_have_larger_weights": true
+    },
+    {
+      "test_year": 2024,
+      "weight_min": 0.03125,
+      "weight_max": 0.9715319411536059,
+      "min_distance_months": 1,
+      "max_distance_months": 120,
+      "newer_rows_have_larger_weights": true
+    },
+    {
+      "test_year": 2025,
+      "weight_min": 0.02209708691207961,
+      "weight_max": 0.9715319411536059,
+      "min_distance_months": 1,
+      "max_distance_months": 132,
+      "newer_rows_have_larger_weights": true
+    }
+  ],
+  "output_locations": {
+    "base_dir": "results/experiments/deep_feature_weight_decay_forecasting/identifier_features_threshold_0_15",
+    "predictions": "results/experiments/deep_feature_weight_decay_forecasting/identifier_features_threshold_0_15/predictions",
+    "metrics": "results/experiments/deep_feature_weight_decay_forecasting/identifier_features_threshold_0_15/metrics",
+    "metadata": "results/experiments/deep_feature_weight_decay_forecasting/identifier_features_threshold_0_15/metadata",
+    "report_dir": "reports/deep_feature_weight_decay_forecasting/identifier_features_threshold_0_15"
+  },
+  "dry_run": false,
+  "notebook_modified": false
+}

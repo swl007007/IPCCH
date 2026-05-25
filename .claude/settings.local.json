@@ -47,7 +47,10 @@
       "mcp__plugin_claude-mem_mcp-search__smart_unfold",
       "Bash(grep -R -n 'NEEDS CLARIFICATION\\\\|ACTION REQUIRED\\\\|\\\\[FEATURE\\\\]\\\\|\\\\[###\\\\|\\\\[REMOVE IF UNUSED\\\\]\\\\|$ARGUMENTS' specs/001-deep-feature-weight-decay)",
       "Bash(.specify/scripts/bash/setup-tasks.sh *)",
-      "Bash(.specify/extensions/git/scripts/bash/initialize-repo.sh *)"
+      "Bash(.specify/extensions/git/scripts/bash/initialize-repo.sh *)",
+      "Bash(python *)",
+      "Bash(PYTHONPATH=src ~/.venvs/ipcch-xgb/bin/python *)",
+      "Bash(~/.venvs/ipcch-xgb/bin/python *)"
     ]
   }
 }

@@ -1,0 +1,5 @@
+scope,test_year,n_samples,accuracy,accuracy_status,accuracy_reason,precision_phase3plus,precision_status,precision_reason,sensitivity_phase3plus,sensitivity_status,sensitivity_reason,r2_phase3plus,r2_status,r2_reason,f2_phase3plus,f2_status,f2_reason
+somalia,2022,1129,0.5473870682019486,ok,,0.757380073800738,ok,,0.980884109916368,ok,,-0.815183158200494,ok,,0.9262184115523466,ok,
+somalia,2023,1217,0.45932621199671325,ok,,0.610517666392769,ok,,1.0,ok,,0.13243702533944368,ok,,0.8868465027452853,ok,
+somalia,2024,711,0.3909985935302391,ok,,0.44647887323943664,ok,,1.0,ok,,-0.012655688169264101,ok,,0.8013144590495449,ok,
+somalia,2025,1876,0.48560767590618337,ok,,0.5367803837953091,ok,,1.0,ok,,0.06204097686062737,ok,,0.8528116531165312,ok,

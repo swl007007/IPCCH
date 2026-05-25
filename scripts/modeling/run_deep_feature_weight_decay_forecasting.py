@@ -17,11 +17,13 @@ from ipcch.forecasting_weight_decay import (
     DECAY_FORMULATION,
     DEFAULT_DATASET_KEY,
     DEFAULT_HALF_LIFE_MONTHS,
+    DEFAULT_PHASE_THRESHOLD,
     DEFAULT_SOMALIA_LOOKUP_KEY,
     DEFAULT_TEST_YEARS,
     METRIC_NAMES,
     SPLIT_RULE,
     TARGET_COLUMNS,
+    add_identifier_features,
     annual_splits,
     check_existing_outputs,
     compute_metrics,
@@ -38,6 +40,7 @@ from ipcch.forecasting_weight_decay import (
     time_decay_weights,
     unavailable_metrics,
     validate_half_life,
+    validate_phase_threshold,
     validate_test_years,
     weight_diagnostics,
     write_json,
@@ -55,6 +58,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out-dir", help="Machine-readable output directory.")
     parser.add_argument("--report-dir", help="Human-readable report directory.")
     parser.add_argument("--half-life-months", type=float, default=DEFAULT_HALF_LIFE_MONTHS, help="Exponential decay half-life in months.")
+    parser.add_argument("--phase-threshold", type=float, default=DEFAULT_PHASE_THRESHOLD, help="Cumulative phase prediction threshold for phase conversion.")
+    parser.add_argument("--add-identifier-features", action="store_true", help="Merge lat/lon from the identifier source and add year/month dummy features.")
+    parser.add_argument("--identifier-source", help="Path to IPCCH completed source with admin_code, year, month, lat, and lon.")
+    parser.add_argument("--identifier-source-key", default=DEFAULT_SOMALIA_LOOKUP_KEY, help="ipcch.paths external key for the identifier source.")
     parser.add_argument("--test-years", type=int, nargs="+", default=list(DEFAULT_TEST_YEARS), help="Required annual holdout years.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for XGBoost fitting.")
     parser.add_argument("--dry-run", action="store_true", help="Validate inputs and split plan without fitting models.")
@@ -93,7 +100,7 @@ def fit_model(X_train: pd.DataFrame, y_train: pd.Series, sample_weight: pd.Serie
     return model
 
 
-def convert_phase_predictions(phase_predictions: Mapping[str, pd.Series], phase_truth: Mapping[str, pd.Series]) -> pd.DataFrame:
+def convert_phase_predictions(phase_predictions: Mapping[str, pd.Series], phase_truth: Mapping[str, pd.Series], phase_threshold: float) -> pd.DataFrame:
     converted = pd.DataFrame(index=phase_truth["phase2_worse"].index)
     target_to_phase = {
         "phase2_worse": 2,
@@ -110,8 +117,8 @@ def convert_phase_predictions(phase_predictions: Mapping[str, pd.Series], phase_
     converted["overall_phase"] = 1
     converted["overall_phase_pred"] = 1
     for phase in (5, 4, 3, 2):
-        test_mask = (converted["overall_phase"] == 1) & (converted[f"phase{phase}_test"] >= 0.2)
-        pred_mask = (converted["overall_phase_pred"] == 1) & (converted[f"phase{phase}_pred"] >= 0.2)
+        test_mask = (converted["overall_phase"] == 1) & (converted[f"phase{phase}_test"] >= phase_threshold)
+        pred_mask = (converted["overall_phase_pred"] == 1) & (converted[f"phase{phase}_pred"] >= phase_threshold)
         converted.loc[test_mask, "overall_phase"] = phase
         converted.loc[pred_mask, "overall_phase_pred"] = phase
     converted["test_index"] = converted.index
@@ -127,6 +134,7 @@ def run_holdout(
     hyperparams: Mapping[str, object],
     hyperparams_p3: Mapping[str, object],
     seed: int,
+    phase_threshold: float,
 ) -> pd.DataFrame:
     if train_df.empty:
         raise ValueError(f"No eligible training rows for {test_year}")
@@ -151,7 +159,7 @@ def run_holdout(
         phase_predictions[target_column] = pd.Series(model.predict(X_test), index=X_test.index)
         phase_truth[target_column] = y_test
 
-    converted = convert_phase_predictions(phase_predictions, phase_truth)
+    converted = convert_phase_predictions(phase_predictions, phase_truth, phase_threshold)
     if "test_index" in converted.columns:
         converted = converted.set_index("test_index", drop=True)
         converted.index = converted.index.astype(int)
@@ -234,6 +242,15 @@ def write_report(metrics_overall: Optional[pd.DataFrame], metrics_somalia: Optio
         f"Formula: `{metadata['decay_formulation']}`",
         f"Half-life months: `{metadata['half_life_months']}`",
         "",
+        "## Phase conversion",
+        "",
+        f"Cumulative phase threshold: `{metadata['phase_threshold']}`",
+        "",
+        "## Identifier feature option",
+        "",
+        f"Identifier source: `{metadata['identifier_feature_source']}`",
+        f"Identifier feature columns: `{metadata['identifier_feature_columns']}`",
+        "",
         "## Split rule",
         "",
         f"{metadata['split_rule']}",
@@ -277,6 +294,10 @@ def build_metadata(
     feature_columns: Sequence[str],
     output_plan,
     half_life_months: float,
+    phase_threshold: float,
+    add_identifier_feature_columns: Sequence[str],
+    identifier_source: Optional[Path],
+    identifier_source_key: str,
     dry_run: bool,
     somalia_area_id_count: int,
     weight_diagnostics_rows: Sequence[Mapping[str, object]],
@@ -293,6 +314,9 @@ def build_metadata(
         "feature_columns_hash_or_sample": feature_hash_or_sample(feature_columns),
         "decay_formulation": DECAY_FORMULATION,
         "half_life_months": float(half_life_months),
+        "phase_threshold": float(phase_threshold),
+        "identifier_feature_source": {"key": identifier_source_key, "path": str(identifier_source)} if identifier_source else None,
+        "identifier_feature_columns": list(add_identifier_feature_columns),
         "weight_diagnostics": list(weight_diagnostics_rows),
         "output_locations": {
             "base_dir": str(output_plan.base_dir),
@@ -336,15 +360,22 @@ def print_dry_run_summary(
 
 def run(args: argparse.Namespace) -> int:
     validate_half_life(args.half_life_months)
+    validate_phase_threshold(args.phase_threshold)
     test_years = validate_test_years(args.test_years)
     dataset_path = resolve_input_path(args.dataset, args.dataset_key)
     somalia_lookup_path = resolve_input_path(args.somalia_lookup, args.somalia_lookup_key)
+    identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
     output_plan = plan_outputs(args.out_dir, args.report_dir, test_years)
     check_existing_outputs(output_plan, args.overwrite, args.dry_run)
     ensure_output_dirs(output_plan)
 
     raw_df = load_dataset(dataset_path, args.sample_rows)
     df = prepare_forecasting_dataset(raw_df)
+    identifier_feature_columns: List[str] = []
+    if args.add_identifier_features:
+        identifier_lookup_df = pd.read_csv(identifier_source_path)
+        df = add_identifier_features(df, identifier_lookup_df)
+        identifier_feature_columns = [column for column in df.columns if column in {"lat", "lon"} or column.startswith("month_") or column.startswith("year_")]
     feature_columns = select_numeric_feature_columns(df)
     splits = annual_splits(df, test_years)
     diagnostics = split_diagnostics(splits)
@@ -386,6 +417,7 @@ def run(args: argparse.Namespace) -> int:
                 hyperparams,
                 hyperparams_p3,
                 args.seed,
+                args.phase_threshold,
             )
             predictions.to_csv(output_plan.prediction_paths[year], index=False)
             predictions_by_year[year] = predictions
@@ -402,6 +434,10 @@ def run(args: argparse.Namespace) -> int:
         feature_columns,
         output_plan,
         args.half_life_months,
+        args.phase_threshold,
+        identifier_feature_columns,
+        identifier_source_path,
+        args.identifier_source_key,
         args.dry_run,
         len(somalia_area_ids),
         weight_rows,

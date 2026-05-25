@@ -1,0 +1,31 @@
+{
+  "test_year": 2022,
+  "scope": "overall",
+  "n_samples": 5599,
+  "status": "completed",
+  "accuracy": {
+    "value": 0.5406322557599571,
+    "status": "ok",
+    "reason": null
+  },
+  "precision_phase3plus": {
+    "value": 0.7047387606318347,
+    "status": "ok",
+    "reason": null
+  },
+  "sensitivity_phase3plus": {
+    "value": 0.8650260999254288,
+    "status": "ok",
+    "reason": null
+  },
+  "f2_phase3plus": {
+    "value": 0.8273894436519258,
+    "status": "ok",
+    "reason": null
+  },
+  "r2_phase3plus": {
+    "value": 0.34351722594703127,
+    "status": "ok",
+    "reason": null
+  }
+}

@@ -16,6 +16,7 @@ from ipcch import paths
 
 DEFAULT_TEST_YEARS = (2022, 2023, 2024, 2025)
 DEFAULT_HALF_LIFE_MONTHS = 24.0
+DEFAULT_PHASE_THRESHOLD = 0.2
 PERCENT_TARGET_COLUMNS = (
     "phase1_percent",
     "phase2_percent",
@@ -115,6 +116,47 @@ def prepare_forecasting_dataset(df: pd.DataFrame) -> pd.DataFrame:
     result["overall_phase"] = pd.to_numeric(result["overall_phase"], errors="coerce")
     result = result.sort_values(["area_id", "date"]).reset_index(drop=True)
     return result
+
+
+def add_identifier_features(df: pd.DataFrame, lookup_df: pd.DataFrame) -> pd.DataFrame:
+    required_lookup = {"admin_code", "year", "month", "lat", "lon"}
+    missing = sorted(required_lookup - set(lookup_df.columns))
+    if missing:
+        raise ValueError("Identifier source is missing required columns: " + ", ".join(missing))
+
+    result = df.copy()
+    result["_merge_area_id"] = result["area_id"].astype(str)
+    result["_merge_year"] = pd.to_numeric(result["year"], errors="raise").astype(int)
+    result["_merge_month"] = pd.to_numeric(result["month"], errors="raise").astype(int)
+
+    lookup = lookup_df[["admin_code", "year", "month", "lat", "lon"]].copy()
+    lookup["_merge_area_id"] = lookup["admin_code"].astype(str)
+    lookup["_merge_year"] = pd.to_numeric(lookup["year"], errors="raise").astype(int)
+    lookup["_merge_month"] = pd.to_numeric(lookup["month"], errors="raise").astype(int)
+    lookup["lat"] = pd.to_numeric(lookup["lat"], errors="coerce")
+    lookup["lon"] = pd.to_numeric(lookup["lon"], errors="coerce")
+    lookup = lookup.dropna(subset=["lat", "lon"])
+    lookup = lookup.drop_duplicates(["_merge_area_id", "_merge_year", "_merge_month"])
+
+    result = result.merge(
+        lookup[["_merge_area_id", "_merge_year", "_merge_month", "lat", "lon"]],
+        on=["_merge_area_id", "_merge_year", "_merge_month"],
+        how="left",
+        validate="many_to_one",
+    )
+    if result[["lat", "lon"]].isna().any().any():
+        missing_count = int(result[["lat", "lon"]].isna().any(axis=1).sum())
+        raise ValueError(f"Identifier merge produced missing lat/lon for {missing_count} rows")
+
+    month_dummies = pd.get_dummies(result["_merge_month"], prefix="month", dtype=bool)
+    year_dummies = pd.get_dummies(result["_merge_year"], prefix="year", dtype=bool)
+    result = pd.concat([result, month_dummies, year_dummies], axis=1)
+    return result.drop(columns=["_merge_area_id", "_merge_year", "_merge_month"])
+
+
+def validate_phase_threshold(phase_threshold: float) -> None:
+    if not math.isfinite(float(phase_threshold)) or not 0 < float(phase_threshold) < 1:
+        raise ValueError("phase threshold must be finite and between 0 and 1")
 
 
 def select_numeric_feature_columns(df: pd.DataFrame) -> List[str]:
