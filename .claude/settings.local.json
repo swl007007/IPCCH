@@ -50,7 +50,10 @@
       "Bash(.specify/extensions/git/scripts/bash/initialize-repo.sh *)",
       "Bash(python *)",
       "Bash(PYTHONPATH=src ~/.venvs/ipcch-xgb/bin/python *)",
-      "Bash(~/.venvs/ipcch-xgb/bin/python *)"
+      "Bash(~/.venvs/ipcch-xgb/bin/python *)",
+      "Bash(/home/swl007007/.venvs/ipcch-xgb/bin/python *)",
+      "Bash(PYTHONPATH=src /home/swl007007/.venvs/ipcch-xgb/bin/python *)",
+      "WebSearch"
     ]
   }
 }

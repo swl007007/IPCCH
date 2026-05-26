@@ -182,7 +182,7 @@ def select_numeric_feature_columns(df: pd.DataFrame) -> List[str]:
         r"region",
         r"iso",
         r"pcode",
-        r"overall_phase",
+        r"^overall_phase($|_pred$|_test$)",
         r"(^|_)target($|_)",
         r"(^|_)label($|_)",
         r"(^|_)pred($|_)",
