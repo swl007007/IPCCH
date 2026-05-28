@@ -438,7 +438,7 @@ def _add_latam_inset(parent_ax: Any, latam_gdf: Any, column: str, listed_cmap: A
     for spine in inset.spines.values():
         spine.set_edgecolor("0.35")
         spine.set_linewidth(0.9)
-    inset.set_title("Latin America (FEWSNET)", fontsize=7, pad=1.5)
+    inset.set_title("Latin America", fontsize=7, pad=1.5)
     inset.patch.set_facecolor("white")
     inset.patch.set_alpha(0.92)
 
