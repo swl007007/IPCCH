@@ -53,7 +53,15 @@
       "Bash(~/.venvs/ipcch-xgb/bin/python *)",
       "Bash(/home/swl007007/.venvs/ipcch-xgb/bin/python *)",
       "Bash(PYTHONPATH=src /home/swl007007/.venvs/ipcch-xgb/bin/python *)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(PYTHONPATH=src python *)",
+      "Bash(mkdir -p \"specs/002-2025-alert-risk-maps/checklists\")",
+      "Bash(cp \".specify/templates/spec-template.md\" \"specs/002-2025-alert-risk-maps/spec.md\")",
+      "Bash(grep -E 'predictions_2024_feb_jun_oct|\\\\.py$|\\\\.ipynb$')",
+      "Bash(grep -E 'alert|risk|map|\\\\.py$|\\\\.ipynb$')",
+      "Bash(PYTHONPATH=src pytest *)",
+      "Bash(mkdir -p \"specs/003-canonical-forecast-diagnostics/checklists\")",
+      "Bash(cp \".specify/templates/spec-template.md\" \"specs/003-canonical-forecast-diagnostics/spec.md\")"
     ]
   }
 }

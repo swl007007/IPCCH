@@ -1,5 +1,5 @@
-scope,test_year,n_samples,accuracy,precision_phase3plus,sensitivity_phase3plus,r2_phase3plus,f2_phase3plus,f2_status,f2_reason
-somalia,2022,1129,0.517271922,0.784026997,0.832735962,-0.815183158,0.822515931,ok,
-somalia,2023,1217,0.520131471,0.629787234,0.995962315,0.132437025,0.892211237,ok,
-somalia,2024,711,0.403656821,0.447443182,0.993690852,-0.012655688,0.798681542,ok,
-somalia,2025,1876,0.489872068,0.536780384,1,0.062040977,0.852811653,ok,
+scope,test_year,n_samples,accuracy,accuracy_status,accuracy_reason,precision_phase3plus,precision_status,precision_reason,sensitivity_phase3plus,sensitivity_status,sensitivity_reason,r2_phase3plus,r2_status,r2_reason,f2_phase3plus,f2_status,f2_reason,precision_phase4plus,precision_phase4plus_status,precision_phase4plus_reason,sensitivity_phase4plus,sensitivity_phase4plus_status,sensitivity_phase4plus_reason,r2_phase4plus,r2_phase4plus_status,r2_phase4plus_reason
+somalia,2022,1129,0.5172719220549159,ok,,0.7840269966254219,ok,,0.8327359617682198,ok,,-0.815183158200494,ok,,0.8225159310833138,ok,,,unavailable,zero predicted phase4plus denominator,0.0,ok,,-0.4613287524187972,ok,
+somalia,2023,1217,0.5201314708299096,ok,,0.6297872340425532,ok,,0.9959623149394348,ok,,0.1324370253394436,ok,,0.8922112370388232,ok,,0.2564102564102564,ok,,0.09174311926605505,ok,,0.08032500738989057,ok,
+somalia,2024,711,0.4036568213783403,ok,,0.4474431818181818,ok,,0.9936908517350158,ok,,-0.0126556881692641,ok,,0.7986815415821501,ok,,0.6666666666666666,ok,,0.0625,ok,,0.06469262796963016,ok,
+somalia,2025,1876,0.4898720682302772,ok,,0.5367803837953091,ok,,1.0,ok,,0.0620409768606273,ok,,0.8528116531165312,ok,,,unavailable,zero predicted phase4plus denominator,0.0,ok,,-0.14067777829626404,ok,

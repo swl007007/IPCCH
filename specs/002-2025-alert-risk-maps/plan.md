@@ -1,0 +1,98 @@
+# Implementation Plan: 2025 Alert Risk Maps
+
+**Branch**: `002-2025-alert-risk-maps` | **Date**: 2026-05-27 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/002-2025-alert-risk-maps/spec.md`
+
+## Summary
+
+Build a reproducible post-processing and visualization workflow for 2025 IPCCH prediction outputs. The implementation will add reusable plotting/data-preparation logic under `src/ipcch/`, expose a repository-root runnable reporting script under `scripts/reporting/`, read existing 0m/3m/6m prediction CSVs and external spatial boundaries, validate one-row-per-`area_id` filtering and 100% spatial joins, and write final figures under `reports/` plus optional validation summaries under `results/`. Actual-vs-predicted and top-risk map panels use consistent green/red binary encoding, global maps preserve Latin America areas through per-panel thumbnails, and top-risk figures use actual-over-predicted subplots. No model training, threshold tuning, label recalibration, or source prediction mutation is included.
+
+## Technical Context
+
+**Language/Version**: Python >=3.9 (project package requirement; current working environment uses Python 3.12)  
+**Primary Dependencies**: pandas, geopandas, matplotlib, optional contextily for basemap tiles, `ipcch.paths` for path defaults  
+**Storage**: File-based CSV/shapefile inputs; PNG/PDF-style figures under `reports/`; optional CSV/JSON validation summaries under `results/`  
+**Testing**: Lightweight import checks, CLI `--help`, static checks, and tiny smoke tests using synthetic CSV/spatial inputs  
+**Target Platform**: Repository-root command-line execution on WSL/Linux-compatible Python environment, with path inputs usable across WSL/Windows-mounted paths  
+**Project Type**: Python package plus CLI-style reporting script  
+**Performance Goals**: Complete validation and plotting on existing 2025 prediction and spatial inputs in a single local run without model training; avoid loading model-training datasets  
+**Constraints**: No hardcoded machine-specific absolute paths in reusable code; no raw spatial data copied into repo; no mutation of prediction outputs; fail on ambiguous horizon discovery, incomplete spatial joins, duplicate latest records, and existing output files unless overwrite is enabled; global map main panels should avoid being visually distorted by Latin America coverage by rendering Latin America in thumbnails when present  
+**Scale/Scope**: Four final 2025 figures from three horizon prediction datasets, global plus Somalia-only scopes, area-level polygon joins keyed by `area_id`
+
+## Constitution Check
+
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+
+1. **Temporal validation**: PASS. This feature performs visualization/post-processing only and does not fit, tune, scale, select, or evaluate models. It consumes existing 2025 prediction outputs and filters them to latest 2025 row per `area_id`; no test-window data influences training because no training occurs.
+2. **Reusable code**: PASS. Reusable implementation will live in a new `src/ipcch/alert_risk_maps.py` module imported through `ipcch`; the reporting script will be a thin CLI wrapper.
+3. **Path handling**: PASS. Repository paths will use `ipcch.paths`; external spatial and optional explicit prediction file inputs will be exposed through CLI flags or `paths.local.json`-driven defaults. No hardcoded absolute paths in new reusable code.
+4. **Artifact separation**: PASS. Existing predictions remain under `results/experiments/...`; final figures go under `reports/`; optional validation/intermediate summaries go under `results/`; raw external spatial files remain outside the repository.
+5. **Execution discipline**: PASS. Validation is limited to imports, CLI `--help`, static checks, and tiny smoke tests; no heavy training or notebooks.
+6. **Review-gated inputs**: PASS WITH REVIEW NOTE. Planned changes touch `src/ipcch/`, so review is required before merge. No changes planned for `configs/*.json` or `data/reference/`.
+7. **Classifier workflows, if present**: PASS. No classifier workflow is added or modified.
+
+## Project Structure
+
+### Documentation (this feature)
+
+```text
+specs/002-2025-alert-risk-maps/
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+├── contracts/
+│   └── plot-alert-risk-maps-cli.md
+└── tasks.md              # Phase 2 output from /speckit-tasks
+```
+
+### Source Code (repository root)
+
+```text
+src/ipcch/
+├── alert_risk_maps.py        # reusable loading, filtering, validation, join, and plotting logic
+└── paths.py                  # existing path helpers; add external key only if required by implementation review
+
+scripts/reporting/
+└── plot_2025_alert_risk_maps.py  # CLI wrapper for the workflow
+
+tests/
+├── unit/
+│   └── test_alert_risk_maps.py   # pure-data tests for filtering, ranking, validation, and discovery
+└── integration/
+    └── test_plot_2025_alert_risk_maps_cli.py  # tiny smoke tests with synthetic inputs
+
+reports/
+└── deep_feature_weight_decay_forecasting/alert_risk_maps/  # final human-readable figures
+
+results/
+└── experiments/deep_feature_weight_decay_forecasting/alert_risk_maps/  # optional validation summaries only
+```
+
+**Structure Decision**: Use the existing Python package plus reporting-script pattern. Shared logic goes in `src/ipcch/` to satisfy the constitution and remain testable; `scripts/reporting/` provides the runnable entry point. Tests may be introduced because the repository currently lacks a dedicated test tree for this feature.
+
+## Complexity Tracking
+
+No constitution violations require justification.
+
+## Phase 0 Research
+
+Research decisions are documented in [research.md](research.md). All planning unknowns were resolved from the clarified spec, existing repository conventions, and lightweight inspection of current prediction/spatial artifacts.
+
+## Phase 1 Design
+
+Design artifacts produced:
+
+- [data-model.md](data-model.md)
+- [contracts/plot-alert-risk-maps-cli.md](contracts/plot-alert-risk-maps-cli.md)
+- [quickstart.md](quickstart.md)
+
+## Post-Design Constitution Check
+
+1. **Temporal validation**: PASS. Design consumes existing predictions only; latest-2025 filtering is a visualization selection rule, not model training or tuning.
+2. **Reusable code**: PASS. Data preparation and plotting are assigned to `src/ipcch/alert_risk_maps.py`; CLI remains thin.
+3. **Path handling**: PASS. Contract requires CLI flags for prediction root, spatial path, explicit horizon files, output directories, and overwrite; defaults are repository-relative or path-helper derived.
+4. **Artifact separation**: PASS. Contract separates final figures in `reports/` from optional validation summaries in `results/` and does not copy raw spatial data.
+5. **Execution discipline**: PASS. Quickstart validation uses `--help`, import checks, and smoke tests only.
+6. **Review-gated inputs**: PASS WITH REVIEW NOTE. `src/ipcch/alert_risk_maps.py` will require review. If a `configs/paths.example.json` key is added later, that config change also requires review.
+7. **Classifier workflows, if present**: PASS. Not applicable.

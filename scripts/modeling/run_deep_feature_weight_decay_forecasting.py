@@ -16,9 +16,12 @@ from ipcch import paths
 from ipcch.forecasting_weight_decay import (
     DECAY_FORMULATION,
     DEFAULT_DATASET_KEY,
+    DEFAULT_FS,
     DEFAULT_HALF_LIFE_MONTHS,
     DEFAULT_PHASE_THRESHOLD,
     DEFAULT_SOMALIA_LOOKUP_KEY,
+    FS_DATASET_KEYS,
+    FS_LABELS,
     DEFAULT_TEST_YEARS,
     METRIC_NAMES,
     SPLIT_RULE,
@@ -51,8 +54,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run IPCCH deep-feature annual forecasting with exponential time-decay sample weights."
     )
-    parser.add_argument("--dataset", help="Path to corrected deep-feature forecasting-ready CSV.")
-    parser.add_argument("--dataset-key", default=DEFAULT_DATASET_KEY, help="ipcch.paths external key for the dataset.")
+    parser.add_argument("--dataset", help="Path to corrected deep-feature forecasting-ready CSV. Overrides --fs and --dataset-key.")
+    parser.add_argument("--dataset-key", help="ipcch.paths external key for the dataset. Overrides --fs when --dataset is omitted.")
+    parser.add_argument("--fs", choices=sorted(FS_DATASET_KEYS), default=DEFAULT_FS, help="Feature-scope dataset selector: fs0=0m, fs1=3m, fs2=6m, fs3=default forecasting-ready.")
+    parser.add_argument("--region-scope", type=int, choices=(0, 1), default=0, help="0=global IPC+CH rows; 1=Somalia-only rows selected by area_id before modeling.")
     parser.add_argument("--somalia-lookup", help="Path to IPCCH completed source used to derive Somalia area_id values.")
     parser.add_argument("--somalia-lookup-key", default=DEFAULT_SOMALIA_LOOKUP_KEY, help="ipcch.paths external key for Somalia lookup source.")
     parser.add_argument("--out-dir", help="Machine-readable output directory.")
@@ -70,12 +75,62 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_dataset(path: Path, sample_rows: Optional[int]) -> pd.DataFrame:
+def load_dataset(path: Path, sample_rows: Optional[int], area_ids: Optional[Sequence[object]] = None) -> pd.DataFrame:
     if sample_rows is not None and sample_rows <= 0:
         raise ValueError("--sample-rows must be positive when provided")
-    if sample_rows:
-        return pd.read_csv(path, nrows=sample_rows)
-    return pd.read_csv(path)
+    if not area_ids:
+        if sample_rows:
+            return pd.read_csv(path, nrows=sample_rows)
+        return pd.read_csv(path)
+
+    area_id_strings = {str(area_id) for area_id in area_ids}
+    chunks = []
+    rows_remaining = sample_rows
+    for chunk in pd.read_csv(path, chunksize=100_000):
+        if "area_id" not in chunk.columns:
+            raise ValueError("Dataset is missing area_id; cannot apply --region-scope 1")
+        matched = chunk[chunk["area_id"].astype(str).isin(area_id_strings)]
+        if rows_remaining is not None:
+            matched = matched.head(rows_remaining)
+            rows_remaining -= len(matched)
+        if not matched.empty:
+            chunks.append(matched)
+        if rows_remaining == 0:
+            break
+    if not chunks:
+        raise ValueError("Region scope filter produced zero rows")
+    return pd.concat(chunks, ignore_index=True)
+
+
+def resolve_dataset_selection(args: argparse.Namespace) -> Tuple[Path, str]:
+    if args.dataset:
+        key = args.dataset_key or FS_DATASET_KEYS[args.fs]
+        return resolve_input_path(args.dataset, key), key
+    if args.dataset_key:
+        return resolve_input_path(None, args.dataset_key), args.dataset_key
+    key = FS_DATASET_KEYS[args.fs]
+    return resolve_input_path(None, key), key
+
+
+def default_experiment_name(fs: str, region_scope: int, phase_threshold: float, add_identifier_features: bool) -> str:
+    scope = "somalia" if region_scope == 1 else "global"
+    parts = [FS_LABELS[fs], scope]
+    if add_identifier_features:
+        parts.append("identifier_features")
+    parts.append(f"threshold_{phase_threshold:.2f}".replace(".", "_"))
+    return "_".join(parts)
+
+
+def resolve_output_plan(args: argparse.Namespace, test_years: Sequence[int]):
+    out_dir = args.out_dir
+    report_dir = args.report_dir
+    if out_dir is None or report_dir is None:
+        experiment_name = default_experiment_name(args.fs, args.region_scope, args.phase_threshold, args.add_identifier_features)
+        if out_dir is None:
+            out_dir = str(paths.RESULTS_DIR / "experiments" / "deep_feature_weight_decay_forecasting" / experiment_name)
+        if report_dir is None:
+            report_dir = str(paths.REPORTS_DIR / "deep_feature_weight_decay_forecasting" / experiment_name)
+    return plan_outputs(out_dir, report_dir, test_years)
 
 
 def load_hyperparameters() -> Tuple[Dict[str, object], Dict[str, object]]:
@@ -288,6 +343,10 @@ def _format_report_value(value: object) -> str:
 def build_metadata(
     dataset_path: Path,
     dataset_key: str,
+    fs: str,
+    region_scope: int,
+    loaded_rows: int,
+    somalia_filtered: bool,
     somalia_lookup_path: Path,
     somalia_lookup_key: str,
     test_years: Sequence[int],
@@ -304,7 +363,11 @@ def build_metadata(
 ) -> Dict[str, object]:
     return {
         "run_timestamp": datetime.now(timezone.utc).isoformat(),
-        "dataset_source": {"key": dataset_key, "path": str(dataset_path)},
+        "dataset_source": {"key": dataset_key, "path": str(dataset_path), "fs": fs},
+        "region_scope": int(region_scope),
+        "region_scope_name": "somalia" if region_scope == 1 else "global",
+        "loaded_rows": int(loaded_rows),
+        "somalia_filtered_before_modeling": bool(somalia_filtered),
         "somalia_lookup_source": {"key": somalia_lookup_key, "path": str(somalia_lookup_path)},
         "somalia_area_id_count": int(somalia_area_id_count),
         "split_rule": SPLIT_RULE,
@@ -362,14 +425,17 @@ def run(args: argparse.Namespace) -> int:
     validate_half_life(args.half_life_months)
     validate_phase_threshold(args.phase_threshold)
     test_years = validate_test_years(args.test_years)
-    dataset_path = resolve_input_path(args.dataset, args.dataset_key)
+    dataset_path, dataset_key = resolve_dataset_selection(args)
     somalia_lookup_path = resolve_input_path(args.somalia_lookup, args.somalia_lookup_key)
     identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
-    output_plan = plan_outputs(args.out_dir, args.report_dir, test_years)
+    output_plan = resolve_output_plan(args, test_years)
     check_existing_outputs(output_plan, args.overwrite, args.dry_run)
     ensure_output_dirs(output_plan)
 
-    raw_df = load_dataset(dataset_path, args.sample_rows)
+    somalia_lookup_df = pd.read_csv(somalia_lookup_path)
+    somalia_area_ids = extract_somalia_area_ids(somalia_lookup_df)
+    region_area_ids = somalia_area_ids if args.region_scope == 1 else None
+    raw_df = load_dataset(dataset_path, args.sample_rows, region_area_ids)
     df = prepare_forecasting_dataset(raw_df)
     identifier_feature_columns: List[str] = []
     if args.add_identifier_features:
@@ -393,8 +459,6 @@ def run(args: argparse.Namespace) -> int:
     if not all(row["newer_rows_have_larger_weights"] for row in weight_rows):
         raise ValueError("Sample-weight monotonicity check failed")
 
-    somalia_lookup_df = pd.read_csv(somalia_lookup_path)
-    somalia_area_ids = extract_somalia_area_ids(somalia_lookup_df)
     write_split_diagnostics(diagnostics, output_plan)
 
     metrics_overall = None
@@ -427,7 +491,11 @@ def run(args: argparse.Namespace) -> int:
 
     metadata = build_metadata(
         dataset_path,
-        args.dataset_key,
+        dataset_key,
+        args.fs,
+        args.region_scope,
+        len(df),
+        args.region_scope == 1,
         somalia_lookup_path,
         args.somalia_lookup_key,
         test_years,

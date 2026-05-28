@@ -38,7 +38,20 @@ METRIC_NAMES = (
     "r2_phase3plus",
     "f2_phase3plus",
 )
-DEFAULT_DATASET_KEY = "deep_features_forecasting_dataset"
+DEFAULT_FS = "fs3"
+FS_DATASET_KEYS = {
+    "fs0": "deep_features_scope_0m_model_ready_dataset",
+    "fs1": "deep_features_scope_3m_model_ready_dataset",
+    "fs2": "deep_features_scope_6m_model_ready_dataset",
+    "fs3": "deep_features_forecasting_dataset",
+}
+FS_LABELS = {
+    "fs0": "0m",
+    "fs1": "3m",
+    "fs2": "6m",
+    "fs3": "forecasting",
+}
+DEFAULT_DATASET_KEY = FS_DATASET_KEYS[DEFAULT_FS]
 DEFAULT_SOMALIA_LOOKUP_KEY = "ipcch_2026_completed_dataset"
 SPLIT_RULE = "all-prior-history annual holdout: train date < January 1 of test year; test rows in test calendar year"
 DECAY_FORMULATION = "weight = 0.5 ** (distance_months / half_life_months)"

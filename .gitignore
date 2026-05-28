@@ -40,7 +40,9 @@ configs/paths.local.json
 .idea/
 *.swp
 *.swo
+*.tmp
 *~
+.pytest_cache/
 
 # OS
 .DS_Store

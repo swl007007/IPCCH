@@ -27,5 +27,20 @@
     "value": 0.38474278967696796,
     "status": "ok",
     "reason": null
+  },
+  "precision_phase4plus": {
+    "value": 0.26421404682274247,
+    "status": "ok",
+    "reason": null
+  },
+  "sensitivity_phase4plus": {
+    "value": 0.3910891089108911,
+    "status": "ok",
+    "reason": null
+  },
+  "r2_phase4plus": {
+    "value": 0.23838220167235358,
+    "status": "ok",
+    "reason": null
   }
 }
