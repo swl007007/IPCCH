@@ -140,6 +140,10 @@ def default_spatial_path() -> Optional[Path]:
         return candidate
 
 
+def default_country_lookup_path() -> Path:
+    return paths.SOURCE_DATA_DIR / "assembled_IPCCH" / "country_area_id_lookup.csv"
+
+
 def resolve_path(path: Union[str, Path]) -> Path:
     return Path(path).expanduser().resolve()
 
@@ -153,19 +157,19 @@ def ensure_under(path: Path, root: Path, label: str) -> None:
         raise AlertRiskMapError(f"{label} path must resolve under {root_resolved}: {resolved}") from exc
 
 
-def build_output_plan(out_report_dir: Optional[Union[str, Path]], out_results_dir: Optional[Union[str, Path]], figure_format: str) -> OutputPlan:
+def build_output_plan(out_report_dir: Optional[Union[str, Path]], out_results_dir: Optional[Union[str, Path]], figure_format: str, scope: str, filename_suffix: str = "") -> OutputPlan:
     report_dir = resolve_path(out_report_dir or default_report_dir())
     results_dir = resolve_path(out_results_dir or default_results_dir())
     ensure_under(report_dir, paths.REPORTS_DIR, "Report output")
     ensure_under(results_dir, paths.RESULTS_DIR, "Results output")
     fmt = figure_format.lower().lstrip(".")
+    suffix = filename_suffix
+    scope_label = scope.lower()
     figures = {
-        "global_actual_vs_predicted": report_dir / f"ipcch_2025_global_0m-3m-6m_actual_vs_predicted_alert_map.{fmt}",
-        "somalia_actual_vs_predicted": report_dir / f"ipcch_2025_somalia_0m-3m-6m_actual_vs_predicted_alert_map.{fmt}",
-        "global_top_risk": report_dir / f"ipcch_2025_global_0m_top30_phase3_risk_comparison_map.{fmt}",
-        "somalia_top_risk": report_dir / f"ipcch_2025_somalia_0m_top30_phase3_risk_comparison_map.{fmt}",
+        "actual_vs_predicted": report_dir / f"ipcch_2025_{scope_label}_0m-3m-6m_actual_vs_predicted_alert_map{suffix}.{fmt}",
+        "top_risk": report_dir / f"ipcch_2025_{scope_label}_0m_top30_phase3_risk_comparison_map{suffix}.{fmt}",
     }
-    validation_summary = results_dir / "ipcch_2025_alert_risk_maps_validation_summary.json"
+    validation_summary = results_dir / f"ipcch_2025_{scope_label}_alert_risk_maps_validation_summary.json"
     return OutputPlan(report_dir, results_dir, fmt, figures, validation_summary)
 
 
@@ -204,33 +208,21 @@ def _matches_horizon(path: Path, horizon: str) -> bool:
 def discover_prediction_file(root: Union[str, Path], horizon: str, scope: str, explicit_file: Optional[Union[str, Path]] = None) -> PredictionSelection:
     if horizon not in HORIZONS:
         raise AlertRiskMapError(f"Unsupported horizon {horizon}; expected one of {HORIZONS}")
-    if scope not in SCOPES:
-        raise AlertRiskMapError(f"Unsupported scope {scope}; expected one of {SCOPES}")
     if explicit_file:
         path = resolve_path(explicit_file)
         if not path.exists():
             raise AlertRiskMapError(f"Explicit {scope} {horizon} prediction file does not exist: {path}")
-        rejected: tuple[str, ...] = ()
-        if scope == "somalia" and _is_somalia_local(path):
-            raise AlertRiskMapError(f"Somalia {horizon} prediction file is a Somalia-local output and is not allowed: {path}")
-        if scope == "somalia" and not _is_somalia_global_grouping(path):
-            raise AlertRiskMapError(f"Somalia {horizon} prediction file is not identifiable as global-grouping/global-Somalia output: {path}")
-        return PredictionSelection(horizon, scope, path, True, rejected)
+        return PredictionSelection(horizon, scope, path, True, ())
 
     prediction_root = resolve_path(root)
     candidates = [path for path in _prediction_files(prediction_root) if _matches_horizon(path, horizon)]
-    rejected_local: list[str] = []
-    if scope == "somalia":
-        rejected_local = [str(path) for path in candidates if "somalia" in str(path).lower() and _is_somalia_local(path)]
-        candidates = [path for path in candidates if _is_somalia_global_grouping(path)]
-    else:
-        candidates = [path for path in candidates if "somalia" not in str(path).lower()]
+    candidates = [path for path in candidates if "somalia" not in str(path).lower()]
     if not candidates:
-        raise AlertRiskMapError(f"No {scope} prediction candidates found for horizon {horizon} under {prediction_root}")
+        raise AlertRiskMapError(f"No global prediction candidates found for horizon {horizon} under {prediction_root}")
     if len(candidates) > 1:
         sample = ", ".join(str(path) for path in candidates[:5])
-        raise AlertRiskMapError(f"Ambiguous {scope} prediction candidates for horizon {horizon}; provide an explicit file. Candidates: {sample}")
-    return PredictionSelection(horizon, scope, candidates[0], False, tuple(rejected_local))
+        raise AlertRiskMapError(f"Ambiguous global prediction candidates for horizon {horizon}; provide an explicit file. Candidates: {sample}")
+    return PredictionSelection(horizon, scope, candidates[0], False, ())
 
 
 def validate_required_columns(df: pd.DataFrame, required: Iterable[str], source_file: Path, horizon: str, scope: str) -> None:
@@ -263,7 +255,7 @@ def normalize_area_id(series: pd.Series) -> pd.Series:
     return series.astype(str).str.strip()
 
 
-def filter_latest_2025(df: pd.DataFrame, source_file: Path, horizon: str, scope: str) -> tuple[pd.DataFrame, int, int]:
+def filter_latest_2025(df: pd.DataFrame, source_file: Path, horizon: str, scope: str, min_record_date: Optional[pd.Timestamp] = None) -> tuple[pd.DataFrame, int, int]:
     df = add_temporal_date(df, source_file, horizon, scope)
     df = df[df["_record_year"].eq(YEAR)].copy()
     raw_count = len(df)
@@ -281,24 +273,53 @@ def filter_latest_2025(df: pd.DataFrame, source_file: Path, horizon: str, scope:
         retained_parts.append(latest.iloc[[0]])
         duplicate_removed += len(group) - 1
     retained = pd.concat(retained_parts, ignore_index=True)
+    if min_record_date is not None:
+        retained = retained[retained["_record_date"].ge(min_record_date)].copy()
+        if retained.empty:
+            raise AlertRiskMapError(f"No 2025 records on or after {min_record_date.date()} for {scope} {horizon} in {source_file}")
     return retained, raw_count, duplicate_removed
 
 
-def load_prediction_dataset(source_file: Union[str, Path], horizon: str, scope: str, mode: str) -> HorizonDataset:
+def load_prediction_dataset(
+    source_file: Union[str, Path],
+    horizon: str,
+    scope: str,
+    mode: str,
+    min_record_date: Optional[Union[str, pd.Timestamp]] = None,
+    predicted_alert_threshold: Optional[float] = None,
+    actual_alert_threshold: Optional[float] = None,
+) -> HorizonDataset:
     path = resolve_path(source_file)
     if not path.exists():
         raise AlertRiskMapError(f"Prediction file does not exist for {scope} {horizon}: {path}")
     df = pd.read_csv(path)
     required = ACTUAL_COLUMNS if mode == "actual" else TOP_RISK_COLUMNS
+    if mode == "actual" and predicted_alert_threshold is not None:
+        required = tuple(dict.fromkeys(required + ("phase3_pred",)))
+    if mode == "actual" and actual_alert_threshold is not None:
+        required = tuple(dict.fromkeys(required + ("phase3_worse",)))
     validate_required_columns(df, required, path, horizon, scope)
-    filtered, raw_count, duplicates_removed = filter_latest_2025(df, path, horizon, scope)
+    min_date = pd.Timestamp(min_record_date) if min_record_date is not None else None
+    filtered, raw_count, duplicates_removed = filter_latest_2025(df, path, horizon, scope, min_date)
     if mode == "actual":
         for column in ["overall_phase", "overall_phase_pred"]:
             filtered[column] = pd.to_numeric(filtered[column], errors="coerce")
             if filtered[column].isna().any():
                 raise AlertRiskMapError(f"Non-numeric or missing column {column} for {scope} {horizon} in {path}")
-        filtered["actual_alert"] = filtered["overall_phase"].ge(3)
-        filtered["predicted_alert"] = filtered["overall_phase_pred"].ge(3)
+        if actual_alert_threshold is None:
+            filtered["actual_alert"] = filtered["overall_phase"].ge(3)
+        else:
+            filtered["phase3_worse"] = pd.to_numeric(filtered["phase3_worse"], errors="coerce")
+            if filtered["phase3_worse"].isna().any():
+                raise AlertRiskMapError(f"Non-numeric or missing column phase3_worse for {scope} {horizon} in {path}")
+            filtered["actual_alert"] = filtered["phase3_worse"].ge(actual_alert_threshold)
+        if predicted_alert_threshold is None:
+            filtered["predicted_alert"] = filtered["overall_phase_pred"].ge(3)
+        else:
+            filtered["phase3_pred"] = pd.to_numeric(filtered["phase3_pred"], errors="coerce")
+            if filtered["phase3_pred"].isna().any():
+                raise AlertRiskMapError(f"Non-numeric or missing column phase3_pred for {scope} {horizon} in {path}")
+            filtered["predicted_alert"] = filtered["phase3_pred"].ge(predicted_alert_threshold)
     elif mode == "top_risk":
         for column in ["phase3_worse", "phase3_pred"]:
             filtered[column] = pd.to_numeric(filtered[column], errors="coerce")
@@ -339,39 +360,40 @@ def load_spatial_boundaries(spatial_path: Union[str, Path]) -> Any:
     return gdf
 
 
-def filter_somalia_boundaries(gdf: Any) -> Any:
-    country_columns = [column for column in COUNTRY_COLUMNS if column in gdf.columns]
-    if not country_columns:
-        return gdf
-    mask = pd.Series(False, index=gdf.index)
-    for column in country_columns:
-        values = gdf[column].astype(str).str.strip().str.lower()
-        mask |= values.isin({"somalia", "som", "so"})
-    filtered = gdf[mask].copy()
+def load_country_area_lookup(country_lookup_path: Union[str, Path]) -> pd.DataFrame:
+    path = resolve_path(country_lookup_path)
+    if not path.exists():
+        raise AlertRiskMapError(f"Country area lookup file does not exist: {path}")
+    lookup = pd.read_csv(path, usecols=["area_id", "iso3"])
+    validate_required_columns(lookup, ("area_id", "iso3"), path, "lookup", "country")
+    lookup = lookup.dropna(subset=["area_id", "iso3"]).copy()
+    lookup["area_id"] = normalize_area_id(lookup["area_id"])
+    lookup["iso3"] = lookup["iso3"].astype(str).str.strip().str.upper()
+    return lookup.drop_duplicates(["area_id", "iso3"])
+
+
+def country_area_ids(country_lookup: pd.DataFrame, iso3: str) -> set[str]:
+    code = iso3.upper()
+    area_ids = set(country_lookup.loc[country_lookup["iso3"].eq(code), "area_id"])
+    if not area_ids:
+        raise AlertRiskMapError(f"No area_id records found for ISO3 scope {code} in country lookup")
+    return area_ids
+
+
+def filter_to_area_ids(df: Any, area_ids: set[str], label: str, scope: str) -> Any:
+    filtered = df[df["area_id"].astype(str).isin(area_ids)].copy()
     if filtered.empty:
-        raise AlertRiskMapError("Spatial boundaries include country columns but no Somalia records were found")
+        raise AlertRiskMapError(f"No {label} rows remain for ISO3 scope {scope}")
     return filtered
 
 
-def filter_somalia_predictions(df: pd.DataFrame) -> pd.DataFrame:
-    country_columns = [column for column in COUNTRY_COLUMNS if column in df.columns]
-    if not country_columns:
-        return df
-    mask = pd.Series(False, index=df.index)
-    for column in country_columns:
-        values = df[column].astype(str).str.strip().str.lower()
-        mask |= values.isin({"somalia", "som", "so"})
-    return df[mask].copy()
-
-
-def join_predictions_to_spatial(dataset: HorizonDataset, boundaries: Any) -> JoinedMapDataset:
+def join_predictions_to_spatial(dataset: HorizonDataset, boundaries: Any, area_ids: Optional[set[str]] = None) -> JoinedMapDataset:
     prediction = dataset.records.copy()
-    if dataset.scope == "somalia":
-        prediction = filter_somalia_predictions(prediction)
-        if prediction.empty:
-            raise AlertRiskMapError(f"No Somalia prediction rows remain for {dataset.scope} {dataset.horizon} from {dataset.source_file}")
     prediction["area_id"] = normalize_area_id(prediction["area_id"])
-    spatial = filter_somalia_boundaries(boundaries) if dataset.scope == "somalia" else boundaries
+    spatial = boundaries
+    if area_ids is not None:
+        prediction = filter_to_area_ids(prediction, area_ids, "prediction", dataset.scope)
+        spatial = filter_to_area_ids(spatial, area_ids, "spatial boundary", dataset.scope)
     joined = spatial.merge(prediction, on="area_id", how="right", indicator=True)
     unmatched = sorted(joined.loc[joined["_merge"].ne("both"), "area_id"].astype(str).unique().tolist())
     duplicates = sorted(joined.loc[joined["area_id"].duplicated(), "area_id"].astype(str).unique().tolist())
@@ -520,19 +542,26 @@ def _plot_boolean_map(gdf: Any, column: str, ax: Any, title: str, listed_cmap: A
 
 def plot_actual_vs_predicted(datasets: Sequence[JoinedMapDataset], output_path: Union[str, Path], scope: str, no_basemap: bool = False) -> None:
     by_horizon = {dataset.horizon: dataset.joined_records for dataset in datasets}
-    missing = [horizon for horizon in HORIZONS if horizon not in by_horizon]
-    if missing:
-        raise AlertRiskMapError(f"Missing horizons for {scope} actual-vs-predicted figure: {missing}")
     plt, listed_cmap, patch = _require_matplotlib()
-    fig, axes = plt.subplots(2, 3, figsize=(15, 9))
     use_latam_thumbnail = scope == "global"
-    for col, horizon in enumerate(HORIZONS):
-        _plot_boolean_map(by_horizon[horizon], "actual_alert", axes[0, col], f"{horizon} actual: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
-        _plot_boolean_map(by_horizon[horizon], "predicted_alert", axes[1, col], f"{horizon} predicted: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
+    if len(datasets) == 1:
+        horizon = datasets[0].horizon
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        _plot_boolean_map(by_horizon[horizon], "actual_alert", axes[0], f"{horizon} actual: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
+        _plot_boolean_map(by_horizon[horizon], "predicted_alert", axes[1], f"{horizon} predicted: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
+        fig.subplots_adjust(left=0.03, right=0.99, bottom=0.12, top=0.84, wspace=0.08)
+    else:
+        missing = [horizon for horizon in HORIZONS if horizon not in by_horizon]
+        if missing:
+            raise AlertRiskMapError(f"Missing horizons for {scope} actual-vs-predicted figure: {missing}")
+        fig, axes = plt.subplots(2, 3, figsize=(15, 9))
+        for col, horizon in enumerate(HORIZONS):
+            _plot_boolean_map(by_horizon[horizon], "actual_alert", axes[0, col], f"{horizon} actual: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
+            _plot_boolean_map(by_horizon[horizon], "predicted_alert", axes[1, col], f"{horizon} predicted: phase >= 3", listed_cmap, use_latam_thumbnail, no_basemap)
+        fig.subplots_adjust(left=0.03, right=0.99, bottom=0.08, top=0.90, wspace=0.08, hspace=0.22)
     handles = [patch(color=NO_ALERT_COLOR, label="No alert"), patch(color=ALERT_COLOR, label="Alert")]
     fig.legend(handles=handles, loc="lower center", ncol=2)
     fig.suptitle(f"IPCCH 2025 {scope.title()} Actual vs Predicted Alert Map")
-    fig.subplots_adjust(left=0.03, right=0.99, bottom=0.08, top=0.90, wspace=0.08, hspace=0.22)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=300)
@@ -570,51 +599,63 @@ def run_alert_risk_maps(
     out_results_dir: Optional[Union[str, Path]] = None,
     horizon_files: Optional[Mapping[str, Optional[Union[str, Path]]]] = None,
     somalia_horizon_files: Optional[Mapping[str, Optional[Union[str, Path]]]] = None,
+    country_lookup_path: Optional[Union[str, Path]] = None,
     overwrite: bool = False,
     write_summary: bool = True,
     no_basemap: bool = False,
     figure_format: str = "png",
+    scope: str = "global",
+    scopes: Optional[Sequence[str]] = None,
+    min_record_date: Optional[Union[str, pd.Timestamp]] = None,
+    predicted_alert_threshold: Optional[float] = None,
+    actual_alert_threshold: Optional[float] = None,
+    filename_suffix: str = "",
 ) -> ValidationSummary:
     root = resolve_path(prediction_root or default_prediction_root())
     spatial = resolve_path(spatial_path or default_spatial_path())
-    plan = build_output_plan(out_report_dir, out_results_dir, figure_format)
+    selected_scope = (tuple(scopes)[0] if scopes else scope).strip().upper()
+    if selected_scope == "GLOBAL":
+        selected_scope = "global"
+    plan = build_output_plan(out_report_dir, out_results_dir, figure_format, selected_scope, filename_suffix)
     summary = ValidationSummary(output_paths={key: str(value) for key, value in plan.figures.items()} | {"validation_summary": str(plan.validation_summary)})
     try:
         validate_output_conflicts(plan, overwrite, write_summary)
         boundaries = load_spatial_boundaries(spatial)
         summary.selected_files["spatial"] = str(spatial)
         horizon_files = horizon_files or {}
-        somalia_horizon_files = somalia_horizon_files or {}
-        actual_joined: dict[str, list[JoinedMapDataset]] = {"global": [], "somalia": []}
-        top_joined: dict[str, JoinedMapDataset] = {}
-        for scope in SCOPES:
-            explicit_map = somalia_horizon_files if scope == "somalia" else horizon_files
-            for horizon in HORIZONS:
-                selection = discover_prediction_file(root, horizon, scope, explicit_map.get(horizon))
-                key = f"{scope}_{horizon}"
-                summary.selected_files[key] = str(selection.path)
-                summary.somalia_local_rejections.extend(selection.rejected_somalia_local_candidates)
-                dataset = load_prediction_dataset(selection.path, horizon, scope, "actual")
-                joined = join_predictions_to_spatial(dataset, boundaries)
-                actual_joined[scope].append(joined)
-                summary.record_counts[key] = {
-                    "raw_2025_count": dataset.raw_2025_count,
-                    "retained_count": dataset.retained_count,
-                    "duplicates_removed": dataset.duplicates_removed,
-                }
-                summary.join_counts[key] = {
-                    "matched_count": joined.validation.matched_count,
-                    "unmatched_area_ids": joined.validation.unmatched_area_ids,
-                    "duplicate_join_area_ids": joined.validation.duplicate_join_area_ids,
-                }
-                if horizon == "0m":
-                    top_dataset = load_prediction_dataset(selection.path, horizon, scope, "top_risk")
-                    top_dataset.records = compute_top_risk_categories(top_dataset.records)
-                    top_joined[scope] = join_predictions_to_spatial(top_dataset, boundaries)
-        plot_actual_vs_predicted(actual_joined["global"], plan.figures["global_actual_vs_predicted"], "global", no_basemap)
-        plot_actual_vs_predicted(actual_joined["somalia"], plan.figures["somalia_actual_vs_predicted"], "somalia", no_basemap)
-        plot_top_risk(top_joined["global"].joined_records, plan.figures["global_top_risk"], "global", no_basemap)
-        plot_top_risk(top_joined["somalia"].joined_records, plan.figures["somalia_top_risk"], "somalia", no_basemap)
+        country_area_filter = None
+        if selected_scope != "global":
+            country_lookup_file = resolve_path(country_lookup_path or default_country_lookup_path())
+            country_lookup = load_country_area_lookup(country_lookup_file)
+            country_area_filter = country_area_ids(country_lookup, selected_scope)
+            summary.selected_files["country_lookup"] = str(country_lookup_file)
+        actual_joined: list[JoinedMapDataset] = []
+        top_joined: Optional[JoinedMapDataset] = None
+        for horizon in HORIZONS:
+            selection = discover_prediction_file(root, horizon, selected_scope, horizon_files.get(horizon))
+            key = f"{selected_scope}_{horizon}"
+            summary.selected_files[key] = str(selection.path)
+            dataset = load_prediction_dataset(selection.path, horizon, selected_scope, "actual", min_record_date, predicted_alert_threshold, actual_alert_threshold)
+            joined = join_predictions_to_spatial(dataset, boundaries, country_area_filter)
+            actual_joined.append(joined)
+            summary.record_counts[key] = {
+                "raw_2025_count": dataset.raw_2025_count,
+                "retained_count": dataset.retained_count,
+                "duplicates_removed": dataset.duplicates_removed,
+            }
+            summary.join_counts[key] = {
+                "matched_count": joined.validation.matched_count,
+                "unmatched_area_ids": joined.validation.unmatched_area_ids,
+                "duplicate_join_area_ids": joined.validation.duplicate_join_area_ids,
+            }
+            if horizon == "0m":
+                top_dataset = load_prediction_dataset(selection.path, horizon, selected_scope, "top_risk", min_record_date)
+                top_dataset.records = compute_top_risk_categories(top_dataset.records)
+                top_joined = join_predictions_to_spatial(top_dataset, boundaries, country_area_filter)
+        if top_joined is None:
+            raise AlertRiskMapError("Missing 0m top-risk dataset")
+        plot_actual_vs_predicted(actual_joined, plan.figures["actual_vs_predicted"], selected_scope, no_basemap)
+        plot_top_risk(top_joined.joined_records, plan.figures["top_risk"], selected_scope, no_basemap)
         summary.status = "success"
         if write_summary:
             write_validation_summary(summary, plan.validation_summary, overwrite)
