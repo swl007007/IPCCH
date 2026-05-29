@@ -66,6 +66,7 @@ reports/figures/
 reports/cleanlab/cleanlab_label_quality_report.pdf
 
 CLAUDE.md
+AGENTS.md
 
 .specify/*
 .claude/*

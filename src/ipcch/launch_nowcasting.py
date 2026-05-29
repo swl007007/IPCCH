@@ -1,0 +1,878 @@
+"""April 2026 global nowcasting launch (comprehensive-CSV fallback).
+
+Production launch workflow (NOT a held-out validation experiment): trains the
+canonical four-regressor cumulative-phase XGBoost workflow on valid-target rows
+strictly before the training cutoff, then predicts ``phase2_worse``..``phase5_worse``
+for every eligible launch-month ``area_id`` and derives ``overall_phase_pred`` via
+the canonical top-down rule with ``th=0.2``.
+
+Both training rows and the launch X_test come from one comprehensive deep-feature
+CSV. This module reuses the canonical deep-feature workflow utilities in
+``ipcch.forecasting_weight_decay`` and the prediction-only phase conversion in
+``ipcch.forecast_diagnostics`` (see specs/004-launch-2026-04-nowcasting-fallback).
+
+Reusable launch logic lives here (Principle II). Heavy Mode-1 training is gated
+behind explicit approval by the CLI; this module never trains unless asked.
+"""
+from __future__ import annotations
+
+import json
+import math
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+
+import numpy as np
+import pandas as pd
+
+from ipcch import paths
+from ipcch import forecasting_weight_decay as fwd
+from ipcch import forecast_diagnostics as fdiag
+
+# --- Launch constants -------------------------------------------------------
+COMPREHENSIVE_SOURCE_KEY = "deep_features_2026_target_corrected_dataset"
+EXPECTED_SOURCE_FILENAME = (
+    "assembled_IPCCH/features/forecasting_subset_IPCCH_2026_target_corrected_deep_features.csv"
+)
+DEFAULT_LAUNCH_MONTH = "2026-04"
+DEFAULT_TRAINING_CUTOFF = "2026-04-01"
+DEFAULT_SCALE = "global"
+CANONICAL_THRESHOLD = 0.2
+MODEL_WORKFLOW = "deep_feature_weight_decay_cumulative_regression"
+TARGET_COLUMNS = fwd.TARGET_COLUMNS  # phase2_worse..phase5_worse
+PHASE_FROM_TARGET = {"phase2_worse": 2, "phase3_worse": 3, "phase4_worse": 4, "phase5_worse": 5}
+IDENTIFIER_DERIVED_BASE = ("lat", "lon")
+# Target/label columns excluded from features (FR-011b); patterns enforced by
+# select_numeric_feature_columns plus the documented audit families below.
+TARGET_LABEL_COLUMNS = (
+    "overall_phase",
+    "overall_phase_pred",
+    *fwd.PERCENT_TARGET_COLUMNS,
+    *fwd.TARGET_COLUMNS,
+)
+TARGET_DERIVED_PATTERNS = ("overall_phase_lag", "target_relative", "diagnostic", "phase_target", "target")
+# Raw identifier / reporting columns preserved for output/joins but never modelled.
+REPORTING_ID_COLUMNS = ("area_id", "country", "region", "name", "admin_code", "pcode", "iso3", "iso")
+
+
+class LaunchError(ValueError):
+    """Raised for actionable launch configuration / data errors."""
+
+
+@dataclass(frozen=True)
+class LaunchConfig:
+    comprehensive_source: Path
+    launch_month: str = DEFAULT_LAUNCH_MONTH
+    scale: str = DEFAULT_SCALE
+    training_cutoff: str = DEFAULT_TRAINING_CUTOFF
+    threshold: float = CANONICAL_THRESHOLD
+    out_root: Path = field(default_factory=lambda: paths.RESULTS_DIR / "launch" / "nowcasting_2026_04")
+    report_root: Path = field(default_factory=lambda: paths.REPORTS_DIR / "launch" / "nowcasting_2026_04")
+    seed: int = 42
+    add_identifier_features: bool = True
+    allow_missing_identifier_features: bool = False
+    identifier_source: Optional[Path] = None
+    half_life_months: float = fwd.DEFAULT_HALF_LIFE_MONTHS
+    use_time_decay: bool = True
+    hyperparameter_set: str = "canonical"
+    hyperparameters_path: Optional[Path] = None
+    hyperparameters_p3_path: Optional[Path] = None
+    dedup_rule: Optional[str] = None
+    drop_nonfinite_predictions: bool = False
+    run_id: str = "launch_2026_04"
+    execution_mode: str = "train_and_predict"
+
+
+# --- Source resolution & validation (T005, FR-006/010, I1) ------------------
+
+def resolve_comprehensive_source(explicit_path: Optional[str]) -> Path:
+    """Resolve the comprehensive source from an explicit flag or the workspace key.
+
+    The key ``deep_features_2026_target_corrected_dataset`` is workspace-local and
+    expected in ``configs/paths.local.json``; it is intentionally not a repo default.
+    """
+    if explicit_path:
+        resolved = Path(explicit_path).expanduser()
+    else:
+        try:
+            resolved = paths.external_path(COMPREHENSIVE_SOURCE_KEY)
+        except KeyError as exc:
+            raise LaunchError(
+                "Comprehensive source path is not configured. The external key "
+                f"'{COMPREHENSIVE_SOURCE_KEY}' is not defined. Either pass "
+                "--comprehensive-source <path> or add the key to configs/paths.local.json "
+                f"pointing at '{EXPECTED_SOURCE_FILENAME}'."
+            ) from exc
+    if not resolved.exists():
+        raise LaunchError(f"Comprehensive source file does not exist: {resolved}")
+    return resolved
+
+
+def _parse_month(launch_month: str) -> Tuple[int, int]:
+    try:
+        year_s, month_s = launch_month.split("-")
+        return int(year_s), int(month_s)
+    except Exception as exc:  # noqa: BLE001
+        raise LaunchError(f"launch_month must be 'YYYY-MM'; received {launch_month!r}") from exc
+
+
+_MASK_COLUMNS = ("area_id", "year", "month", "overall_phase", *fwd.PERCENT_TARGET_COLUMNS)
+
+
+def _row_keep_mask(small: pd.DataFrame, training_cutoff: str, launch_month: str) -> np.ndarray:
+    """Boolean keep-mask (training-eligible OR launch-month) in original file order.
+
+    Replicates the exact training/launch-month row selection used downstream
+    (``_training_mask`` + the launch-month mask) on a narrow mask-column frame,
+    without sorting, so positions map back to original CSV rows for pass 2.
+    """
+    prepared = small.replace([np.inf, -np.inf], np.nan).copy()
+    prepared = fwd.add_monthly_date(prepared)
+    prepared = fwd.derive_cumulative_targets(prepared)
+    prepared["overall_phase"] = pd.to_numeric(prepared["overall_phase"], errors="coerce")
+    cutoff = pd.Timestamp(training_cutoff)
+    ly, lm = _parse_month(launch_month)
+    train_mask = _training_mask(prepared, cutoff)
+    april_mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
+    return (train_mask | april_mask).to_numpy()
+
+
+def load_comprehensive_source(
+    path: Path,
+    sample_rows: Optional[int] = None,
+    *,
+    training_cutoff: Optional[str] = None,
+    launch_month: Optional[str] = None,
+) -> pd.DataFrame:
+    """Load the comprehensive source.
+
+    When ``training_cutoff`` and ``launch_month`` are supplied (and no
+    ``sample_rows`` cap is requested), use a memory-safe two-pass read: pass 1
+    reads only the narrow mask columns to find which rows are training-eligible
+    or in the launch month; pass 2 reads all columns for just those rows. This
+    avoids materialising the full multi-million-row source (the rows dropped are
+    never used by training or the launch X_test, so results are unchanged). Falls
+    back to a plain read for samples or when the mask columns are unavailable.
+    """
+    if sample_rows is not None or training_cutoff is None or launch_month is None:
+        return pd.read_csv(path, nrows=sample_rows)
+    header = pd.read_csv(path, nrows=0)
+    if not all(c in header.columns for c in _MASK_COLUMNS):
+        return pd.read_csv(path)
+    small = pd.read_csv(path, usecols=list(_MASK_COLUMNS))
+    keep = _row_keep_mask(small, training_cutoff, launch_month)
+    del small
+    keep_positions = set(np.flatnonzero(keep).tolist())
+    return pd.read_csv(path, skiprows=lambda i: i > 0 and (i - 1) not in keep_positions)
+
+
+def validate_source(df: pd.DataFrame, config: LaunchConfig) -> dict:
+    """Validate the comprehensive source; raise actionable LaunchError on failure.
+
+    Returns an input-validation summary dict (FR-006).
+    """
+    summary: dict = {"comprehensive_source": str(config.comprehensive_source), "checks": {}}
+    required_ids = ["area_id", "year", "month"]
+    missing = [c for c in required_ids if c not in df.columns]
+    summary["checks"]["required_identifier_columns_present"] = not missing
+    if missing:
+        raise LaunchError(f"Comprehensive source missing required identifier columns: {', '.join(missing)}")
+
+    prepared = prepare_source(df)
+    cutoff = pd.Timestamp(config.training_cutoff)
+    ly, lm = _parse_month(config.launch_month)
+
+    train_candidates = _training_mask(prepared, cutoff)
+    april_mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
+    n_train = int(train_candidates.sum())
+    n_april = int(april_mask.sum())
+
+    summary["checks"]["date_constructable"] = True  # prepare_source would have raised otherwise
+    summary["checks"]["valid_training_rows_before_cutoff"] = n_train > 0
+    summary["checks"]["april_xtest_rows_exist"] = n_april > 0
+    summary["checks"]["cumulative_targets_derivable"] = all(t in prepared.columns for t in TARGET_COLUMNS)
+    summary["training_rows_before_cutoff"] = n_train
+    summary["launch_month_rows"] = n_april
+    summary["launch_month"] = config.launch_month
+    summary["training_cutoff"] = config.training_cutoff
+
+    if n_april == 0:
+        raise LaunchError(
+            f"No launch-month rows (year={ly}, month={lm}) found in the comprehensive source. "
+            "A valid comprehensive source with April 2026 rows is required."
+        )
+    if n_train == 0:
+        raise LaunchError(
+            f"No valid-target training rows strictly before {config.training_cutoff} found in the comprehensive source."
+        )
+    # Duplicate launch-month area_id detection (report; hard-stop handled in build_xtest_april)
+    april_ids = prepared.loc[april_mask, "area_id"].astype(str)
+    dup_ids = sorted(april_ids[april_ids.duplicated()].unique().tolist())
+    summary["launch_month_duplicate_area_ids"] = dup_ids
+    summary["launch_month_unique_area_ids"] = int(april_ids.nunique())
+    return summary
+
+
+def prepare_source(df: pd.DataFrame) -> pd.DataFrame:
+    """Construct date + cumulative targets without requiring labels on every row.
+
+    Unlike ``fwd.prepare_forecasting_dataset`` (which requires all percent targets),
+    the launch tolerates missing targets on launch-month rows. Date construction and
+    target derivation are applied where columns exist.
+    """
+    fwd.validate_required_columns(df, ["area_id", "year", "month"])
+    result = df.replace([np.inf, -np.inf], np.nan).copy()
+    result = fwd.add_monthly_date(result)
+    if all(c in result.columns for c in fwd.PERCENT_TARGET_COLUMNS):
+        result = fwd.derive_cumulative_targets(result)
+    if "overall_phase" in result.columns:
+        result["overall_phase"] = pd.to_numeric(result["overall_phase"], errors="coerce")
+    return result.sort_values(["area_id", "date"]).reset_index(drop=True)
+
+
+# --- Training / X_test frames (T006, T007; FR-007/008/009) ------------------
+
+def _training_mask(prepared: pd.DataFrame, cutoff: pd.Timestamp) -> pd.Series:
+    has_targets = pd.Series(True, index=prepared.index)
+    for t in TARGET_COLUMNS:
+        has_targets &= prepared[t].notna() if t in prepared.columns else False
+    overall = prepared.get("overall_phase")
+    valid_label = overall.notna() & (overall != 0) if overall is not None else pd.Series(False, index=prepared.index)
+    return (prepared["date"] < cutoff) & valid_label & has_targets
+
+
+def build_training_frame(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+    cutoff = pd.Timestamp(config.training_cutoff)
+    mask = _training_mask(prepared, cutoff)
+    train = prepared.loc[mask].copy()
+    if train.empty:
+        raise LaunchError(f"No eligible training rows strictly before {config.training_cutoff}.")
+    per_month = (
+        train.assign(ym=train["date"].dt.strftime("%Y-%m"))
+        .groupby("ym").size().sort_index().to_dict()
+    )
+    summary = {
+        "training_rows": int(len(train)),
+        "train_min_date": fwd._format_date(train["date"].min()),
+        "train_max_date": fwd._format_date(train["date"].max()),
+        "rows_per_month": {k: int(v) for k, v in per_month.items()},
+    }
+    return train, summary
+
+
+def build_xtest_april(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+    ly, lm = _parse_month(config.launch_month)
+    mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
+    april = prepared.loc[mask].copy()
+    if april.empty:
+        raise LaunchError(
+            f"No launch-month rows (year={ly}, month={lm}). A valid comprehensive source with April 2026 rows is required."
+        )
+    april["area_id"] = april["area_id"].astype(str)
+    dup_ids = sorted(april.loc[april["area_id"].duplicated(keep=False), "area_id"].unique().tolist())
+    dedup_report: dict = {"duplicate_area_ids": dup_ids, "dedup_rule": config.dedup_rule}
+    if dup_ids:
+        if config.dedup_rule != "latest-date":
+            raise LaunchError(
+                f"Duplicate launch-month area_id rows found ({len(dup_ids)} ids). "
+                "Default is hard-stop. Re-run with --dedup-rule latest-date (requires a date column) "
+                "to resolve deterministically, or de-duplicate the source."
+            )
+        # Deterministic latest-date resolution + report
+        candidate_counts = april.groupby("area_id").size().to_dict()
+        before = len(april)
+        april = april.sort_values(["area_id", "date"]).drop_duplicates("area_id", keep="last")
+        dedup_report["candidate_counts"] = {k: int(candidate_counts[k]) for k in dup_ids}
+        dedup_report["rows_dropped"] = int(before - len(april))
+        dedup_report["selected_date"] = config.launch_month
+    coverage = {
+        "launch_month_area_count": int(april["area_id"].nunique()),
+        "launch_month_rows": int(len(april)),
+        "dedup": dedup_report,
+    }
+    return april.reset_index(drop=True), coverage
+
+
+# --- Feature pipeline (T008, T009; FR-011/011a/011b/012/013) ----------------
+
+def _add_month_year_dummies(df: pd.DataFrame) -> pd.DataFrame:
+    result = df.copy()
+    month = pd.to_numeric(result["month"], errors="raise").astype(int)
+    year = pd.to_numeric(result["year"], errors="raise").astype(int)
+    month_dummies = pd.get_dummies(month, prefix="month", dtype=bool)
+    year_dummies = pd.get_dummies(year, prefix="year", dtype=bool)
+    return pd.concat([result, month_dummies, year_dummies], axis=1)
+
+
+def apply_identifier_features(
+    prepared: pd.DataFrame, config: LaunchConfig
+) -> Tuple[pd.DataFrame, dict]:
+    """Apply the canonical identifier-feature setting (FR-011a).
+
+    Detect identifier-derived columns when present; otherwise construct them via the
+    canonical ``forecasting_weight_decay.add_identifier_features`` lookup helper.
+    Records, per identifier-derived feature, whether it was detected or constructed.
+    """
+    transform: dict = {"enabled": config.add_identifier_features, "lat_lon": "absent", "month_year_dummies": "none"}
+    if not config.add_identifier_features:
+        transform["note"] = "identifier-feature setting disabled by flag"
+        return prepared.copy(), transform
+
+    have_latlon = all(c in prepared.columns and prepared[c].notna().any() for c in IDENTIFIER_DERIVED_BASE)
+    if have_latlon:
+        result = _add_month_year_dummies(prepared)
+        transform["lat_lon"] = "detected"
+        transform["month_year_dummies"] = "constructed"
+        return result, transform
+
+    # Need to construct lat/lon via lookup
+    lookup_path = config.identifier_source
+    if lookup_path is None:
+        try:
+            lookup_path = paths.external_path(fwd.DEFAULT_SOMALIA_LOOKUP_KEY)
+        except KeyError:
+            lookup_path = None
+    if lookup_path is None or not Path(lookup_path).exists():
+        if config.allow_missing_identifier_features:
+            transform["note"] = "identifier-derived features missing; proceeding under --allow-missing-identifier-features"
+            return _add_month_year_dummies(prepared), transform
+        raise LaunchError(
+            "Required identifier-derived features (lat/lon) are absent from the comprehensive source and no "
+            "identifier lookup is configured. Provide --identifier-source <csv> (admin_code/year/month/lat/lon) "
+            f"or set the '{fwd.DEFAULT_SOMALIA_LOOKUP_KEY}' key, or pass --allow-missing-identifier-features to override."
+        )
+    lookup_df = pd.read_csv(lookup_path)
+    result = fwd.add_identifier_features(prepared, lookup_df)
+    transform["lat_lon"] = "constructed"
+    transform["month_year_dummies"] = "constructed"
+    transform["identifier_source"] = str(lookup_path)
+    return result, transform
+
+
+def _exclusion_family(column: str) -> Optional[Tuple[str, str]]:
+    """Return (family, matched_pattern) if the column should be excluded, else None."""
+    lower = column.lower()
+    if lower in {c.lower() for c in TARGET_LABEL_COLUMNS}:
+        return ("target_label", lower)
+    for pat in TARGET_DERIVED_PATTERNS:
+        if pat in lower:
+            return ("target_derived", pat)
+    if lower in {c.lower() for c in REPORTING_ID_COLUMNS} or lower in {"year", "month", "date"}:
+        return ("identifier_reporting", lower)
+    return None
+
+
+def build_feature_schema_report(
+    featured: pd.DataFrame, feature_columns: Sequence[str], train_cols: Sequence[str], xtest_cols: Sequence[str], transform: dict
+) -> Tuple[pd.DataFrame, List[str]]:
+    feature_set = set(feature_columns)
+    train_set, xtest_set = set(train_cols), set(xtest_cols)
+    rows = []
+    warnings: List[str] = []
+    identifier_derived = {c for c in featured.columns if c in IDENTIFIER_DERIVED_BASE or c.startswith("month_") or c.startswith("year_")}
+    numeric_cols = set(featured.select_dtypes(include=[np.number, "bool"]).columns)
+    out_of_family_excluded = []
+    for col in featured.columns:
+        included = col in feature_set
+        fam = _exclusion_family(col)
+        role = "model_feature" if included else "other_excluded"
+        matched, exclusion_family, reason = "", "", ""
+        if included and col in identifier_derived:
+            role = "identifier_derived_feature"
+        if not included:
+            if fam is not None:
+                exclusion_family, matched = fam[0], fam[1]
+                role = {"target_label": "target", "target_derived": "target_derived_excluded",
+                        "identifier_reporting": "raw_identifier_reporting"}[fam[0]]
+                reason = f"matched {fam[0]} ({fam[1]})"
+            elif col not in numeric_cols:
+                exclusion_family, role, reason = "non_numeric", "non_numeric_excluded", "non-numeric column"
+            else:
+                exclusion_family, reason = "unused_extra", "not selected as a model feature"
+                out_of_family_excluded.append(col)
+        rows.append({
+            "column": col,
+            "included_in_model": included,
+            "role": role,
+            "matched_pattern": matched,
+            "exclusion_family": exclusion_family,
+            "exclusion_reason": reason,
+            "identifier_derived": col in identifier_derived,
+            "identifier_lat_lon_origin": transform.get("lat_lon", "") if col in IDENTIFIER_DERIVED_BASE else "",
+            "present_in_training": col in train_set,
+            "present_in_xtest": col in xtest_set,
+            "expected_identifier_feature_missing": (col in IDENTIFIER_DERIVED_BASE and col not in featured.columns),
+        })
+    # Over-exclusion / out-of-family warning (FR-009/audit, analysis fix #3)
+    total = len(featured.columns)
+    excluded = total - len(feature_set)
+    if total and excluded / total > 0.9:
+        warnings.append(f"Over-exclusion warning: {excluded}/{total} columns excluded from features (>90%).")
+    if out_of_family_excluded:
+        warnings.append(
+            "Out-of-family exclusions (numeric columns dropped without a known target/identifier reason): "
+            + ", ".join(out_of_family_excluded[:20]) + (" ..." if len(out_of_family_excluded) > 20 else "")
+        )
+    if train_set != xtest_set:
+        only_train = sorted(train_set - xtest_set)[:20]
+        only_xtest = sorted(xtest_set - train_set)[:20]
+        warnings.append(f"Train/X_test feature schema differ. only_train={only_train} only_xtest={only_xtest}")
+    return pd.DataFrame(rows), warnings
+
+
+def select_model_features(featured_train: pd.DataFrame) -> List[str]:
+    """Canonical numeric feature selection, then enforce the FR-011b exclusion families.
+
+    ``select_numeric_feature_columns`` covers identifiers/dates/percent/worse targets and
+    ``*_pred``/``*_target``/``*_label`` patterns, but does NOT catch target-derived
+    diagnostics like ``overall_phase_lag1``. We additionally drop any column whose name
+    matches a documented target-label / target-derived family (FR-011b).
+    """
+    base = fwd.select_numeric_feature_columns(featured_train)
+    selected = [c for c in base if _target_or_derived_exclusion(c) is None]
+    if not selected:
+        raise LaunchError("No eligible model feature columns remain after target-derived exclusion.")
+    return selected
+
+
+def _target_or_derived_exclusion(column: str) -> Optional[Tuple[str, str]]:
+    """Return (family, matched) only for target/target-derived families (not identifiers)."""
+    fam = _exclusion_family(column)
+    if fam is not None and fam[0] in ("target_label", "target_derived"):
+        return fam
+    return None
+
+
+# --- Sample weighting anchored at launch month (R5) -------------------------
+
+def launch_time_decay_weights(dates: pd.Series, launch_month: str, half_life_months: float) -> pd.Series:
+    """Time-decay weights anchored at the launch month (mirrors fwd.DECAY_FORMULATION).
+
+    distance = months before the launch month; weight = 0.5 ** (distance / half_life).
+    Uses only training-row dates (no future information).
+    """
+    fwd.validate_half_life(half_life_months)
+    ly, lm = _parse_month(launch_month)
+    normalized = pd.to_datetime(dates).dt.to_period("M").dt.to_timestamp()
+    distances = (ly - normalized.dt.year) * 12 + (lm - normalized.dt.month)
+    if (distances <= 0).any():
+        raise LaunchError("All training rows must precede the launch month for time-decay weighting.")
+    weights = pd.Series(np.power(0.5, distances.astype(float) / float(half_life_months)), index=dates.index, name="sample_weight")
+    fwd.validate_weights(weights)
+    return weights
+
+
+# --- Prediction validation & phase derivation (T016/T017; FR-017a/018) ------
+
+def validate_and_clip_predictions(pred_df: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+    """Clip cumulative predictions to [0,1] + round 2dp; surface non-finite (FR-017a)."""
+    cols = [f"{t}_pred" for t in TARGET_COLUMNS]
+    report: dict = {"clipped_low": {}, "clipped_high": {}, "nonfinite": {}, "rows_excluded": 0}
+    out = pred_df.copy()
+    nonfinite_mask = pd.Series(False, index=out.index)
+    for c in cols:
+        vals = pd.to_numeric(out[c], errors="coerce")
+        nf = ~np.isfinite(vals.to_numpy(dtype=float))
+        report["nonfinite"][c] = int(nf.sum())
+        nonfinite_mask |= nf
+        report["clipped_low"][c] = int((vals < 0).sum())
+        report["clipped_high"][c] = int((vals > 1).sum())
+        out[c] = vals.clip(0.0, 1.0).round(2)
+    if nonfinite_mask.any():
+        if not config.drop_nonfinite_predictions:
+            bad = out.loc[nonfinite_mask, "area_id"].astype(str).tolist()[:20]
+            raise LaunchError(
+                f"Non-finite cumulative predictions for {int(nonfinite_mask.sum())} area_id(s) "
+                f"(e.g. {bad}). Re-run with --drop-nonfinite-predictions to exclude+report them, "
+                "or investigate the input features."
+            )
+        report["rows_excluded"] = int(nonfinite_mask.sum())
+        report["excluded_area_ids"] = out.loc[nonfinite_mask, "area_id"].astype(str).tolist()
+        out = out.loc[~nonfinite_mask].copy()
+    return out, report
+
+
+def derive_overall_phase(pred_df: pd.DataFrame, threshold: float = CANONICAL_THRESHOLD) -> pd.Series:
+    resolved = {p: f"{t}_pred" for t, p in PHASE_FROM_TARGET.items()}
+    return fdiag.reconstruct_phase_from_cumulative(pred_df, resolved, threshold)
+
+
+# --- Output layout & run summary (T010; FR-029/031/034) ---------------------
+
+@dataclass
+class OutputLayout:
+    out_root: Path
+    report_root: Path
+    predictions_csv: Path
+    run_summary_json: Path
+    config_json: Path
+    input_validation_json: Path
+    training_summary_csv: Path
+    feature_schema_csv: Path
+    xtest_coverage_csv: Path
+    eligibility_csv: Path
+    xtest_aligned_csv: Path
+    prediction_distribution_csv: Path
+    prediction_validation_json: Path
+    predicted_phase_distribution_csv: Path
+    model_artifacts_dir: Path
+    comparison_dir: Path
+    viz_results_dir: Path
+    viz_report_dir: Path
+
+    @property
+    def validation_only_targets(self) -> List[Path]:
+        return [self.input_validation_json, self.feature_schema_csv]
+
+
+def resolve_output_layout(config: LaunchConfig) -> OutputLayout:
+    out = config.out_root
+    rep = config.report_root
+    fdiag_paths = paths  # noqa: F841 (paths used below)
+    # Output-path safety: results under RESULTS_DIR, reports under REPORTS_DIR.
+    from ipcch.alert_risk_maps import ensure_under  # reuse guardrail
+    ensure_under(out, paths.RESULTS_DIR, "Launch results output")
+    ensure_under(rep, paths.REPORTS_DIR, "Launch report output")
+    return OutputLayout(
+        out_root=out,
+        report_root=rep,
+        predictions_csv=out / "predictions_2026_04_all_area_id.csv",
+        run_summary_json=out / "run_summary.json",
+        config_json=out / "launch_config_resolved.json",
+        input_validation_json=out / "input_validation_summary.json",
+        training_summary_csv=out / "training_data_summary.csv",
+        feature_schema_csv=out / "feature_schema_report.csv",
+        xtest_coverage_csv=out / "x_test_area_coverage.csv",
+        eligibility_csv=out / "april_2026_area_id_eligibility.csv",
+        xtest_aligned_csv=out / "x_test_2026_04_all_area_id_model_aligned.csv",
+        prediction_distribution_csv=out / "prediction_distribution_summary.csv",
+        prediction_validation_json=out / "prediction_validation_summary.json",
+        predicted_phase_distribution_csv=out / "predicted_phase_distribution.csv",
+        model_artifacts_dir=out / "model_artifacts",
+        comparison_dir=out / "actual_comparison",
+        viz_results_dir=out / "visualizations",
+        viz_report_dir=rep / "visualizations",
+    )
+
+
+def guard_output_conflicts(targets: Sequence[Path], overwrite: bool) -> List[str]:
+    conflicts = [str(p) for p in targets if p.exists()]
+    if conflicts and not overwrite:
+        raise LaunchError("Existing output file conflict without --overwrite: " + ", ".join(conflicts))
+    return conflicts
+
+
+def write_json(path: Path, payload: Mapping) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, default=_json_default), encoding="utf-8")
+
+
+def _json_default(value):
+    if isinstance(value, (np.integer,)):
+        return int(value)
+    if isinstance(value, (np.floating,)):
+        return float(value)
+    if isinstance(value, Path):
+        return str(value)
+    return str(value)
+
+
+# --- Hyperparameters (T015; R3) ---------------------------------------------
+
+def resolve_hyperparameters(config: LaunchConfig) -> Tuple[dict, dict, dict]:
+    """Return (hyperparams, hyperparams_p3, provenance). Default = canonical forecasting set."""
+    if config.hyperparameter_set == "custom":
+        if not (config.hyperparameters_path and config.hyperparameters_p3_path):
+            raise LaunchError("--hyperparameter-set custom requires both --hyperparameters and --hyperparameters-p3.")
+        hp = json.loads(Path(config.hyperparameters_path).read_text(encoding="utf-8"))
+        hp3 = json.loads(Path(config.hyperparameters_p3_path).read_text(encoding="utf-8"))
+        prov = {"set": "custom", "hyperparameters": str(config.hyperparameters_path), "hyperparameters_p3": str(config.hyperparameters_p3_path)}
+        return hp, hp3, prov
+    hp_path = config.hyperparameters_path or (paths.CONFIG_DIR / "forecasting_hyperparameters.json")
+    hp3_path = config.hyperparameters_p3_path or (paths.CONFIG_DIR / "forecasting_hyperparameters_p3.json")
+    missing = [str(p) for p in (hp_path, hp3_path) if not Path(p).exists()]
+    if missing:
+        raise LaunchError("Missing hyperparameter config files: " + "; ".join(missing))
+    hp = json.loads(Path(hp_path).read_text(encoding="utf-8"))
+    hp3 = json.loads(Path(hp3_path).read_text(encoding="utf-8"))
+    prov = {"set": "canonical", "hyperparameters": str(hp_path), "hyperparameters_p3": str(hp3_path)}
+    return hp, hp3, prov
+
+
+def _fit_model(X_train, y_train, sample_weight, target_column, hyperparams, hyperparams_p3, seed):
+    """Mirror of the canonical deep-feature fit_model (generic; no weight-decay assumptions)."""
+    import xgboost as xgb
+
+    params = dict(hyperparams_p3 if target_column == "phase3_worse" else hyperparams)
+    params["random_state"] = seed
+    model = xgb.XGBRegressor(**params)
+    model.fit(X_train, y_train, sample_weight=sample_weight)
+    return model
+
+
+def train_cumulative_regressors(
+    train_featured: pd.DataFrame, feature_columns: Sequence[str], config: LaunchConfig, model_dir: Optional[Path] = None
+) -> Tuple[Dict[str, object], dict]:
+    """Train four canonical cumulative regressors (FR-014/015). Persists boosters if model_dir given."""
+    hp, hp3, prov = resolve_hyperparameters(config)
+    weights_all = None
+    if config.use_time_decay:
+        weights_all = launch_time_decay_weights(train_featured["date"], config.launch_month, config.half_life_months)
+    models: Dict[str, object] = {}
+    for target in TARGET_COLUMNS:
+        ready = train_featured.dropna(subset=[target])
+        X = ready.loc[:, list(feature_columns)]
+        y = ready[target]
+        w = weights_all.reindex(ready.index) if weights_all is not None else pd.Series(1.0, index=ready.index)
+        fwd.validate_weights(w)
+        models[target] = _fit_model(X, y, w, target, hp, hp3, config.seed)
+    prov["time_decay"] = {"enabled": config.use_time_decay, "half_life_months": config.half_life_months, "anchor_month": config.launch_month}
+    prov["feature_count"] = len(feature_columns)
+    if model_dir is not None:
+        save_model_artifacts(models, feature_columns, model_dir)
+    return models, prov
+
+
+def save_model_artifacts(models: Mapping[str, object], feature_columns: Sequence[str], model_dir: Path) -> None:
+    model_dir.mkdir(parents=True, exist_ok=True)
+    for target, model in models.items():
+        model.save_model(str(model_dir / f"{target}_model.json"))
+    (model_dir / "feature_columns.json").write_text(json.dumps(list(feature_columns), indent=2), encoding="utf-8")
+
+
+def load_model_artifacts(model_dir: Path) -> Tuple[Dict[str, object], List[str]]:
+    import xgboost as xgb
+
+    if not Path(model_dir).exists():
+        raise LaunchError(f"--model-artifact-dir does not exist: {model_dir}")
+    feature_file = Path(model_dir) / "feature_columns.json"
+    if not feature_file.exists():
+        raise LaunchError(f"Model artifact directory missing feature_columns.json: {model_dir}")
+    feature_columns = json.loads(feature_file.read_text(encoding="utf-8"))
+    models: Dict[str, object] = {}
+    for target in TARGET_COLUMNS:
+        path = Path(model_dir) / f"{target}_model.json"
+        if not path.exists():
+            raise LaunchError(f"Model artifact directory missing {target}_model.json: {model_dir}")
+        model = xgb.XGBRegressor()
+        model.load_model(str(path))
+        models[target] = model
+    return models, feature_columns
+
+
+def predict_april(models: Mapping[str, object], xtest_featured: pd.DataFrame, feature_columns: Sequence[str], config: LaunchConfig) -> pd.DataFrame:
+    """Predict the four cumulative targets for every eligible April area (FR-017/019)."""
+    X = xtest_featured.reindex(columns=list(feature_columns), fill_value=0)
+    out_cols = {}
+    for target in TARGET_COLUMNS:
+        out_cols[f"{target}_pred"] = np.asarray(models[target].predict(X), dtype=float)
+    pred = xtest_featured[[c for c in ("area_id", "year", "month", "date") if c in xtest_featured.columns]].copy()
+    for c in ("country", "region", "name"):
+        if c in xtest_featured.columns:
+            pred[c] = xtest_featured[c].values
+    for k, v in out_cols.items():
+        pred[k] = v
+    return pred.reset_index(drop=True)
+
+
+def assemble_prediction_output(pred_validated: pd.DataFrame, overall_phase: pd.Series, config: LaunchConfig) -> pd.DataFrame:
+    out = pred_validated.copy()
+    out["overall_phase_pred"] = overall_phase.reindex(out.index).astype("Int64")
+    # aliases phase{2..5}_pred mirroring canonical naming
+    for target, phase in PHASE_FROM_TARGET.items():
+        out[f"phase{phase}_pred"] = out[f"{target}_pred"]
+    out["launch_month"] = config.launch_month
+    out["model_workflow"] = MODEL_WORKFLOW
+    out["scale"] = config.scale
+    out["threshold"] = config.threshold
+    out["training_cutoff"] = config.training_cutoff
+    out["comprehensive_source"] = str(config.comprehensive_source)
+    out["run_id"] = config.run_id
+    return out
+
+
+# --- Distribution summaries & output writing (T019; FR-030/031) -------------
+
+def prediction_distribution_summary(pred_out: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for target in TARGET_COLUMNS:
+        col = f"{target}_pred"
+        s = pd.to_numeric(pred_out[col], errors="coerce")
+        rows.append({
+            "target": col, "count": int(s.notna().sum()), "min": float(s.min()), "p25": float(s.quantile(0.25)),
+            "median": float(s.median()), "p75": float(s.quantile(0.75)), "max": float(s.max()), "mean": float(s.mean()),
+        })
+    return pd.DataFrame(rows)
+
+
+def predicted_phase_distribution(pred_out: pd.DataFrame) -> pd.DataFrame:
+    counts = pred_out["overall_phase_pred"].value_counts(dropna=False).sort_index()
+    total = int(counts.sum())
+    return pd.DataFrame([
+        {"overall_phase_pred": (int(k) if pd.notna(k) else None), "count": int(v), "share": (float(v) / total if total else 0.0)}
+        for k, v in counts.items()
+    ])
+
+
+def write_prediction_outputs(
+    layout: OutputLayout, pred_out: pd.DataFrame, xtest_featured: pd.DataFrame, feature_columns: Sequence[str],
+    coverage: dict, pred_validation: dict, overwrite: bool,
+) -> None:
+    layout.out_root.mkdir(parents=True, exist_ok=True)
+    pred_out.to_csv(layout.predictions_csv, index=False)
+    prediction_distribution_summary(pred_out).to_csv(layout.prediction_distribution_csv, index=False)
+    predicted_phase_distribution(pred_out).to_csv(layout.predicted_phase_distribution_csv, index=False)
+    write_json(layout.prediction_validation_json, pred_validation)
+    # model-aligned X_test artifact
+    aligned = xtest_featured.reindex(columns=["area_id", *list(feature_columns)], fill_value=0) if "area_id" in xtest_featured.columns else xtest_featured.reindex(columns=list(feature_columns), fill_value=0)
+    aligned.to_csv(layout.xtest_aligned_csv, index=False)
+    # coverage + eligibility
+    pd.DataFrame([coverage.get("dedup", {})]).to_csv(layout.xtest_coverage_csv, index=False)
+    pred_out[["area_id"]].assign(eligible=True, predicted=True).to_csv(layout.eligibility_csv, index=False)
+
+
+def build_run_summary(config: LaunchConfig, layout: OutputLayout, training_summary: dict, coverage: dict, feature_columns: Sequence[str], hp_prov: dict, viz_paths: Optional[dict] = None) -> dict:
+    return {
+        "run_id": config.run_id,
+        "scale": config.scale,
+        "comprehensive_source": str(config.comprehensive_source),
+        "training_cutoff": config.training_cutoff,
+        "launch_month": config.launch_month,
+        "threshold": config.threshold,
+        "model_workflow": MODEL_WORKFLOW,
+        "execution_mode": config.execution_mode,
+        "hyperparameters": hp_prov,
+        "identifier_feature_setting": config.add_identifier_features,
+        "sample_weighting": {"time_decay": config.use_time_decay, "half_life_months": config.half_life_months, "anchor_month": config.launch_month},
+        "training_rows": training_summary.get("training_rows"),
+        "train_min_date": training_summary.get("train_min_date"),
+        "train_max_date": training_summary.get("train_max_date"),
+        "predicted_area_count": coverage.get("launch_month_area_count"),
+        "feature_count": len(feature_columns),
+        "output_paths": {
+            "predictions": str(layout.predictions_csv),
+            "run_summary": str(layout.run_summary_json),
+            "feature_schema": str(layout.feature_schema_csv),
+        },
+        "visualization_paths": viz_paths or {},
+    }
+
+
+# --- Validate-only (T022; FR-006/036, I1) -----------------------------------
+
+def run_validation_only(config: LaunchConfig, df: pd.DataFrame, layout: OutputLayout, overwrite: bool) -> dict:
+    """Validate inputs/schema/mode without training or prediction. Writes only validation artifacts."""
+    summary = validate_source(df, config)
+    prepared = prepare_source(df)
+    train, train_summary = build_training_frame(prepared, config)
+    april, coverage = build_xtest_april(prepared, config)
+    featured_train, transform = apply_identifier_features(train, config)
+    featured_xtest, _ = apply_identifier_features(april, config)
+    feature_columns = select_model_features(featured_train)
+    schema_df, warnings = build_feature_schema_report(
+        featured_train, feature_columns, featured_train.columns, featured_xtest.columns, transform,
+    )
+    summary["feature_count"] = len(feature_columns)
+    summary["feature_schema_warnings"] = warnings
+    summary["training_summary"] = train_summary
+    summary["coverage"] = coverage
+    summary["execution_mode"] = config.execution_mode
+    summary["status"] = "validated"
+    # Only validation artifacts are written; never production outputs.
+    guard_output_conflicts(layout.validation_only_targets, overwrite)
+    layout.out_root.mkdir(parents=True, exist_ok=True)
+    write_json(layout.input_validation_json, summary)
+    schema_df.to_csv(layout.feature_schema_csv, index=False)
+    # Report (do not block on) intended production-output conflicts.
+    production_conflicts = [str(p) for p in (layout.predictions_csv, layout.run_summary_json) if p.exists()]
+    summary["intended_production_output_conflicts"] = production_conflicts
+    return summary
+
+
+# --- Human-readable launch report (T035; SC-010) ----------------------------
+
+def _df_to_md(df: pd.DataFrame) -> str:
+    """Render a DataFrame as a markdown table without requiring the optional 'tabulate' dep."""
+    try:
+        return df.to_markdown(index=False)
+    except Exception:  # noqa: BLE001 - tabulate not installed
+        cols = list(df.columns)
+        header = "| " + " | ".join(str(c) for c in cols) + " |"
+        sep = "| " + " | ".join("---" for _ in cols) + " |"
+        rows = ["| " + " | ".join(str(v) for v in row) + " |" for row in df.itertuples(index=False, name=None)]
+        return "\n".join([header, sep, *rows])
+
+
+def write_launch_reports(
+    config: LaunchConfig, layout: OutputLayout, run_summary: dict, pred_out: Optional[pd.DataFrame],
+    pred_dist: Optional[pd.DataFrame], phase_dist: Optional[pd.DataFrame], comparison: Optional[dict],
+    map_summary: Optional[dict], warnings: Sequence[str],
+) -> None:
+    layout.report_root.mkdir(parents=True, exist_ok=True)
+    lines: List[str] = []
+    lines.append(f"# April 2026 Global Nowcasting Launch — {config.launch_month}")
+    lines.append("")
+    lines.append("**This is a production launch, NOT a held-out validation experiment.** Global scale only.")
+    lines.append("")
+    lines.append("**Fallback comprehensive-source caveat:** This launch draws features directly from the comprehensive "
+                 "feature CSV rather than the canonical `scope_0m_model_ready` feature schema. Results may not be "
+                 "directly comparable to prior canonical 0m model-ready experiments if the feature schema differs.")
+    lines.append("")
+    lines.append("## Configuration")
+    lines.append(f"- Comprehensive source: `{config.comprehensive_source}`")
+    lines.append(f"- Training cutoff: `{config.training_cutoff}` (train strictly before)")
+    lines.append(f"- Threshold: `th={config.threshold}` (canonical, fixed)")
+    lines.append(f"- Execution mode: `{config.execution_mode}`")
+    lines.append(f"- Hyperparameters: `{run_summary.get('hyperparameters', {})}`")
+    lines.append(f"- Sample weighting: `{run_summary.get('sample_weighting', {})}`")
+    lines.append(f"- Training rows: {run_summary.get('training_rows')} (dates {run_summary.get('train_min_date')} .. {run_summary.get('train_max_date')})")
+    lines.append(f"- Predicted April 2026 areas: {run_summary.get('predicted_area_count')}")
+    lines.append(f"- Feature count: {run_summary.get('feature_count')}")
+    lines.append("")
+    if phase_dist is not None and len(phase_dist):
+        lines.append("## Predicted phase distribution")
+        lines.append(_df_to_md(phase_dist))
+        lines.append("")
+    if pred_dist is not None and len(pred_dist):
+        lines.append("## phase2-5 worse prediction distributions")
+        lines.append(_df_to_md(pred_dist))
+        lines.append("")
+    if comparison is not None:
+        cov = comparison.get("coverage", {})
+        lines.append("## Actual comparison (April 2026 only)")
+        lines.append(f"- Predicted areas: {cov.get('predicted_area_count')}; April actual-labeled: {cov.get('april_actual_labeled_area_count')}; "
+                     f"covered intersection: {cov.get('covered_intersection_count')} ({cov.get('coverage_share_of_predicted', 0):.1%} of predicted).")
+        if cov.get("actual_coverage_partial"):
+            lines.append("- **Warning: actual coverage is partial.** Metrics below apply ONLY to the covered subset.")
+        lines.append("- These are **descriptive** comparison metrics — not held-out validation, model-selection, or threshold-tuning evidence.")
+        m = comparison.get("metrics", {})
+        if m.get("covered_area_count"):
+            lines.append(f"- Covered n={m.get('covered_area_count')}; accuracy={m.get('accuracy')}, macro-F1={m.get('macro_f1')}, weighted-F1={m.get('weighted_f1')}.")
+            lines.append(f"- 3+ crisis P/R/F1/F2 = {m.get('phase3_plus_precision')}/{m.get('phase3_plus_recall')}/{m.get('phase3_plus_f1')}/{m.get('phase3_plus_f2')}.")
+            lines.append(f"- 4+ crisis P/R/F1/F2 = {m.get('phase4_plus_precision')}/{m.get('phase4_plus_recall')}/{m.get('phase4_plus_f1')}/{m.get('phase4_plus_f2')}.")
+        lines.append("")
+    if map_summary is not None:
+        lines.append("## Two-panel crisis map")
+        lines.append(f"- Figure: `{map_summary.get('output_path')}`")
+        lines.append(f"- Mapped predicted areas: {map_summary.get('mapped_predicted_count')}; mapped actual areas: {map_summary.get('mapped_actual_count')}.")
+        lines.append(f"- Unmatched prediction ids: {len(map_summary.get('unmatched_prediction_area_ids', []))}; unmatched actual ids: {len(map_summary.get('unmatched_actual_area_ids', []))}.")
+        lines.append("- Top panel: April actual crisis (actual-covered subset). Bottom panel: April predicted crisis (all eligible). Coverage may differ.")
+        lines.append("")
+    if warnings:
+        lines.append("## Warnings")
+        for w in warnings:
+            lines.append(f"- {w}")
+        lines.append("")
+    (layout.report_root / "launch_summary.md").write_text("\n".join(lines), encoding="utf-8")
+    # supporting summaries
+    if pred_dist is not None:
+        (layout.report_root / "prediction_distribution_summary.md").write_text(
+            "# Prediction distribution summary\n\n" + (_df_to_md(pred_dist) if len(pred_dist) else "n/a"), encoding="utf-8")
+    cov_warn = "\n".join(f"- {w}" for w in warnings) or "- none"
+    (layout.report_root / "data_coverage_and_warnings.md").write_text(
+        f"# Data coverage and warnings\n\n{cov_warn}\n", encoding="utf-8")
+    if comparison is not None:
+        (layout.report_root / "actual_comparison_summary.md").write_text(
+            "# April 2026 actual comparison (descriptive only)\n\n"
+            f"Coverage: {comparison.get('coverage', {})}\n\nMetrics: {comparison.get('metrics', {})}\n", encoding="utf-8")
+

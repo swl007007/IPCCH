@@ -49,6 +49,8 @@ from ipcch.forecasting_weight_decay import (
     write_json,
 )
 
+DEFAULT_COUNTRY_AREA_LOOKUP_PATH = paths.SOURCE_DATA_DIR / "assembled_IPCCH" / "country_area_id_lookup.csv"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -58,8 +60,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-key", help="ipcch.paths external key for the dataset. Overrides --fs when --dataset is omitted.")
     parser.add_argument("--fs", choices=sorted(FS_DATASET_KEYS), default=DEFAULT_FS, help="Feature-scope dataset selector: fs0=0m, fs1=3m, fs2=6m, fs3=default forecasting-ready.")
     parser.add_argument("--region-scope", type=int, choices=(0, 1), default=0, help="0=global IPC+CH rows; 1=Somalia-only rows selected by area_id before modeling.")
-    parser.add_argument("--somalia-lookup", help="Path to IPCCH completed source used to derive Somalia area_id values.")
-    parser.add_argument("--somalia-lookup-key", default=DEFAULT_SOMALIA_LOOKUP_KEY, help="ipcch.paths external key for Somalia lookup source.")
+    parser.add_argument("--somalia-lookup", help="Path to persistent country-area lookup CSV used to select Somalia area_id values.")
+    parser.add_argument("--somalia-lookup-key", help="ipcch.paths external key for Somalia lookup source. Overrides the persistent country-area lookup default when --somalia-lookup is omitted.")
     parser.add_argument("--out-dir", help="Machine-readable output directory.")
     parser.add_argument("--report-dir", help="Human-readable report directory.")
     parser.add_argument("--half-life-months", type=float, default=DEFAULT_HALF_LIFE_MONTHS, help="Exponential decay half-life in months.")
@@ -110,6 +112,16 @@ def resolve_dataset_selection(args: argparse.Namespace) -> Tuple[Path, str]:
         return resolve_input_path(None, args.dataset_key), args.dataset_key
     key = FS_DATASET_KEYS[args.fs]
     return resolve_input_path(None, key), key
+
+
+def resolve_somalia_lookup(args: argparse.Namespace) -> Tuple[Path, str]:
+    if args.somalia_lookup:
+        return resolve_input_path(args.somalia_lookup, args.somalia_lookup_key or DEFAULT_SOMALIA_LOOKUP_KEY), "explicit_path"
+    if args.somalia_lookup_key:
+        return resolve_input_path(None, args.somalia_lookup_key), args.somalia_lookup_key
+    if not DEFAULT_COUNTRY_AREA_LOOKUP_PATH.exists():
+        raise FileNotFoundError(f"Input path does not exist: {DEFAULT_COUNTRY_AREA_LOOKUP_PATH}")
+    return DEFAULT_COUNTRY_AREA_LOOKUP_PATH, "country_area_id_lookup"
 
 
 def default_experiment_name(fs: str, region_scope: int, phase_threshold: float, add_identifier_features: bool) -> str:
@@ -426,7 +438,7 @@ def run(args: argparse.Namespace) -> int:
     validate_phase_threshold(args.phase_threshold)
     test_years = validate_test_years(args.test_years)
     dataset_path, dataset_key = resolve_dataset_selection(args)
-    somalia_lookup_path = resolve_input_path(args.somalia_lookup, args.somalia_lookup_key)
+    somalia_lookup_path, somalia_lookup_key = resolve_somalia_lookup(args)
     identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
     output_plan = resolve_output_plan(args, test_years)
     check_existing_outputs(output_plan, args.overwrite, args.dry_run)
@@ -497,7 +509,7 @@ def run(args: argparse.Namespace) -> int:
         len(df),
         args.region_scope == 1,
         somalia_lookup_path,
-        args.somalia_lookup_key,
+        somalia_lookup_key,
         test_years,
         feature_columns,
         output_plan,
