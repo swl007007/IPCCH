@@ -96,7 +96,17 @@
       "Bash(~/.venvs/ipcch-geo/bin/python scripts/modeling/run_launch_nowcasting_2026_04.py --skip-prediction --predictions results/launch/nowcasting_2026_04/predictions_2026_04_all_area_id.csv --actual-source /tmp/april_2026_actuals_labeled.csv --spatial-path '../../../1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.shp' --overwrite)",
       "Bash(PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python -)",
       "Bash(~/.venvs/ipcch-geo/bin/python scripts/modeling/run_launch_nowcasting_2026_04.py --skip-prediction --predictions results/launch/nowcasting_2026_04/predictions_2026_04_all_area_id_th0p25.csv --actual-source /tmp/april_2026_actuals_labeled.csv --spatial-path '../../../1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.shp' --out-root results/launch/nowcasting_2026_04_th0p25 --report-root reports/launch/nowcasting_2026_04_th0p25 --overwrite)",
-      "Bash(PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_launch_nowcasting.py tests/unit/test_launch_comparison.py tests/unit/test_launch_visualizations.py tests/smoke/test_launch_cli.py tests/integration/test_launch_end_to_end.py -q)"
+      "Bash(PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_launch_nowcasting.py tests/unit/test_launch_comparison.py tests/unit/test_launch_visualizations.py tests/smoke/test_launch_cli.py tests/integration/test_launch_end_to_end.py -q)",
+      "Bash(command -v python3)",
+      "Bash(command -v conda)",
+      "Bash(command -v mamba)",
+      "Bash(command -v micromamba)",
+      "Bash(command -v uv)",
+      "Bash(PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python *)",
+      "Bash(mkdir -p \"specs/005-add-launch-scope/checklists\")",
+      "Bash(cp \".specify/templates/spec-template.md\" \"specs/005-add-launch-scope/spec.md\")",
+      "Bash(uv run *)",
+      "Bash(UV_LINK_MODE=copy uv run *)"
     ]
   }
 }

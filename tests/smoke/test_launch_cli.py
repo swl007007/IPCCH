@@ -19,6 +19,15 @@ def test_help_runs_without_computation():
     res = _run(["--help"])
     assert res.returncode == 0
     assert "comprehensive-source" in res.stdout
+    assert "--scope" in res.stdout
+    assert "{0,3,6}" in res.stdout
+
+
+def test_invalid_scope_fails_before_workflow_steps():
+    res = _run(["--scope", "2", "--validate-only"])
+    assert res.returncode == 2
+    assert "invalid choice" in res.stderr
+    assert "{0,3,6}" in res.stderr
 
 
 def test_missing_key_clear_message(monkeypatch):
@@ -54,6 +63,33 @@ def test_validate_only_with_explicit_source(comprehensive_csv, repo_temp_dirs):
     assert (out / "feature_schema_report.csv").exists()
     # validate-only must NOT write production outputs
     assert not (out / "predictions_2026_04_all_area_id.csv").exists()
+
+
+def test_validate_only_accepts_default_and_explicit_scope_zero(comprehensive_csv, repo_temp_dirs):
+    out, rep = repo_temp_dirs
+    default = _run([
+        "--comprehensive-source", str(comprehensive_csv),
+        "--out-root", str(out / "default"), "--report-root", str(rep / "default"),
+        "--validate-only",
+    ])
+    explicit = _run([
+        "--comprehensive-source", str(comprehensive_csv),
+        "--out-root", str(out / "explicit"), "--report-root", str(rep / "explicit"),
+        "--validate-only", "--scope", "0",
+    ])
+    assert default.returncode == 0, default.stderr
+    assert explicit.returncode == 0, explicit.stderr
+
+
+def test_validate_only_accepts_scope3_and_scope6_without_future_rows(comprehensive_csv, repo_temp_dirs):
+    out, rep = repo_temp_dirs
+    for scope in (3, 6):
+        res = _run([
+            "--comprehensive-source", str(comprehensive_csv),
+            "--out-root", str(out / f"scope{scope}"), "--report-root", str(rep / f"scope{scope}"),
+            "--validate-only", "--scope", str(scope),
+        ])
+        assert res.returncode == 0, res.stderr
 
 
 def test_validate_only_does_not_overwrite_existing_production_outputs(comprehensive_csv, repo_temp_dirs):

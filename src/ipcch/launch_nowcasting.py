@@ -51,6 +51,7 @@ TARGET_LABEL_COLUMNS = (
     *fwd.TARGET_COLUMNS,
 )
 TARGET_DERIVED_PATTERNS = ("overall_phase_lag", "target_relative", "diagnostic", "phase_target", "target")
+ALLOWED_SCOPE_MONTHS = (0, 3, 6)
 # Raw identifier / reporting columns preserved for output/joins but never modelled.
 REPORTING_ID_COLUMNS = ("area_id", "country", "region", "name", "admin_code", "pcode", "iso3", "iso")
 
@@ -66,6 +67,7 @@ class LaunchConfig:
     scale: str = DEFAULT_SCALE
     training_cutoff: str = DEFAULT_TRAINING_CUTOFF
     threshold: float = CANONICAL_THRESHOLD
+    scope_months: int = 0
     out_root: Path = field(default_factory=lambda: paths.RESULTS_DIR / "launch" / "nowcasting_2026_04")
     report_root: Path = field(default_factory=lambda: paths.REPORTS_DIR / "launch" / "nowcasting_2026_04")
     seed: int = 42
@@ -81,6 +83,11 @@ class LaunchConfig:
     drop_nonfinite_predictions: bool = False
     run_id: str = "launch_2026_04"
     execution_mode: str = "train_and_predict"
+
+    def __post_init__(self) -> None:
+        if self.scope_months not in ALLOWED_SCOPE_MONTHS:
+            allowed = ", ".join(str(v) for v in ALLOWED_SCOPE_MONTHS)
+            raise LaunchError(f"scope_months must be one of {allowed}; received {self.scope_months!r}.")
 
 
 # --- Source resolution & validation (T005, FR-006/010, I1) ------------------
@@ -114,6 +121,36 @@ def _parse_month(launch_month: str) -> Tuple[int, int]:
         return int(year_s), int(month_s)
     except Exception as exc:  # noqa: BLE001
         raise LaunchError(f"launch_month must be 'YYYY-MM'; received {launch_month!r}") from exc
+
+
+def add_months(period: pd.Period, months: int) -> pd.Period:
+    return pd.Period(period, freq="M") + int(months)
+
+
+def subtract_months(period: pd.Period, months: int) -> pd.Period:
+    return pd.Period(period, freq="M") - int(months)
+
+
+def target_period_for_scope(feature_period: pd.Period, scope_months: int) -> pd.Period:
+    if scope_months not in ALLOWED_SCOPE_MONTHS:
+        allowed = ", ".join(str(v) for v in ALLOWED_SCOPE_MONTHS)
+        raise LaunchError(f"scope_months must be one of {allowed}; received {scope_months!r}.")
+    return add_months(feature_period, scope_months)
+
+
+def launch_feature_period(config: LaunchConfig) -> pd.Period:
+    year, month = _parse_month(config.launch_month)
+    return pd.Period(f"{year:04d}-{month:02d}", freq="M")
+
+
+def launch_target_period(config: LaunchConfig) -> pd.Period:
+    return target_period_for_scope(launch_feature_period(config), config.scope_months)
+
+
+def monthly_period_from_year_month(year: pd.Series, month: pd.Series) -> pd.Series:
+    y = pd.to_numeric(year, errors="raise").astype(int).astype(str)
+    m = pd.to_numeric(month, errors="raise").astype(int).astype(str).str.zfill(2)
+    return pd.Series(pd.PeriodIndex(y + "-" + m, freq="M"), index=year.index)
 
 
 _MASK_COLUMNS = ("area_id", "year", "month", "overall_phase", *fwd.PERCENT_TARGET_COLUMNS)
@@ -166,6 +203,17 @@ def load_comprehensive_source(
     return pd.read_csv(path, skiprows=lambda i: i > 0 and (i - 1) not in keep_positions)
 
 
+def validate_required_source_columns(df: pd.DataFrame, predictor_columns: Optional[Sequence[str]] = None) -> None:
+    required = ["area_id", "year", "month"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise LaunchError(f"Comprehensive source missing required identifier columns: {', '.join(missing)}")
+    if predictor_columns is not None:
+        missing_predictors = [c for c in predictor_columns if c not in df.columns]
+        if missing_predictors:
+            raise LaunchError(f"Comprehensive source missing required predictor columns: {', '.join(missing_predictors)}")
+
+
 def validate_source(df: pd.DataFrame, config: LaunchConfig) -> dict:
     """Validate the comprehensive source; raise actionable LaunchError on failure.
 
@@ -175,8 +223,7 @@ def validate_source(df: pd.DataFrame, config: LaunchConfig) -> dict:
     required_ids = ["area_id", "year", "month"]
     missing = [c for c in required_ids if c not in df.columns]
     summary["checks"]["required_identifier_columns_present"] = not missing
-    if missing:
-        raise LaunchError(f"Comprehensive source missing required identifier columns: {', '.join(missing)}")
+    validate_required_source_columns(df)
 
     prepared = prepare_source(df)
     cutoff = pd.Timestamp(config.training_cutoff)
@@ -241,12 +288,22 @@ def _training_mask(prepared: pd.DataFrame, cutoff: pd.Timestamp) -> pd.Series:
     return (prepared["date"] < cutoff) & valid_label & has_targets
 
 
-def build_training_frame(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+def build_training_frame(
+    prepared: pd.DataFrame,
+    config: LaunchConfig,
+    static_features: Optional[Sequence[str]] = None,
+) -> Tuple[pd.DataFrame, dict]:
     cutoff = pd.Timestamp(config.training_cutoff)
     mask = _training_mask(prepared, cutoff)
     train = prepared.loc[mask].copy()
     if train.empty:
         raise LaunchError(f"No eligible training rows strictly before {config.training_cutoff}.")
+    if config.scope_months:
+        train = align_scoped_training_frame(prepared, train, config, static_features)
+    else:
+        train["feature_period"] = monthly_period_from_year_month(train["year"], train["month"]).astype(str)
+        train["target_period"] = train["feature_period"]
+        train["scope_months"] = 0
     per_month = (
         train.assign(ym=train["date"].dt.strftime("%Y-%m"))
         .groupby("ym").size().sort_index().to_dict()
@@ -256,20 +313,64 @@ def build_training_frame(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[
         "train_min_date": fwd._format_date(train["date"].min()),
         "train_max_date": fwd._format_date(train["date"].max()),
         "rows_per_month": {k: int(v) for k, v in per_month.items()},
+        "scope_months": config.scope_months,
     }
     return train, summary
 
 
-def build_xtest_april(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+def align_scoped_training_frame(
+    prepared: pd.DataFrame,
+    target_rows: pd.DataFrame,
+    config: LaunchConfig,
+    static_features: Optional[Sequence[str]],
+) -> pd.DataFrame:
+    target = target_rows.copy()
+    target_period = monthly_period_from_year_month(target["year"], target["month"])
+    feature_period = target_period.map(lambda p: subtract_months(p, config.scope_months))
+    target["target_period"] = target_period.astype(str)
+    target["feature_period"] = feature_period.astype(str)
+    feature_source = prepared.copy()
+    feature_source["feature_period"] = monthly_period_from_year_month(feature_source["year"], feature_source["month"]).astype(str)
+    candidate_columns = [
+        c for c in feature_source.columns
+        if c not in set(TARGET_COLUMNS) | set(fwd.PERCENT_TARGET_COLUMNS) | {"overall_phase", "date", "year", "month", "area_id", "feature_period"}
+    ]
+    resolved_static = static_features
+    if resolved_static is None:
+        resolved_static = resolve_static_feature_classification(feature_source, candidate_columns).static_features
+    static_set = set(resolved_static)
+    passthrough = set(TARGET_COLUMNS) | set(fwd.PERCENT_TARGET_COLUMNS) | {"area_id", "overall_phase", "date", "year", "month"}
+    dynamic_columns = [
+        c for c in feature_source.columns
+        if c not in passthrough and c not in static_set and c not in {"feature_period"}
+    ]
+    feature_cols = ["area_id", "feature_period", *dynamic_columns]
+    feature_values = feature_source.loc[:, feature_cols].copy()
+    aligned = target.drop(columns=[c for c in dynamic_columns if c in target.columns], errors="ignore").merge(
+        feature_values,
+        on=["area_id", "feature_period"],
+        how="inner",
+        validate="many_to_one",
+    )
+    if aligned.empty:
+        raise LaunchError(
+            f"No usable scoped training/evaluation records after aligning target rows to {config.scope_months}-month-prior features."
+        )
+    aligned["scope_months"] = config.scope_months
+    return aligned
+
+
+def build_launch_prediction_frame(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
     ly, lm = _parse_month(config.launch_month)
     mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
-    april = prepared.loc[mask].copy()
-    if april.empty:
+    launch = prepared.loc[mask].copy()
+    if launch.empty:
         raise LaunchError(
-            f"No launch-month rows (year={ly}, month={lm}). A valid comprehensive source with April 2026 rows is required."
+            f"No usable launch feature-period prediction records (year={ly}, month={lm}). "
+            "A valid comprehensive source with launch feature-period rows is required."
         )
-    april["area_id"] = april["area_id"].astype(str)
-    dup_ids = sorted(april.loc[april["area_id"].duplicated(keep=False), "area_id"].unique().tolist())
+    launch["area_id"] = launch["area_id"].astype(str)
+    dup_ids = sorted(launch.loc[launch["area_id"].duplicated(keep=False), "area_id"].unique().tolist())
     dedup_report: dict = {"duplicate_area_ids": dup_ids, "dedup_rule": config.dedup_rule}
     if dup_ids:
         if config.dedup_rule != "latest-date":
@@ -278,19 +379,30 @@ def build_xtest_april(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.
                 "Default is hard-stop. Re-run with --dedup-rule latest-date (requires a date column) "
                 "to resolve deterministically, or de-duplicate the source."
             )
-        # Deterministic latest-date resolution + report
-        candidate_counts = april.groupby("area_id").size().to_dict()
-        before = len(april)
-        april = april.sort_values(["area_id", "date"]).drop_duplicates("area_id", keep="last")
+        candidate_counts = launch.groupby("area_id").size().to_dict()
+        before = len(launch)
+        launch = launch.sort_values(["area_id", "date"]).drop_duplicates("area_id", keep="last")
         dedup_report["candidate_counts"] = {k: int(candidate_counts[k]) for k in dup_ids}
-        dedup_report["rows_dropped"] = int(before - len(april))
+        dedup_report["rows_dropped"] = int(before - len(launch))
         dedup_report["selected_date"] = config.launch_month
+    feature_period = str(launch_feature_period(config))
+    target_period = str(launch_target_period(config))
+    launch["feature_period"] = feature_period
+    launch["target_period"] = target_period
+    launch["scope_months"] = config.scope_months
     coverage = {
-        "launch_month_area_count": int(april["area_id"].nunique()),
-        "launch_month_rows": int(len(april)),
+        "launch_month_area_count": int(launch["area_id"].nunique()),
+        "launch_month_rows": int(len(launch)),
+        "feature_period": feature_period,
+        "target_period": target_period,
+        "scope_months": config.scope_months,
         "dedup": dedup_report,
     }
-    return april.reset_index(drop=True), coverage
+    return launch.reset_index(drop=True), coverage
+
+
+def build_xtest_april(prepared: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, dict]:
+    return build_launch_prediction_frame(prepared, config)
 
 
 # --- Feature pipeline (T008, T009; FR-011/011a/011b/012/013) ----------------
@@ -362,6 +474,60 @@ def _exclusion_family(column: str) -> Optional[Tuple[str, str]]:
     return None
 
 
+@dataclass(frozen=True)
+class StaticFeatureClassification:
+    static_features: List[str]
+    time_varying_features: List[str]
+    inconsistent_static_features: List[str]
+
+
+def _is_area_level_invariant(df: pd.DataFrame, column: str) -> bool:
+    observed = df[["area_id", column]].dropna(subset=[column])
+    if observed.empty:
+        return True
+    return bool(observed.groupby("area_id")[column].nunique(dropna=True).le(1).all())
+
+
+def classify_static_time_varying_features(
+    df: pd.DataFrame,
+    predictor_columns: Sequence[str],
+    config_static_features: Optional[Sequence[str]] = None,
+) -> StaticFeatureClassification:
+    validate_required_source_columns(df, predictor_columns)
+    infer_static = config_static_features is None
+    config_static = set(config_static_features or [])
+    static_features: List[str] = []
+    time_varying_features: List[str] = []
+    inconsistent: List[str] = []
+    for column in predictor_columns:
+        invariant = _is_area_level_invariant(df, column)
+        if infer_static and invariant:
+            static_features.append(column)
+        elif column in config_static and invariant:
+            static_features.append(column)
+        else:
+            time_varying_features.append(column)
+            if column in config_static:
+                inconsistent.append(column)
+    return StaticFeatureClassification(static_features, time_varying_features, inconsistent)
+
+
+def resolve_static_feature_classification(
+    df: pd.DataFrame,
+    predictor_columns: Sequence[str],
+    config_static_features: Optional[Sequence[str]] = None,
+    *,
+    fail_on_inconsistency: bool = True,
+) -> StaticFeatureClassification:
+    classification = classify_static_time_varying_features(df, predictor_columns, config_static_features)
+    if fail_on_inconsistency and classification.inconsistent_static_features:
+        raise LaunchError(
+            "Unresolved static classification inconsistency for config static feature(s): "
+            + ", ".join(classification.inconsistent_static_features)
+        )
+    return classification
+
+
 def build_feature_schema_report(
     featured: pd.DataFrame, feature_columns: Sequence[str], train_cols: Sequence[str], xtest_cols: Sequence[str], transform: dict
 ) -> Tuple[pd.DataFrame, List[str]]:
@@ -394,6 +560,7 @@ def build_feature_schema_report(
             "column": col,
             "included_in_model": included,
             "role": role,
+            "scope_role": "time_varying_predictor" if included else "not_scope_aligned",
             "matched_pattern": matched,
             "exclusion_family": exclusion_family,
             "exclusion_reason": reason,
@@ -528,6 +695,9 @@ class OutputLayout:
 def resolve_output_layout(config: LaunchConfig) -> OutputLayout:
     out = config.out_root
     rep = config.report_root
+    if config.scope_months != 0:
+        out = out / f"scope_{config.scope_months}m"
+        rep = rep / f"scope_{config.scope_months}m"
     fdiag_paths = paths  # noqa: F841 (paths used below)
     # Output-path safety: results under RESULTS_DIR, reports under REPORTS_DIR.
     from ipcch.alert_risk_maps import ensure_under  # reuse guardrail
@@ -681,6 +851,11 @@ def assemble_prediction_output(pred_validated: pd.DataFrame, overall_phase: pd.S
     # aliases phase{2..5}_pred mirroring canonical naming
     for target, phase in PHASE_FROM_TARGET.items():
         out[f"phase{phase}_pred"] = out[f"{target}_pred"]
+    feature_period = str(launch_feature_period(config))
+    target_period = str(launch_target_period(config))
+    out["scope_months"] = config.scope_months
+    out["feature_period"] = feature_period
+    out["target_period"] = target_period
     out["launch_month"] = config.launch_month
     out["model_workflow"] = MODEL_WORKFLOW
     out["scale"] = config.scale
@@ -732,12 +907,17 @@ def write_prediction_outputs(
 
 
 def build_run_summary(config: LaunchConfig, layout: OutputLayout, training_summary: dict, coverage: dict, feature_columns: Sequence[str], hp_prov: dict, viz_paths: Optional[dict] = None) -> dict:
+    feature_period = str(launch_feature_period(config))
+    target_period = str(launch_target_period(config))
     return {
         "run_id": config.run_id,
         "scale": config.scale,
         "comprehensive_source": str(config.comprehensive_source),
         "training_cutoff": config.training_cutoff,
         "launch_month": config.launch_month,
+        "scope_months": config.scope_months,
+        "feature_period": feature_period,
+        "target_period": target_period,
         "threshold": config.threshold,
         "model_workflow": MODEL_WORKFLOW,
         "execution_mode": config.execution_mode,
@@ -821,6 +1001,7 @@ def write_launch_reports(
     lines.append("## Configuration")
     lines.append(f"- Comprehensive source: `{config.comprehensive_source}`")
     lines.append(f"- Training cutoff: `{config.training_cutoff}` (train strictly before)")
+    lines.append(f"- Scope: `{config.scope_months}` month(s); feature period `{launch_feature_period(config)}`; target period `{launch_target_period(config)}`")
     lines.append(f"- Threshold: `th={config.threshold}` (canonical, fixed)")
     lines.append(f"- Execution mode: `{config.execution_mode}`")
     lines.append(f"- Hyperparameters: `{run_summary.get('hyperparameters', {})}`")
@@ -839,24 +1020,31 @@ def write_launch_reports(
         lines.append("")
     if comparison is not None:
         cov = comparison.get("coverage", {})
-        lines.append("## Actual comparison (April 2026 only)")
-        lines.append(f"- Predicted areas: {cov.get('predicted_area_count')}; April actual-labeled: {cov.get('april_actual_labeled_area_count')}; "
-                     f"covered intersection: {cov.get('covered_intersection_count')} ({cov.get('coverage_share_of_predicted', 0):.1%} of predicted).")
-        if cov.get("actual_coverage_partial"):
-            lines.append("- **Warning: actual coverage is partial.** Metrics below apply ONLY to the covered subset.")
-        lines.append("- These are **descriptive** comparison metrics — not held-out validation, model-selection, or threshold-tuning evidence.")
+        lines.append(f"## Actual comparison ({cov.get('target_period', launch_target_period(config))})")
         m = comparison.get("metrics", {})
-        if m.get("covered_area_count"):
-            lines.append(f"- Covered n={m.get('covered_area_count')}; accuracy={m.get('accuracy')}, macro-F1={m.get('macro_f1')}, weighted-F1={m.get('weighted_f1')}.")
-            lines.append(f"- 3+ crisis P/R/F1/F2 = {m.get('phase3_plus_precision')}/{m.get('phase3_plus_recall')}/{m.get('phase3_plus_f1')}/{m.get('phase3_plus_f2')}.")
-            lines.append(f"- 4+ crisis P/R/F1/F2 = {m.get('phase4_plus_precision')}/{m.get('phase4_plus_recall')}/{m.get('phase4_plus_f1')}/{m.get('phase4_plus_f2')}.")
+        if m.get("status") == "unavailable":
+            lines.append(f"- Actual-dependent metrics unavailable: {m.get('reason')}.")
+        else:
+            lines.append(f"- Predicted areas: {cov.get('predicted_area_count')}; actual-labeled: {cov.get('april_actual_labeled_area_count')}; "
+                         f"covered intersection: {cov.get('covered_intersection_count')} ({cov.get('coverage_share_of_predicted', 0):.1%} of predicted).")
+            if cov.get("actual_coverage_partial"):
+                lines.append("- **Warning: actual coverage is partial.** Metrics below apply ONLY to the covered subset.")
+            lines.append("- These are **descriptive** comparison metrics — not held-out validation, model-selection, or threshold-tuning evidence.")
+            if m.get("covered_area_count"):
+                lines.append(f"- Covered n={m.get('covered_area_count')}; accuracy={m.get('accuracy')}, macro-F1={m.get('macro_f1')}, weighted-F1={m.get('weighted_f1')}.")
+                lines.append(f"- 3+ crisis P/R/F1/F2 = {m.get('phase3_plus_precision')}/{m.get('phase3_plus_recall')}/{m.get('phase3_plus_f1')}/{m.get('phase3_plus_f2')}.")
+                lines.append(f"- 4+ crisis P/R/F1/F2 = {m.get('phase4_plus_precision')}/{m.get('phase4_plus_recall')}/{m.get('phase4_plus_f1')}/{m.get('phase4_plus_f2')}.")
         lines.append("")
     if map_summary is not None:
-        lines.append("## Two-panel crisis map")
+        heading = "Predicted-only crisis map" if map_summary.get("status") == "rendered_predicted_only" else "Two-panel crisis map"
+        lines.append(f"## {heading}")
         lines.append(f"- Figure: `{map_summary.get('output_path')}`")
         lines.append(f"- Mapped predicted areas: {map_summary.get('mapped_predicted_count')}; mapped actual areas: {map_summary.get('mapped_actual_count')}.")
         lines.append(f"- Unmatched prediction ids: {len(map_summary.get('unmatched_prediction_area_ids', []))}; unmatched actual ids: {len(map_summary.get('unmatched_actual_area_ids', []))}.")
-        lines.append("- Top panel: April actual crisis (actual-covered subset). Bottom panel: April predicted crisis (all eligible). Coverage may differ.")
+        if map_summary.get("status") == "rendered_predicted_only":
+            lines.append("- Target-period actuals unavailable; map shows predictions only.")
+        else:
+            lines.append("- Top panel: actual crisis (actual-covered subset). Bottom panel: predicted crisis (all eligible). Coverage may differ.")
         lines.append("")
     if warnings:
         lines.append("## Warnings")

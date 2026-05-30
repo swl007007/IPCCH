@@ -15,6 +15,33 @@ def _config(**kw) -> ln.LaunchConfig:
     return ln.LaunchConfig(**defaults)
 
 
+# --- Scope config (005 launch scope foundation) ------------------------------
+
+
+def test_launch_config_scope_defaults_to_zero():
+    cfg = _config()
+    assert cfg.scope_months == 0
+
+
+def test_launch_config_accepts_supported_scope_values():
+    assert _config(scope_months=0).scope_months == 0
+    assert _config(scope_months=3).scope_months == 3
+    assert _config(scope_months=6).scope_months == 6
+
+
+def test_launch_config_rejects_unsupported_scope_values():
+    with pytest.raises(ln.LaunchError, match="scope_months must be one of"):
+        _config(scope_months=2)
+
+
+def test_default_and_explicit_scope_zero_have_equivalent_config_semantics():
+    default = _config()
+    explicit = _config(scope_months=0)
+    assert default.scope_months == explicit.scope_months == 0
+    assert default.launch_month == explicit.launch_month
+    assert default.training_cutoff == explicit.training_cutoff
+
+
 # --- Source validation (T005, FR-006/010) -----------------------------------
 
 def test_validate_source_missing_identifier_columns(comprehensive_frame):

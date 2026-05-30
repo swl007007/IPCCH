@@ -156,6 +156,25 @@ def _rate(y_true: pd.Series, y_pred: pd.Series, true_phase: int, pred_phase: int
     return float(((y_true == true_phase) & (y_pred == pred_phase)).sum()) / denom
 
 
+def unavailable_actuals_comparison_summary(predictions: pd.DataFrame, target_period: str) -> dict:
+    pred_ids = predictions["area_id"].astype(str).nunique() if "area_id" in predictions.columns else len(predictions)
+    reason = f"target-period actuals are unavailable for {target_period}"
+    return {
+        "coverage": {
+            "predicted_area_count": int(pred_ids),
+            "target_period": target_period,
+            "actuals_available": False,
+            "covered_intersection_count": 0,
+            "note": reason,
+        },
+        "metrics": {
+            "status": "unavailable",
+            "reason": reason,
+            "descriptive_only": True,
+        },
+    }
+
+
 def write_comparison_outputs(result: ComparisonResult, comparison_dir: Path, launch_month: str = "2026-04") -> None:
     comparison_dir.mkdir(parents=True, exist_ok=True)
     result.per_area.to_csv(comparison_dir / f"actual_crisis_{launch_month.replace('-', '_')}_by_area.csv", index=False)

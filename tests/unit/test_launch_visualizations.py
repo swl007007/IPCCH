@@ -42,6 +42,36 @@ def test_duplicate_spatial_keys_hard_fail():
         lv.join_for_two_panel(preds, preds.iloc[0:0], boundaries)
 
 
+def test_build_map_predicted_only_when_actuals_unavailable(tmp_path):
+    pytest.importorskip("matplotlib")
+    import json
+    from ipcch import paths
+
+    boundaries_path = tmp_path / "boundaries.geojson"
+    _boundaries(["A", "B", "C"]).to_file(boundaries_path, driver="GeoJSON")
+    preds = _predictions(["A", "B", "C"])
+    import shutil
+    import uuid
+    token = uuid.uuid4().hex[:8]
+    rep_dir = paths.REPORTS_DIR / "launch" / f"_pytest_{token}" / "visualizations"
+    res_dir = paths.RESULTS_DIR / "launch" / f"_pytest_{token}" / "visualizations"
+    try:
+        summary = lv.build_map(
+            predictions=preds, april_actuals=None, spatial_path=boundaries_path,
+            figure_path=rep_dir / "map.png", summary_path=res_dir / "summary.json",
+            join_validation_csv=res_dir / "join.csv", actual_source="none",
+            prediction_source="preds.csv", scope="global", no_basemap=True, overwrite=True,
+        )
+        assert (rep_dir / "map.png").exists()
+        written = json.loads((res_dir / "summary.json").read_text())
+        assert written["status"] == "rendered_predicted_only"
+        assert written["mapped_actual_count"] == 0
+        assert summary.mapped_predicted_count == 3
+    finally:
+        shutil.rmtree(rep_dir.parent, ignore_errors=True)
+        shutil.rmtree(res_dir.parent, ignore_errors=True)
+
+
 def test_build_map_renders_and_writes_validation_summary(tmp_path):
     pytest.importorskip("matplotlib")
     import json

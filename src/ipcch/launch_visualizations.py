@@ -118,6 +118,31 @@ def _ensure_crisis_columns(join: TwoPanelJoin) -> None:
             join.actual_joined["actual_crisis"] = pd.to_numeric(join.actual_joined["actual_overall_phase"], errors="coerce") >= 3
 
 
+def plot_predicted_only(
+    join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False,
+) -> None:
+    plt, listed_cmap, patch = arm._require_matplotlib()
+    _ensure_crisis_columns(join)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 7))
+    use_latam = scope == "global"
+    _panel(
+        ax,
+        join.predicted_joined,
+        "predicted_crisis",
+        f"Predicted crisis (phase >= 3) — all eligible predicted areas (n={join.mapped_predicted_count})",
+        listed_cmap,
+        use_latam,
+        no_basemap,
+    )
+    handles = [patch(color=arm.NO_ALERT_COLOR, label="No crisis (phase 1-2)"), patch(color=arm.ALERT_COLOR, label="Crisis (phase 3+)")]
+    fig.legend(handles=handles, loc="lower center", ncol=2)
+    fig.suptitle("IPCCH Forecast Crisis Map\nTarget-period actuals unavailable; predicted-only view.", fontsize=12)
+    fig.subplots_adjust(left=0.04, right=0.97, bottom=0.10, top=0.88)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=300)
+    plt.close(fig)
+
+
 def plot_two_panel_actual_vs_predicted(
     join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False, partial_coverage: bool = True,
 ) -> None:
@@ -199,9 +224,15 @@ def build_map(
         raise LaunchMapError("Existing map output conflict without --overwrite: " + ", ".join(conflicts))
 
     boundaries = arm.load_spatial_boundaries(spatial_path)
-    join = join_for_two_panel(predictions, april_actuals if april_actuals is not None else predictions.iloc[0:0], boundaries)
-    partial = (april_actuals is None) or (join.mapped_actual_count < join.mapped_predicted_count)
-    plot_two_panel_actual_vs_predicted(join, figure_path, scope=scope, no_basemap=no_basemap, partial_coverage=partial)
+    actuals_available = april_actuals is not None and len(april_actuals) > 0
+    join = join_for_two_panel(predictions, april_actuals if actuals_available else predictions.iloc[0:0], boundaries)
+    partial = (not actuals_available) or (join.mapped_actual_count < join.mapped_predicted_count)
+    if actuals_available:
+        plot_two_panel_actual_vs_predicted(join, figure_path, scope=scope, no_basemap=no_basemap, partial_coverage=partial)
+        status = "rendered"
+    else:
+        plot_predicted_only(join, figure_path, scope=scope, no_basemap=no_basemap)
+        status = "rendered_predicted_only"
 
     summary = MapValidationSummary(
         actual_source=actual_source,
@@ -215,7 +246,7 @@ def build_map(
         unmatched_actual_area_ids=join.unmatched_actual,
         duplicate_spatial_keys=join.duplicate_spatial_keys,
         output_path=str(figure_path),
-        status="rendered",
+        status=status,
     )
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     import json

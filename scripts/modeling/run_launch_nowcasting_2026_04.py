@@ -28,7 +28,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="April 2026 global nowcasting launch (comprehensive-CSV fallback).")
     # Core / paths
     p.add_argument("--comprehensive-source", help="Comprehensive feature CSV (training + X_test). Default resolves the workspace key from configs/paths.local.json.")
-    p.add_argument("--launch-month", default=ln.DEFAULT_LAUNCH_MONTH, help="Launch (prediction) month YYYY-MM. Default 2026-04.")
+    p.add_argument("--launch-month", default=ln.DEFAULT_LAUNCH_MONTH, help="Launch feature month YYYY-MM. Default 2026-04.")
+    p.add_argument("--scope", type=int, choices=ln.ALLOWED_SCOPE_MONTHS, default=0, help="Forecast scope in calendar months between feature period and target period.")
     p.add_argument("--scale", default=ln.DEFAULT_SCALE, choices=["global"], help="Only 'global' is supported.")
     p.add_argument("--training-cutoff", default=ln.DEFAULT_TRAINING_CUTOFF, help="Train strictly before this date (YYYY-MM-DD).")
     p.add_argument("--out-root", help="Machine-readable output root.")
@@ -91,6 +92,7 @@ def build_config(args) -> ln.LaunchConfig:
         scale=args.scale,
         training_cutoff=args.training_cutoff,
         threshold=ln.CANONICAL_THRESHOLD,
+        scope_months=args.scope,
         out_root=Path(args.out_root) if args.out_root else (paths.RESULTS_DIR / "launch" / "nowcasting_2026_04"),
         report_root=Path(args.report_root) if args.report_root else (paths.REPORTS_DIR / "launch" / "nowcasting_2026_04"),
         seed=args.seed,
@@ -198,18 +200,22 @@ def _post_prediction(config, layout, args, pred_out, train_summary, coverage, fe
     april_actuals = None
     if args.actual_source:
         actuals_df = pd.read_csv(args.actual_source)
-        april_actuals = lc.load_april_actuals(actuals_df, config.launch_month, args.actual_crisis_flag)
+        april_actuals = lc.load_april_actuals(actuals_df, str(ln.launch_target_period(config)), args.actual_crisis_flag)
         result = lc.compare_predictions_to_actuals(pred_out, april_actuals)
-        lc.write_comparison_outputs(result, layout.comparison_dir, config.launch_month)
+        lc.write_comparison_outputs(result, layout.comparison_dir, str(ln.launch_target_period(config)))
         comparison_payload = {"coverage": result.coverage, "metrics": result.metrics}
+    else:
+        comparison_payload = lc.unavailable_actuals_comparison_summary(pred_out, str(ln.launch_target_period(config)))
 
     # US4 map
     make_map = args.make_map if args.make_map is not None else bool(args.spatial_path)
     if make_map and args.spatial_path:
         from ipcch import launch_visualizations as lv
-        figure_path = layout.viz_report_dir / "ipcch_2026_04_global_actual_vs_predicted_crisis_map.png"
-        summary_path = layout.viz_results_dir / "april_2026_crisis_map_validation_summary.json"
-        join_csv = layout.viz_results_dir / "april_2026_crisis_map_join_validation.csv"
+        target_label = str(ln.launch_target_period(config)).replace("-", "_")
+        suffix = "actual_vs_predicted" if april_actuals is not None and len(april_actuals) else "predicted_only"
+        figure_path = layout.viz_report_dir / f"ipcch_{target_label}_global_{suffix}_crisis_map.png"
+        summary_path = layout.viz_results_dir / f"{target_label}_crisis_map_validation_summary.json"
+        join_csv = layout.viz_results_dir / f"{target_label}_crisis_map_join_validation.csv"
         ms = lv.build_map(
             predictions=pred_out,
             april_actuals=april_actuals,

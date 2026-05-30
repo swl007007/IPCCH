@@ -69,3 +69,10 @@ def test_unavailable_actuals_does_not_break_predictions():
     result = lc.compare_predictions_to_actuals(_predictions(), april)
     assert result.coverage["covered_intersection_count"] == 0
     assert result.metrics["covered_area_count"] == 0
+
+
+def test_actual_dependent_metrics_mark_unavailable_when_actuals_missing():
+    result = lc.unavailable_actuals_comparison_summary(_predictions(), target_period="2026-07")
+    assert result["coverage"]["actuals_available"] is False
+    assert result["metrics"]["status"] == "unavailable"
+    assert "target-period actuals are unavailable" in result["metrics"]["reason"]
