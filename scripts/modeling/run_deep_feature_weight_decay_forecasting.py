@@ -7,12 +7,30 @@ import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 
 from ipcch import paths
+from ipcch.forecasting_shap import (
+    DEFAULT_CROSSWALK_KEY,
+    RAW_SHAP_MAX_ROWS_DEFAULT,
+    aggregate_six_category_importance,
+    compute_phase3_shap_values,
+    empty_shap_rows_diagnostic,
+    import_shap_engine,
+    enforce_raw_export_size,
+    load_crosswalk,
+    per_feature_shap_summary,
+    raw_shap_frame,
+    render_heatmap,
+    scope_matrix,
+    unavailable_split_diagnostic,
+    unmapped_feature_diagnostics,
+    validate_crosswalk,
+    validate_sample_type,
+)
 from ipcch.forecasting_weight_decay import (
     DECAY_FORMULATION,
     DEFAULT_DATASET_KEY,
@@ -73,6 +91,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42, help="Random seed for XGBoost fitting.")
     parser.add_argument("--dry-run", action="store_true", help="Validate inputs and split plan without fitting models.")
     parser.add_argument("--sample-rows", type=int, help="Limit loaded rows for lightweight validation.")
+    parser.add_argument("--enable-shap", action="store_true", help="Enable phase-3-only SHAP recording and six-category aggregation.")
+    parser.add_argument("--variable-crosswalk-path", help="Path to six-category feature crosswalk CSV. Overrides --variable-crosswalk-key.")
+    parser.add_argument("--variable-crosswalk-key", default=DEFAULT_CROSSWALK_KEY, help="ipcch.paths external key for the six-category feature crosswalk.")
+    parser.add_argument("--crosswalk-feature-column", help="Crosswalk column containing model feature names.")
+    parser.add_argument("--crosswalk-category-column", help="Crosswalk column containing six feature-group labels.")
+    parser.add_argument("--shap-sample", choices=("train", "test"), default="train", help="Rows to use for phase-3 SHAP explanation.")
+    parser.add_argument("--allow-unmapped-shap-features", action="store_true", help="Exclude unmapped SHAP features from the denominator and record diagnostics.")
+    parser.add_argument("--save-raw-shap", action="store_true", help="Write raw row-level phase-3 SHAP values when size limits allow.")
+    parser.add_argument("--raw-shap-max-rows", type=int, default=RAW_SHAP_MAX_ROWS_DEFAULT, help="Maximum raw SHAP rows allowed without --allow-large-raw-shap.")
+    parser.add_argument("--allow-large-raw-shap", action="store_true", help="Permit raw row-level SHAP output beyond --raw-shap-max-rows.")
     parser.add_argument("--overwrite", action="store_true", help="Allow replacing existing outputs.")
     return parser.parse_args()
 
@@ -122,6 +150,14 @@ def resolve_somalia_lookup(args: argparse.Namespace) -> Tuple[Path, str]:
     if not DEFAULT_COUNTRY_AREA_LOOKUP_PATH.exists():
         raise FileNotFoundError(f"Input path does not exist: {DEFAULT_COUNTRY_AREA_LOOKUP_PATH}")
     return DEFAULT_COUNTRY_AREA_LOOKUP_PATH, "country_area_id_lookup"
+
+
+def resolve_crosswalk_source(args: argparse.Namespace) -> Tuple[Optional[Path], Optional[str]]:
+    if not args.enable_shap:
+        return None, None
+    if args.variable_crosswalk_path:
+        return resolve_input_path(args.variable_crosswalk_path, args.variable_crosswalk_key), "explicit_path"
+    return resolve_input_path(None, args.variable_crosswalk_key), args.variable_crosswalk_key
 
 
 def default_experiment_name(fs: str, region_scope: int, phase_threshold: float, add_identifier_features: bool) -> str:
@@ -202,6 +238,7 @@ def run_holdout(
     hyperparams_p3: Mapping[str, object],
     seed: int,
     phase_threshold: float,
+    phase3_callback: Optional[Callable[[Mapping[str, object]], None]] = None,
 ) -> pd.DataFrame:
     if train_df.empty:
         raise ValueError(f"No eligible training rows for {test_year}")
@@ -223,6 +260,17 @@ def run_holdout(
         if X_test.empty:
             raise ValueError(f"No test rows with target {target_column} for {test_year}")
         model = fit_model(X_train, y_train, aligned_weights, target_column, hyperparams, hyperparams_p3, seed)
+        if target_column == "phase3_worse" and phase3_callback is not None:
+            phase3_callback(
+                {
+                    "test_year": test_year,
+                    "model": model,
+                    "X_train": X_train,
+                    "X_test": X_test,
+                    "sample_weight": aligned_weights,
+                    "feature_columns": list(feature_columns),
+                }
+            )
         phase_predictions[target_column] = pd.Series(model.predict(X_test), index=X_test.index)
         phase_truth[target_column] = y_test
 
@@ -328,6 +376,25 @@ def write_report(metrics_overall: Optional[pd.DataFrame], metrics_somalia: Optio
     lines.extend(_markdown_table(metrics_overall))
     lines.extend(["", "## Somalia-only metrics", ""])
     lines.extend(_markdown_table(metrics_somalia))
+    shap_metadata = metadata.get("shap", {}) if isinstance(metadata, Mapping) else {}
+    if shap_metadata.get("enabled"):
+        artifact_paths = shap_metadata.get("artifact_paths", {})
+        heatmaps = artifact_paths.get("heatmaps", {}) if isinstance(artifact_paths, Mapping) else {}
+        lines.extend(
+            [
+                "",
+                "## Phase-3 SHAP feature importance",
+                "",
+                f"Target: `{shap_metadata.get('target')}`",
+                f"SHAP explanation sample: `{shap_metadata.get('sample_type')}`",
+                f"Crosswalk source: `{shap_metadata.get('crosswalk_source')}`",
+                "",
+                "### Heatmaps",
+                "",
+            ]
+        )
+        for scope, path in heatmaps.items():
+            lines.append(f"- `{scope}`: `{path}`")
     lines.extend(["", "## Notebook discipline", "", "Original notebook modified: `false`", ""])
     output_plan.summary_report.write_text("\n".join(lines), encoding="utf-8")
 
@@ -399,10 +466,76 @@ def build_metadata(
             "metrics": str(output_plan.metrics_dir),
             "metadata": str(output_plan.metadata_dir),
             "report_dir": str(output_plan.report_dir),
+            "shap_results": str(output_plan.shap_result_dir),
+            "shap_reports": str(output_plan.shap_report_dir),
         },
         "dry_run": bool(dry_run),
         "notebook_modified": False,
     }
+
+
+def build_phase3_shap_callback(
+    args: argparse.Namespace,
+    fs: str,
+    scope_label: str,
+    crosswalk: pd.DataFrame,
+    feature_groups: Sequence[str],
+    diagnostics: List[Mapping[str, object]],
+    summaries: List[Mapping[str, object]],
+    per_feature_frames: List[pd.DataFrame],
+    six_category_frames: List[pd.DataFrame],
+    raw_frames: List[pd.DataFrame],
+):
+    if not args.enable_shap:
+        return None
+    import_shap_engine()
+
+    def callback(context: Mapping[str, object]) -> None:
+        test_year = int(context["test_year"])
+        shap_matrix = context["X_train"] if args.shap_sample == "train" else context["X_test"]
+        if len(shap_matrix) == 0:
+            diagnostics.append(empty_shap_rows_diagnostic(fs, test_year, args.shap_sample))
+            return
+        shap_values, engine_info = compute_phase3_shap_values(context["model"], shap_matrix, context["feature_columns"])
+        feature_summary = per_feature_shap_summary(
+            shap_values,
+            context["feature_columns"],
+            crosswalk,
+            fs,
+            scope_label,
+            test_year,
+            args.shap_sample,
+        )
+        six_category, aggregate_diagnostics = aggregate_six_category_importance(
+            feature_summary,
+            feature_groups,
+            fs,
+            scope_label,
+            test_year,
+            args.shap_sample,
+        )
+        if args.allow_unmapped_shap_features:
+            diagnostics.extend(unmapped_feature_diagnostics(shap_values, context["feature_columns"], crosswalk["feature_name"], fs, test_year))
+        diagnostics.extend(aggregate_diagnostics)
+        per_feature_frames.append(feature_summary)
+        six_category_frames.append(six_category)
+        if args.save_raw_shap:
+            raw_frames.append(raw_shap_frame(shap_values, shap_matrix, fs, scope_label, test_year, args.shap_sample))
+        summaries.append(
+            {
+                "forecasting_scope": fs,
+                "scope_label": scope_label,
+                "test_year": test_year,
+                "target": "phase3_worse",
+                "sample_type": args.shap_sample,
+                "feature_count": int(shap_values.shape[1]),
+                "n_explanation_rows": int(shap_values.shape[0]),
+                "shap_package": engine_info.package,
+                "shap_version": engine_info.version,
+            }
+        )
+
+    return callback
 
 
 def print_dry_run_summary(
@@ -437,12 +570,16 @@ def run(args: argparse.Namespace) -> int:
     validate_half_life(args.half_life_months)
     validate_phase_threshold(args.phase_threshold)
     test_years = validate_test_years(args.test_years)
+    validate_sample_type(args.shap_sample)
+    if args.raw_shap_max_rows <= 0:
+        raise ValueError("--raw-shap-max-rows must be positive")
     dataset_path, dataset_key = resolve_dataset_selection(args)
     somalia_lookup_path, somalia_lookup_key = resolve_somalia_lookup(args)
+    crosswalk_path, crosswalk_source = resolve_crosswalk_source(args)
     identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
     output_plan = resolve_output_plan(args, test_years)
-    check_existing_outputs(output_plan, args.overwrite, args.dry_run)
-    ensure_output_dirs(output_plan)
+    check_existing_outputs(output_plan, args.overwrite, args.dry_run, args.enable_shap)
+    ensure_output_dirs(output_plan, args.enable_shap)
 
     somalia_lookup_df = pd.read_csv(somalia_lookup_path)
     somalia_area_ids = extract_somalia_area_ids(somalia_lookup_df)
@@ -455,6 +592,20 @@ def run(args: argparse.Namespace) -> int:
         df = add_identifier_features(df, identifier_lookup_df)
         identifier_feature_columns = [column for column in df.columns if column in {"lat", "lon"} or column.startswith("month_") or column.startswith("year_")]
     feature_columns = select_numeric_feature_columns(df)
+    shap_crosswalk = pd.DataFrame()
+    shap_feature_groups: List[str] = []
+    if args.enable_shap:
+        raw_crosswalk, feature_column, category_column = load_crosswalk(crosswalk_path, args.crosswalk_feature_column, args.crosswalk_category_column)
+        shap_crosswalk, crosswalk_diagnostics = validate_crosswalk(
+            raw_crosswalk,
+            feature_columns,
+            feature_column,
+            category_column,
+            args.allow_unmapped_shap_features,
+        )
+        shap_feature_groups = shap_crosswalk["feature_group"].drop_duplicates().tolist()
+    else:
+        crosswalk_diagnostics = []
     splits = annual_splits(df, test_years)
     diagnostics = split_diagnostics(splits)
     if (diagnostics["train_rows"] == 0).any() or (diagnostics["test_rows"] == 0).any():
@@ -476,6 +627,23 @@ def run(args: argparse.Namespace) -> int:
     metrics_overall = None
     metrics_somalia = None
     predictions_by_year: Dict[int, pd.DataFrame] = {}
+    shap_diagnostics: List[Mapping[str, object]] = list(crosswalk_diagnostics)
+    shap_summaries: List[Mapping[str, object]] = []
+    shap_per_feature_frames: List[pd.DataFrame] = []
+    shap_six_category_frames: List[pd.DataFrame] = []
+    shap_raw_frames: List[pd.DataFrame] = []
+    phase3_callback = build_phase3_shap_callback(
+        args,
+        args.fs,
+        FS_LABELS[args.fs],
+        shap_crosswalk,
+        shap_feature_groups,
+        shap_diagnostics,
+        shap_summaries,
+        shap_per_feature_frames,
+        shap_six_category_frames,
+        shap_raw_frames,
+    )
 
     if args.dry_run:
         print_dry_run_summary(dataset_path, somalia_lookup_path, df, feature_columns, diagnostics, weight_rows, somalia_area_ids, output_plan)
@@ -494,12 +662,29 @@ def run(args: argparse.Namespace) -> int:
                 hyperparams_p3,
                 args.seed,
                 args.phase_threshold,
+                phase3_callback,
             )
             predictions.to_csv(output_plan.prediction_paths[year], index=False)
             predictions_by_year[year] = predictions
             metrics_by_year[year] = compute_metrics(predictions, year, "overall")
         metrics_overall = write_metrics_outputs(metrics_by_year, output_plan)
         metrics_somalia = write_somalia_metrics(predictions_by_year, somalia_area_ids, output_plan)
+        if args.enable_shap:
+            if shap_per_feature_frames:
+                pd.concat(shap_per_feature_frames, ignore_index=True).to_csv(output_plan.shap_feature_summary_csv, index=False)
+            if shap_six_category_frames:
+                shap_long = pd.concat(shap_six_category_frames, ignore_index=True)
+                shap_long.to_csv(output_plan.shap_six_category_long_csv, index=False)
+                matrix = scope_matrix(shap_long, args.fs, shap_feature_groups)
+                output_plan.shap_matrix_paths[args.fs].parent.mkdir(parents=True, exist_ok=True)
+                output_plan.shap_heatmap_paths[args.fs].parent.mkdir(parents=True, exist_ok=True)
+                matrix.to_csv(output_plan.shap_matrix_paths[args.fs], index=False)
+                render_heatmap(matrix, output_plan.shap_heatmap_paths[args.fs], FS_LABELS.get(args.fs, args.fs), args.shap_sample)
+            if args.save_raw_shap:
+                raw_frame = pd.concat(shap_raw_frames, ignore_index=True) if shap_raw_frames else pd.DataFrame()
+                enforce_raw_export_size(raw_frame, args.raw_shap_max_rows, args.allow_large_raw_shap)
+                raw_frame.to_csv(output_plan.shap_raw_values_csv, index=False)
+            pd.DataFrame(shap_diagnostics).to_csv(output_plan.shap_diagnostics_csv, index=False)
 
     metadata = build_metadata(
         dataset_path,
@@ -522,6 +707,29 @@ def run(args: argparse.Namespace) -> int:
         len(somalia_area_ids),
         weight_rows,
     )
+    metadata["shap"] = {
+        "enabled": bool(args.enable_shap),
+        "target": "phase3_worse",
+        "sample_type": args.shap_sample,
+        "crosswalk_source": {"key": crosswalk_source, "path": str(crosswalk_path)} if crosswalk_path else None,
+        "allow_unmapped_features": bool(args.allow_unmapped_shap_features),
+        "raw_export_enabled": bool(args.save_raw_shap),
+        "raw_export_size_guard": int(args.raw_shap_max_rows),
+        "allow_large_raw_export": bool(args.allow_large_raw_shap),
+        "context_summaries": list(shap_summaries),
+        "diagnostics": list(shap_diagnostics),
+        "artifact_paths": {
+            "feature_summary": str(output_plan.shap_feature_summary_csv),
+            "six_category_long": str(output_plan.shap_six_category_long_csv),
+            "diagnostics": str(output_plan.shap_diagnostics_csv),
+            "metadata": str(output_plan.shap_metadata_json),
+            "raw_values": str(output_plan.shap_raw_values_csv),
+            "matrix_tables": {args.fs: str(output_plan.shap_matrix_paths[args.fs])},
+            "heatmaps": {args.fs: str(output_plan.shap_heatmap_paths[args.fs])},
+        },
+    }
+    if args.enable_shap and not args.dry_run:
+        write_json(output_plan.shap_metadata_json, metadata["shap"])
     write_json(output_plan.run_metadata_json, metadata)
     write_report(metrics_overall, metrics_somalia, metadata, output_plan)
     return 0

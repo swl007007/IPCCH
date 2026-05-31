@@ -106,7 +106,13 @@
       "Bash(mkdir -p \"specs/005-add-launch-scope/checklists\")",
       "Bash(cp \".specify/templates/spec-template.md\" \"specs/005-add-launch-scope/spec.md\")",
       "Bash(uv run *)",
-      "Bash(UV_LINK_MODE=copy uv run *)"
+      "Bash(UV_LINK_MODE=copy uv run *)",
+      "Bash(mkdir -p \"specs/006-phase3-shap-importance/checklists\")",
+      "Bash(cp \".specify/templates/spec-template.md\" \"specs/006-phase3-shap-importance/spec.md\")",
+      "Bash(./.venv/bin/python *)",
+      "Bash(command -v pip3)",
+      "Bash(command -v python.exe)",
+      "Bash(command -v py.exe)"
     ]
   }
 }
