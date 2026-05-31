@@ -33,6 +33,10 @@ DEFAULT_EXTERNAL_PATHS = {
     / "model_ready"
     / "forecasting_subset_IPCCH_2026_target_corrected_deep_features_forecasting_ready.csv",
     "ipcch_2026_completed_dataset": SOURCE_DATA_DIR / "assembled_IPCCH" / "raw" / "IPCCH_2026_completed.csv",
+    "six_category_feature_crosswalk": SOURCE_DATA_DIR
+    / "assembled_IPCCH"
+    / "metadata"
+    / "forecasting_2026_model_ready_variable_six_category_crosswalk.csv",
 }
 
 

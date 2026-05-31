@@ -6,7 +6,7 @@ import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -73,6 +73,15 @@ class OutputPlan:
     summary_report: Path
     report_metrics_overall_csv: Path
     report_metrics_somalia_csv: Path
+    shap_result_dir: Path
+    shap_report_dir: Path
+    shap_feature_summary_csv: Path
+    shap_six_category_long_csv: Path
+    shap_diagnostics_csv: Path
+    shap_metadata_json: Path
+    shap_raw_values_csv: Path
+    shap_matrix_paths: Mapping[str, Path]
+    shap_heatmap_paths: Mapping[str, Path]
 
 
 def resolve_input_path(explicit_path: Optional[str], key: str) -> Path:
@@ -425,7 +434,10 @@ def plan_outputs(base_dir: Optional[str] = None, report_dir: Optional[str] = Non
     prediction_dir = base / "predictions"
     metrics_dir = base / "metrics"
     metadata_dir = base / "metadata"
+    shap_result_dir = base / "shap" / "phase3"
+    shap_report_dir = report / "shap" / "phase3"
     years = validate_test_years(test_years)
+    scopes = tuple(FS_DATASET_KEYS)
     return OutputPlan(
         base_dir=base,
         prediction_dir=prediction_dir,
@@ -441,15 +453,32 @@ def plan_outputs(base_dir: Optional[str] = None, report_dir: Optional[str] = Non
         summary_report=report / "summary.md",
         report_metrics_overall_csv=report / "metrics_overall.csv",
         report_metrics_somalia_csv=report / "metrics_somalia.csv",
+        shap_result_dir=shap_result_dir,
+        shap_report_dir=shap_report_dir,
+        shap_feature_summary_csv=shap_result_dir / "phase3_worse_feature_summary.csv",
+        shap_six_category_long_csv=shap_result_dir / "phase3_worse_six_category_long.csv",
+        shap_diagnostics_csv=shap_result_dir / "phase3_worse_diagnostics.csv",
+        shap_metadata_json=shap_result_dir / "phase3_worse_metadata.json",
+        shap_raw_values_csv=shap_result_dir / "phase3_worse_raw_values.csv",
+        shap_matrix_paths={scope: shap_report_dir / f"phase3_worse_{scope}_matrix.csv" for scope in scopes},
+        shap_heatmap_paths={scope: shap_report_dir / f"phase3_worse_{scope}_heatmap.png" for scope in scopes},
     )
 
 
-def ensure_output_dirs(output_plan: OutputPlan) -> None:
-    for directory in (output_plan.prediction_dir, output_plan.metrics_dir, output_plan.metadata_dir, output_plan.report_dir):
+def ensure_output_dirs(output_plan: OutputPlan, include_shap: bool = False) -> None:
+    directories = [
+        output_plan.prediction_dir,
+        output_plan.metrics_dir,
+        output_plan.metadata_dir,
+        output_plan.report_dir,
+    ]
+    if include_shap:
+        directories.extend([output_plan.shap_result_dir, output_plan.shap_report_dir])
+    for directory in directories:
         directory.mkdir(parents=True, exist_ok=True)
 
 
-def check_existing_outputs(output_plan: OutputPlan, overwrite: bool, dry_run: bool) -> None:
+def check_existing_outputs(output_plan: OutputPlan, overwrite: bool, dry_run: bool, include_shap: bool = False) -> None:
     if overwrite or dry_run:
         return
     paths_to_check = [
@@ -463,6 +492,18 @@ def check_existing_outputs(output_plan: OutputPlan, overwrite: bool, dry_run: bo
         output_plan.report_metrics_overall_csv,
         output_plan.report_metrics_somalia_csv,
     ]
+    if include_shap:
+        paths_to_check.extend(
+            [
+                output_plan.shap_feature_summary_csv,
+                output_plan.shap_six_category_long_csv,
+                output_plan.shap_diagnostics_csv,
+                output_plan.shap_metadata_json,
+                output_plan.shap_raw_values_csv,
+                *output_plan.shap_matrix_paths.values(),
+                *output_plan.shap_heatmap_paths.values(),
+            ]
+        )
     existing = [str(path) for path in paths_to_check if path.exists()]
     if existing:
         raise FileExistsError("Output paths already exist; rerun with --overwrite to replace: " + "; ".join(existing))

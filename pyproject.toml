@@ -8,5 +8,8 @@ version = "0.1.0"
 description = "IPC/CH food crisis forecasting utilities"
 requires-python = ">=3.9"
 
+[project.optional-dependencies]
+shap = ["shap"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
