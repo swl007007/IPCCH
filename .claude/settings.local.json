@@ -112,7 +112,14 @@
       "Bash(./.venv/bin/python *)",
       "Bash(command -v pip3)",
       "Bash(command -v python.exe)",
-      "Bash(command -v py.exe)"
+      "Bash(command -v py.exe)",
+      "WebFetch(domain:population.un.org)",
+      "Bash(.specify/extensions/git/scripts/bash/auto-commit.sh manual *)",
+      "Bash(Acceptance Readiness: Ready)",
+      "Bash(grep -RIn \"Version: v0.3.3\\\\|Validation Command Policy\\\\|Not Applicable\\\\|Use `Acceptance Readiness: Ready` conservatively\\\\|Support Level Guidance\\\\|Checked? reflects only\" speckit-evidence-pack .claude/skills/speckit-evidence-pack)",
+      "Bash(grep -RIn 'Use `Acceptance Readiness: Ready` conservatively\\\\|`Checked?` reflects only\\\\|Support Level Guidance\\\\|Validation Command Policy\\\\|Version: v0.3.3' speckit-evidence-pack .claude/skills/speckit-evidence-pack)",
+      "mcp__plugin_claude-mem_mcp-search__search",
+      "mcp__plugin_claude-mem_mcp-search__timeline"
     ]
   }
 }
