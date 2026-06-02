@@ -119,7 +119,11 @@
       "Bash(grep -RIn \"Version: v0.3.3\\\\|Validation Command Policy\\\\|Not Applicable\\\\|Use `Acceptance Readiness: Ready` conservatively\\\\|Support Level Guidance\\\\|Checked? reflects only\" speckit-evidence-pack .claude/skills/speckit-evidence-pack)",
       "Bash(grep -RIn 'Use `Acceptance Readiness: Ready` conservatively\\\\|`Checked?` reflects only\\\\|Support Level Guidance\\\\|Validation Command Policy\\\\|Version: v0.3.3' speckit-evidence-pack .claude/skills/speckit-evidence-pack)",
       "mcp__plugin_claude-mem_mcp-search__search",
-      "mcp__plugin_claude-mem_mcp-search__timeline"
+      "mcp__plugin_claude-mem_mcp-search__timeline",
+      "Bash(PYTHONPATH=src ./.venv/bin/python *)",
+      "Bash(~/.venvs/ipcch-geo/bin/python *)",
+      "Bash(/usr/bin/time *)",
+      "Bash(ps -eo pid,ppid,etime,pcpu,pmem,cmd)"
     ]
   }
 }

@@ -39,6 +39,11 @@ DEFAULT_TRAINING_CUTOFF = "2026-04-01"
 DEFAULT_SCALE = "global"
 CANONICAL_THRESHOLD = 0.2
 MODEL_WORKFLOW = "deep_feature_weight_decay_cumulative_regression"
+FORECASTED_WEATHER_SOURCE_KEY = "forecasted_weather_by_area_time"
+HISTORICAL_WEATHER_SOURCE_KEY = "ipcch_2026_completed_dataset"
+FORECASTED_WEATHER_DEFAULT_RELATIVE_PATH = Path("assembled_IPCCH") / "spatial" / "cds_api_tif_values_by_area_time.csv"
+FORECASTED_WEATHER_COLUMNS = ("Rainf_f_tavg_mean", "Tair_f_tavg_mean")
+FORECASTED_WEATHER_PROXY_SUFFIX = "_forecast_proxy"
 TARGET_COLUMNS = fwd.TARGET_COLUMNS  # phase2_worse..phase5_worse
 PHASE_FROM_TARGET = {"phase2_worse": 2, "phase3_worse": 3, "phase4_worse": 4, "phase5_worse": 5}
 IDENTIFIER_DERIVED_BASE = ("lat", "lon")
@@ -51,9 +56,10 @@ TARGET_LABEL_COLUMNS = (
     *fwd.TARGET_COLUMNS,
 )
 TARGET_DERIVED_PATTERNS = ("overall_phase_lag", "target_relative", "diagnostic", "phase_target", "target")
-ALLOWED_SCOPE_MONTHS = (0, 3, 6)
+ALLOWED_SCOPE_MONTHS = (0, 3, 6, 12)
 # Raw identifier / reporting columns preserved for output/joins but never modelled.
 REPORTING_ID_COLUMNS = ("area_id", "country", "region", "name", "admin_code", "pcode", "iso3", "iso")
+MODEL_METADATA_COLUMNS = ("scope_months",)
 
 
 class LaunchError(ValueError):
@@ -81,6 +87,8 @@ class LaunchConfig:
     hyperparameters_p3_path: Optional[Path] = None
     dedup_rule: Optional[str] = None
     drop_nonfinite_predictions: bool = False
+    using_forecasted_weather: bool = False
+    forecasted_weather_source: Optional[Path] = None
     run_id: str = "launch_2026_04"
     execution_mode: str = "train_and_predict"
 
@@ -156,13 +164,14 @@ def monthly_period_from_year_month(year: pd.Series, month: pd.Series) -> pd.Seri
 _MASK_COLUMNS = ("area_id", "year", "month", "overall_phase", *fwd.PERCENT_TARGET_COLUMNS)
 
 
-def _row_keep_mask(small: pd.DataFrame, training_cutoff: str, launch_month: str) -> np.ndarray:
-    """Boolean keep-mask (training-eligible OR launch-month) in original file order.
-
-    Replicates the exact training/launch-month row selection used downstream
-    (``_training_mask`` + the launch-month mask) on a narrow mask-column frame,
-    without sorting, so positions map back to original CSV rows for pass 2.
-    """
+def _row_keep_mask(
+    small: pd.DataFrame,
+    training_cutoff: str,
+    launch_month: str,
+    scope_months: int = 0,
+    using_forecasted_weather: bool = False,
+) -> np.ndarray:
+    """Boolean keep-mask in original file order for the memory-safe CSV pass."""
     prepared = small.replace([np.inf, -np.inf], np.nan).copy()
     prepared = fwd.add_monthly_date(prepared)
     prepared = fwd.derive_cumulative_targets(prepared)
@@ -170,8 +179,30 @@ def _row_keep_mask(small: pd.DataFrame, training_cutoff: str, launch_month: str)
     cutoff = pd.Timestamp(training_cutoff)
     ly, lm = _parse_month(launch_month)
     train_mask = _training_mask(prepared, cutoff)
-    april_mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
-    return (train_mask | april_mask).to_numpy()
+    launch_mask = (prepared["year"].astype(int) == ly) & (prepared["month"].astype(int) == lm)
+    keep_mask = train_mask | launch_mask
+    if scope_months:
+        target_period = monthly_period_from_year_month(prepared.loc[train_mask, "year"], prepared.loc[train_mask, "month"])
+        feature_periods = target_period.map(lambda p: subtract_months(p, scope_months)).astype(str)
+        period = monthly_period_from_year_month(prepared["year"], prepared["month"]).astype(str)
+        scoped_feature_keys = pd.MultiIndex.from_frame(
+            pd.DataFrame({
+                "area_id": prepared.loc[train_mask, "area_id"].astype(str),
+                "period": feature_periods,
+            })
+        )
+        row_keys = pd.MultiIndex.from_frame(pd.DataFrame({"area_id": prepared["area_id"].astype(str), "period": period}))
+        keep_mask |= pd.Series(row_keys.isin(scoped_feature_keys), index=prepared.index)
+        if using_forecasted_weather and scope_months == 12:
+            proxy_periods = pd.PeriodIndex(feature_periods, freq="M") + 6
+            proxy_keys = pd.MultiIndex.from_frame(
+                pd.DataFrame({
+                    "area_id": prepared.loc[train_mask, "area_id"].astype(str),
+                    "period": proxy_periods.astype(str),
+                })
+            )
+            keep_mask |= pd.Series(row_keys.isin(proxy_keys), index=prepared.index)
+    return keep_mask.to_numpy()
 
 
 def load_comprehensive_source(
@@ -180,16 +211,17 @@ def load_comprehensive_source(
     *,
     training_cutoff: Optional[str] = None,
     launch_month: Optional[str] = None,
+    scope_months: int = 0,
+    using_forecasted_weather: bool = False,
 ) -> pd.DataFrame:
     """Load the comprehensive source.
 
     When ``training_cutoff`` and ``launch_month`` are supplied (and no
     ``sample_rows`` cap is requested), use a memory-safe two-pass read: pass 1
-    reads only the narrow mask columns to find which rows are training-eligible
-    or in the launch month; pass 2 reads all columns for just those rows. This
-    avoids materialising the full multi-million-row source (the rows dropped are
-    never used by training or the launch X_test, so results are unchanged). Falls
-    back to a plain read for samples or when the mask columns are unavailable.
+    reads only the narrow mask columns to find which rows are training-eligible,
+    launch-month, or needed as scoped feature/proxy rows; pass 2 reads all columns
+    for just those rows. Falls back to a plain read for samples or when the mask
+    columns are unavailable.
     """
     if sample_rows is not None or training_cutoff is None or launch_month is None:
         return pd.read_csv(path, nrows=sample_rows)
@@ -197,7 +229,7 @@ def load_comprehensive_source(
     if not all(c in header.columns for c in _MASK_COLUMNS):
         return pd.read_csv(path)
     small = pd.read_csv(path, usecols=list(_MASK_COLUMNS))
-    keep = _row_keep_mask(small, training_cutoff, launch_month)
+    keep = _row_keep_mask(small, training_cutoff, launch_month, scope_months, using_forecasted_weather)
     del small
     keep_positions = set(np.flatnonzero(keep).tolist())
     return pd.read_csv(path, skiprows=lambda i: i > 0 and (i - 1) not in keep_positions)
@@ -275,6 +307,255 @@ def prepare_source(df: pd.DataFrame) -> pd.DataFrame:
     if "overall_phase" in result.columns:
         result["overall_phase"] = pd.to_numeric(result["overall_phase"], errors="coerce")
     return result.sort_values(["area_id", "date"]).reset_index(drop=True)
+
+
+# --- Forecasted weather feature handling -------------------------------------
+
+
+def forecasted_weather_proxy_columns() -> List[str]:
+    return [f"{c}{FORECASTED_WEATHER_PROXY_SUFFIX}" for c in FORECASTED_WEATHER_COLUMNS]
+
+
+def forecasted_weather_is_active(config: LaunchConfig) -> bool:
+    return bool(config.using_forecasted_weather and config.scope_months in (3, 6, 12))
+
+
+def resolve_forecasted_weather_source(explicit_path: Optional[Path] = None) -> Path:
+    if explicit_path is not None:
+        resolved = Path(explicit_path).expanduser()
+    else:
+        try:
+            resolved = paths.external_path(FORECASTED_WEATHER_SOURCE_KEY)
+        except KeyError:
+            resolved = paths.SOURCE_DATA_DIR / FORECASTED_WEATHER_DEFAULT_RELATIVE_PATH
+    if not resolved.exists():
+        raise LaunchError(f"Forecasted weather source file does not exist: {resolved}")
+    return resolved
+
+
+def _forecast_period_from_time(time: pd.Series) -> pd.Series:
+    text = time.astype(str).str.strip()
+    parsed = pd.to_datetime(text, format="%b%Y", errors="coerce")
+    missing = parsed.isna()
+    if missing.any():
+        parsed_fallback = pd.to_datetime(text.loc[missing], errors="coerce")
+        parsed.loc[missing] = parsed_fallback
+    if parsed.isna().any():
+        examples = time.loc[parsed.isna()].astype(str).head(5).tolist()
+        raise LaunchError(f"Forecasted weather time values cannot be parsed as months, e.g. {examples}.")
+    return pd.Series(pd.PeriodIndex(parsed.dt.strftime("%Y-%m"), freq="M"), index=time.index).astype(str)
+
+
+def load_forecasted_weather(path: Path) -> pd.DataFrame:
+    required = ["area_id", "time", *FORECASTED_WEATHER_COLUMNS]
+    forecast = pd.read_csv(path, usecols=required)
+    missing = [c for c in required if c not in forecast.columns]
+    if missing:
+        raise LaunchError("Forecasted weather source missing required columns: " + ", ".join(missing))
+    forecast = forecast.replace([np.inf, -np.inf], np.nan).copy()
+    forecast["area_id"] = forecast["area_id"].astype(str)
+    forecast["forecast_period"] = _forecast_period_from_time(forecast["time"])
+    dup = forecast.duplicated(["area_id", "forecast_period"], keep=False)
+    if dup.any():
+        examples = forecast.loc[dup, ["area_id", "forecast_period"]].drop_duplicates().head(10).to_dict("records")
+        raise LaunchError(f"Forecasted weather has duplicate area_id/forecast_period keys, e.g. {examples}.")
+    weather_na = forecast.loc[:, list(FORECASTED_WEATHER_COLUMNS)].isna().sum().to_dict()
+    if any(v for v in weather_na.values()):
+        raise LaunchError(f"Forecasted weather contains missing values in required weather columns: {weather_na}")
+    return forecast.loc[:, ["area_id", "forecast_period", *FORECASTED_WEATHER_COLUMNS]]
+
+
+def load_historical_weather_source(path: Optional[Path] = None) -> pd.DataFrame:
+    resolved = Path(path).expanduser() if path is not None else paths.external_path(HISTORICAL_WEATHER_SOURCE_KEY)
+    required = ["admin_code", "year", "month", *FORECASTED_WEATHER_COLUMNS]
+    weather = pd.read_csv(resolved, usecols=required)
+    missing = [c for c in required if c not in weather.columns]
+    if missing:
+        raise LaunchError("Historical weather source missing required columns: " + ", ".join(missing))
+    weather = weather.replace([np.inf, -np.inf], np.nan).copy()
+    weather = weather.rename(columns={"admin_code": "area_id"})
+    weather["area_id"] = weather["area_id"].astype(str)
+    weather["forecast_period"] = monthly_period_from_year_month(weather["year"], weather["month"]).astype(str)
+    dup = weather.duplicated(["area_id", "forecast_period"], keep=False)
+    if dup.any():
+        examples = weather.loc[dup, ["area_id", "forecast_period"]].drop_duplicates().head(10).to_dict("records")
+        raise LaunchError(f"Historical weather source has duplicate area_id/period keys, e.g. {examples}.")
+    weather_na = weather.loc[:, list(FORECASTED_WEATHER_COLUMNS)].isna().sum().to_dict()
+    if any(v for v in weather_na.values()):
+        raise LaunchError(f"Historical weather source contains missing values in required weather columns: {weather_na}")
+    return weather.loc[:, ["area_id", "forecast_period", *FORECASTED_WEATHER_COLUMNS]]
+
+
+def _training_weather_source(source_featured: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
+    if all(c in source_featured.columns for c in FORECASTED_WEATHER_COLUMNS):
+        train_weather = source_featured.loc[:, ["area_id", "year", "month", *FORECASTED_WEATHER_COLUMNS]].copy()
+        train_weather["area_id"] = train_weather["area_id"].astype(str)
+        train_weather["forecast_period"] = monthly_period_from_year_month(train_weather["year"], train_weather["month"]).astype(str)
+        return train_weather.loc[:, ["area_id", "forecast_period", *FORECASTED_WEATHER_COLUMNS]], "comprehensive_source_current_period_weather"
+    return load_historical_weather_source(), str(paths.external_path(HISTORICAL_WEATHER_SOURCE_KEY))
+
+
+def _weather_proxy_periods(frame: pd.DataFrame, config: LaunchConfig, *, source_label: str) -> pd.Series:
+    if config.scope_months in (3, 6):
+        return pd.Series(frame["target_period"].astype(str).values, index=frame.index)
+    if config.scope_months == 12:
+        periods = pd.PeriodIndex(frame["feature_period"].astype(str), freq="M") + 6
+        return pd.Series(periods.astype(str), index=frame.index)
+    return pd.Series(frame["feature_period"].astype(str).values, index=frame.index)
+
+
+def forecasted_weather_scope_note(config: LaunchConfig) -> str:
+    if config.scope_months in (3, 6):
+        return (
+            f"scope {config.scope_months}: training aligns labels to feature_month=target_month-{config.scope_months} "
+            f"and adds target_month weather as the forecast proxy; inference uses April 2026 base features "
+            f"plus forecast weather for {launch_target_period(config)}"
+        )
+    if config.scope_months == 12:
+        intermediate = add_months(launch_feature_period(config), 6)
+        return (
+            f"scope 12: April 2026 prediction rows use the six-month intermediate forecast weather for {intermediate}, "
+            f"not the 12-month target horizon {launch_target_period(config)}"
+        )
+    return "scope 0: forecasted weather disabled/no-op"
+
+
+def forecasted_weather_scope_mapping(config: LaunchConfig) -> dict:
+    forecast_run_period = str(launch_feature_period(config))
+    if config.scope_months == 0:
+        return {
+            "mode": "noop",
+            "forecast_value_source": "none",
+            "feature_period": forecast_run_period,
+            "target_period": forecast_run_period,
+            "forecast_weather_period": None,
+            "forecast_run_period": forecast_run_period,
+            "april_forecast_valid_period": None,
+            "inference_forecast_period": None,
+        }
+    if config.scope_months in (3, 6):
+        valid_period = str(launch_target_period(config))
+        return {
+            "mode": "target_month_weather_forecast_proxy",
+            "forecast_value_source": "scope_specific_forecast_weather_values",
+            "feature_period": forecast_run_period,
+            "target_period": valid_period,
+            "forecast_weather_period": valid_period,
+            "forecast_run_period": forecast_run_period,
+            "launch_feature_period": forecast_run_period,
+            "april_forecast_valid_period": valid_period,
+            "inference_forecast_period": valid_period,
+            "lead_months": config.scope_months,
+            "requirement_interpretation": "For scope 3/6, April 2026 base features are target_month-scope lagged features; weather forecast proxy columns use target_month rainfall and temperature values.",
+        }
+    if config.scope_months == 12:
+        intermediate = add_months(launch_feature_period(config), 6)
+        return {
+            "mode": "six_month_intermediate_weather_forecast_proxy",
+            "forecast_value_source": "six_month_intermediate_forecast_weather_values",
+            "feature_period": forecast_run_period,
+            "target_period": str(launch_target_period(config)),
+            "forecast_weather_period": str(intermediate),
+            "forecast_run_period": forecast_run_period,
+            "launch_feature_period": forecast_run_period,
+            "april_forecast_valid_period": str(intermediate),
+            "inference_forecast_period": str(intermediate),
+            "lead_months": 6,
+            "requirement_interpretation": "For scope 12, April 2026 base features are target_month-12 lagged features; weather forecast proxy columns use the target_month-6 intermediate rainfall and temperature values.",
+        }
+    return {
+        "mode": "unsupported",
+        "forecast_value_source": "none",
+        "feature_period": forecast_run_period,
+        "target_period": str(launch_target_period(config)),
+        "forecast_weather_period": None,
+        "forecast_run_period": forecast_run_period,
+        "april_forecast_valid_period": None,
+        "inference_forecast_period": None,
+    }
+
+
+def _merge_weather_proxy(
+    frame: pd.DataFrame,
+    weather_source: pd.DataFrame,
+    config: LaunchConfig,
+    *,
+    source_label: str,
+) -> Tuple[pd.DataFrame, dict]:
+    before = len(frame)
+    out = frame.copy()
+    out["area_id"] = out["area_id"].astype(str)
+    out["weather_proxy_period"] = _weather_proxy_periods(out, config, source_label=source_label)
+    lookup = weather_source.rename(columns={c: f"{c}{FORECASTED_WEATHER_PROXY_SUFFIX}" for c in FORECASTED_WEATHER_COLUMNS})
+    merged = out.merge(
+        lookup,
+        left_on=["area_id", "weather_proxy_period"],
+        right_on=["area_id", "forecast_period"],
+        how="left",
+        validate="many_to_one",
+    ).drop(columns=["forecast_period"])
+    after = len(merged)
+    if after != before:
+        raise LaunchError(f"Forecasted weather merge changed {source_label} row count from {before} to {after}.")
+    proxy_cols = forecasted_weather_proxy_columns()
+    missing_counts = merged.loc[:, proxy_cols].isna().sum().to_dict()
+    if any(v for v in missing_counts.values()):
+        missing_periods = merged.loc[merged.loc[:, proxy_cols].isna().any(axis=1), "weather_proxy_period"].drop_duplicates().head(10).tolist()
+        raise LaunchError(
+            f"Forecasted weather merge left missing {source_label} proxy values: {missing_counts}; "
+            f"example periods={missing_periods}."
+        )
+    return merged, {
+        "source": source_label,
+        "rows_before": int(before),
+        "rows_after": int(after),
+        "proxy_periods": sorted(merged["weather_proxy_period"].astype(str).unique().tolist()),
+        "proxy_columns": proxy_cols,
+        "missing_proxy_values": {k: int(v) for k, v in missing_counts.items()},
+    }
+
+
+def apply_forecasted_weather_features(
+    train_featured: pd.DataFrame,
+    xtest_featured: pd.DataFrame,
+    source_featured: pd.DataFrame,
+    config: LaunchConfig,
+) -> Tuple[pd.DataFrame, pd.DataFrame, dict]:
+    report: dict = {
+        "enabled": bool(config.using_forecasted_weather),
+        "active": forecasted_weather_is_active(config),
+        "scope_months": config.scope_months,
+        "weather_columns": list(FORECASTED_WEATHER_COLUMNS),
+        "proxy_columns": forecasted_weather_proxy_columns(),
+        "scope_note": forecasted_weather_scope_note(config),
+        "scope_mapping": forecasted_weather_scope_mapping(config),
+    }
+    if not config.using_forecasted_weather:
+        report["action"] = "disabled; existing weather feature behavior unchanged"
+        return train_featured, xtest_featured, report
+    if config.scope_months == 0:
+        report["action"] = "scope_0_noop; existing weather feature behavior unchanged"
+        return train_featured, xtest_featured, report
+    if config.scope_months not in (3, 6, 12):
+        raise LaunchError(f"Forecasted weather is only supported for scope 0, 3, 6, or 12; received {config.scope_months}.")
+    train_weather, training_proxy_source = _training_weather_source(source_featured)
+    dup = train_weather.duplicated(["area_id", "forecast_period"], keep=False)
+    if dup.any():
+        examples = train_weather.loc[dup, ["area_id", "forecast_period"]].drop_duplicates().head(10).to_dict("records")
+        raise LaunchError(f"Training weather proxy source has duplicate area_id/period keys, e.g. {examples}.")
+    train_featured, train_report = _merge_weather_proxy(train_featured, train_weather, config, source_label="training")
+
+    forecast_path = resolve_forecasted_weather_source(config.forecasted_weather_source)
+    forecast = load_forecasted_weather(forecast_path)
+    xtest_featured, xtest_report = _merge_weather_proxy(xtest_featured, forecast, config, source_label="inference")
+    report.update({
+        "action": "added forecast proxy weather features",
+        "forecasted_weather_source": str(forecast_path),
+        "training_proxy_source": training_proxy_source,
+        "training": train_report,
+        "inference": xtest_report,
+    })
+    return train_featured, xtest_featured, report
 
 
 # --- Training / X_test frames (T006, T007; FR-007/008/009) ------------------
@@ -471,6 +752,8 @@ def _exclusion_family(column: str) -> Optional[Tuple[str, str]]:
             return ("target_derived", pat)
     if lower in {c.lower() for c in REPORTING_ID_COLUMNS} or lower in {"year", "month", "date"}:
         return ("identifier_reporting", lower)
+    if lower in {c.lower() for c in MODEL_METADATA_COLUMNS}:
+        return ("model_metadata", lower)
     return None
 
 
@@ -549,7 +832,8 @@ def build_feature_schema_report(
             if fam is not None:
                 exclusion_family, matched = fam[0], fam[1]
                 role = {"target_label": "target", "target_derived": "target_derived_excluded",
-                        "identifier_reporting": "raw_identifier_reporting"}[fam[0]]
+                        "identifier_reporting": "raw_identifier_reporting",
+                        "model_metadata": "model_metadata_excluded"}[fam[0]]
                 reason = f"matched {fam[0]} ({fam[1]})"
             elif col not in numeric_cols:
                 exclusion_family, role, reason = "non_numeric", "non_numeric_excluded", "non-numeric column"
@@ -596,7 +880,7 @@ def select_model_features(featured_train: pd.DataFrame) -> List[str]:
     matches a documented target-label / target-derived family (FR-011b).
     """
     base = fwd.select_numeric_feature_columns(featured_train)
-    selected = [c for c in base if _target_or_derived_exclusion(c) is None]
+    selected = [c for c in base if _target_or_derived_exclusion(c) is None and c not in MODEL_METADATA_COLUMNS]
     if not selected:
         raise LaunchError("No eligible model feature columns remain after target-derived exclusion.")
     return selected
@@ -906,7 +1190,16 @@ def write_prediction_outputs(
     pred_out[["area_id"]].assign(eligible=True, predicted=True).to_csv(layout.eligibility_csv, index=False)
 
 
-def build_run_summary(config: LaunchConfig, layout: OutputLayout, training_summary: dict, coverage: dict, feature_columns: Sequence[str], hp_prov: dict, viz_paths: Optional[dict] = None) -> dict:
+def build_run_summary(
+    config: LaunchConfig,
+    layout: OutputLayout,
+    training_summary: dict,
+    coverage: dict,
+    feature_columns: Sequence[str],
+    hp_prov: dict,
+    viz_paths: Optional[dict] = None,
+    forecasted_weather: Optional[dict] = None,
+) -> dict:
     feature_period = str(launch_feature_period(config))
     target_period = str(launch_target_period(config))
     return {
@@ -924,6 +1217,7 @@ def build_run_summary(config: LaunchConfig, layout: OutputLayout, training_summa
         "hyperparameters": hp_prov,
         "identifier_feature_setting": config.add_identifier_features,
         "sample_weighting": {"time_decay": config.use_time_decay, "half_life_months": config.half_life_months, "anchor_month": config.launch_month},
+        "forecasted_weather": forecasted_weather or {"enabled": bool(config.using_forecasted_weather), "active": False},
         "training_rows": training_summary.get("training_rows"),
         "train_min_date": training_summary.get("train_min_date"),
         "train_max_date": training_summary.get("train_max_date"),
@@ -948,6 +1242,9 @@ def run_validation_only(config: LaunchConfig, df: pd.DataFrame, layout: OutputLa
     april, coverage = build_xtest_april(prepared, config)
     featured_train, transform = apply_identifier_features(train, config)
     featured_xtest, _ = apply_identifier_features(april, config)
+    featured_train, featured_xtest, weather_report = apply_forecasted_weather_features(
+        featured_train, featured_xtest, prepared, config
+    )
     feature_columns = select_model_features(featured_train)
     schema_df, warnings = build_feature_schema_report(
         featured_train, feature_columns, featured_train.columns, featured_xtest.columns, transform,
@@ -956,6 +1253,7 @@ def run_validation_only(config: LaunchConfig, df: pd.DataFrame, layout: OutputLa
     summary["feature_schema_warnings"] = warnings
     summary["training_summary"] = train_summary
     summary["coverage"] = coverage
+    summary["forecasted_weather"] = weather_report
     summary["execution_mode"] = config.execution_mode
     summary["status"] = "validated"
     # Only validation artifacts are written; never production outputs.
@@ -1006,6 +1304,7 @@ def write_launch_reports(
     lines.append(f"- Execution mode: `{config.execution_mode}`")
     lines.append(f"- Hyperparameters: `{run_summary.get('hyperparameters', {})}`")
     lines.append(f"- Sample weighting: `{run_summary.get('sample_weighting', {})}`")
+    lines.append(f"- Forecasted weather: `{run_summary.get('forecasted_weather', {})}`")
     lines.append(f"- Training rows: {run_summary.get('training_rows')} (dates {run_summary.get('train_min_date')} .. {run_summary.get('train_max_date')})")
     lines.append(f"- Predicted April 2026 areas: {run_summary.get('predicted_area_count')}")
     lines.append(f"- Feature count: {run_summary.get('feature_count')}")

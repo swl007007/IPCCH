@@ -61,10 +61,13 @@ def test_build_map_predicted_only_when_actuals_unavailable(tmp_path):
             figure_path=rep_dir / "map.png", summary_path=res_dir / "summary.json",
             join_validation_csv=res_dir / "join.csv", actual_source="none",
             prediction_source="preds.csv", scope="global", no_basemap=True, overwrite=True,
+            target_period="2027-04", prediction_period="2027-04",
         )
         assert (rep_dir / "map.png").exists()
         written = json.loads((res_dir / "summary.json").read_text())
         assert written["status"] == "rendered_predicted_only"
+        assert written["actual_month"] == "2027-04"
+        assert written["prediction_month"] == "2027-04"
         assert written["mapped_actual_count"] == 0
         assert summary.mapped_predicted_count == 3
     finally:

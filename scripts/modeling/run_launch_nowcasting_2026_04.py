@@ -49,6 +49,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--no-time-decay", dest="use_time_decay", action="store_false", default=True)
     p.add_argument("--threshold", type=float, default=ln.CANONICAL_THRESHOLD, help="Fixed/informational; only 0.2 accepted.")
     p.add_argument("--drop-nonfinite-predictions", action="store_true")
+    p.add_argument("--using_forecasted_weather", "--using-forecasted-weather", dest="using_forecasted_weather", action="store_true", help="For scope 3/6/12, add forecast-weather proxy features and replace inference proxy values from the forecast file.")
+    p.add_argument("--forecasted-weather-source", help="Forecast weather CSV with area_id,time,Rainf_f_tavg_mean,Tair_f_tavg_mean. Defaults to assembled_IPCCH/spatial/cds_api_tif_values_by_area_time.csv.")
     # Execution modes
     p.add_argument("--skip-training", action="store_true", help="Mode 2: requires --model-artifact-dir.")
     p.add_argument("--model-artifact-dir", help="Directory with fitted model artifacts (Mode 2).")
@@ -106,6 +108,8 @@ def build_config(args) -> ln.LaunchConfig:
         hyperparameters_p3_path=Path(args.hyperparameters_p3) if args.hyperparameters_p3 else None,
         dedup_rule=args.dedup_rule,
         drop_nonfinite_predictions=args.drop_nonfinite_predictions,
+        using_forecasted_weather=args.using_forecasted_weather,
+        forecasted_weather_source=Path(args.forecasted_weather_source) if args.forecasted_weather_source else None,
         execution_mode=mode,
     )
 
@@ -129,7 +133,8 @@ def run(args) -> int:
             print(f"[validate-only] Mode 3 predictions present: {args.predictions}")
             return 0
         pred_out = pd.read_csv(args.predictions)
-        _post_prediction(config, layout, args, pred_out, train_summary={}, coverage={"launch_month_area_count": int(pred_out['area_id'].nunique())}, feature_columns=[], hp_prov={}, warnings=[])
+        weather_report = {"enabled": bool(config.using_forecasted_weather), "active": False, "action": "not_applied_in_report_from_supplied_predictions_mode"}
+        _post_prediction(config, layout, args, pred_out, train_summary={}, coverage={"launch_month_area_count": int(pred_out['area_id'].nunique())}, feature_columns=[], hp_prov={}, warnings=[], forecasted_weather=weather_report)
         return 0
 
     # --- Modes 1/2 need the comprehensive source --------------------------
@@ -140,6 +145,8 @@ def run(args) -> int:
         sample_rows=args.sample_rows,
         training_cutoff=config.training_cutoff,
         launch_month=config.launch_month,
+        scope_months=config.scope_months,
+        using_forecasted_weather=config.using_forecasted_weather,
     )
 
     if args.validate_only:
@@ -162,9 +169,21 @@ def run(args) -> int:
     featured_all, transform = ln.apply_identifier_features(prepared, config)
     train_featured, train_summary = ln.build_training_frame(featured_all, config)
     april_featured, coverage = ln.build_xtest_april(featured_all, config)
+    train_featured, april_featured, weather_report = ln.apply_forecasted_weather_features(
+        train_featured, april_featured, featured_all, config
+    )
+    print(f"[forecasted-weather] enabled={weather_report.get('enabled')} active={weather_report.get('active')} action={weather_report.get('action')}")
+    if weather_report.get("active"):
+        print(f"[forecasted-weather] {weather_report.get('scope_note')}; inference_periods={weather_report.get('inference', {}).get('proxy_periods')}")
 
     if mode == "predict_with_supplied_models":
         models, feature_columns = ln.load_model_artifacts(Path(args.model_artifact_dir))
+        missing_weather_features = [c for c in ln.forecasted_weather_proxy_columns() if weather_report.get("active") and c not in feature_columns]
+        if missing_weather_features:
+            raise ln.LaunchError(
+                "--using_forecasted_weather requires supplied model artifacts trained with forecast-weather proxy features; "
+                "missing feature(s): " + ", ".join(missing_weather_features)
+            )
         hp_prov = {"set": "supplied_models", "model_artifact_dir": args.model_artifact_dir}
     else:
         feature_columns = ln.select_model_features(train_featured)
@@ -186,11 +205,11 @@ def run(args) -> int:
     pd.DataFrame([train_summary]).to_csv(layout.training_summary_csv, index=False)
     ln.write_prediction_outputs(layout, pred_out, april_featured, feature_columns, coverage, pred_validation, args.overwrite)
 
-    _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings)
+    _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, weather_report)
     return 0
 
 
-def _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings):
+def _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, forecasted_weather=None):
     """Comparison (US3), map (US4), reports (US5), run summary. Actuals loaded ONLY here."""
     comparison_payload = None
     map_summary = None
@@ -228,11 +247,13 @@ def _post_prediction(config, layout, args, pred_out, train_summary, coverage, fe
             scope=config.scale,
             no_basemap=args.no_basemap,
             overwrite=args.overwrite,
+            target_period=str(ln.launch_target_period(config)),
+            prediction_period=str(ln.launch_target_period(config)),
         )
         map_summary = ms.to_dict()
         viz_paths = {"figure": str(figure_path), "validation_summary": str(summary_path)}
 
-    run_summary = ln.build_run_summary(config, layout, train_summary, coverage, feature_columns, hp_prov, viz_paths)
+    run_summary = ln.build_run_summary(config, layout, train_summary, coverage, feature_columns, hp_prov, viz_paths, forecasted_weather)
     ln.write_json(layout.run_summary_json, run_summary)
     ln.write_json(layout.config_json, ln.asdict(config) if hasattr(ln, "asdict") else {"launch_month": config.launch_month})
     pred_dist = ln.prediction_distribution_summary(pred_out) if "phase2_worse_pred" in pred_out.columns else None

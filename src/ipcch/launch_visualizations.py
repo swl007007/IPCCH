@@ -1,4 +1,4 @@
-"""Two-panel April 2026 actual-vs-predicted global crisis map.
+"""Launch actual-vs-predicted global crisis maps.
 
 Reuses the ``ipcch.alert_risk_maps`` guardrails (alert/no-alert colors, Latin
 America inset, binary layer, no-basemap, ensure_under) but provides a
@@ -6,9 +6,9 @@ launch-specific spatial join that RECORDS unmatched area_id values and renders
 the matched subset, while hard-failing on duplicate spatial keys (spec FR-024..
 FR-028, R8/R9). This does not alter the existing six-panel/top-risk behavior.
 
-Top panel: April 2026 actual crisis (overall_phase >= 3) on the actual-covered
-subset. Bottom panel: April 2026 predicted crisis (overall_phase_pred >= 3) on
-all eligible predicted areas. Coverage may differ; the figure states this.
+When target-period actuals are available, the top panel maps actual crisis on the
+actual-covered subset and the bottom panel maps predicted crisis on all eligible
+predicted areas. Coverage may differ; the figure states this.
 """
 from __future__ import annotations
 
@@ -119,7 +119,7 @@ def _ensure_crisis_columns(join: TwoPanelJoin) -> None:
 
 
 def plot_predicted_only(
-    join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False,
+    join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False, target_period: str = "2026-04",
 ) -> None:
     plt, listed_cmap, patch = arm._require_matplotlib()
     _ensure_crisis_columns(join)
@@ -129,14 +129,14 @@ def plot_predicted_only(
         ax,
         join.predicted_joined,
         "predicted_crisis",
-        f"Predicted crisis (phase >= 3) — all eligible predicted areas (n={join.mapped_predicted_count})",
+        f"{target_period} predicted crisis (phase >= 3) — all eligible predicted areas (n={join.mapped_predicted_count})",
         listed_cmap,
         use_latam,
         no_basemap,
     )
     handles = [patch(color=arm.NO_ALERT_COLOR, label="No crisis (phase 1-2)"), patch(color=arm.ALERT_COLOR, label="Crisis (phase 3+)")]
     fig.legend(handles=handles, loc="lower center", ncol=2)
-    fig.suptitle("IPCCH Forecast Crisis Map\nTarget-period actuals unavailable; predicted-only view.", fontsize=12)
+    fig.suptitle(f"IPCCH {target_period} Forecast Crisis Map\nTarget-period actuals unavailable; predicted-only view.", fontsize=12)
     fig.subplots_adjust(left=0.04, right=0.97, bottom=0.10, top=0.88)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=300)
@@ -144,24 +144,24 @@ def plot_predicted_only(
 
 
 def plot_two_panel_actual_vs_predicted(
-    join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False, partial_coverage: bool = True,
+    join: TwoPanelJoin, output_path: Path, scope: str = "global", no_basemap: bool = False, partial_coverage: bool = True, target_period: str = "2026-04",
 ) -> None:
-    """Build a 2x1 vertical figure (April actual top, April predicted bottom). FR-024/025/026."""
+    """Build a 2x1 vertical figure (target actual top, target predicted bottom). FR-024/025/026."""
     plt, listed_cmap, patch = arm._require_matplotlib()
     _ensure_crisis_columns(join)
     fig, axes = plt.subplots(2, 1, figsize=(10, 12))
     use_latam = scope == "global"
 
     _panel(axes[0], join.actual_joined, "actual_crisis",
-           f"April 2026 actual crisis (phase >= 3) — actual-covered subset (n={join.mapped_actual_count})",
+           f"{target_period} actual crisis (phase >= 3) — actual-covered subset (n={join.mapped_actual_count})",
            listed_cmap, use_latam, no_basemap)
     _panel(axes[1], join.predicted_joined, "predicted_crisis",
-           f"April 2026 predicted crisis (phase >= 3) — all eligible predicted areas (n={join.mapped_predicted_count})",
+           f"{target_period} predicted crisis (phase >= 3) — all eligible predicted areas (n={join.mapped_predicted_count})",
            listed_cmap, use_latam, no_basemap)
 
     handles = [patch(color=arm.NO_ALERT_COLOR, label="No crisis (phase 1-2)"), patch(color=arm.ALERT_COLOR, label="Crisis (phase 3+)")]
     fig.legend(handles=handles, loc="lower center", ncol=2)
-    title = "IPCCH April 2026 Global Actual vs Predicted Crisis"
+    title = f"IPCCH {target_period} Global Actual vs Predicted Crisis"
     subtitle = "Actual coverage is partial; actual and predicted panels may cover different area_id sets." if partial_coverage else "Actual vs predicted crisis."
     fig.suptitle(f"{title}\n{subtitle}", fontsize=12)
     fig.subplots_adjust(left=0.04, right=0.97, bottom=0.08, top=0.90, hspace=0.18)
@@ -214,6 +214,8 @@ def build_map(
     scope: str = "global",
     no_basemap: bool = False,
     overwrite: bool = False,
+    target_period: str = "2026-04",
+    prediction_period: str = "2026-04",
 ) -> MapValidationSummary:
     """Orchestrate the two-panel map with output safety + validation summary."""
     arm.ensure_under(figure_path.parent, paths.REPORTS_DIR, "Map figure output")
@@ -228,16 +230,18 @@ def build_map(
     join = join_for_two_panel(predictions, april_actuals if actuals_available else predictions.iloc[0:0], boundaries)
     partial = (not actuals_available) or (join.mapped_actual_count < join.mapped_predicted_count)
     if actuals_available:
-        plot_two_panel_actual_vs_predicted(join, figure_path, scope=scope, no_basemap=no_basemap, partial_coverage=partial)
+        plot_two_panel_actual_vs_predicted(join, figure_path, scope=scope, no_basemap=no_basemap, partial_coverage=partial, target_period=target_period)
         status = "rendered"
     else:
-        plot_predicted_only(join, figure_path, scope=scope, no_basemap=no_basemap)
+        plot_predicted_only(join, figure_path, scope=scope, no_basemap=no_basemap, target_period=target_period)
         status = "rendered_predicted_only"
 
     summary = MapValidationSummary(
         actual_source=actual_source,
         prediction_source=prediction_source,
         spatial_boundary_source=str(spatial_path),
+        actual_month=target_period,
+        prediction_month=prediction_period,
         predicted_area_count=int(predictions["area_id"].astype(str).nunique()),
         april_actual_covered_area_count=int(april_actuals["area_id"].astype(str).nunique()) if april_actuals is not None and len(april_actuals) else 0,
         mapped_predicted_count=join.mapped_predicted_count,

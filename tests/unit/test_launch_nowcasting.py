@@ -27,6 +27,7 @@ def test_launch_config_accepts_supported_scope_values():
     assert _config(scope_months=0).scope_months == 0
     assert _config(scope_months=3).scope_months == 3
     assert _config(scope_months=6).scope_months == 6
+    assert _config(scope_months=12).scope_months == 12
 
 
 def test_launch_config_rejects_unsupported_scope_values():
@@ -103,15 +104,17 @@ def test_duplicate_april_resolved_with_latest_date_rule(comprehensive_frame):
 # --- Feature pipeline + exclusion audit (T008/T009, FR-011/012/013) ----------
 
 def test_identifier_features_detected_and_features_exclude_targets(comprehensive_frame):
-    prepared = ln.prepare_source(comprehensive_frame)
+    frame = comprehensive_frame.copy()
+    frame["estimated_population"] = range(len(frame))
+    prepared = ln.prepare_source(frame)
     featured, transform = ln.apply_identifier_features(prepared, _config())
     assert transform["lat_lon"] == "detected"
     assert any(c.startswith("month_") for c in featured.columns)
     train, _ = ln.build_training_frame(featured, _config())
     feats = ln.select_model_features(train)
-    assert {"feat_x", "feat_y", "lat", "lon"}.issubset(set(feats))
-    # Targets / target-derived / identifiers excluded
-    for bad in ["overall_phase", "phase2_worse", "phase3_percent", "overall_phase_lag1", "area_id", "country", "region", "year", "month"]:
+    assert {"feat_x", "feat_y", "lat", "lon", "estimated_population"}.issubset(set(feats))
+    # Targets / target-derived / identifiers / launch metadata excluded
+    for bad in ["overall_phase", "phase2_worse", "phase3_percent", "overall_phase_lag1", "area_id", "country", "region", "year", "month", "scope_months"]:
         assert bad not in feats
 
 
@@ -139,6 +142,171 @@ def test_out_of_family_warning_fires(comprehensive_frame):
     feats = [f for f in ln.select_model_features(train) if f != "feat_y"]  # drop one numeric feature
     schema, warnings = ln.build_feature_schema_report(featured, feats, train.columns, train.columns, transform)
     assert any("Out-of-family" in w for w in warnings)
+
+
+# --- Forecasted weather feature handling -------------------------------------
+
+
+def _weather_percent_rows(phase: int) -> dict:
+    base = {f"phase{i}_percent": 0.0 for i in range(1, 6)}
+    base[f"phase{phase}_percent"] = 1.0
+    return base
+
+
+def _weather_frame() -> pd.DataFrame:
+    rows = []
+    for area in ["A", "B"]:
+        offset = 0 if area == "A" else 1000
+        for year, month, rain, temp, phase in [
+            (2024, 7, -5.0, 275.0, 1),
+            (2024, 10, -2.0, 278.0, 2),
+            (2025, 1, 1.0, 280.0, 1),
+            (2025, 4, 4.0, 284.0, 2),
+            (2025, 7, 7.0, 287.0, 3),
+            (2025, 10, 10.0, 290.0, 4),
+            (2026, 4, 16.0, 296.0, np.nan),
+        ]:
+            row = {
+                "area_id": area,
+                "country": "X",
+                "region": "R",
+                "year": year,
+                "month": month,
+                "lat": 1.0,
+                "lon": 2.0,
+                "overall_phase": phase,
+                "feat_x": rain + offset,
+                "Rainf_f_tavg_mean": rain + offset,
+                "Tair_f_tavg_mean": temp + offset,
+            }
+            if pd.isna(phase):
+                row.update({f"phase{i}_percent": np.nan for i in range(1, 6)})
+            else:
+                row.update(_weather_percent_rows(int(phase)))
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _forecast_weather_csv(tmp_path) -> Path:
+    path = tmp_path / "forecast_weather.csv"
+    pd.DataFrame(
+        [
+            {"area_id": "A", "time": "apr2026", "Rainf_f_tavg_mean": 40.0, "Tair_f_tavg_mean": 299.0},
+            {"area_id": "A", "time": "jul2026", "Rainf_f_tavg_mean": 70.0, "Tair_f_tavg_mean": 300.0},
+            {"area_id": "A", "time": "oct2026", "Rainf_f_tavg_mean": 100.0, "Tair_f_tavg_mean": 303.0},
+            {"area_id": "B", "time": "apr2026", "Rainf_f_tavg_mean": 1040.0, "Tair_f_tavg_mean": 1299.0},
+            {"area_id": "B", "time": "jul2026", "Rainf_f_tavg_mean": 1070.0, "Tair_f_tavg_mean": 1300.0},
+            {"area_id": "B", "time": "oct2026", "Rainf_f_tavg_mean": 1100.0, "Tair_f_tavg_mean": 1303.0},
+        ]
+    ).to_csv(path, index=False)
+    return path
+
+
+def test_forecasted_weather_disabled_keeps_training_and_xtest_schema_unchanged(tmp_path):
+    prepared = ln.prepare_source(_weather_frame())
+    cfg = _config(scope_months=3, training_cutoff="2026-01-01")
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+    assert out_train.columns.tolist() == train.columns.tolist()
+    assert out_xtest.columns.tolist() == xtest.columns.tolist()
+    assert report["active"] is False
+
+
+def test_forecasted_weather_scope0_is_noop_even_when_enabled(tmp_path):
+    prepared = ln.prepare_source(_weather_frame())
+    cfg = _config(scope_months=0, using_forecasted_weather=True, forecasted_weather_source=_forecast_weather_csv(tmp_path))
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+    assert out_train.columns.tolist() == train.columns.tolist()
+    assert out_xtest.columns.tolist() == xtest.columns.tolist()
+    assert report["action"].startswith("scope_0_noop")
+
+
+def test_scope3_forecasted_weather_uses_target_period_proxy_for_train_and_inference(tmp_path):
+    prepared = ln.prepare_source(_weather_frame())
+    cfg = _config(scope_months=3, training_cutoff="2026-01-01", using_forecasted_weather=True, forecasted_weather_source=_forecast_weather_csv(tmp_path))
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+    row = out_train[(out_train["area_id"] == "A") & (out_train["target_period"] == "2025-07")].iloc[0]
+    assert row["Rainf_f_tavg_mean"] == 4.0
+    assert row["Rainf_f_tavg_mean_forecast_proxy"] == 7.0
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "weather_proxy_period"].iloc[0] == "2026-07"
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "Rainf_f_tavg_mean_forecast_proxy"].iloc[0] == 70.0
+    assert report["inference"]["proxy_periods"] == ["2026-07"]
+    assert "target_month weather as the forecast proxy" in report["scope_note"]
+    assert report["scope_mapping"]["forecast_weather_period"] == "2026-07"
+
+
+def test_forecasted_weather_training_proxy_falls_back_to_raw_historical_weather(tmp_path, monkeypatch):
+    source = _weather_frame().drop(columns=["Rainf_f_tavg_mean", "Tair_f_tavg_mean"])
+    prepared = ln.prepare_source(source)
+    raw_path = tmp_path / "raw_weather.csv"
+    raw_rows = []
+    for area, offset in [("A", 0), ("B", 1000)]:
+        for year, month, rain, temp in [
+            (2024, 10, -2.0, 278.0),
+            (2025, 1, 1.0, 280.0),
+            (2025, 4, 4.0, 284.0),
+            (2025, 7, 7.0, 287.0),
+            (2025, 10, 10.0, 290.0),
+            (2026, 7, 70.0, 300.0),
+        ]:
+            raw_rows.append({"admin_code": area, "year": year, "month": month, "Rainf_f_tavg_mean": rain + offset, "Tair_f_tavg_mean": temp + offset})
+    pd.DataFrame(raw_rows).to_csv(raw_path, index=False)
+
+    def fake_external_path(key):
+        if key == ln.HISTORICAL_WEATHER_SOURCE_KEY:
+            return raw_path
+        raise KeyError(key)
+
+    monkeypatch.setattr(ln.paths, "external_path", fake_external_path)
+    cfg = _config(scope_months=3, training_cutoff="2026-01-01", using_forecasted_weather=True, forecasted_weather_source=_forecast_weather_csv(tmp_path))
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+
+    row = out_train[(out_train["area_id"] == "A") & (out_train["target_period"] == "2025-07")].iloc[0]
+    assert row["Rainf_f_tavg_mean_forecast_proxy"] == 7.0
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "Rainf_f_tavg_mean_forecast_proxy"].iloc[0] == 70.0
+    assert report["training_proxy_source"] == str(raw_path)
+
+
+
+def test_scope6_forecasted_weather_uses_october_2026_forecast(tmp_path):
+    prepared = ln.prepare_source(_weather_frame())
+    cfg = _config(scope_months=6, training_cutoff="2026-01-01", using_forecasted_weather=True, forecasted_weather_source=_forecast_weather_csv(tmp_path))
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+    row = out_train[(out_train["area_id"] == "A") & (out_train["target_period"] == "2025-07")].iloc[0]
+    assert row["Rainf_f_tavg_mean"] == 1.0
+    assert row["Rainf_f_tavg_mean_forecast_proxy"] == 7.0
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "weather_proxy_period"].iloc[0] == "2026-10"
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "Tair_f_tavg_mean_forecast_proxy"].iloc[0] == 303.0
+    assert report["inference"]["proxy_periods"] == ["2026-10"]
+    assert "target_month weather as the forecast proxy" in report["scope_note"]
+    assert report["scope_mapping"]["forecast_weather_period"] == "2026-10"
+
+
+def test_scope12_forecasted_weather_uses_six_month_intermediate_proxy_not_target_period(tmp_path):
+    prepared = ln.prepare_source(_weather_frame())
+    cfg = _config(scope_months=12, training_cutoff="2026-01-01", using_forecasted_weather=True, forecasted_weather_source=_forecast_weather_csv(tmp_path))
+    train, _ = ln.build_training_frame(prepared, cfg)
+    xtest, _ = ln.build_xtest_april(prepared, cfg)
+    out_train, out_xtest, report = ln.apply_forecasted_weather_features(train, xtest, prepared, cfg)
+    row = out_train[(out_train["area_id"] == "A") & (out_train["target_period"] == "2025-07")].iloc[0]
+    assert row["feature_period"] == "2024-07"
+    assert row["weather_proxy_period"] == "2025-01"
+    assert row["Rainf_f_tavg_mean_forecast_proxy"] == 1.0
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "weather_proxy_period"].iloc[0] == "2026-10"
+    assert out_xtest.loc[out_xtest["area_id"] == "A", "Rainf_f_tavg_mean_forecast_proxy"].iloc[0] == 100.0
+    assert report["inference"]["proxy_periods"] == ["2026-10"]
+    assert "six-month intermediate forecast weather for 2026-10" in report["scope_note"]
+    assert report["scope_mapping"]["forecast_weather_period"] == "2026-10"
 
 
 # --- Prediction validation & non-finite handling (T016/T014, FR-017a) --------

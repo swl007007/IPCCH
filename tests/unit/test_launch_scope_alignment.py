@@ -12,11 +12,13 @@ def test_add_months_supports_scope_offsets_and_year_boundaries():
     assert ln.add_months(pd.Period("2026-04", freq="M"), 3) == pd.Period("2026-07", freq="M")
     assert ln.add_months(pd.Period("2026-04", freq="M"), 6) == pd.Period("2026-10", freq="M")
     assert ln.add_months(pd.Period("2025-11", freq="M"), 3) == pd.Period("2026-02", freq="M")
+    assert ln.add_months(pd.Period("2026-04", freq="M"), 12) == pd.Period("2027-04", freq="M")
 
 
 def test_subtract_months_supports_scope_offsets_and_year_boundaries():
     assert ln.subtract_months(pd.Period("2025-07", freq="M"), 3) == pd.Period("2025-04", freq="M")
     assert ln.subtract_months(pd.Period("2026-01", freq="M"), 6) == pd.Period("2025-07", freq="M")
+    assert ln.subtract_months(pd.Period("2027-04", freq="M"), 12) == pd.Period("2026-04", freq="M")
 
 
 def test_monthly_period_from_year_month():
@@ -30,6 +32,7 @@ def test_target_periods_for_april_2026_scope_examples():
     assert ln.target_period_for_scope(feature_period, 0) == pd.Period("2026-04", freq="M")
     assert ln.target_period_for_scope(feature_period, 3) == pd.Period("2026-07", freq="M")
     assert ln.target_period_for_scope(feature_period, 6) == pd.Period("2026-10", freq="M")
+    assert ln.target_period_for_scope(feature_period, 12) == pd.Period("2027-04", freq="M")
 
 
 def _scoped_frame() -> pd.DataFrame:
@@ -105,3 +108,18 @@ def test_scope6_launch_prediction_uses_april_features_not_future_months():
     launch, _ = ln.build_launch_prediction_frame(prepared, cfg)
     assert launch["time_feature"].tolist() == [4]
     assert launch["target_period"].tolist() == ["2026-10"]
+
+
+def test_scope12_launch_prediction_uses_april_features_for_next_april_target():
+    df = pd.DataFrame({
+        "area_id": ["A"] * 3,
+        "year": [2026, 2026, 2027],
+        "month": [4, 10, 4],
+        "time_feature": [4, 10, 404],
+    })
+    prepared = ln.prepare_source(df)
+    cfg = ln.LaunchConfig(comprehensive_source="dummy.csv", scope_months=12)
+    launch, _ = ln.build_launch_prediction_frame(prepared, cfg)
+    assert launch["time_feature"].tolist() == [4]
+    assert launch["feature_period"].tolist() == ["2026-04"]
+    assert launch["target_period"].tolist() == ["2027-04"]
