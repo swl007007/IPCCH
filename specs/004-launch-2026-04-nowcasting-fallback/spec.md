@@ -13,6 +13,8 @@ The launch is a **fallback** because the usual "0m model-ready" / April-specific
 
 **Fallback-nowcasting terminology**: This fallback launch is operationally a nowcasting launch because the prediction target is April 2026 contemporaneous crisis status. However, the fallback feature schema is drawn directly from the comprehensive feature CSV rather than the canonical `scope_0m_model_ready` feature schema. The launch report must state that results may not be directly comparable to prior canonical 0m model-ready experiments if the feature schema differs.
 
+**Implementation baseline note**: This specification governs the core/default global 0m April 2026 fallback launch. The shared launch CLI/module now also contains later additive options for forecast scope, forecast-weather inputs, and grouped SHAP; those extensions do not replace the default fallback-launch requirements in this spec.
+
 After predictions are produced, the launch performs an optional, **coverage-aware** comparison against **April 2026 actual** food-crisis labels only (no pooling across months), and produces a single two-panel actual-vs-predicted global crisis map following the existing visualization module's style and safety guardrails. April 2026 covered-subset metrics are post-launch descriptive comparison metrics only — not held-out validation performance, not model-selection evidence, and not threshold-tuning evidence.
 
 ## User Scenarios & Testing *(mandatory)*

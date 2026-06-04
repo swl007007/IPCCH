@@ -16,6 +16,10 @@
 - Q: How should binary map colors and Latin America areas be displayed? → A: Use green for no-alert/non-top-risk and red for alert/top-risk, and show Latin America areas in a small per-panel thumbnail/inset when present.
 - Q: How should top-30% risk comparison figures be structured? → A: Use the same actual-over-predicted subplot structure as alert maps: actual top-30% on the upper panel and predicted top-30% on the lower panel, with the same green/red encoding.
 
+### Session 2026-06-03
+
+- Q: Should one CLI run generate global and Somalia figures together? → A: No. The current single-scope CLI is the intended design: each invocation selects one `--scope` (`global` or a country ISO3 such as `SOM`) and writes that selected scope's actual-vs-predicted and top-risk outputs. Generating global and Somalia deliverables requires separate runs.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Generate global 2025 actual-vs-predicted alert map (Priority: P1)
@@ -117,7 +121,7 @@ As an IPCCH analyst, I want the workflow to validate files, columns, spatial joi
 
 ### Functional Requirements
 
-- **FR-001**: The workflow MUST generate four final 2025 figures: global actual-vs-predicted alert map, Somalia-only actual-vs-predicted alert map, global nowcasting top-risk comparison map, and Somalia-only nowcasting top-risk comparison map.
+- **FR-001**: Each workflow invocation MUST generate outputs for exactly one selected 2025 map scope. For the selected `--scope` (`global` or a country ISO3 such as `SOM`), the run MUST write one actual-vs-predicted alert map for the 0m/3m/6m horizons and one nowcasting top-risk comparison map for the 0m horizon. Producing both global and Somalia deliverables requires separate invocations.
 - **FR-002**: The workflow MUST treat this feature as visualization and post-processing only; it MUST NOT retrain models, tune hyperparameters, tune thresholds, recalibrate labels, or modify existing prediction outputs.
 - **FR-003**: The workflow MUST allow users to provide path-bearing inputs without embedding machine-specific absolute paths in reusable project artifacts.
 - **FR-004**: The workflow MUST use existing prediction outputs under the selected prediction root and existing external spatial boundary data without copying raw spatial source data into the repository.
@@ -130,7 +134,7 @@ As an IPCCH analyst, I want the workflow to validate files, columns, spatial joi
 - **FR-011**: The workflow MUST join filtered prediction records to spatial boundaries using `area_id` and report the number of matched and unmatched records for each horizon and scope.
 - **FR-012**: The workflow MUST require 100% of filtered prediction `area_id` records to join to spatial boundaries before saving any final figure.
 - **FR-013**: The workflow MUST fail clearly when any filtered prediction record cannot be joined to spatial boundaries or when the join result would produce duplicate mapped records for an `area_id`.
-- **FR-014**: The workflow MUST support a global scope and a Somalia-only scope for actual-vs-predicted maps.
+- **FR-014**: The workflow MUST support selecting one map scope per run: `global` or a country ISO3 scope such as `SOM`. Somalia-only outputs are produced by running the same CLI with the Somalia scope.
 - **FR-015**: The Somalia-only scope MUST include only Somalia areas in both the prediction records and mapped spatial boundaries.
 - **FR-016**: Somalia-only figures MUST use Somalia-only or global-Somalia prediction outputs from the global experiment grouping; they MUST NOT use Somalia-local model outputs.
 - **FR-017**: If both global-grouping Somalia outputs and Somalia-local outputs exist for a requested horizon, the workflow MUST select the global-grouping Somalia output or require an explicit user selection that still excludes Somalia-local outputs.
@@ -156,20 +160,20 @@ As an IPCCH analyst, I want the workflow to validate files, columns, spatial joi
 - **Prediction Record**: One prediction row for an `area_id` and temporal observation. Key attributes include `area_id`, date or temporal ordering field, year, `overall_phase`, `overall_phase_pred`, binary actual alert status, binary predicted alert status, `phase3_worse`, and `phase3_pred`.
 - **Horizon Dataset**: The filtered prediction records for one horizon after year selection and latest-record-per-`area_id` filtering. It must contain at most one row per `area_id`.
 - **Spatial Boundary**: A polygon or multipolygon geometry representing an IPCCH area. Key attributes include `area_id`, country or scope-identifying attributes, and geometry.
-- **Map Scope**: The geographic coverage requested for an output figure. Supported scopes are global and Somalia-only. Somalia-only is a geographic filter on global-grouping or global-Somalia outputs, not a request to use Somalia-local model outputs.
-- **Actual-vs-Predicted Figure**: A 2x3 final map artifact for one scope and year, with horizon columns and actual/predicted rows.
-- **Top-Risk Comparison Figure**: A final map artifact for one scope and year that compares actual and predicted 0m top-30% `phase3_worse` risk membership.
+- **Map Scope**: The single geographic coverage selected for one CLI invocation. Supported scopes include `global` and country ISO3 values such as `SOM`. Somalia-only is a geographic filter on global-grouping or global-Somalia outputs, not a request to use Somalia-local model outputs.
+- **Actual-vs-Predicted Figure**: A 2x3 final map artifact for the selected scope and year, with horizon columns and actual/predicted rows.
+- **Top-Risk Comparison Figure**: A final map artifact for the selected scope and year that compares actual and predicted 0m top-30% `phase3_worse` risk membership.
 - **Validation Result**: A summary of file selection, filtering, duplicate handling, spatial join coverage, and output destinations for each requested map.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: A user can generate all four required 2025 figures in one workflow run from valid existing prediction and spatial inputs without manually editing notebook cells or source files.
+- **SC-001**: A user can generate the selected scope's two required 2025 figures in one workflow run from valid existing prediction and spatial inputs without manually editing notebook cells or source files; global and Somalia deliverables are generated by separate `--scope` runs.
 - **SC-002**: Each actual-vs-predicted output contains exactly six mapped panels arranged as two rows by three columns, with horizon labels for 0m, 3m, and 6m and row labels for actual and predicted outcomes.
 - **SC-003**: For every generated figure, 100% of mapped prediction data used in each horizon has been filtered to year 2025 and reduced to at most one row per `area_id` before plotting.
 - **SC-004**: Top-risk comparison outputs compute both actual and predicted top-30% groups only after duplicate filtering and display them as actual-over-predicted subplots using the same green/red encoding as the alert maps.
-- **SC-005**: For valid inputs with no output conflicts or with overwrite explicitly enabled, the workflow saves four final human-readable figures under `reports/` with filenames that visibly identify `2025`, scope, horizon group, and map type.
+- **SC-005**: For valid inputs with no output conflicts or with overwrite explicitly enabled, the workflow saves the selected scope's two final human-readable figures under `reports/` with filenames that visibly identify `2025`, scope, horizon group, and map type.
 - **SC-006**: For invalid inputs in the validation scenarios, the workflow stops before saving final figures and reports the specific missing, ambiguous, duplicate, or unmatched condition that must be corrected.
 - **SC-007**: Validation reports record counts for each horizon and scope, including raw 2025 rows, retained latest rows, duplicate rows removed, spatial matches, and spatial non-matches.
 - **SC-008**: The complete workflow can be validated with lightweight checks and small representative samples without running model training, hyperparameter tuning, threshold tuning, or notebook-heavy execution.

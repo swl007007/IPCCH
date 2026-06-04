@@ -5,6 +5,10 @@
 **Status**: Draft  
 **Input**: User description: "Create a new IPCCH modelling entry point using the deep-feature forecasting-ready dataset, exponential time-decay sample weights, F2 reporting, annual holdouts for 2022-2025, and Somalia-only metrics, without modifying the original notebook or upstream data assembly pipeline."
 
+## Implementation Baseline Note
+
+The current implementation preserves this feature's core weighted-decay annual-holdout workflow and additionally exposes later additive controls such as selected feature-scope datasets (`--fs`), region scope, identifier-feature controls, threshold controls, and optional phase-3 SHAP. Those later controls do not replace the baseline requirements below; when they are used, outputs may be nested under an experiment-name directory inside the deep-feature weighted-decay results/report roots.
+
 ## Clarifications
 
 ### Session 2026-05-21

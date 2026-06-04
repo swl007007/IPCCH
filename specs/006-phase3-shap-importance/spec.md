@@ -15,6 +15,10 @@
 - Q: If the user enables raw row-level SHAP export and the resulting output would be very large, what should the workflow do by default to prevent accidental oversized artifacts? → A: Refuse oversized raw exports by default unless the user sets an explicit size override or maximum-row limit.
 - Q: If all mapped phase-3 absolute SHAP values are zero for a forecasting scope and test year, so the six-category relative-importance denominator is zero, what should the output table and heatmap show for that scope-year? → A: Write `0` for all six relative-importance values and record a zero-denominator diagnostic.
 
+### Session 2026-06-03
+
+- Q: Should one CLI invocation generate SHAP artifacts for all four `--fs` values? → A: No. The current selected-`--fs` CLI design is intended: each invocation runs one feature scope (`fs0`, `fs1`, `fs2`, or `fs3`). Complete four-scope tables and heatmaps are assembled from separate per-`--fs` runs or downstream aggregation.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Record phase-3 SHAP explanations during forecasting runs (Priority: P1)
@@ -23,11 +27,11 @@ As a researcher running the forecasting weight-decay pipeline, I want to optiona
 
 **Why this priority**: This is the core capability. Without reliable phase-3 explanation extraction from the existing cumulative-regressor workflow, downstream six-category summaries and heatmaps cannot be produced.
 
-**Independent Test**: Run the forecasting workflow on a tiny smoke-test dataset or equivalent lightweight validation path with explanation recording enabled for one forecasting scope and one annual split. Verify that phase-3 explanation artifacts are produced and that the ordinary prediction, metric, and diagnostic outputs remain present.
+**Independent Test**: Run the forecasting workflow on a tiny smoke-test dataset or equivalent lightweight validation path with explanation recording enabled for one selected `--fs` forecasting scope and one annual split. Verify that phase-3 explanation artifacts are produced for the selected scope and that the ordinary prediction, metric, and diagnostic outputs remain present.
 
 **Acceptance Scenarios**:
 
-1. **Given** explanation recording is enabled, **When** the forecasting workflow completes the phase-3-or-higher model for a supported scope and test year, **Then** it records phase-3 explanation values for the selected explanation rows, using the phase-3 training feature matrix by default.
+1. **Given** explanation recording is enabled, **When** the forecasting workflow completes the phase-3-or-higher model for the selected `--fs` scope and test year, **Then** it records phase-3 explanation values for the selected explanation rows, using the phase-3 training feature matrix by default.
 2. **Given** explanation recording is disabled, **When** the forecasting workflow runs normally, **Then** existing prediction, metric, metadata, and report behavior remains unchanged.
 3. **Given** a scope-year split has no eligible phase-3 training or explanation rows, **When** explanation recording is enabled, **Then** the system records a diagnostic status for that split rather than silently omitting it.
 
@@ -59,7 +63,7 @@ As a researcher preparing manuscript or project outputs, I want one heatmap per 
 
 **Acceptance Scenarios**:
 
-1. **Given** valid six-category relative-importance data for `fs0`, `fs1`, `fs2`, and `fs3`, **When** visualization runs, **Then** four separate phase-3 heatmap artifacts are created.
+1. **Given** valid six-category relative-importance data for the selected `--fs` scope, **When** visualization runs, **Then** that run creates the selected scope's phase-3 heatmap artifact; complete four-scope reporting is assembled by running `fs0`, `fs1`, `fs2`, and `fs3` separately or by downstream aggregation.
 2. **Given** a scope-year has unavailable explanation values, **When** visualization runs, **Then** the corresponding heatmap cell is marked consistently and a diagnostic is recorded.
 3. **Given** phase-4 or phase-5 explanation data exist in reference material or prior outputs, **When** this feature runs, **Then** no phase-4, phase-5, or combined phase-3/phase-4 visualization is generated.
 
@@ -102,7 +106,7 @@ As a collaborator using a different machine, I want the feature to run without e
 
 - **FR-001**: The system MUST provide an optional phase-3 explanation recording mode for the existing forecasting weight-decay workflow.
 - **FR-002**: The system MUST preserve default forecasting behavior when explanation recording is disabled, including existing training, prediction, metrics, target derivation, sample weighting, split rules, and reports.
-- **FR-003**: The system MUST support explanation recording and aggregation for all four forecasting scopes: `fs0`, `fs1`, `fs2`, and `fs3`.
+- **FR-003**: The system MUST support explanation recording and aggregation for each forecasting scope `fs0`, `fs1`, `fs2`, and `fs3` through the selected-`--fs` workflow. Each CLI invocation processes one selected `--fs`; complete four-scope deliverables are assembled from separate selected-scope runs or downstream aggregation.
 - **FR-004**: The system MUST focus all explanation outputs on the phase-3-or-higher cumulative target only.
 - **FR-005**: The system MUST preserve the annual holdout rule: training observations are strictly before the test year and test observations are in the test calendar year.
 - **FR-006**: The system MUST preserve the requested annual test years: 2022, 2023, 2024, and 2025.
@@ -121,10 +125,10 @@ As a collaborator using a different machine, I want the feature to run without e
 - **FR-016**: The system MUST aggregate feature-level importance by summing absolute explanation values across explanation rows and features within each feature group.
 - **FR-017**: The system MUST compute relative importance within each forecasting scope and test year as each feature group's absolute importance divided by the total absolute importance across the six groups.
 - **FR-017a**: When the mapped absolute-importance denominator is zero for a forecasting scope and test year, the system MUST write `0` for all six relative-importance values and MUST record a zero-denominator diagnostic.
-- **FR-018**: The system MUST write a long six-category relative-importance table with one row per forecasting scope, test year, and feature group when all data are available.
-- **FR-019**: The complete long six-category table MUST contain 96 rows when all four scopes, four test years, and six feature groups are available.
-- **FR-020**: The system MUST write one matrix table per forecasting scope with six feature-group rows and four annual test-year columns.
-- **FR-021**: The system MUST generate one phase-3 heatmap for each forecasting scope: `fs0`, `fs1`, `fs2`, and `fs3`.
+- **FR-018**: Each selected-`--fs` run MUST write a long six-category relative-importance table with one row per selected forecasting scope, test year, and feature group when data are available.
+- **FR-019**: A complete four-scope long six-category deliverable MUST contain 96 rows when all four selected-scope runs (`fs0`, `fs1`, `fs2`, `fs3`), four test years, and six feature groups are available.
+- **FR-020**: Each selected-`--fs` run MUST write one matrix table for its selected forecasting scope with six feature-group rows and four annual test-year columns.
+- **FR-021**: Each selected-`--fs` run MUST generate one phase-3 heatmap for its selected forecasting scope. A complete four-scope report contains one heatmap each for `fs0`, `fs1`, `fs2`, and `fs3` after the four runs or downstream aggregation.
 - **FR-022**: Each heatmap MUST be a 6 x 4 grid with six feature-group rows and four annual test-year columns.
 - **FR-023**: Heatmap cell color intensity MUST represent relative feature-group importance.
 - **FR-024**: The system MUST save human-readable phase-3 heatmaps and summary tables in a separated reports location for the forecasting weight-decay workflow.
@@ -144,7 +148,7 @@ As a collaborator using a different machine, I want the feature to run without e
 
 ### Key Entities *(include if feature involves data)*
 
-- **Forecasting Scope**: One of `fs0`, `fs1`, `fs2`, or `fs3`; identifies the forecasting horizon or feature-scope variant being explained.
+- **Forecasting Scope**: One selected value of `--fs` (`fs0`, `fs1`, `fs2`, or `fs3`) for a CLI invocation; identifies the forecasting horizon or feature-scope variant being explained.
 - **Annual Split**: One test year among 2022, 2023, 2024, and 2025, with training observations limited to prior years and test observations limited to the calendar year.
 - **Phase-3 Model**: The fitted cumulative forecasting model whose target represents phase-3-or-higher risk.
 - **Explanation Value Record**: A value associated with one feature, one explanation row, one forecasting scope, one test year, and the phase-3 target.
@@ -158,9 +162,9 @@ As a collaborator using a different machine, I want the feature to run without e
 
 ### Measurable Outcomes
 
-- **SC-001**: With explanations enabled and valid data for all scopes and years, researchers receive a six-category relative-importance table containing exactly 96 rows: four scopes times four test years times six feature groups.
+- **SC-001**: With explanations enabled and valid data for all selected-scope runs and years, researchers can assemble a complete six-category relative-importance table containing exactly 96 rows: four scopes times four test years times six feature groups. Each individual selected-`--fs` run contributes up to 24 rows.
 - **SC-002**: For every complete forecasting scope and test year with nonzero mapped absolute importance, the six relative-importance values sum to 1.0 within a tolerance of 0.000001; zero-denominator scope-years contain six `0` values and a diagnostic.
-- **SC-003**: Researchers receive four phase-3 heatmap artifacts, one each for `fs0`, `fs1`, `fs2`, and `fs3`.
+- **SC-003**: Researchers receive one phase-3 heatmap artifact per selected-`--fs` run, and a complete four-scope report contains four phase-3 heatmap artifacts, one each for `fs0`, `fs1`, `fs2`, and `fs3`.
 - **SC-004**: Each heatmap contains exactly six category rows and four annual test-year columns.
 - **SC-005**: The feature produces zero phase-4, phase-5, or combined phase-3/phase-4 heatmap artifacts.
 - **SC-006**: When explanation recording is disabled, existing forecasting prediction and metric outputs are unchanged relative to a run with the same inputs and settings.

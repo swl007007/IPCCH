@@ -14,6 +14,10 @@
 - Q: How should scoped alignment be interpreted? → A: For scope `s`, training rows pair target outcome `y(area_id, t)` with time-varying predictors `X(area_id, t - s)` and static predictors for the same `area_id`; this is period-aware alignment, not an ambiguous row shift.
 - Q: How are launch prediction records different from training or evaluation records? → A: Training and evaluation records require target outcomes plus aligned earlier features; launch prediction records require valid feature-period predictor rows and do not require target-period actual or target rows.
 
+### Session 2026-06-03
+
+- Q: Should `12m` be included in the launch-scope feature? → A: Yes. Current implementation supports scopes `0`, `3`, `6`, and `12`; `12m` is part of this feature's intended design. For April 2026 feature rows, scope 12 predicts April 2027.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Run default April 2026 launch workflow unchanged (Priority: P1)
@@ -34,19 +38,19 @@ An analyst running the launch workflow without specifying a forecast scope can r
 
 ### User Story 2 - Generate forward-scope predictions from April 2026 features (Priority: P1)
 
-An analyst can request a 3-month or 6-month forecast scope so the launch workflow uses April 2026 feature information while clearly labeling the prediction target period as July 2026 or October 2026, respectively, without requiring future target or actual outcome rows to exist.
+An analyst can request a 3-month, 6-month, or 12-month forecast scope so the launch workflow uses April 2026 feature information while clearly labeling the prediction target period as July 2026, October 2026, or April 2027, respectively, without requiring future target or actual outcome rows to exist.
 
 **Why this priority**: The main business value is extending the launch workflow from same-period nowcasting to forward-looking predictions without confusing feature time with target time or blocking on unavailable future targets or actuals.
 
-**Independent Test**: Run the workflow once with scope 3 and once with scope 6 using April 2026 launch features, then confirm that each run uses April 2026 as the feature time, reports July 2026 or October 2026 as the target time, and generates predictions even when future target and actual rows are absent.
+**Independent Test**: Run the workflow once each with scope 3, scope 6, and scope 12 using April 2026 launch features, then confirm that each run uses April 2026 as the feature time, reports July 2026, October 2026, or April 2027 as the target time, and generates predictions even when future target and actual rows are absent.
 
 **Acceptance Scenarios**:
 
 1. **Given** a valid launch input containing April 2026 feature records, **When** the analyst selects scope 3, **Then** the workflow produces July 2026 predictions while preserving April 2026 as the feature reference time.
 2. **Given** a valid launch input containing April 2026 feature records, **When** the analyst selects scope 6, **Then** the workflow produces October 2026 predictions while preserving April 2026 as the feature reference time.
-3. **Given** scope 3 or 6 is selected, **When** July 2026 or October 2026 target or actual rows are unavailable, **Then** prediction generation still succeeds and actual-dependent outputs are skipped, marked unavailable, or omitted clearly.
-4. **Given** scope 3 or 6 is selected, **When** outputs are written, **Then** output names, metadata, and summaries distinguish the feature month from the predicted target month.
-5. **Given** scope 3 or 6 launch prediction is requested, **When** future target or actual rows are missing, **Then** those missing future rows are not treated as missing prediction records.
+3. **Given** scope 3, 6, or 12 is selected, **When** the target-period target or actual rows are unavailable, **Then** prediction generation still succeeds and actual-dependent outputs are skipped, marked unavailable, or omitted clearly.
+4. **Given** scope 3, 6, or 12 is selected, **When** outputs are written, **Then** output names, metadata, and summaries distinguish the feature month from the predicted target month.
+5. **Given** scope 3, 6, or 12 launch prediction is requested, **When** future target or actual rows are missing, **Then** those missing future rows are not treated as missing prediction records.
 
 ---
 
@@ -56,7 +60,7 @@ A model reviewer can verify that forward-scope training uses period-aware alignm
 
 **Why this priority**: The scoped predictions are only credible if the feature timing is consistently offset from the target timing and cannot accidentally use future information.
 
-**Independent Test**: Inspect the prepared training, evaluation, and launch prediction records for scope 3 and scope 6 and confirm that target outcome `y(area_id, t)` is paired with time-varying predictors from `t - 3 months` or `t - 6 months`, plus static predictors for the same `area_id`, and that launch prediction uses only the launch feature period as the feature reference period.
+**Independent Test**: Inspect the prepared training, evaluation, and launch prediction records for scope 3, scope 6, and scope 12 and confirm that target outcome `y(area_id, t)` is paired with time-varying predictors from `t - 3 months`, `t - 6 months`, or `t - 12 months`, plus static predictors for the same `area_id`, and that launch prediction uses only the launch feature period as the feature reference period.
 
 **Acceptance Scenarios**:
 
@@ -71,15 +75,15 @@ A model reviewer can verify that forward-scope training uses period-aware alignm
 
 ### User Story 4 - Produce forecast-only visualizations and clear reporting when actuals are unavailable (Priority: P2)
 
-An analyst can generate a map for scoped predictions even when July 2026 or October 2026 actual outcomes are not available, and any evaluation outputs that require actuals are skipped or marked unavailable clearly.
+An analyst can generate a map for scoped predictions even when July 2026, October 2026, or April 2027 actual outcomes are not available, and any evaluation outputs that require actuals are skipped or marked unavailable clearly.
 
 **Why this priority**: Forward-scope outputs should still be visually and operationally usable at launch time, even though future actuals cannot yet exist.
 
-**Independent Test**: Run visualization and reporting for a scope 3 or scope 6 prediction set without future actuals and confirm it produces a single predicted-risk map, does not fail due to missing actuals, and clearly omits or marks unavailable actual-dependent metrics and reports.
+**Independent Test**: Run visualization and reporting for a scope 3, scope 6, or scope 12 prediction set without future actuals and confirm it produces a single predicted-risk map, does not fail due to missing actuals, and clearly omits or marks unavailable actual-dependent metrics and reports.
 
 **Acceptance Scenarios**:
 
-1. **Given** a scope 3 or scope 6 prediction set and no matching future actual data, **When** visualization is requested, **Then** the output contains a single predicted map panel only.
+1. **Given** a scope 3, scope 6, or scope 12 prediction set and no matching future actual data, **When** visualization is requested, **Then** the output contains a single predicted map panel only.
 2. **Given** target-period actuals are available and comparison mode is requested, **When** visualization is requested, **Then** an actual-versus-predicted visualization may be produced.
 3. **Given** scope 0 target-period actuals are available, **When** visualization is requested, **Then** the existing actual-versus-predicted visualization behavior remains available.
 4. **Given** target-period actuals are unavailable, **When** metrics, reports, or summaries would require actual outcomes, **Then** those actual-dependent outputs are skipped, marked unavailable, or omitted clearly while prediction artifacts and forecast-only maps are still produced.
@@ -88,9 +92,9 @@ An analyst can generate a map for scoped predictions even when July 2026 or Octo
 
 ### Edge Cases
 
-- If an analyst provides a scope value other than 0, 3, or 6, the workflow fails fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization, and explains the accepted values.
+- If an analyst provides a scope value other than 0, 3, 6, or 12, the workflow fails fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization, and explains the accepted values.
 - If scoped alignment removes all usable training or evaluation records, or if launch prediction has no usable feature-period prediction records, the workflow fails fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization, rather than producing empty outputs.
-- For launch prediction, missing July 2026 or October 2026 target or actual rows must not be treated as missing prediction records.
+- For launch prediction, missing July 2026, October 2026, or April 2027 target or actual rows must not be treated as missing prediction records.
 - If an area has missing earlier feature records for some training or evaluation target months, those affected target records are not allowed to use later feature values.
 - If a feature changes within an `area_id` across `year` and `month`, it must not be treated as static for scoped alignment.
 - If a feature is invariant within each `area_id` across `year` and `month`, it may be treated as static according to the workflow config.
@@ -101,23 +105,23 @@ An analyst can generate a map for scoped predictions even when July 2026 or Octo
 - If the static/time-varying classification is missing, the workflow regenerates or validates it according to existing project conventions before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization.
 - If static/time-varying validation detects an inconsistency that cannot be resolved automatically, the workflow fails fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization.
 - If required alignment keys are missing, the workflow fails fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization.
-- If scope 3 or 6 is requested together with actual-versus-predicted visualization and no matching target-period actuals exist, the workflow produces forecast-only visualization and clearly skips or marks actual-dependent evaluation outputs unavailable.
+- If scope 3, 6, or 12 is requested together with actual-versus-predicted visualization and no matching target-period actuals exist, the workflow produces forecast-only visualization and clearly skips or marks actual-dependent evaluation outputs unavailable.
 - If both feature time and target time appear in outputs, their labels must not be interchangeable or ambiguous.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: The launch workflow MUST allow analysts to select exactly one forecast scope from 0, 3, or 6 months.
+- **FR-001**: The launch workflow MUST allow analysts to select exactly one forecast scope from 0, 3, 6, or 12 months.
 - **FR-002**: The launch workflow MUST default to scope 0 when no forecast scope is specified.
 - **FR-003**: Scope 0 MUST preserve legacy prediction values and downstream compatibility for the current same-period workflow, where April 2026 features are used to predict April 2026 outcomes.
 - **FR-004**: Existing legacy output names and paths for scope 0 SHOULD remain available unless intentionally migrated.
-- **FR-005**: The workflow MAY additionally write scope-qualified metadata, summaries, or copies for scope 0 so scope 0, scope 3, and scope 6 artifacts can coexist.
-- **FR-006**: Scope 3 and scope 6 outputs MUST be clearly distinguished from scope 0 outputs and MUST NOT overwrite scope 0 artifacts unintentionally.
+- **FR-005**: The workflow MAY additionally write scope-qualified metadata, summaries, or copies for scope 0 so scope 0, scope 3, scope 6, and scope 12 artifacts can coexist.
+- **FR-006**: Scope 3, scope 6, and scope 12 outputs MUST be clearly distinguished from scope 0 outputs and MUST NOT overwrite scope 0 artifacts unintentionally.
 - **FR-007**: For any scope `s`, the workflow MUST define the prediction target period as `feature period + s months` in launch prediction mode.
 - **FR-008**: For scope 3 using April 2026 launch features, the workflow MUST identify April 2026 as the feature time and July 2026 as the prediction target time.
 - **FR-009**: For scope 6 using April 2026 launch features, the workflow MUST identify April 2026 as the feature time and October 2026 as the prediction target time.
-- **FR-010**: Launch prediction for scope 3 or scope 6 MUST NOT require target-period actual or target rows to exist in order to generate predictions.
+- **FR-010**: Launch prediction for scope 3, scope 6, or scope 12 MUST NOT require target-period actual or target rows to exist in order to generate predictions.
 - **FR-011**: For launch prediction, valid feature-period predictor rows are required; missing target-period actual or target rows MUST NOT be treated as missing prediction records.
 - **FR-012**: For scoped training with scope `s`, the workflow MUST pair target outcome `y(area_id, t)` with time-varying predictors from `X(area_id, t - s months)` and static predictors for the same `area_id`.
 - **FR-013**: Scoped training and evaluation alignment MUST be period-aware and area-aware, using explicit alignment or joining on area and monthly period rather than an ambiguous row shift.
@@ -134,21 +138,21 @@ An analyst can generate a map for scoped predictions even when July 2026 or Octo
 - **FR-024**: Any model predictor column that is not an identifier, target, prediction, or config-recognized static feature MUST be treated as time-varying for scoped alignment.
 - **FR-025**: Scoped training and evaluation MUST require, at minimum, `area_id`, `year`, `month` or an equivalent monthly period column, the target column, and predictor columns from config.
 - **FR-026**: Launch prediction MUST require, at minimum, `area_id`, `year`, `month` or an equivalent monthly period column, and feature-period predictor columns from config; it MUST NOT require target-period target or actual columns.
-- **FR-027**: Period fields used for scoped alignment MUST support adding and subtracting 3 or 6 calendar months.
+- **FR-027**: Period fields used for scoped alignment MUST support adding and subtracting 3, 6, or 12 calendar months.
 - **FR-028**: Missing required alignment keys, unsupported scopes, missing predictor columns, scoped alignment that leaves no usable training or evaluation records, or launch prediction with no usable feature-period prediction records MUST fail fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization.
 - **FR-029**: Outputs from scoped runs MUST record both feature period and target period in machine-readable results and human-readable summaries.
 - **FR-030**: If target-period actuals are unavailable, visualization MUST produce predicted-only output rather than requiring actual-versus-predicted layout.
 - **FR-031**: If target-period actuals are available and comparison mode is requested, visualization MAY produce an actual-versus-predicted layout.
 - **FR-032**: For scope 0 runs with target-period actuals available, the existing actual-versus-predicted visualization behavior MUST remain available.
-- **FR-033**: For scope 3 and scope 6 launch runs, predicted-only visualization MUST be the expected default because future actuals are unavailable.
+- **FR-033**: For scope 3, scope 6, and scope 12 launch runs, predicted-only visualization MUST be the expected default because future actuals are unavailable.
 - **FR-034**: Metrics, reports, or summaries requiring actual outcomes MUST be skipped, marked unavailable, or omitted clearly when target-period actuals are missing, while prediction artifacts and forecast-only maps still complete.
 - **FR-035**: Example alignment MUST be unambiguous: for a training target row with `area_id = A`, `year = 2025`, `month = 7`, and `scope = 3`, the workflow uses time-varying predictors from `area_id = A`, `year = 2025`, `month = 4`; for launch prediction with feature row `area_id = A`, April 2026, and `scope = 3`, the workflow emits a prediction for July 2026.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Forecast Scope**: The number of months between the feature reference period and the prediction target period. Allowed values are 0, 3, and 6.
+- **Forecast Scope**: The number of months between the feature reference period and the prediction target period. Allowed values are 0, 3, 6, and 12.
 - **Feature Period**: The calendar period represented by the input predictor values used for a launch run, such as April 2026.
-- **Target Period**: The calendar period the model prediction is intended to represent; in launch prediction mode it is computed as `feature period + forecast scope`, such as April 2026 for scope 0, July 2026 for scope 3, and October 2026 for scope 6.
+- **Target Period**: The calendar period the model prediction is intended to represent; in launch prediction mode it is computed as `feature period + forecast scope`, such as April 2026 for scope 0, July 2026 for scope 3, October 2026 for scope 6, and April 2027 for scope 12.
 - **Scoped Training or Evaluation Row**: A record that requires a target outcome `y(area_id, t)` and aligned predictors: time-varying predictors from the same `area_id` at `t - scope` plus static predictors for the same `area_id`.
 - **Launch Prediction Record**: A prediction record that requires valid feature-period predictor values and emits a target-period prediction computed from the feature period and forecast scope; it does not require target-period actual or target rows.
 - **Time-Varying Feature**: Any model predictor column that is not an identifier, target, prediction, or config-recognized static attribute; these predictors must be period-aligned for forward-scope training.
@@ -161,25 +165,25 @@ An analyst can generate a map for scoped predictions even when July 2026 or Octo
 ### Measurable Outcomes
 
 - **SC-001**: 100% of valid launch runs without a scope argument complete using scope 0 semantics and preserve existing April 2026 prediction values and downstream-compatible outputs.
-- **SC-002**: 100% of scope 3 and scope 6 launch prediction outputs clearly expose both feature period and target period in their tabular results or summary metadata.
+- **SC-002**: 100% of scope 3, scope 6, and scope 12 launch prediction outputs clearly expose both feature period and target period in their tabular results or summary metadata.
 - **SC-003**: In validation checks for scoped preparation, 0 scoped training, evaluation, or launch prediction records use time-varying feature values from after their allowed feature period.
 - **SC-004**: 100% of unsupported scope values and missing required alignment keys fail fast with a clear message before starting the requested long-running workflow step, such as model training, prediction generation, reporting, or visualization.
-- **SC-005**: Scope 3 and scope 6 launch prediction generation succeeds without target-period actual or target rows when valid feature-period predictor inputs are available.
+- **SC-005**: Scope 3, scope 6, and scope 12 launch prediction generation succeeds without target-period actual or target rows when valid feature-period predictor inputs are available.
 - **SC-006**: Static feature classification matches the project definition for 100% of checked predictor columns: static features have invariant observed non-missing values within each `area_id` across `year` and `month`, and non-invariant predictors are treated as time-varying.
-- **SC-007**: Forecast-only visualization for scope 3 and scope 6 completes successfully without requiring future actual data.
+- **SC-007**: Forecast-only visualization for scope 3, scope 6, and scope 12 completes successfully without requiring future actual data.
 - **SC-008**: 100% of actual-dependent metrics, reports, or summaries are skipped, marked unavailable, or omitted clearly when target-period actuals are missing.
-- **SC-009**: Scope 3 and scope 6 artifacts are clearly distinguished from scope 0 artifacts and do not overwrite legacy scope 0 outputs unintentionally.
+- **SC-009**: Scope 3, scope 6, and scope 12 artifacts are clearly distinguished from scope 0 artifacts and do not overwrite legacy scope 0 outputs unintentionally.
 - **SC-010**: Scope 0 runs with target-period actuals available retain the existing actual-versus-predicted visualization behavior.
 
 ## Assumptions
 
 - The launch workflow's current April 2026 same-period behavior is the correct definition of scope 0.
-- April 2026 is the initial launch feature period for scope 3 and scope 6 examples, but the scope concept should apply to any future launch period supported by the workflow.
+- April 2026 is the initial launch feature period for scope 3, scope 6, and scope 12 examples, but the scope concept should apply to any future launch period supported by the workflow.
 - Training and evaluation records require target outcomes and aligned earlier feature rows; launch prediction records require valid feature-period predictor rows and do not require target-period actual or target rows.
 - The workflow config remains the source of truth for model predictor columns and static feature designation.
 - The config-recognized static feature designation is derived from or validated against area-level invariance across `year` and `month` in existing feature data.
 - Static feature validation follows existing project missing-value conventions; observed non-missing variation within any `area_id` prevents a feature from being classified as static, and one-period-only areas do not alone establish global static status.
 - Existing project conventions for static/time-varying classification are derived from the current launch config/schema generation and feature-selection behavior discovered during Phase 1. If no existing regeneration convention exists, the implementation should define the minimal validation convention described in this spec.
 - Any model predictor not classified as static by the config-derived project definition is treated as time-varying for scoped alignment.
-- Future target rows and actual outcomes for July 2026 and October 2026 are unavailable at launch time, so scoped launch predictions must use valid feature-period predictor rows, scoped visualizations default to predicted-only maps, and actual-dependent evaluation outputs are unavailable.
+- Future target rows and actual outcomes for July 2026, October 2026, and April 2027 are unavailable at launch time, so scoped launch predictions must use valid feature-period predictor rows, scoped visualizations default to predicted-only maps, and actual-dependent evaluation outputs are unavailable.
 - Actual-versus-predicted comparison remains relevant for scope 0 and for future scoped runs if matching target-period actuals later become available.
