@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "explicit-task-dependencies": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:746498be0c0eb9dcef0345ad907ee8092a307e0241c428c394df5c44d7400a9c",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.tasks"
+        ]
+      },
+      "registered_skills": [
+        "speckit-tasks"
+      ],
+      "installed_at": "2026-06-01T21:57:02.652401+00:00"
+    }
+  }
+}

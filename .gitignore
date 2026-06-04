@@ -70,10 +70,6 @@ results/experiments/region_vs_global_model_comparison/**/*.png
 reports/figures/
 reports/cleanlab/cleanlab_label_quality_report.pdf
 
-CLAUDE.md
-AGENTS.md
-
-.specify/*
 .claude/*
 .claude/settings.local.json
 reports/*
