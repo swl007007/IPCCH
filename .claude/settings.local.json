@@ -123,7 +123,8 @@
       "Bash(PYTHONPATH=src ./.venv/bin/python *)",
       "Bash(~/.venvs/ipcch-geo/bin/python *)",
       "Bash(/usr/bin/time *)",
-      "Bash(ps -eo pid,ppid,etime,pcpu,pmem,cmd)"
+      "Bash(ps -eo pid,ppid,etime,pcpu,pmem,cmd)",
+      "Bash(PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python *)"
     ]
   }
 }

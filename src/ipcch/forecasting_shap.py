@@ -8,8 +8,12 @@ import numpy as np
 import pandas as pd
 
 TARGET = "phase3_worse"
+NOWCASTING_GROUPED_SHAP_TARGET = TARGET
 ALLOWED_SAMPLE_TYPES = ("train", "test")
 EXPECTED_FEATURE_GROUP_COUNT = 6
+WEATHER_FORECAST_GROUP = "weather forecast"
+NOWCASTING_SCOPE_ORDER = ("0m", "3m", "6m", "12m")
+EXPECTED_NOWCASTING_FEATURE_GROUP_COUNT = 7
 DEFAULT_CROSSWALK_KEY = "six_category_feature_crosswalk"
 DEFAULT_TEST_YEARS = (2022, 2023, 2024, 2025)
 RAW_SHAP_MAX_ROWS_DEFAULT = 100_000
@@ -216,6 +220,92 @@ def _select_column(crosswalk: pd.DataFrame, explicit: Optional[str], candidates:
     raise ShapValidationError(f"Could not auto-detect crosswalk {label} column")
 
 
+def _normalize_feature_name(name: str) -> str:
+    value = str(name).lower()
+    for token in ("_forecast_proxy",):
+        if value.endswith(token):
+            value = value[: -len(token)]
+    for suffix in ("_current", "_lag1", "_lag2", "_lag3", "_lag6", "_lag12", "_0m", "_3m", "_6m", "_12m"):
+        if value.endswith(suffix):
+            value = value[: -len(suffix)]
+            break
+    for prefix in ("current_", "lag1_", "lag2_", "lag3_", "lag6_", "lag12_"):
+        if value.startswith(prefix):
+            value = value[len(prefix) :]
+            break
+    return value
+
+
+def expected_nowcasting_feature_groups(crosswalk: pd.DataFrame, category_column: str) -> List[str]:
+    if category_column not in crosswalk.columns:
+        raise ShapValidationError(f"Crosswalk category column not found: {category_column}")
+    groups = [str(group) for group in crosswalk[category_column].dropna().drop_duplicates().tolist()]
+    groups = [group for group in groups if group and group != WEATHER_FORECAST_GROUP]
+    if WEATHER_FORECAST_GROUP not in groups:
+        groups.append(WEATHER_FORECAST_GROUP)
+    return groups
+
+
+def map_features_to_groups(
+    feature_columns: Sequence[str],
+    crosswalk: pd.DataFrame,
+    feature_column: str,
+    category_column: str,
+    weather_forecast_features: Optional[Sequence[str]] = None,
+) -> pd.DataFrame:
+    required = {feature_column, category_column}
+    missing_columns = required - set(crosswalk.columns)
+    if missing_columns:
+        raise ShapValidationError("Crosswalk is missing required columns: " + ", ".join(sorted(missing_columns)))
+    cleaned = crosswalk[[feature_column, category_column]].dropna().copy()
+    cleaned[feature_column] = cleaned[feature_column].astype(str)
+    cleaned[category_column] = cleaned[category_column].astype(str)
+    exact = cleaned.drop_duplicates(subset=[feature_column]).set_index(feature_column)[category_column].to_dict()
+    normalized: Dict[str, List[Tuple[str, str]]] = {}
+    for _, row in cleaned.iterrows():
+        normalized.setdefault(_normalize_feature_name(row[feature_column]), []).append((row[feature_column], row[category_column]))
+    weather_set = set(map(str, weather_forecast_features or []))
+    rows = []
+    for feature_name in map(str, feature_columns):
+        assigned_group = ""
+        match_method = "unmatched"
+        matched_reference = ""
+        is_weather = feature_name in weather_set
+        notes = ""
+        if is_weather:
+            assigned_group = WEATHER_FORECAST_GROUP
+            match_method = "weather_forecast"
+            matched_reference = feature_name
+        elif feature_name in exact:
+            assigned_group = exact[feature_name]
+            match_method = "exact"
+            matched_reference = feature_name
+        else:
+            matches = normalized.get(_normalize_feature_name(feature_name), [])
+            unique_matches = sorted(set(matches))
+            if len(unique_matches) == 1:
+                matched_reference, assigned_group = unique_matches[0]
+                match_method = "normalized" if _normalize_feature_name(feature_name) == _normalize_feature_name(matched_reference) else "base_variable"
+            elif len(unique_matches) > 1:
+                match_method = "ambiguous"
+                notes = "multiple normalized crosswalk matches"
+            else:
+                notes = "no crosswalk match"
+        is_unmatched = assigned_group == ""
+        rows.append(
+            {
+                "feature_name": feature_name,
+                "assigned_group": assigned_group,
+                "match_method": match_method,
+                "matched_reference_feature": matched_reference,
+                "is_weather_forecast": bool(is_weather),
+                "is_unmatched": bool(is_unmatched),
+                "notes": notes,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def validate_crosswalk(
     crosswalk: pd.DataFrame,
     feature_columns: Sequence[str],
@@ -284,7 +374,7 @@ def per_feature_shap_summary(
     return pd.DataFrame(rows)
 
 
-def aggregate_six_category_importance(
+def aggregate_grouped_importance(
     per_feature_summary: pd.DataFrame,
     feature_groups: Sequence[str],
     forecasting_scope: str,
@@ -316,6 +406,42 @@ def aggregate_six_category_importance(
             }
         )
     return pd.DataFrame(rows), diagnostics
+
+
+def aggregate_six_category_importance(
+    per_feature_summary: pd.DataFrame,
+    feature_groups: Sequence[str],
+    forecasting_scope: str,
+    scope_label: str,
+    test_year: int,
+    sample_type: str,
+) -> Tuple[pd.DataFrame, List[Dict[str, object]]]:
+    return aggregate_grouped_importance(per_feature_summary, feature_groups, forecasting_scope, scope_label, test_year, sample_type)
+
+
+def attribution_coverage_summary(
+    shap_values: np.ndarray,
+    feature_columns: Sequence[str],
+    mapped_features: Sequence[str],
+) -> Dict[str, object]:
+    values = np.asarray(shap_values, dtype=float)
+    if values.ndim != 2 or values.shape[1] != len(feature_columns):
+        raise ShapValidationError("SHAP values do not align with feature columns for attribution coverage")
+    mapped_set = set(mapped_features)
+    abs_sums = np.abs(values).sum(axis=0)
+    unmatched = [(feature, float(value)) for feature, value in zip(feature_columns, abs_sums) if feature not in mapped_set]
+    mapped_sum = float(sum(value for feature, value in zip(feature_columns, abs_sums) if feature in mapped_set))
+    unmatched_sum = float(sum(value for _, value in unmatched))
+    denominator = mapped_sum + unmatched_sum
+    return {
+        "feature_count": int(len(feature_columns)),
+        "matched_feature_count": int(len(feature_columns) - len(unmatched)),
+        "unmatched_feature_count": int(len(unmatched)),
+        "unmatched_features": [feature for feature, _ in unmatched],
+        "mapped_abs_shap_sum": mapped_sum,
+        "unmatched_abs_shap_sum": unmatched_sum,
+        "unmatched_abs_shap_share": 0.0 if denominator == 0.0 else unmatched_sum / denominator,
+    }
 
 
 def unmapped_feature_diagnostics(
@@ -365,6 +491,59 @@ def scope_matrix(
     matrix.columns = [str(year) for year in matrix.columns]
     matrix.index.name = "feature_group"
     return matrix.reset_index()
+
+
+def nowcasting_scope_group_matrix(
+    grouped_long: pd.DataFrame,
+    feature_groups: Sequence[str],
+    scope_order: Sequence[str] = NOWCASTING_SCOPE_ORDER,
+    value_column: str = "relative_importance",
+) -> pd.DataFrame:
+    if grouped_long.empty:
+        matrix = pd.DataFrame(index=list(feature_groups), columns=list(scope_order), dtype=float).fillna(0.0)
+    else:
+        required = {"feature_group", "scope_label", value_column}
+        missing = required - set(grouped_long.columns)
+        if missing:
+            raise ShapValidationError("Grouped SHAP long output missing required columns: " + ", ".join(sorted(missing)))
+        available_scopes = [scope for scope in scope_order if scope in set(grouped_long["scope_label"].astype(str))]
+        matrix = grouped_long.assign(scope_label=grouped_long["scope_label"].astype(str)).pivot_table(
+            index="feature_group",
+            columns="scope_label",
+            values=value_column,
+            aggfunc="first",
+        )
+        matrix = matrix.reindex(index=list(feature_groups), columns=available_scopes, fill_value=0.0)
+    matrix.index.name = "feature_group"
+    return matrix.reset_index()
+
+
+def render_nowcasting_scope_heatmap(matrix: pd.DataFrame, output_path: Path, sample_type: str = "train") -> None:
+    validate_phase3_artifact_name(output_path)
+    import matplotlib.pyplot as plt
+
+    scope_columns = [scope for scope in NOWCASTING_SCOPE_ORDER if scope in matrix.columns]
+    if not scope_columns:
+        raise ShapValidationError("Nowcasting grouped SHAP heatmap requires at least one scope column")
+    values = matrix.set_index("feature_group")[scope_columns].astype(float)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(7, 4.2))
+    vmax = max(0.4, float(values.to_numpy().max()))
+    image = ax.imshow(values.to_numpy(), vmin=0, vmax=vmax, cmap="YlGnBu", aspect="auto")
+    ax.set_xticks(range(len(scope_columns)), scope_columns)
+    ax.set_yticks(range(len(values.index)), values.index)
+    for row_index in range(values.shape[0]):
+        for col_index in range(values.shape[1]):
+            value = float(values.iat[row_index, col_index])
+            text_color = "white" if value / vmax >= 0.58 else "black"
+            ax.text(col_index, row_index, f"{value:.2f}", ha="center", va="center", fontsize=8, color=text_color)
+    fig.colorbar(image, ax=ax, label=f"relative importance (0-{vmax:.2f})")
+    ax.set_title(f"Nowcasting grouped SHAP ({TARGET}, sample: {sample_type})")
+    ax.set_xlabel("forecasting scope")
+    ax.set_ylabel("feature group")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200)
+    plt.close(fig)
 
 
 def validate_phase3_artifact_name(path: Path) -> None:
