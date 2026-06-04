@@ -28,6 +28,7 @@ import pandas as pd
 from ipcch import paths
 from ipcch import forecasting_weight_decay as fwd
 from ipcch import forecast_diagnostics as fdiag
+from ipcch import forecasting_shap as fshap
 
 # --- Launch constants -------------------------------------------------------
 COMPREHENSIVE_SOURCE_KEY = "deep_features_2026_target_corrected_dataset"
@@ -41,6 +42,7 @@ CANONICAL_THRESHOLD = 0.2
 MODEL_WORKFLOW = "deep_feature_weight_decay_cumulative_regression"
 FORECASTED_WEATHER_SOURCE_KEY = "forecasted_weather_by_area_time"
 HISTORICAL_WEATHER_SOURCE_KEY = "ipcch_2026_completed_dataset"
+GROUPED_SHAP_CROSSWALK_KEY = fshap.DEFAULT_CROSSWALK_KEY
 FORECASTED_WEATHER_DEFAULT_RELATIVE_PATH = Path("assembled_IPCCH") / "spatial" / "cds_api_tif_values_by_area_time.csv"
 FORECASTED_WEATHER_COLUMNS = ("Rainf_f_tavg_mean", "Tair_f_tavg_mean")
 FORECASTED_WEATHER_PROXY_SUFFIX = "_forecast_proxy"
@@ -67,6 +69,13 @@ class LaunchError(ValueError):
 
 
 @dataclass(frozen=True)
+class ForecastedWeatherMonthSpec:
+    offset_from_feature_months: int
+    target_minus_months: int
+    period_column: str
+
+
+@dataclass(frozen=True)
 class LaunchConfig:
     comprehensive_source: Path
     launch_month: str = DEFAULT_LAUNCH_MONTH
@@ -89,6 +98,11 @@ class LaunchConfig:
     drop_nonfinite_predictions: bool = False
     using_forecasted_weather: bool = False
     forecasted_weather_source: Optional[Path] = None
+    compute_grouped_shap: bool = False
+    grouped_shap_crosswalk_path: Optional[Path] = None
+    grouped_shap_crosswalk_key: str = GROUPED_SHAP_CROSSWALK_KEY
+    grouped_shap_crosswalk_feature_column: Optional[str] = None
+    grouped_shap_crosswalk_category_column: Optional[str] = None
     run_id: str = "launch_2026_04"
     execution_mode: str = "train_and_predict"
 
@@ -193,14 +207,17 @@ def _row_keep_mask(
         )
         row_keys = pd.MultiIndex.from_frame(pd.DataFrame({"area_id": prepared["area_id"].astype(str), "period": period}))
         keep_mask |= pd.Series(row_keys.isin(scoped_feature_keys), index=prepared.index)
-        if using_forecasted_weather and scope_months == 12:
-            proxy_periods = pd.PeriodIndex(feature_periods, freq="M") + 6
-            proxy_keys = pd.MultiIndex.from_frame(
-                pd.DataFrame({
-                    "area_id": prepared.loc[train_mask, "area_id"].astype(str),
-                    "period": proxy_periods.astype(str),
-                })
-            )
+        if using_forecasted_weather and scope_months in (3, 6, 12):
+            feature_period_index = pd.PeriodIndex(feature_periods, freq="M")
+            proxy_frames = []
+            for spec in _forecasted_weather_month_specs(scope_months):
+                proxy_frames.append(
+                    pd.DataFrame({
+                        "area_id": prepared.loc[train_mask, "area_id"].astype(str).values,
+                        "period": (feature_period_index + spec.offset_from_feature_months).astype(str),
+                    })
+                )
+            proxy_keys = pd.MultiIndex.from_frame(pd.concat(proxy_frames, ignore_index=True))
             keep_mask |= pd.Series(row_keys.isin(proxy_keys), index=prepared.index)
     return keep_mask.to_numpy()
 
@@ -312,8 +329,63 @@ def prepare_source(df: pd.DataFrame) -> pd.DataFrame:
 # --- Forecasted weather feature handling -------------------------------------
 
 
-def forecasted_weather_proxy_columns() -> List[str]:
-    return [f"{c}{FORECASTED_WEATHER_PROXY_SUFFIX}" for c in FORECASTED_WEATHER_COLUMNS]
+def _forecasted_weather_primary_target_minus(scope_months: int) -> int:
+    return 6 if scope_months == 12 else 0
+
+
+def _forecasted_weather_month_specs(scope_months: int) -> List[ForecastedWeatherMonthSpec]:
+    if scope_months == 0:
+        return []
+    if scope_months in (3, 6):
+        primary_target_minus = _forecasted_weather_primary_target_minus(scope_months)
+        return [
+            ForecastedWeatherMonthSpec(
+                offset_from_feature_months=scope_months - target_minus,
+                target_minus_months=target_minus,
+                period_column=_forecasted_weather_period_column(target_minus, primary_target_minus),
+            )
+            for target_minus in range(0, scope_months + 1)
+        ]
+    if scope_months == 12:
+        primary_target_minus = _forecasted_weather_primary_target_minus(scope_months)
+        return [
+            ForecastedWeatherMonthSpec(
+                offset_from_feature_months=12 - target_minus,
+                target_minus_months=target_minus,
+                period_column=_forecasted_weather_period_column(target_minus, primary_target_minus),
+            )
+            for target_minus in range(6, 13)
+        ]
+    raise LaunchError(f"Forecasted weather is only supported for scope 0, 3, 6, or 12; received {scope_months}.")
+
+
+def _forecasted_weather_proxy_column(base_column: str, target_minus_months: int, primary_target_minus: int) -> str:
+    if target_minus_months == primary_target_minus:
+        return f"{base_column}{FORECASTED_WEATHER_PROXY_SUFFIX}"
+    return f"{base_column}_minus_{target_minus_months}{FORECASTED_WEATHER_PROXY_SUFFIX}"
+
+
+def _forecasted_weather_period_column(target_minus_months: int, primary_target_minus: int) -> str:
+    if target_minus_months == primary_target_minus:
+        return "weather_proxy_period"
+    return f"weather_proxy_period_target_minus_{target_minus_months}"
+
+
+def forecasted_weather_proxy_columns(scope_months: Optional[int] = None) -> List[str]:
+    if scope_months is None:
+        return [f"{c}{FORECASTED_WEATHER_PROXY_SUFFIX}" for c in FORECASTED_WEATHER_COLUMNS]
+    primary_target_minus = _forecasted_weather_primary_target_minus(scope_months)
+    return [
+        _forecasted_weather_proxy_column(c, spec.target_minus_months, primary_target_minus)
+        for spec in _forecasted_weather_month_specs(scope_months)
+        for c in FORECASTED_WEATHER_COLUMNS
+    ]
+
+
+def grouped_shap_weather_forecast_features(config: LaunchConfig) -> List[str]:
+    if forecasted_weather_is_active(config):
+        return forecasted_weather_proxy_columns(config.scope_months)
+    return forecasted_weather_proxy_columns()
 
 
 def forecasted_weather_is_active(config: LaunchConfig) -> bool:
@@ -395,27 +467,43 @@ def _training_weather_source(source_featured: pd.DataFrame) -> Tuple[pd.DataFram
     return load_historical_weather_source(), str(paths.external_path(HISTORICAL_WEATHER_SOURCE_KEY))
 
 
-def _weather_proxy_periods(frame: pd.DataFrame, config: LaunchConfig, *, source_label: str) -> pd.Series:
-    if config.scope_months in (3, 6):
-        return pd.Series(frame["target_period"].astype(str).values, index=frame.index)
-    if config.scope_months == 12:
-        periods = pd.PeriodIndex(frame["feature_period"].astype(str), freq="M") + 6
-        return pd.Series(periods.astype(str), index=frame.index)
-    return pd.Series(frame["feature_period"].astype(str).values, index=frame.index)
+def _combine_inference_weather_sources(forecast: pd.DataFrame, visible_weather: pd.DataFrame) -> pd.DataFrame:
+    combined = pd.concat([forecast, visible_weather], ignore_index=True)
+    combined = combined.drop_duplicates(["area_id", "forecast_period"], keep="first")
+    return combined.loc[:, ["area_id", "forecast_period", *FORECASTED_WEATHER_COLUMNS]]
+
+
+def _add_forecasted_weather_period_columns(frame: pd.DataFrame, config: LaunchConfig) -> Tuple[pd.DataFrame, List[str]]:
+    out = frame.copy()
+    feature_period = pd.PeriodIndex(out["feature_period"].astype(str), freq="M")
+    period_columns = []
+    for spec in _forecasted_weather_month_specs(config.scope_months):
+        out[spec.period_column] = (feature_period + spec.offset_from_feature_months).astype(str)
+        period_columns.append(spec.period_column)
+    return out, period_columns
+
+
+def _weather_window_periods(config: LaunchConfig) -> List[str]:
+    feature_period = launch_feature_period(config)
+    return [str(add_months(feature_period, spec.offset_from_feature_months)) for spec in _forecasted_weather_month_specs(config.scope_months)]
+
+
+def _weather_window_target_minus_months(config: LaunchConfig) -> List[int]:
+    return [spec.target_minus_months for spec in _forecasted_weather_month_specs(config.scope_months)]
 
 
 def forecasted_weather_scope_note(config: LaunchConfig) -> str:
     if config.scope_months in (3, 6):
         return (
             f"scope {config.scope_months}: training aligns labels to feature_month=target_month-{config.scope_months} "
-            f"and adds target_month weather as the forecast proxy; inference uses April 2026 base features "
-            f"plus forecast weather for {launch_target_period(config)}"
+            f"and adds visible forecast weather from target_month back through feature_month; inference uses April 2026 base features "
+            f"plus forecast weather for {', '.join(_weather_window_periods(config))}"
         )
     if config.scope_months == 12:
         intermediate = add_months(launch_feature_period(config), 6)
         return (
-            f"scope 12: April 2026 prediction rows use the six-month intermediate forecast weather for {intermediate}, "
-            f"not the 12-month target horizon {launch_target_period(config)}"
+            f"scope 12: April 2026 prediction rows use forecast weather from six-month intermediate {intermediate} "
+            f"back through feature month {launch_feature_period(config)}, not the 12-month target horizon {launch_target_period(config)}"
         )
     return "scope 0: forecasted weather disabled/no-op"
 
@@ -435,33 +523,47 @@ def forecasted_weather_scope_mapping(config: LaunchConfig) -> dict:
         }
     if config.scope_months in (3, 6):
         valid_period = str(launch_target_period(config))
+        periods = _weather_window_periods(config)
+        target_minus_months = _weather_window_target_minus_months(config)
         return {
             "mode": "target_month_weather_forecast_proxy",
             "forecast_value_source": "scope_specific_forecast_weather_values",
             "feature_period": forecast_run_period,
             "target_period": valid_period,
             "forecast_weather_period": valid_period,
+            "primary_forecast_weather_period": valid_period,
+            "forecast_weather_periods": periods,
             "forecast_run_period": forecast_run_period,
             "launch_feature_period": forecast_run_period,
             "april_forecast_valid_period": valid_period,
             "inference_forecast_period": valid_period,
+            "weather_window_target_minus_months": target_minus_months,
+            "weather_window_feature_offsets": [s.offset_from_feature_months for s in _forecasted_weather_month_specs(config.scope_months)],
+            "weather_window_month_count": len(periods),
             "lead_months": config.scope_months,
-            "requirement_interpretation": "For scope 3/6, April 2026 base features are target_month-scope lagged features; weather forecast proxy columns use target_month rainfall and temperature values.",
+            "requirement_interpretation": "For scope 3/6, April 2026 base features are target_month-scope lagged features; weather forecast proxy columns use visible months from target_month back through feature_month.",
         }
     if config.scope_months == 12:
         intermediate = add_months(launch_feature_period(config), 6)
+        periods = _weather_window_periods(config)
+        target_minus_months = _weather_window_target_minus_months(config)
         return {
             "mode": "six_month_intermediate_weather_forecast_proxy",
             "forecast_value_source": "six_month_intermediate_forecast_weather_values",
             "feature_period": forecast_run_period,
             "target_period": str(launch_target_period(config)),
             "forecast_weather_period": str(intermediate),
+            "primary_forecast_weather_period": str(intermediate),
+            "forecast_weather_periods": periods,
             "forecast_run_period": forecast_run_period,
             "launch_feature_period": forecast_run_period,
             "april_forecast_valid_period": str(intermediate),
             "inference_forecast_period": str(intermediate),
+            "weather_window_target_minus_months": target_minus_months,
+            "weather_window_feature_offsets": [s.offset_from_feature_months for s in _forecasted_weather_month_specs(config.scope_months)],
+            "weather_window_month_count": len(periods),
             "lead_months": 6,
-            "requirement_interpretation": "For scope 12, April 2026 base features are target_month-12 lagged features; weather forecast proxy columns use the target_month-6 intermediate rainfall and temperature values.",
+            "requirement_interpretation": "For scope 12, April 2026 base features are target_month-12 lagged features; weather forecast proxy columns use visible months from target_month-6 back through feature_month.",
         }
     return {
         "mode": "unsupported",
@@ -485,31 +587,51 @@ def _merge_weather_proxy(
     before = len(frame)
     out = frame.copy()
     out["area_id"] = out["area_id"].astype(str)
-    out["weather_proxy_period"] = _weather_proxy_periods(out, config, source_label=source_label)
-    lookup = weather_source.rename(columns={c: f"{c}{FORECASTED_WEATHER_PROXY_SUFFIX}" for c in FORECASTED_WEATHER_COLUMNS})
-    merged = out.merge(
-        lookup,
-        left_on=["area_id", "weather_proxy_period"],
-        right_on=["area_id", "forecast_period"],
-        how="left",
-        validate="many_to_one",
-    ).drop(columns=["forecast_period"])
+    out, period_cols = _add_forecasted_weather_period_columns(out, config)
+    specs = _forecasted_weather_month_specs(config.scope_months)
+    primary_target_minus = _forecasted_weather_primary_target_minus(config.scope_months)
+    proxy_cols = forecasted_weather_proxy_columns(config.scope_months)
+    generated_cols = set(period_cols) | set(proxy_cols)
+    preexisting_generated = sorted(c for c in generated_cols if c in frame.columns)
+    if preexisting_generated:
+        raise LaunchError(f"Forecasted weather generated columns already exist in {source_label} frame: {preexisting_generated}")
+    merged = out
+    for spec in specs:
+        renamed_weather = {
+            c: _forecasted_weather_proxy_column(c, spec.target_minus_months, primary_target_minus)
+            for c in FORECASTED_WEATHER_COLUMNS
+        }
+        lookup = weather_source.rename(columns=renamed_weather)
+        lookup_cols = ["area_id", "forecast_period", *renamed_weather.values()]
+        merged = merged.merge(
+            lookup.loc[:, lookup_cols],
+            left_on=["area_id", spec.period_column],
+            right_on=["area_id", "forecast_period"],
+            how="left",
+            validate="many_to_one",
+        ).drop(columns=["forecast_period"])
+        after_merge = len(merged)
+        if after_merge != before:
+            raise LaunchError(f"Forecasted weather merge changed {source_label} row count from {before} to {after_merge}.")
     after = len(merged)
-    if after != before:
-        raise LaunchError(f"Forecasted weather merge changed {source_label} row count from {before} to {after}.")
-    proxy_cols = forecasted_weather_proxy_columns()
     missing_counts = merged.loc[:, proxy_cols].isna().sum().to_dict()
     if any(v for v in missing_counts.values()):
-        missing_periods = merged.loc[merged.loc[:, proxy_cols].isna().any(axis=1), "weather_proxy_period"].drop_duplicates().head(10).tolist()
+        missing_mask = merged.loc[:, proxy_cols].isna().any(axis=1)
+        missing_period_values = pd.unique(merged.loc[missing_mask, period_cols].astype(str).values.ravel()).tolist()[:10]
         raise LaunchError(
             f"Forecasted weather merge left missing {source_label} proxy values: {missing_counts}; "
-            f"example periods={missing_periods}."
+            f"example periods={missing_period_values}."
         )
     return merged, {
         "source": source_label,
         "rows_before": int(before),
         "rows_after": int(after),
         "proxy_periods": sorted(merged["weather_proxy_period"].astype(str).unique().tolist()),
+        "all_proxy_periods": sorted(pd.unique(merged.loc[:, period_cols].astype(str).values.ravel()).tolist()),
+        "proxy_periods_by_column": {c: sorted(merged[c].astype(str).unique().tolist()) for c in period_cols},
+        "period_columns": period_cols,
+        "weather_window_target_minus_months": [s.target_minus_months for s in specs],
+        "weather_window_feature_offsets": [s.offset_from_feature_months for s in specs],
         "proxy_columns": proxy_cols,
         "missing_proxy_values": {k: int(v) for k, v in missing_counts.items()},
     }
@@ -526,7 +648,7 @@ def apply_forecasted_weather_features(
         "active": forecasted_weather_is_active(config),
         "scope_months": config.scope_months,
         "weather_columns": list(FORECASTED_WEATHER_COLUMNS),
-        "proxy_columns": forecasted_weather_proxy_columns(),
+        "proxy_columns": forecasted_weather_proxy_columns(config.scope_months) if forecasted_weather_is_active(config) else forecasted_weather_proxy_columns(),
         "scope_note": forecasted_weather_scope_note(config),
         "scope_mapping": forecasted_weather_scope_mapping(config),
     }
@@ -547,10 +669,12 @@ def apply_forecasted_weather_features(
 
     forecast_path = resolve_forecasted_weather_source(config.forecasted_weather_source)
     forecast = load_forecasted_weather(forecast_path)
-    xtest_featured, xtest_report = _merge_weather_proxy(xtest_featured, forecast, config, source_label="inference")
+    inference_weather = _combine_inference_weather_sources(forecast, train_weather)
+    xtest_featured, xtest_report = _merge_weather_proxy(xtest_featured, inference_weather, config, source_label="inference")
     report.update({
         "action": "added forecast proxy weather features",
         "forecasted_weather_source": str(forecast_path),
+        "inference_weather_fallback_source": training_proxy_source,
         "training_proxy_source": training_proxy_source,
         "training": train_report,
         "inference": xtest_report,
@@ -967,6 +1091,15 @@ class OutputLayout:
     prediction_validation_json: Path
     predicted_phase_distribution_csv: Path
     model_artifacts_dir: Path
+    grouped_shap_dir: Path
+    grouped_shap_report_dir: Path
+    grouped_shap_mapping_csv: Path
+    grouped_shap_unmatched_csv: Path
+    grouped_shap_feature_summary_csv: Path
+    grouped_shap_long_csv: Path
+    grouped_shap_matrix_csv: Path
+    grouped_shap_metadata_json: Path
+    grouped_shap_heatmap_png: Path
     comparison_dir: Path
     viz_results_dir: Path
     viz_report_dir: Path
@@ -1003,10 +1136,135 @@ def resolve_output_layout(config: LaunchConfig) -> OutputLayout:
         prediction_validation_json=out / "prediction_validation_summary.json",
         predicted_phase_distribution_csv=out / "predicted_phase_distribution.csv",
         model_artifacts_dir=out / "model_artifacts",
+        grouped_shap_dir=out / "grouped_shap",
+        grouped_shap_report_dir=rep / "grouped_shap",
+        grouped_shap_mapping_csv=out / "grouped_shap" / "feature_to_group_mapping.csv",
+        grouped_shap_unmatched_csv=out / "grouped_shap" / "unmatched_feature_diagnostics.csv",
+        grouped_shap_feature_summary_csv=out / "grouped_shap" / "phase3_worse_feature_shap_summary.csv",
+        grouped_shap_long_csv=out / "grouped_shap" / "phase3_worse_grouped_shap_long.csv",
+        grouped_shap_matrix_csv=out / "grouped_shap" / "phase3_worse_grouped_shap_matrix.csv",
+        grouped_shap_metadata_json=out / "grouped_shap" / "grouped_shap_metadata.json",
+        grouped_shap_heatmap_png=rep / "grouped_shap" / "phase3_worse_grouped_shap_heatmap.png",
         comparison_dir=out / "actual_comparison",
         viz_results_dir=out / "visualizations",
         viz_report_dir=rep / "visualizations",
     )
+
+
+def resolve_grouped_shap_crosswalk(config: LaunchConfig) -> Path:
+    if config.grouped_shap_crosswalk_path:
+        resolved = Path(config.grouped_shap_crosswalk_path).expanduser()
+    else:
+        try:
+            resolved = paths.external_path(config.grouped_shap_crosswalk_key)
+        except KeyError as exc:
+            raise LaunchError(
+                "Grouped SHAP crosswalk path is not configured. Pass --grouped-shap-crosswalk-path <path> "
+                f"or configure external path key '{config.grouped_shap_crosswalk_key}' in configs/paths.local.json."
+            ) from exc
+    if not resolved.exists():
+        raise LaunchError(f"Grouped SHAP crosswalk file does not exist: {resolved}")
+    return resolved
+
+
+def build_phase3_grouped_shap_training_matrix(train_featured: pd.DataFrame, feature_columns: Sequence[str]) -> pd.DataFrame:
+    missing = [feature for feature in feature_columns if feature not in train_featured.columns]
+    if missing:
+        raise LaunchError("Grouped SHAP feature columns are missing from the phase3 training frame: " + ", ".join(missing))
+    if fshap.NOWCASTING_GROUPED_SHAP_TARGET not in train_featured.columns:
+        raise LaunchError(f"Grouped SHAP target column is missing: {fshap.NOWCASTING_GROUPED_SHAP_TARGET}")
+    matrix = train_featured.dropna(subset=[fshap.NOWCASTING_GROUPED_SHAP_TARGET]).loc[:, list(feature_columns)]
+    fshap.validate_feature_alignment(matrix, feature_columns)
+    if matrix.empty:
+        raise LaunchError("Grouped SHAP phase3 training matrix is empty after dropping missing phase3_worse rows.")
+    return matrix
+
+
+def _grouped_shap_reported_artifact_paths(layout: OutputLayout, include_unmatched_diagnostics: Optional[bool] = None) -> Dict[str, Path]:
+    paths_by_name = grouped_shap_artifact_paths(layout)
+    include_unmatched = bool(layout.grouped_shap_unmatched_csv.exists()) if include_unmatched_diagnostics is None else bool(include_unmatched_diagnostics)
+    if not include_unmatched:
+        paths_by_name.pop("unmatched_feature_diagnostics", None)
+    return paths_by_name
+
+
+def compute_nowcasting_grouped_shap(
+    models: Mapping[str, object],
+    train_featured: pd.DataFrame,
+    feature_columns: Sequence[str],
+    config: LaunchConfig,
+    layout: OutputLayout,
+    weather_forecast_features: Sequence[str],
+) -> Dict[str, object]:
+    if not config.compute_grouped_shap:
+        return {}
+    if fshap.NOWCASTING_GROUPED_SHAP_TARGET not in models:
+        raise LaunchError("Grouped SHAP requires a fitted phase3_worse model.")
+    crosswalk_path = resolve_grouped_shap_crosswalk(config)
+    crosswalk, feature_col, category_col = fshap.load_crosswalk(
+        crosswalk_path,
+        config.grouped_shap_crosswalk_feature_column,
+        config.grouped_shap_crosswalk_category_column,
+    )
+    shap_matrix = build_phase3_grouped_shap_training_matrix(train_featured, feature_columns)
+    try:
+        shap_values, engine_info = fshap.compute_phase3_shap_values(models[fshap.NOWCASTING_GROUPED_SHAP_TARGET], shap_matrix, feature_columns)
+        mapping = fshap.map_features_to_groups(feature_columns, crosswalk, feature_col, category_col, weather_forecast_features=weather_forecast_features)
+        mapped = mapping.loc[~mapping["is_unmatched"], ["feature_name", "assigned_group"]].rename(columns={"assigned_group": "feature_group"})
+        summary = fshap.per_feature_shap_summary(shap_values, feature_columns, mapped, "nowcasting", f"{config.scope_months}m", 0, "train")
+        group_labels = fshap.expected_nowcasting_feature_groups(crosswalk, category_col)
+        long, diagnostics = fshap.aggregate_grouped_importance(summary, group_labels, "nowcasting", f"{config.scope_months}m", 0, "train")
+        matrix = fshap.nowcasting_scope_group_matrix(long, group_labels)
+        coverage = fshap.attribution_coverage_summary(shap_values, feature_columns, mapping.loc[~mapping["is_unmatched"], "feature_name"])
+    except Exception as exc:
+        raise LaunchError(f"Grouped SHAP computation failed: {exc}") from exc
+    layout.grouped_shap_dir.mkdir(parents=True, exist_ok=True)
+    layout.grouped_shap_report_dir.mkdir(parents=True, exist_ok=True)
+    mapping.to_csv(layout.grouped_shap_mapping_csv, index=False)
+    has_unmatched = bool(mapping["is_unmatched"].any())
+    if has_unmatched:
+        mapping.loc[mapping["is_unmatched"]].to_csv(layout.grouped_shap_unmatched_csv, index=False)
+    summary.to_csv(layout.grouped_shap_feature_summary_csv, index=False)
+    long.to_csv(layout.grouped_shap_long_csv, index=False)
+    matrix.to_csv(layout.grouped_shap_matrix_csv, index=False)
+    fshap.render_nowcasting_scope_heatmap(matrix, layout.grouped_shap_heatmap_png)
+    reported_paths = _grouped_shap_reported_artifact_paths(layout, include_unmatched_diagnostics=has_unmatched)
+    metadata = {
+        "target": fshap.NOWCASTING_GROUPED_SHAP_TARGET,
+        "sample_source": "train_featured.dropna(subset=['phase3_worse']).loc[:, feature_columns]",
+        "feature_order_validated": True,
+        "aggregation_metric": "absolute SHAP sum and relative importance",
+        "scope_label": f"{config.scope_months}m",
+        "expected_feature_groups": group_labels,
+        "crosswalk_path": str(crosswalk_path),
+        "crosswalk_feature_column": feature_col,
+        "crosswalk_category_column": category_col,
+        "engine": asdict(engine_info),
+        "coverage": coverage,
+        "diagnostic_count": len(diagnostics),
+        "artifact_paths": {name: str(path) for name, path in reported_paths.items() if name == "metadata" or path.exists()},
+    }
+    write_json(layout.grouped_shap_metadata_json, metadata)
+    return {
+        "metadata_path": str(layout.grouped_shap_metadata_json),
+        "coverage": coverage,
+        "artifact_paths": metadata["artifact_paths"],
+        "matched_feature_count": coverage["matched_feature_count"],
+        "weather_forecast_feature_count": int(mapping["is_weather_forecast"].sum()),
+        "unmatched_feature_count": coverage["unmatched_feature_count"],
+    }
+
+
+def grouped_shap_artifact_paths(layout: OutputLayout) -> Dict[str, Path]:
+    return {
+        "feature_to_group_mapping": layout.grouped_shap_mapping_csv,
+        "unmatched_feature_diagnostics": layout.grouped_shap_unmatched_csv,
+        "feature_summary": layout.grouped_shap_feature_summary_csv,
+        "grouped_long": layout.grouped_shap_long_csv,
+        "grouped_matrix": layout.grouped_shap_matrix_csv,
+        "metadata": layout.grouped_shap_metadata_json,
+        "heatmap": layout.grouped_shap_heatmap_png,
+    }
 
 
 def guard_output_conflicts(targets: Sequence[Path], overwrite: bool) -> List[str]:
@@ -1199,6 +1457,7 @@ def build_run_summary(
     hp_prov: dict,
     viz_paths: Optional[dict] = None,
     forecasted_weather: Optional[dict] = None,
+    grouped_shap: Optional[dict] = None,
 ) -> dict:
     feature_period = str(launch_feature_period(config))
     target_period = str(launch_target_period(config))
@@ -1218,6 +1477,7 @@ def build_run_summary(
         "identifier_feature_setting": config.add_identifier_features,
         "sample_weighting": {"time_decay": config.use_time_decay, "half_life_months": config.half_life_months, "anchor_month": config.launch_month},
         "forecasted_weather": forecasted_weather or {"enabled": bool(config.using_forecasted_weather), "active": False},
+        "grouped_shap": grouped_shap or {"enabled": bool(config.compute_grouped_shap), "active": False},
         "training_rows": training_summary.get("training_rows"),
         "train_min_date": training_summary.get("train_min_date"),
         "train_max_date": training_summary.get("train_max_date"),
@@ -1227,6 +1487,7 @@ def build_run_summary(
             "predictions": str(layout.predictions_csv),
             "run_summary": str(layout.run_summary_json),
             "feature_schema": str(layout.feature_schema_csv),
+            "grouped_shap": {name: str(path) for name, path in _grouped_shap_reported_artifact_paths(layout).items()},
         },
         "visualization_paths": viz_paths or {},
     }
@@ -1305,6 +1566,7 @@ def write_launch_reports(
     lines.append(f"- Hyperparameters: `{run_summary.get('hyperparameters', {})}`")
     lines.append(f"- Sample weighting: `{run_summary.get('sample_weighting', {})}`")
     lines.append(f"- Forecasted weather: `{run_summary.get('forecasted_weather', {})}`")
+    lines.append(f"- Grouped SHAP: `{run_summary.get('grouped_shap', {})}`")
     lines.append(f"- Training rows: {run_summary.get('training_rows')} (dates {run_summary.get('train_min_date')} .. {run_summary.get('train_max_date')})")
     lines.append(f"- Predicted April 2026 areas: {run_summary.get('predicted_area_count')}")
     lines.append(f"- Feature count: {run_summary.get('feature_count')}")

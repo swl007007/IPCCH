@@ -3,16 +3,23 @@ import pandas as pd
 import pytest
 
 from ipcch.forecasting_shap import (
+    NOWCASTING_SCOPE_ORDER,
     TARGET,
+    WEATHER_FORECAST_GROUP,
+    aggregate_grouped_importance,
     aggregate_six_category_importance,
+    attribution_coverage_summary,
     detect_crosswalk_columns,
     diagnostic_record,
     empty_shap_rows_diagnostic,
     enforce_raw_export_size,
+    map_features_to_groups,
     normalize_shap_values,
+    nowcasting_scope_group_matrix,
     per_feature_shap_summary,
     phase3_shap_filename,
     render_heatmap,
+    render_nowcasting_scope_heatmap,
     scope_matrix,
     unavailable_split_diagnostic,
     unmapped_feature_diagnostics,
@@ -91,6 +98,58 @@ def six_group_crosswalk():
     )
 
 
+@pytest.fixture
+def grouped_shap_feature_matrix():
+    return pd.DataFrame(
+        {
+            "food_price_index_lag1": [1.0, 1.2, 1.3],
+            "conflict_events_current": [0.0, 2.0, 1.0],
+            "Rainf_f_tavg_mean_forecast_proxy": [40.0, 42.0, 41.0],
+            "unmapped_runtime_feature": [5.0, 6.0, 7.0],
+        }
+    )
+
+
+@pytest.fixture
+def grouped_shap_values(grouped_shap_feature_matrix):
+    return np.array(
+        [
+            [0.10, -0.20, 0.30, 0.05],
+            [0.20, -0.10, 0.40, 0.10],
+            [0.30, -0.30, 0.50, 0.15],
+        ]
+    )
+
+
+@pytest.fixture
+def grouped_shap_crosswalk_rows():
+    return pd.DataFrame(
+        {
+            "variable": [
+                "food_price_index",
+                "conflict_events",
+                "soil_moisture",
+                "market_access",
+                "cropland_area",
+                "population_density",
+            ],
+            "six_category": [
+                "food prices",
+                "conflict",
+                "weather",
+                "econ",
+                "agriculture",
+                "geography",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def weather_forecast_feature_seeds():
+    return {"Rainf_f_tavg_mean_forecast_proxy", "Tair_f_tavg_mean_forecast_proxy"}
+
+
 def test_crosswalk_column_auto_detection_and_explicit_selection():
     crosswalk = six_group_crosswalk()
     assert detect_crosswalk_columns(crosswalk) == ("variable", "six_category")
@@ -125,6 +184,62 @@ def test_allowed_unmapped_features_are_excluded_and_diagnosed():
     assert details[0]["mapped_abs_shap_sum"] == 3.0
     assert details[0]["unmapped_abs_shap_sum"] == 3.0
     assert details[0]["unmapped_abs_shap_share"] == 0.5
+
+
+def test_nowcasting_mapping_exact_crosswalk_match(grouped_shap_crosswalk_rows):
+    mapping = map_features_to_groups(["conflict_events"], grouped_shap_crosswalk_rows, "variable", "six_category")
+    row = mapping.iloc[0]
+    assert row["feature_name"] == "conflict_events"
+    assert row["assigned_group"] == "conflict"
+    assert row["match_method"] == "exact"
+    assert row["matched_reference_feature"] == "conflict_events"
+    assert not row["is_unmatched"]
+
+
+def test_nowcasting_mapping_normalized_base_variants_preserve_original_names(grouped_shap_crosswalk_rows):
+    features = ["food_price_index_lag1", "conflict_events_current", "market_access_3m", "missing_signal"]
+    mapping = map_features_to_groups(features, grouped_shap_crosswalk_rows, "variable", "six_category")
+    by_feature = mapping.set_index("feature_name")
+    assert by_feature.loc["food_price_index_lag1", "assigned_group"] == "food prices"
+    assert by_feature.loc["food_price_index_lag1", "match_method"] in {"normalized", "base_variable"}
+    assert by_feature.loc["food_price_index_lag1", "matched_reference_feature"] == "food_price_index"
+    assert by_feature.loc["conflict_events_current", "assigned_group"] == "conflict"
+    assert by_feature.loc["market_access_3m", "assigned_group"] == "econ"
+    assert by_feature.loc["missing_signal", "is_unmatched"]
+
+
+def test_nowcasting_mapping_weather_forecast_seed_precedes_crosswalk(grouped_shap_crosswalk_rows, weather_forecast_feature_seeds):
+    crosswalk = pd.concat(
+        [grouped_shap_crosswalk_rows, pd.DataFrame({"variable": ["Rainf_f_tavg_mean_forecast_proxy"], "six_category": ["weather"]})],
+        ignore_index=True,
+    )
+    mapping = map_features_to_groups(["Rainf_f_tavg_mean_forecast_proxy"], crosswalk, "variable", "six_category", weather_forecast_features=weather_forecast_feature_seeds)
+    row = mapping.iloc[0]
+    assert row["assigned_group"] == WEATHER_FORECAST_GROUP
+    assert row["match_method"] == "weather_forecast"
+    assert row["is_weather_forecast"]
+
+
+def test_nowcasting_mapping_ambiguous_normalized_match_is_unresolved(grouped_shap_crosswalk_rows):
+    crosswalk = pd.concat(
+        [grouped_shap_crosswalk_rows, pd.DataFrame({"variable": ["food_price_index_current"], "six_category": ["econ"]})],
+        ignore_index=True,
+    )
+    mapping = map_features_to_groups(["food_price_index_lag1"], crosswalk, "variable", "six_category")
+    row = mapping.iloc[0]
+    assert row["match_method"] == "ambiguous"
+    assert row["is_unmatched"]
+    assert not row["assigned_group"]
+
+
+def test_nowcasting_unmatched_coverage_reports_abs_shap_share(grouped_shap_feature_matrix, grouped_shap_values, grouped_shap_crosswalk_rows):
+    mapping = map_features_to_groups(grouped_shap_feature_matrix.columns, grouped_shap_crosswalk_rows, "variable", "six_category", weather_forecast_features={"Rainf_f_tavg_mean_forecast_proxy"})
+    matched = mapping.loc[~mapping["is_unmatched"], "feature_name"]
+    coverage = attribution_coverage_summary(grouped_shap_values, grouped_shap_feature_matrix.columns, matched)
+    assert coverage["unmatched_feature_count"] == 1
+    assert coverage["unmatched_features"] == ["unmapped_runtime_feature"]
+    assert coverage["unmatched_abs_shap_sum"] == pytest.approx(0.30)
+    assert 0 < coverage["unmatched_abs_shap_share"] < 1
 
 
 def test_nonzero_six_category_relative_importance_sums_to_one():
@@ -167,6 +282,38 @@ def test_scope_matrix_has_6x4_shape_and_preserves_crosswalk_labels():
     assert matrix.shape == (6, 5)
     assert matrix["feature_group"].tolist() == groups
     assert list(matrix.columns) == ["feature_group", "2022", "2023", "2024", "2025"]
+
+
+def test_nowcasting_scope_group_matrix_has_seven_rows_and_canonical_scope_order():
+    groups = ["food prices", "geography", "econ", "conflict", "agriculture", "weather", WEATHER_FORECAST_GROUP]
+    long = pd.DataFrame(
+        {
+            "feature_group": ["food prices", WEATHER_FORECAST_GROUP, "food prices", WEATHER_FORECAST_GROUP],
+            "scope_label": ["3m", "3m", "0m", "0m"],
+            "relative_importance": [0.4, 0.6, 0.7, 0.3],
+        }
+    )
+    matrix = nowcasting_scope_group_matrix(long, groups)
+    assert matrix.shape == (7, 3)
+    assert matrix["feature_group"].tolist() == groups
+    assert list(matrix.columns) == ["feature_group", "0m", "3m"]
+    assert [scope for scope in NOWCASTING_SCOPE_ORDER if scope in matrix.columns] == ["0m", "3m"]
+
+
+def test_nowcasting_scope_heatmap_writes_subset_scope_artifact(tmp_path):
+    groups = ["food prices", "geography", "econ", "conflict", "agriculture", "weather", WEATHER_FORECAST_GROUP]
+    matrix = pd.DataFrame({"feature_group": groups, "3m": [0.1] * 7, "12m": [0.2] * 7})
+    out = tmp_path / "phase3_worse_nowcasting_grouped_shap_heatmap.png"
+    render_nowcasting_scope_heatmap(matrix, out)
+    assert out.exists()
+
+
+def test_nowcasting_scope_group_matrix_includes_zero_rows_for_expected_groups():
+    groups = ["food prices", "geography", "econ", "conflict", "agriculture", "weather", WEATHER_FORECAST_GROUP]
+    long = pd.DataFrame({"feature_group": ["food prices"], "scope_label": ["6m"], "relative_importance": [0.0]})
+    matrix = nowcasting_scope_group_matrix(long, groups)
+    assert matrix["feature_group"].tolist() == groups
+    assert matrix["6m"].tolist() == [0.0] * 7
 
 
 def test_heatmap_artifact_name_rejects_non_phase3_outputs():

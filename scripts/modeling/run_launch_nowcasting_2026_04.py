@@ -49,8 +49,13 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--no-time-decay", dest="use_time_decay", action="store_false", default=True)
     p.add_argument("--threshold", type=float, default=ln.CANONICAL_THRESHOLD, help="Fixed/informational; only 0.2 accepted.")
     p.add_argument("--drop-nonfinite-predictions", action="store_true")
-    p.add_argument("--using_forecasted_weather", "--using-forecasted-weather", dest="using_forecasted_weather", action="store_true", help="For scope 3/6/12, add forecast-weather proxy features and replace inference proxy values from the forecast file.")
+    p.add_argument("--using_forecasted_weather", "--using-forecasted-weather", dest="using_forecasted_weather", action="store_true", help="For scope 3/6/12, add visible forecast-weather proxy features across the scope window and replace inference proxy values from the forecast file.")
     p.add_argument("--forecasted-weather-source", help="Forecast weather CSV with area_id,time,Rainf_f_tavg_mean,Tair_f_tavg_mean. Defaults to assembled_IPCCH/spatial/cds_api_tif_values_by_area_time.csv.")
+    p.add_argument("--compute-grouped-shap", action="store_true", help="Compute grouped SHAP for the fitted phase3_worse nowcasting model in Mode 1 train-and-predict runs.")
+    p.add_argument("--grouped-shap-crosswalk-path", help="Six-category feature crosswalk CSV for grouped SHAP. Overrides --grouped-shap-crosswalk-key.")
+    p.add_argument("--grouped-shap-crosswalk-key", default=ln.GROUPED_SHAP_CROSSWALK_KEY, help="External path key for grouped SHAP crosswalk when no explicit path is supplied.")
+    p.add_argument("--grouped-shap-crosswalk-feature-column", help="Feature-name column in the grouped SHAP crosswalk CSV.")
+    p.add_argument("--grouped-shap-crosswalk-category-column", help="Six-category column in the grouped SHAP crosswalk CSV.")
     # Execution modes
     p.add_argument("--skip-training", action="store_true", help="Mode 2: requires --model-artifact-dir.")
     p.add_argument("--model-artifact-dir", help="Directory with fitted model artifacts (Mode 2).")
@@ -80,10 +85,20 @@ def _resolve_mode(args) -> str:
     return "train_and_predict"
 
 
+def _validate_grouped_shap_mode(args, mode: str) -> None:
+    if not args.compute_grouped_shap:
+        return
+    if mode == "predict_with_supplied_models":
+        raise ln.LaunchError("grouped SHAP currently supports train-and-predict Mode 1 runs only; remove --skip-training or omit --compute-grouped-shap.")
+    if mode == "report_from_supplied_predictions":
+        raise ln.LaunchError("grouped SHAP requires a fitted phase3_worse model and corresponding training feature matrix; remove --skip-prediction or omit --compute-grouped-shap.")
+
+
 def build_config(args) -> ln.LaunchConfig:
     if abs(float(args.threshold) - ln.CANONICAL_THRESHOLD) > 1e-12:
         raise ln.LaunchError("This launch is constitutionally fixed to canonical th=0.2; --threshold cannot be changed.")
     mode = _resolve_mode(args)
+    _validate_grouped_shap_mode(args, mode)
     source = None
     if mode != "report_from_supplied_predictions":
         source = ln.resolve_comprehensive_source(args.comprehensive_source)
@@ -110,6 +125,11 @@ def build_config(args) -> ln.LaunchConfig:
         drop_nonfinite_predictions=args.drop_nonfinite_predictions,
         using_forecasted_weather=args.using_forecasted_weather,
         forecasted_weather_source=Path(args.forecasted_weather_source) if args.forecasted_weather_source else None,
+        compute_grouped_shap=args.compute_grouped_shap,
+        grouped_shap_crosswalk_path=Path(args.grouped_shap_crosswalk_path) if args.grouped_shap_crosswalk_path else None,
+        grouped_shap_crosswalk_key=args.grouped_shap_crosswalk_key,
+        grouped_shap_crosswalk_feature_column=args.grouped_shap_crosswalk_feature_column,
+        grouped_shap_crosswalk_category_column=args.grouped_shap_crosswalk_category_column,
         execution_mode=mode,
     )
 
@@ -178,7 +198,7 @@ def run(args) -> int:
 
     if mode == "predict_with_supplied_models":
         models, feature_columns = ln.load_model_artifacts(Path(args.model_artifact_dir))
-        missing_weather_features = [c for c in ln.forecasted_weather_proxy_columns() if weather_report.get("active") and c not in feature_columns]
+        missing_weather_features = [c for c in weather_report.get("proxy_columns", []) if weather_report.get("active") and c not in feature_columns]
         if missing_weather_features:
             raise ln.LaunchError(
                 "--using_forecasted_weather requires supplied model artifacts trained with forecast-weather proxy features; "
@@ -193,6 +213,17 @@ def run(args) -> int:
         featured_all, feature_columns, train_featured.columns, april_featured.columns, transform,
     )
 
+    grouped_shap_summary = {}
+    if config.compute_grouped_shap:
+        grouped_shap_summary = ln.compute_nowcasting_grouped_shap(
+            models,
+            train_featured,
+            feature_columns,
+            config,
+            layout,
+            ln.grouped_shap_weather_forecast_features(config),
+        )
+
     pred = ln.predict_april(models, april_featured, feature_columns, config)
     pred_valid, pred_validation = ln.validate_and_clip_predictions(pred, config)
     overall = ln.derive_overall_phase(pred_valid, config.threshold)
@@ -205,11 +236,11 @@ def run(args) -> int:
     pd.DataFrame([train_summary]).to_csv(layout.training_summary_csv, index=False)
     ln.write_prediction_outputs(layout, pred_out, april_featured, feature_columns, coverage, pred_validation, args.overwrite)
 
-    _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, weather_report)
+    _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, weather_report, grouped_shap_summary)
     return 0
 
 
-def _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, forecasted_weather=None):
+def _post_prediction(config, layout, args, pred_out, train_summary, coverage, feature_columns, hp_prov, warnings, forecasted_weather=None, grouped_shap=None):
     """Comparison (US3), map (US4), reports (US5), run summary. Actuals loaded ONLY here."""
     comparison_payload = None
     map_summary = None
@@ -253,12 +284,22 @@ def _post_prediction(config, layout, args, pred_out, train_summary, coverage, fe
         map_summary = ms.to_dict()
         viz_paths = {"figure": str(figure_path), "validation_summary": str(summary_path)}
 
-    run_summary = ln.build_run_summary(config, layout, train_summary, coverage, feature_columns, hp_prov, viz_paths, forecasted_weather)
+    run_summary = ln.build_run_summary(config, layout, train_summary, coverage, feature_columns, hp_prov, viz_paths, forecasted_weather, grouped_shap)
     ln.write_json(layout.run_summary_json, run_summary)
     ln.write_json(layout.config_json, ln.asdict(config) if hasattr(ln, "asdict") else {"launch_month": config.launch_month})
     pred_dist = ln.prediction_distribution_summary(pred_out) if "phase2_worse_pred" in pred_out.columns else None
     phase_dist = ln.predicted_phase_distribution(pred_out) if "overall_phase_pred" in pred_out.columns else None
     ln.write_launch_reports(config, layout, run_summary, pred_out, pred_dist, phase_dist, comparison_payload, map_summary, warnings)
+    if grouped_shap:
+        coverage = grouped_shap.get("coverage", {})
+        print(
+            "[grouped-shap] "
+            f"matched={grouped_shap.get('matched_feature_count')} "
+            f"weather_forecast={grouped_shap.get('weather_forecast_feature_count')} "
+            f"unmatched={grouped_shap.get('unmatched_feature_count')} "
+            f"unmatched_abs_share={coverage.get('unmatched_abs_shap_share')} "
+            f"metadata={grouped_shap.get('metadata_path')}"
+        )
     print(f"[done] mode={config.execution_mode} predicted_areas={run_summary.get('predicted_area_count')} "
           f"outputs={layout.out_root}")
 
