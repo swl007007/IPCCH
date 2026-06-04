@@ -75,6 +75,7 @@ AGENTS.md
 
 .specify/*
 .claude/*
+.claude/settings.local.json
 reports/*
 results/*
 presentation/*
