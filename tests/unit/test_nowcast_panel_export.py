@@ -5,15 +5,15 @@ from pathlib import Path
 import geopandas
 import pandas as pd
 import pytest
-from shapely.geometry import box
+from shapely.geometry import Polygon, box
 
 from ipcch.nowcast_panel_export import (
     GEOMETRY_BASENAME,
     PANEL_FILENAME,
     SUMMARY_FILENAME,
     NowcastPanelExportError,
-    ExportSummary,
     build_panel,
+    build_export_summary,
     build_geometry_layer,
     load_country_lookup,
     load_predictions,
@@ -99,11 +99,13 @@ def test_load_country_lookup_requires_iso3_and_country_columns(tmp_path):
         load_country_lookup(path)
 
 
-def write_spatial(path: Path, area_ids: list[str]) -> Path:
+def write_spatial(path: Path, area_ids: list[str], geometries: list | None = None) -> Path:
+    if geometries is None:
+        geometries = [box(i, i, i + 1, i + 1) for i in range(len(area_ids))]
     gdf = geopandas.GeoDataFrame(
         {
             "area_id": area_ids,
-            "geometry": [box(i, i, i + 1, i + 1) for i in range(len(area_ids))],
+            "geometry": geometries,
         },
         crs="EPSG:4326",
     )
@@ -126,6 +128,33 @@ def test_build_geometry_layer_has_one_row_per_area_id(tmp_path):
     assert geometry["area_id"].tolist() == ["10", "100033"]
     assert geometry.set_index("area_id").loc["10", "n_months"] == 2
     assert geometry.crs.to_string() == "EPSG:4326"
+
+
+def test_build_export_summary_tracks_geometry_repairs_and_country_month_counts(tmp_path):
+    panel = pd.DataFrame(
+        [
+            {"area_id": "10", "iso3": "LSO", "country": "Lesotho", "date": "2025-01-01"},
+            {"area_id": "10", "iso3": "LSO", "country": "Lesotho", "date": "2025-02-01"},
+            {"area_id": "100033", "iso3": "NGA", "country": "Nigeria", "date": "2025-01-01"},
+        ]
+    )
+    invalid_polygon = Polygon([(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)])
+    spatial = write_spatial(tmp_path / "invalid_spatial.geojson", ["10", "100033"], [invalid_polygon, box(2, 2, 3, 3)])
+    geometry = build_geometry_layer(panel, spatial)
+    summary = build_export_summary(
+        predictions=pd.DataFrame([{"area_id": "10"}]),
+        panel=panel,
+        geometry=geometry,
+        prediction_source="predictions.csv",
+        country_lookup_source="lookup.csv",
+        spatial_source=spatial,
+        output_paths=validate_output_conflicts(tmp_path / "export", overwrite=True),
+        countries=["LSO", "NGA"],
+        overwrite=True,
+    )
+
+    assert summary.geometry_repaired_count > 0
+    assert summary.month_row_counts == {"LSO": {"2025-01": 1, "2025-02": 1}, "NGA": {"2025-01": 1}}
 
 
 def test_build_geometry_layer_fails_on_missing_area_id(tmp_path):
@@ -184,21 +213,15 @@ def test_write_export_package_writes_csv_shapefile_and_summary(tmp_path):
         crs="EPSG:4326",
     )
     paths = validate_output_conflicts(tmp_path / "export", overwrite=False)
-    summary = ExportSummary(
-        run_timestamp="2026-07-08T00:00:00+00:00",
+    summary = build_export_summary(
+        predictions=pd.DataFrame([{"area_id": "10"}]),
+        panel=panel,
+        geometry=geometry,
         prediction_source="pred.csv",
         country_lookup_source="lookup.csv",
         spatial_source="spatial.geojson",
-        output_paths={},
+        output_paths=paths,
         countries=["LSO"],
-        source_rows=1,
-        panel_rows=1,
-        admin_units=1,
-        country_row_counts={"LSO": 1},
-        country_admin_counts={"LSO": 1},
-        month_row_counts={"2025-01": 1},
-        geometry_rows=1,
-        unmatched_geometry_area_ids=[],
         overwrite=False,
     )
 
@@ -207,3 +230,4 @@ def test_write_export_package_writes_csv_shapefile_and_summary(tmp_path):
     assert (tmp_path / "export" / PANEL_FILENAME).exists()
     assert (tmp_path / "export" / f"{GEOMETRY_BASENAME}.shp").exists()
     assert (tmp_path / "export" / SUMMARY_FILENAME).exists()
+    assert summary.month_row_counts == {"LSO": {"2025-01": 1}}

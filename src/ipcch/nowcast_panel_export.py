@@ -11,7 +11,7 @@ import pandas as pd
 from ipcch import paths
 from ipcch.alert_risk_maps import default_country_lookup_path as _default_country_lookup_path
 from ipcch.alert_risk_maps import default_spatial_path as _default_spatial_path
-from ipcch.alert_risk_maps import load_spatial_boundaries
+from ipcch.alert_risk_maps import AREA_ID_ALIASES
 from ipcch.alert_risk_maps import normalize_area_id, resolve_path
 
 
@@ -88,8 +88,9 @@ class ExportSummary:
     admin_units: int
     country_row_counts: Mapping[str, int]
     country_admin_counts: Mapping[str, int]
-    month_row_counts: Mapping[str, int]
+    month_row_counts: Mapping[str, Mapping[str, int]]
     geometry_rows: int
+    geometry_repaired_count: int
     unmatched_geometry_area_ids: list[str]
     overwrite: bool
 
@@ -144,6 +145,37 @@ def validate_output_conflicts(output_dir: str | Path, overwrite: bool) -> Export
         joined = ", ".join(str(path) for path in conflicts)
         raise NowcastPanelExportError(f"Existing output file conflict without --overwrite: {joined}")
     return paths_obj
+
+
+def _load_spatial_boundaries_with_repair_count(spatial_path: str | Path):
+    path = resolve_path(spatial_path)
+    if not path.exists():
+        raise NowcastPanelExportError(f"Spatial boundary file does not exist: {path}")
+
+    gpd = __import__("geopandas")
+    gdf = gpd.read_file(path)
+    area_column = next((column for column in AREA_ID_ALIASES if column in gdf.columns), None)
+    if area_column is None:
+        raise NowcastPanelExportError(f"Spatial boundary file missing area_id or documented equivalent column: {path}")
+    if area_column != "area_id":
+        gdf = gdf.rename(columns={area_column: "area_id"})
+    if "geometry" not in gdf.columns:
+        raise NowcastPanelExportError(f"Spatial boundary file missing geometry column: {path}")
+
+    gdf = gdf.dropna(subset=["area_id", "geometry"]).copy()
+    gdf["area_id"] = normalize_area_id(gdf["area_id"])
+    invalid_count = int((~gdf.geometry.is_valid).sum())
+    if invalid_count:
+        repaired = gdf.copy()
+        repaired["geometry"] = repaired.geometry.buffer(0)
+        if not repaired.geometry.is_valid.all():
+            raise NowcastPanelExportError(f"Spatial boundary file contains invalid geometries that could not be repaired: {path}")
+        gdf = repaired
+    duplicates = sorted(gdf.loc[gdf["area_id"].duplicated(), "area_id"].unique().tolist())
+    if duplicates:
+        raise NowcastPanelExportError(f"Spatial boundary file has duplicate area_id values: {duplicates[:10]}")
+    gdf.attrs["geometry_repaired_count"] = invalid_count
+    return gdf
 
 
 def load_predictions(path: str | Path) -> pd.DataFrame:
@@ -230,10 +262,11 @@ def build_geometry_layer(panel: pd.DataFrame, spatial_path: str | Path):
     admin_meta["max_date"] = admin_meta["max_date"].dt.date.astype(str)
 
     try:
-        boundaries = load_spatial_boundaries(spatial_path)
+        boundaries = _load_spatial_boundaries_with_repair_count(spatial_path)
     except Exception as exc:  # pragma: no cover - exercised through happy path in tests
         raise NowcastPanelExportError(f"Failed to load spatial boundaries: {exc}") from exc
 
+    repaired_count = int(getattr(boundaries, "attrs", {}).get("geometry_repaired_count", 0))
     boundaries = boundaries[["area_id", "geometry"]].copy()
     boundaries["area_id"] = normalize_area_id(boundaries["area_id"])
     joined = admin_meta.merge(boundaries, on="area_id", how="left", validate="one_to_one")
@@ -242,12 +275,19 @@ def build_geometry_layer(panel: pd.DataFrame, spatial_path: str | Path):
         raise NowcastPanelExportError(f"Selected area_id values missing geometry: {missing[:10]}")
 
     gpd = __import__("geopandas")
-    return gpd.GeoDataFrame(joined, geometry="geometry", crs=boundaries.crs)
+    geometry = gpd.GeoDataFrame(joined, geometry="geometry", crs=boundaries.crs)
+    geometry.attrs["geometry_repaired_count"] = repaired_count
+    return geometry
 
 
-def _month_counts(panel: pd.DataFrame) -> dict[str, int]:
+def _month_counts(panel: pd.DataFrame) -> dict[str, dict[str, int]]:
     months = pd.to_datetime(panel["date"], errors="coerce").dt.to_period("M").astype(str)
-    return {str(key): int(value) for key, value in months.value_counts().sort_index().items()}
+    frame = pd.DataFrame({"iso3": panel["iso3"].astype(str), "month": months})
+    counts = frame.groupby(["iso3", "month"]).size().sort_index()
+    result: dict[str, dict[str, int]] = {}
+    for (iso3, month), value in counts.items():
+        result.setdefault(str(iso3), {})[str(month)] = int(value)
+    return result
 
 
 def build_export_summary(
@@ -282,6 +322,7 @@ def build_export_summary(
         country_admin_counts={str(key): int(value) for key, value in admin_counts.items()},
         month_row_counts=_month_counts(panel),
         geometry_rows=int(len(geometry)),
+        geometry_repaired_count=int(getattr(geometry, "attrs", {}).get("geometry_repaired_count", 0)),
         unmatched_geometry_area_ids=[],
         overwrite=bool(overwrite),
     )
@@ -291,9 +332,4 @@ def write_export_package(panel: pd.DataFrame, geometry, summary: ExportSummary, 
     output_paths.output_dir.mkdir(parents=True, exist_ok=True)
     panel.to_csv(output_paths.panel_csv, index=False)
     geometry.to_file(output_paths.geometry_shp, driver="ESRI Shapefile", encoding="UTF-8")
-    summary.output_paths = {
-        "panel_csv": str(output_paths.panel_csv),
-        "geometry_shp": str(output_paths.geometry_shp),
-        "summary_json": str(output_paths.summary_json),
-    }
     output_paths.summary_json.write_text(json.dumps(summary.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
