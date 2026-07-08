@@ -333,3 +333,37 @@ def write_export_package(panel: pd.DataFrame, geometry, summary: ExportSummary, 
     panel.to_csv(output_paths.panel_csv, index=False)
     geometry.to_file(output_paths.geometry_shp, driver="ESRI Shapefile", encoding="UTF-8")
     output_paths.summary_json.write_text(json.dumps(summary.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
+
+
+def run_export(
+    *,
+    predictions_path: str | Path | None = None,
+    country_lookup_path: str | Path | None = None,
+    spatial_path: str | Path | None = None,
+    output_dir: str | Path | None = None,
+    countries: Sequence[str] = DEFAULT_COUNTRIES,
+    overwrite: bool = False,
+) -> ExportSummary:
+    resolved_predictions = resolve_path(predictions_path or default_prediction_path())
+    resolved_lookup = resolve_path(country_lookup_path or default_country_lookup_path())
+    resolved_spatial = resolve_path(spatial_path or default_spatial_path())
+    resolved_output = output_dir or default_output_dir()
+
+    output_paths = validate_output_conflicts(resolved_output, overwrite=overwrite)
+    predictions = load_predictions(resolved_predictions)
+    lookup = load_country_lookup(resolved_lookup)
+    panel = build_panel(predictions, lookup, countries)
+    geometry = build_geometry_layer(panel, resolved_spatial)
+    summary = build_export_summary(
+        predictions=predictions,
+        panel=panel,
+        geometry=geometry,
+        prediction_source=resolved_predictions,
+        country_lookup_source=resolved_lookup,
+        spatial_source=resolved_spatial,
+        output_paths=output_paths,
+        countries=countries,
+        overwrite=overwrite,
+    )
+    write_export_package(panel, geometry, summary, output_paths)
+    return summary
