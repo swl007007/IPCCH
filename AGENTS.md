@@ -1,79 +1,86 @@
 <claude-mem-context>
 # Memory Context
 
-# [IPCCH] recent context, 2026-05-28 9:53pm EDT
+# [IPCCH] recent context, 2026-08-25 3:16pm EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (21,854t read) | 903,786t work | 98% savings
+Stats: 50 obs (20,932t read) | 458,352t work | 95% savings
 
-### May 12, 2026
-S16 Build 2025 CH centroid CSV: install geopandas, merge dec25 Excel with GeoJSON to get polygon centroid lat/lon, filter current/2025, progressive PCODE join adm3→adm2→adm1 (May 12, 2:11 PM)
-S15 Initialize CLAUDE.md documentation for the IPCCH data subdirectory of an IFPRI food security research project (May 12, 2:11 PM)
-S17 Build 2025 CH centroid CSV by merging dec25 Excel with GeoJSON centroids — pipeline complete, outputs verified, duplicates diagnosed (May 12, 2:55 PM)
-S29 Validate generated tasks and analyze/remediate Spec Kit findings for 2025 alert risk maps (May 12, 2:56 PM)
-139 5:26p ⚖️ ML Pipeline Standard Folder Structure Reorganization Planned
-140 5:27p 🔵 IPCCH Project Existing Folder Structure Mapped
-141 " 🔵 IPCCH Project Architecture and Dependency Graph Fully Documented
-142 " 🔵 Regional Model Data Sparsity Problem Documented in ISSUES_FIXED.md
-143 5:28p 🔵 Hardcoded Absolute Windows Paths Found in Multiple Python Scripts
-144 " ⚖️ ML Pipeline Folder Reorganization Plan Formulated via Subagent Exploration
-145 " 🔵 Git Status Expanded: settings.local.json Also Modified
-146 5:29p 🔵 IPCCH Project: Comprehensive Dependency Audit Before ML Pipeline Reorganization
-147 " ⚖️ ML Pipeline Reorganization Blocked: Zero Code Edits Constraint Cannot Be Satisfied
-148 5:34p ⚖️ ML Pipeline Folder Structure Reorganization Requested
-149 5:39p 🔵 IPCCH Food Security ML Project: Current Structure and Critical Dependency Risks
-150 " ⚖️ 7-Phase ML Pipeline Reorganization Plan Produced for IPCCH Project
-151 5:40p ✅ ML Pipeline Reorganization Plan Saved to Claude Plans Directory
-152 " ⚖️ IPCCH ML Pipeline Folder Reorganization Plan Created
-153 " ⚖️ IPCCH ML Pipeline Folder Reorganization Plan Created
-154 5:50p 🔵 food_crisis_functions Import Dependency Scope Mapped
-155 " 🔄 food_crisis_functions Converted to Installable ipcch Package
-156 5:51p 🔄 All food_crisis_functions Imports Updated to ipcch Package Path
-157 5:52p 🔵 Stale Comment in run_region_models.py References Old Module Name
-158 " 🟣 Phase 1 Import Migration Verified Complete
-159 " 🔄 Stale food_crisis_functions Comment Removed; Zero Old Import References Remain
-160 " 🔵 Hard-coded Path Inventory Completed Before Phase 2 Moves
-161 " 🔄 Config JSONs and Reference CSV Moved to Canonical Locations
-162 5:53p 🟣 Path Resolution Module and Example Config Added to ipcch Package
-163 " 🔄 run_region_models.py Gains Self-Locating PROJECT_ROOT and ipcch.paths Import
-164 5:54p 🔄 run_region_models.py CLI Defaults Updated to Use CONFIG_DIR; --lat-lon-file Made Required
-165 " 🟣 ipcch.paths Gains external_path() with Local Config Override and Hardened Defaults
-166 " 🔴 paths.example.json Relative Paths Corrected to Match 3-Level Directory Depth
-167 " 🔄 run_region_models.py --lat-lon-file Restored to Optional with external_path() Default
-168 5:55p 🔄 cleanlab_label_analysis.py Updated with Self-Locating PROJECT_ROOT and ipcch.paths Imports
-### May 27, 2026
-170 2:05p ⚖️ 2025 alert risk maps planned as post-processing workflow
-171 " ⚖️ Alert map semantics use IPC phase 3 crisis thresholds
-172 " ⚖️ Prediction records require latest 2025 row per area_id
-173 " ⚖️ Alert risk map workflow fails on ambiguous inputs and incomplete joins
-174 " 🔵 2025 alert risk maps CLI contract defined expected inputs and outputs
-S30 Resolve Spec Kit analyze findings for feature 002-2025-alert-risk-maps and continue post-remediation analysis (May 27, 2:31 PM)
-S27 Generate and validate Spec Kit tasks for 2025 alert risk maps (May 27, 2:31 PM)
-S28 Analyze Spec Kit artifacts and report consistency/coverage for 2025 alert risk maps (May 27, 2:31 PM)
-S31 Post-remediation Spec Kit analysis for 2025 alert risk maps after resolving analyze findings (May 27, 2:35 PM)
-S32 Complete post-remediation Spec Kit artifact analysis for 2025 alert risk maps (May 27, 2:39 PM)
 ### May 28, 2026
-175 9:35p 🟣 April 2026 Global Nowcasting Launch CLI Implemented
-176 " 🔵 Launch Environment Requires venv — paths.local.json Missing
-177 " 🔵 ipcch-geo Venv Has Both XGBoost and GeoPandas — Use for Full Launch with Map
-179 " 🔵 Prior Validate-Only Run Exists — Output Artifacts Conflict Without --overwrite
-180 9:38p 🔵 Output Directory Contains Only Partial Validate-Only Artifacts — No Training Run Yet
-178 9:40p 🔵 Launch CLI Successfully Imports and Runs with ipcch-geo Venv
-182 " 🔵 IPCCH Nowcasting Launch Directory — Partial Output State
-183 " 🔵 Launch Nowcasting Script Killed OOM Loading 5 GB CSV
-181 9:41p 🔵 Validation Summary Confirms 49,538 Training Rows and 6,188 April 2026 Prediction Targets
-189 9:42p 🔵 Launch Script Killed by OOM (Exit 137) on 5 GB CSV Load
-S33 Launch the nowcasting_2026_04 pipeline using the newly implemented run_launch_nowcasting_2026_04.py script (May 28, 9:42 PM)
-184 9:51p 🔵 MCP `codex_apps` Startup Fails with `invalid_workspace_selected` (403)
-185 " 🔵 Codex `codex_apps` MCP Tool Cache and Config Location Identified
-186 " 🔵 `codex_apps` GitHub MCP Was Previously Functional — Used to Ship fs0 Pipeline PR
-187 " 🔵 Root Cause of `codex_apps` MCP Failure: Plugin-Provided Server with No Workspace Selected
+187 9:51p 🔵 Root Cause of `codex_apps` MCP Failure: Plugin-Provided Server with No Workspace Selected
 188 9:52p 🔵 `codex doctor` Reveals Network Sandbox Blocks ChatGPT Backend — Root Cause of `codex_apps` MCP Failure
+191 " ✅ `github@openai-curated` Plugin Removed to Eliminate `codex_apps` MCP Startup Error
+193 " ✅ `codex_apps` Tool Cache Backed Up After Plugin Removal
+190 9:53p 🔵 Root Cause of OOM: load_comprehensive_source Uses Plain pd.read_csv with No dtype Optimization
+192 " 🔵 launch_nowcasting.py Model Architecture: Cumulative XGBoost with Time-Decay Weighting
+195 " 🔵 IPCCH Launch Config Constants and CSV Column Structure Confirmed
+196 " 🔴 OOM Fix: Two-Pass Row-Filter CSV Load in load_comprehensive_source
+194 9:54p 🔵 Feature Pipeline Makes Multiple Full DataFrame Copies, Compounding OOM Risk
+197 9:55p 🔵 pytest Fails to Import ipcch Module Without src/ on PYTHONPATH
+199 9:56p 🔵 IPCCH pytest requires PYTHONPATH=src to resolve ipcch module
+200 " 🔵 launch_nowcasting validate-only run: feature schema mismatch between train and April 2026 test set
+201 9:58p 🟣 Launch Nowcasting 2026-04 Pipeline Executed End-to-End
+198 " 🔴 All 16 Unit Tests Pass After OOM Fix — PYTHONPATH=src Required
+202 10:13p 🟣 April 2026 IPC-CH Nowcasting Run Completed Successfully
+203 10:20p 🔵 April 2026 IPC-CH Nowcast Prediction Distribution: Phase 3 Dominates at 81%
+204 " ✅ Project Memory File Created for Launch Nowcasting 2026-04 Runbook
+205 10:21p ✅ MEMORY.md Updated with Launch Nowcasting 2026-04 Pointer
+206 10:23p 🔵 Comparison and Map Inputs Both Available for April 2026 Actuals
+207 " 🔵 launch_comparison.py: Coverage-Aware April-Only Comparison Module Architecture
+208 10:24p 🔵 launch_visualizations.py: Two-Panel Spatial Join Design with Hard-Fail on Duplicate Keys
+209 10:25p 🔵 Shapefile Has No area_id Column — Spatial Join Will Fail Without Remapping
+210 " 🔵 build_map() Delegates Boundary Loading to arm Module — admin_code Remapping May Happen There
+211 10:26p 🔵 admin_code → area_id Remapping Handled Automatically by load_spatial_boundaries() via AREA_ID_ALIASES
+212 " 🔵 April 2026 Actual Coverage: 2,774 of 6,188 Areas Labeled (44.8%) — All IDs Match Perfectly
+213 " 🟣 Mode 3 Comparison and Map Run Launched as Background Process
+214 " 🟣 Mode 3 Report and Map Completed Successfully — Comparison and Choropleth Outputs Written
+215 " 🟣 Full Mode 3 Output Set Confirmed: Comparison CSVs, Confusion Matrix, and Crisis Map PNG Written
+216 10:27p 🔵 April 2026 Nowcast Comparison Metrics: High Phase 3+ Recall (94%) but Zero Phase 4 Detection
+217 10:30p 🔵 contextily Zoom Level 21 Warning When Mapping Labeled-Only Actual Subset
+218 10:43p 🟣 Final Two-Panel Crisis Map PNG Confirmed — 1.17 MB, Correct Partial Coverage Reflected
+219 10:44p ✅ Project Memory Runbook Updated with Complete Mode 3 Comparison and Map Gotchas
+220 10:48p 🔵 alert_risk_maps.py Basemap Pattern: EPSG:3857 Reproject + CartoDB.Positron at alpha=0.4
+221 " 🔵 alert_risk_maps.py Uses Africa-Constrained Extent Calculation to Prevent Basemap Over-Zoom
+222 10:49p 🔵 launch_visualizations.py _panel() Missing EPSG:3857 Reprojection and Africa Extent Filter vs Reference
+224 " 🔴 Basemap Fix Verified: zoom-level-21 Warning Eliminated After EPSG:3857 Reproject
+223 " 🔴 launch_visualizations.py _panel() Fixed: EPSG:3857 Reproject + Africa Extent Filter Added
+225 10:52p 🟣 Crisis Map PNG Now Includes Basemap Tiles — File Size Increased from 1.17MB to 1.89MB
+S38 Threshold sweep diagnostic on April 2026 nowcast — investigating whether lowering th from 0.20 to 0.12 improves Phase 4 detection (May 28, 10:52 PM)
+226 10:53p 🔵 Prediction Output CSV Schema: Dual Prediction Columns (worse + cumulative) Plus Full Metadata
+227 " 🔵 reconstruct_phase_from_cumulative: Last-Phase-Wins Threshold Algorithm — Phase 4 Requires phase4_worse_pred ≥ 0.2
+228 10:54p 🔵 Threshold Sweep Diagnostic: Phase 4 Recall Reaches 38% at th=0.10 but Overall Accuracy Drops to 39%
+S39 Threshold sweep in the upward direction (0.22/0.25/0.30+) to reduce Phase 3 over-prediction in April 2026 nowcast (May 28, 10:55 PM)
+229 11:01p 🔵 High-Threshold Sweep: th=0.25 Maximizes Macro-F1 (0.244); th=0.30 Maximizes Accuracy (0.573)
+230 " 🔵 Per-Phase Thresholds Outperform Global — 0.20/0.30/0.10/0.08 Achieves Best Macro-F1 (0.284) with Phase 4+ Recall 38%
+231 11:03p ✅ Project Memory Updated with Full Threshold Diagnostic Summary and Per-Phase Recommendation
+S41 Stage and commit all changes and merge into main branch (May 28, 11:03 PM)
+232 " 🟣 Alternative th=0.25 Prediction Set and Full Mode 3 Report Generated in Separate Output Directory
+233 11:05p 🟣 th=0.25 Alternative Product Fully Generated: 17-File Output Set with Map PNG and Comparison CSVs
+S40 Re-generate the crisis map and comparison outputs at th=0.25 to show the improved phase distribution compared to canonical th=0.20 (May 28, 11:05 PM)
+S43 Session start — user greeted with "hello" (May 28, 11:05 PM)
+234 11:09p 🔵 Feature Branch 004 Git Status: 13 New Source Files + 3 Modified Files to Commit; Results Directories Gitignored
+235 " 🔵 AGENTS.md Is a Claude-Mem Context File — Should Likely Be Excluded from Commit
+236 11:10p 🔵 AGENTS.md Is Untracked Claude-Mem File Not Covered by .gitignore — Must Be Excluded from Commit
+S44 Session start — user said "hello" (May 28, 11:22 PM)
+S42 Session start — user greeted with "hello" (May 28, 11:22 PM)
+S45 Session start - user said "hello" (May 28, 11:28 PM)
+S46 Run full April 2026 forecast-weather launch pipelines for 3m, 6m, and 12m scopes after validating the historical-weather fallback (May 28, 11:49 PM)
+### Jun 2, 2026
+237 5:07p 🔵 IPCCH completed raw data file location identified
+S47 Validate and run full April 2026 forecast-weather launch pipelines for scopes 3m, 6m, and 12m after implementing the historical-weather fallback (Jun 2, 5:43 PM)
+**Investigated**: Scope 12 validate-only output was observed, along with task state transitions and the launch of full production background jobs for scopes 3, 6, and 12. The commands used the real comprehensive deep-feature CSV, forecasted weather mode, the IPCCH admin geometry shapefile, --approve-training, --overwrite, and shared output/report roots.
 
-Access 904k tokens of past work via get_observations([IDs]) or mem-search skill.
+**Learned**: Scope 12 forecast-weather validate-only completed successfully with status=validated, train_rows=49538, april_rows=6188, and features=406. As with other scopes, it emitted a non-fatal Train/X_test feature schema warning where only_train contains month dummy columns and year dummy columns through 2022, while only_xtest is empty. This remains expected because model-aligned reindexing handles missing X-test dummy columns.
+
+**Completed**: Task 10 was marked completed, indicating the validation phase finished. Tasks 11, 12, and 13 were moved to in_progress for the full production pipeline phase. Full background production runs were started for scope 3 with backgroundTaskId bjvp1o15u, scope 6 with backgroundTaskId b7oz792er, and scope 12 with backgroundTaskId bvip9ju8p. Earlier completed work includes the forecast-weather training proxy fallback to assembled_IPCCH/raw/IPCCH_2026_completed.csv, passing unit tests with 35 passed, and successful validate-only runs for the relevant scopes.
+
+**Next Steps**: Monitor or wait for the three background production jobs to complete. After completion, inspect each scope output directory and corresponding report directory, then summarize run summaries, predictions, validation summaries, feature schema, model-aligned X-test files, maps, markdown reports, runtime/resource usage, and any warnings or failures.
+
+
+Access 458k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
 
 # Project Guidance Addendum

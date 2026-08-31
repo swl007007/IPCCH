@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
+import re
 import sys
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
@@ -26,14 +27,12 @@ from ipcch.forecasting_shap import (
     raw_shap_frame,
     render_heatmap,
     scope_matrix,
-    unavailable_split_diagnostic,
     unmapped_feature_diagnostics,
     validate_crosswalk,
     validate_sample_type,
 )
 from ipcch.forecasting_weight_decay import (
     DECAY_FORMULATION,
-    DEFAULT_DATASET_KEY,
     DEFAULT_FS,
     DEFAULT_HALF_LIFE_MONTHS,
     DEFAULT_PHASE_THRESHOLD,
@@ -41,7 +40,6 @@ from ipcch.forecasting_weight_decay import (
     FS_DATASET_KEYS,
     FS_LABELS,
     DEFAULT_TEST_YEARS,
-    METRIC_NAMES,
     SPLIT_RULE,
     TARGET_COLUMNS,
     add_identifier_features,
@@ -49,7 +47,8 @@ from ipcch.forecasting_weight_decay import (
     check_existing_outputs,
     compute_metrics,
     ensure_output_dirs,
-    extract_somalia_area_ids,
+    extract_country_area_ids,
+    extract_country_name,
     feature_hash_or_sample,
     flatten_metric_result,
     plan_outputs,
@@ -70,6 +69,22 @@ from ipcch.forecasting_weight_decay import (
 DEFAULT_COUNTRY_AREA_LOOKUP_PATH = paths.SOURCE_DATA_DIR / "assembled_IPCCH" / "country_area_id_lookup.csv"
 
 
+@dataclass(frozen=True)
+class ScopeSelection:
+    region_scope_name: str
+    region_area_ids: Optional[Sequence[object]]
+    selected_country_iso3: Optional[str]
+    selected_country_name: Optional[str]
+    metric_scope_iso3: str
+    metric_scope_name: str
+    metric_scope_slug: str
+    metric_scope_area_ids: Sequence[object]
+
+    @property
+    def country_filtered(self) -> bool:
+        return self.region_area_ids is not None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run IPCCH deep-feature annual forecasting with exponential time-decay sample weights."
@@ -77,9 +92,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset", help="Path to corrected deep-feature forecasting-ready CSV. Overrides --fs and --dataset-key.")
     parser.add_argument("--dataset-key", help="ipcch.paths external key for the dataset. Overrides --fs when --dataset is omitted.")
     parser.add_argument("--fs", choices=sorted(FS_DATASET_KEYS), default=DEFAULT_FS, help="Feature-scope dataset selector: fs0=0m, fs1=3m, fs2=6m, fs3=default forecasting-ready.")
-    parser.add_argument("--region-scope", type=int, choices=(0, 1), default=0, help="0=global IPC+CH rows; 1=Somalia-only rows selected by area_id before modeling.")
-    parser.add_argument("--somalia-lookup", help="Path to persistent country-area lookup CSV used to select Somalia area_id values.")
-    parser.add_argument("--somalia-lookup-key", help="ipcch.paths external key for Somalia lookup source. Overrides the persistent country-area lookup default when --somalia-lookup is omitted.")
+    parser.add_argument("--region-scope", type=int, choices=(0, 1), default=0, help="0=global IPC+CH rows; 1=legacy Somalia-only alias. Use --country-iso3 for other countries.")
+    parser.add_argument("--country-iso3", help="Filter modeling rows to one ISO3 country code, for example NGA.")
+    parser.add_argument("--country-name", help="Optional country name fallback for lookups without an ISO3 column; requires --country-iso3.")
+    parser.add_argument("--country-lookup", "--somalia-lookup", dest="country_lookup", help="Path to persistent country-area lookup CSV used for country filtering and scope metrics.")
+    parser.add_argument("--country-lookup-key", "--somalia-lookup-key", dest="country_lookup_key", help="ipcch.paths external key for the country lookup source. Overrides the persistent country-area lookup default when --country-lookup is omitted.")
     parser.add_argument("--out-dir", help="Machine-readable output directory.")
     parser.add_argument("--report-dir", help="Human-readable report directory.")
     parser.add_argument("--half-life-months", type=float, default=DEFAULT_HALF_LIFE_MONTHS, help="Exponential decay half-life in months.")
@@ -118,7 +135,7 @@ def load_dataset(path: Path, sample_rows: Optional[int], area_ids: Optional[Sequ
     rows_remaining = sample_rows
     for chunk in pd.read_csv(path, chunksize=100_000):
         if "area_id" not in chunk.columns:
-            raise ValueError("Dataset is missing area_id; cannot apply --region-scope 1")
+            raise ValueError("Dataset is missing area_id; cannot apply country filtering")
         matched = chunk[chunk["area_id"].astype(str).isin(area_id_strings)]
         if rows_remaining is not None:
             matched = matched.head(rows_remaining)
@@ -142,14 +159,53 @@ def resolve_dataset_selection(args: argparse.Namespace) -> Tuple[Path, str]:
     return resolve_input_path(None, key), key
 
 
-def resolve_somalia_lookup(args: argparse.Namespace) -> Tuple[Path, str]:
-    if args.somalia_lookup:
-        return resolve_input_path(args.somalia_lookup, args.somalia_lookup_key or DEFAULT_SOMALIA_LOOKUP_KEY), "explicit_path"
-    if args.somalia_lookup_key:
-        return resolve_input_path(None, args.somalia_lookup_key), args.somalia_lookup_key
+def resolve_country_lookup(args: argparse.Namespace) -> Tuple[Path, str]:
+    if args.country_lookup:
+        return resolve_input_path(args.country_lookup, args.country_lookup_key or DEFAULT_SOMALIA_LOOKUP_KEY), "explicit_path"
+    if args.country_lookup_key:
+        return resolve_input_path(None, args.country_lookup_key), args.country_lookup_key
     if not DEFAULT_COUNTRY_AREA_LOOKUP_PATH.exists():
         raise FileNotFoundError(f"Input path does not exist: {DEFAULT_COUNTRY_AREA_LOOKUP_PATH}")
     return DEFAULT_COUNTRY_AREA_LOOKUP_PATH, "country_area_id_lookup"
+
+
+def resolve_scope_selection(args: argparse.Namespace, lookup_df: pd.DataFrame) -> ScopeSelection:
+    if args.country_iso3 and args.region_scope == 1:
+        raise ValueError("Use either --country-iso3 or legacy --region-scope 1, not both")
+    if args.country_name and not args.country_iso3:
+        raise ValueError("--country-name requires --country-iso3")
+
+    selected_iso3 = str(args.country_iso3).strip().upper() if args.country_iso3 else ("SOM" if args.region_scope == 1 else None)
+    selected_name_hint = args.country_name or ("Somalia" if args.region_scope == 1 else None)
+    if selected_iso3:
+        selected_name = extract_country_name(lookup_df, selected_iso3, selected_name_hint)
+        selected_area_ids = extract_country_area_ids(lookup_df, selected_iso3, selected_name_hint or selected_name)
+        region_scope_name = _scope_slug(selected_name, selected_iso3)
+    else:
+        selected_name = None
+        selected_area_ids = None
+        region_scope_name = "global"
+
+    metric_iso3 = selected_iso3 or "SOM"
+    metric_name_hint = selected_name or "Somalia"
+    metric_name = extract_country_name(lookup_df, metric_iso3, metric_name_hint)
+    metric_area_ids = extract_country_area_ids(lookup_df, metric_iso3, metric_name)
+    metric_slug = _scope_slug(metric_name, metric_iso3)
+    return ScopeSelection(
+        region_scope_name=region_scope_name,
+        region_area_ids=selected_area_ids,
+        selected_country_iso3=selected_iso3,
+        selected_country_name=selected_name,
+        metric_scope_iso3=metric_iso3,
+        metric_scope_name=metric_name,
+        metric_scope_slug=metric_slug,
+        metric_scope_area_ids=metric_area_ids,
+    )
+
+
+def _scope_slug(country_name: str, country_iso3: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", str(country_name).strip().lower()).strip("_")
+    return slug or str(country_iso3).strip().lower()
 
 
 def resolve_crosswalk_source(args: argparse.Namespace) -> Tuple[Optional[Path], Optional[str]]:
@@ -160,8 +216,14 @@ def resolve_crosswalk_source(args: argparse.Namespace) -> Tuple[Optional[Path], 
     return resolve_input_path(None, args.variable_crosswalk_key), args.variable_crosswalk_key
 
 
-def default_experiment_name(fs: str, region_scope: int, phase_threshold: float, add_identifier_features: bool) -> str:
-    scope = "somalia" if region_scope == 1 else "global"
+def default_experiment_name(
+    fs: str,
+    region_scope: int,
+    phase_threshold: float,
+    add_identifier_features: bool,
+    country_scope: Optional[str] = None,
+) -> str:
+    scope = country_scope or ("somalia" if region_scope == 1 else "global")
     parts = [FS_LABELS[fs], scope]
     if add_identifier_features:
         parts.append("identifier_features")
@@ -169,16 +231,22 @@ def default_experiment_name(fs: str, region_scope: int, phase_threshold: float, 
     return "_".join(parts)
 
 
-def resolve_output_plan(args: argparse.Namespace, test_years: Sequence[int]):
+def resolve_output_plan(args: argparse.Namespace, test_years: Sequence[int], scope_selection: ScopeSelection):
     out_dir = args.out_dir
     report_dir = args.report_dir
     if out_dir is None or report_dir is None:
-        experiment_name = default_experiment_name(args.fs, args.region_scope, args.phase_threshold, args.add_identifier_features)
+        experiment_name = default_experiment_name(
+            args.fs,
+            args.region_scope,
+            args.phase_threshold,
+            args.add_identifier_features,
+            scope_selection.region_scope_name if scope_selection.country_filtered else None,
+        )
         if out_dir is None:
             out_dir = str(paths.RESULTS_DIR / "experiments" / "deep_feature_weight_decay_forecasting" / experiment_name)
         if report_dir is None:
             report_dir = str(paths.REPORTS_DIR / "deep_feature_weight_decay_forecasting" / experiment_name)
-    return plan_outputs(out_dir, report_dir, test_years)
+    return plan_outputs(out_dir, report_dir, test_years, metric_scope=scope_selection.metric_scope_slug)
 
 
 def load_hyperparameters() -> Tuple[Dict[str, object], Dict[str, object]]:
@@ -320,27 +388,40 @@ def write_metrics_outputs(metrics_by_year: Mapping[int, Mapping[str, object]], o
     return metrics_df
 
 
-def write_somalia_metrics(predictions_by_year: Mapping[int, pd.DataFrame], somalia_area_ids: Sequence[object], output_plan) -> pd.DataFrame:
+def write_scope_metrics(
+    predictions_by_year: Mapping[int, pd.DataFrame],
+    scope_area_ids: Sequence[object],
+    scope_slug: str,
+    scope_name: str,
+    output_plan,
+) -> pd.DataFrame:
     rows = []
-    somalia_ids = set(somalia_area_ids)
+    scope_ids = {str(area_id) for area_id in scope_area_ids}
     for year, predictions in predictions_by_year.items():
-        somalia_predictions = predictions[predictions["area_id"].isin(somalia_ids)].copy()
-        if somalia_predictions.empty:
-            result = unavailable_metrics(year, "somalia", "no eligible Somalia samples")
+        scope_predictions = predictions[predictions["area_id"].astype(str).isin(scope_ids)].copy()
+        if scope_predictions.empty:
+            result = unavailable_metrics(year, scope_slug, f"no eligible {scope_name} samples")
         else:
-            result = compute_metrics(somalia_predictions, year, "somalia")
+            result = compute_metrics(scope_predictions, year, scope_slug)
         rows.append(flatten_metric_result(result))
     metrics_df = pd.DataFrame(rows).sort_values("test_year")
-    metrics_df.to_csv(output_plan.metrics_somalia_csv, index=False)
+    metrics_df.to_csv(output_plan.metrics_scope_csv, index=False)
     return metrics_df
 
 
-def write_report(metrics_overall: Optional[pd.DataFrame], metrics_somalia: Optional[pd.DataFrame], metadata: Mapping[str, object], output_plan) -> None:
+def write_report(metrics_overall: Optional[pd.DataFrame], metrics_scope: Optional[pd.DataFrame], metadata: Mapping[str, object], output_plan) -> None:
     output_plan.report_dir.mkdir(parents=True, exist_ok=True)
     if metrics_overall is not None:
         metrics_overall.to_csv(output_plan.report_metrics_overall_csv, index=False)
-    if metrics_somalia is not None:
-        metrics_somalia.to_csv(output_plan.report_metrics_somalia_csv, index=False)
+    if metrics_scope is not None:
+        metrics_scope.to_csv(output_plan.report_metrics_scope_csv, index=False)
+
+    country_filter = metadata.get("country_filter")
+    country_filter_text = "global"
+    if isinstance(country_filter, Mapping):
+        country_filter_text = f"{country_filter.get('name')} ({country_filter.get('iso3')})"
+    metrics_scope_metadata = metadata.get("metrics_scope", {})
+    metrics_scope_name = metrics_scope_metadata.get("name", "Somalia") if isinstance(metrics_scope_metadata, Mapping) else "Somalia"
 
     lines = [
         "# Deep Feature Weighted Decay Forecasting Summary",
@@ -350,7 +431,8 @@ def write_report(metrics_overall: Optional[pd.DataFrame], metrics_somalia: Optio
         "## Data source replacement",
         "",
         f"Dataset source: `{metadata['dataset_source']}`",
-        f"Somalia lookup source: `{metadata['somalia_lookup_source']}`",
+        f"Country lookup source: `{metadata['country_lookup_source']}`",
+        f"Modeling scope: `{country_filter_text}`",
         "",
         "## Time-decay weighting",
         "",
@@ -374,8 +456,8 @@ def write_report(metrics_overall: Optional[pd.DataFrame], metrics_somalia: Optio
         "",
     ]
     lines.extend(_markdown_table(metrics_overall))
-    lines.extend(["", "## Somalia-only metrics", ""])
-    lines.extend(_markdown_table(metrics_somalia))
+    lines.extend(["", f"## {metrics_scope_name}-only metrics", ""])
+    lines.extend(_markdown_table(metrics_scope))
     shap_metadata = metadata.get("shap", {}) if isinstance(metadata, Mapping) else {}
     if shap_metadata.get("enabled"):
         artifact_paths = shap_metadata.get("artifact_paths", {})
@@ -423,11 +505,10 @@ def build_metadata(
     dataset_path: Path,
     dataset_key: str,
     fs: str,
-    region_scope: int,
+    scope_selection: ScopeSelection,
     loaded_rows: int,
-    somalia_filtered: bool,
-    somalia_lookup_path: Path,
-    somalia_lookup_key: str,
+    country_lookup_path: Path,
+    country_lookup_key: str,
     test_years: Sequence[int],
     feature_columns: Sequence[str],
     output_plan,
@@ -437,18 +518,39 @@ def build_metadata(
     identifier_source: Optional[Path],
     identifier_source_key: str,
     dry_run: bool,
-    somalia_area_id_count: int,
+    seed: int,
     weight_diagnostics_rows: Sequence[Mapping[str, object]],
 ) -> Dict[str, object]:
+    country_lookup_source = {"key": country_lookup_key, "path": str(country_lookup_path)}
+    country_filter = None
+    if scope_selection.country_filtered:
+        country_filter = {
+            "iso3": scope_selection.selected_country_iso3,
+            "name": scope_selection.selected_country_name,
+            "slug": scope_selection.region_scope_name,
+            "area_id_count": len(scope_selection.region_area_ids or ()),
+        }
+    metrics_scope = {
+        "iso3": scope_selection.metric_scope_iso3,
+        "name": scope_selection.metric_scope_name,
+        "slug": scope_selection.metric_scope_slug,
+        "area_id_count": len(scope_selection.metric_scope_area_ids),
+    }
+    somalia_metrics = scope_selection.metric_scope_iso3 == "SOM"
     return {
         "run_timestamp": datetime.now(timezone.utc).isoformat(),
         "dataset_source": {"key": dataset_key, "path": str(dataset_path), "fs": fs},
-        "region_scope": int(region_scope),
-        "region_scope_name": "somalia" if region_scope == 1 else "global",
+        "region_scope": int(scope_selection.country_filtered),
+        "region_scope_name": scope_selection.region_scope_name,
         "loaded_rows": int(loaded_rows),
-        "somalia_filtered_before_modeling": bool(somalia_filtered),
-        "somalia_lookup_source": {"key": somalia_lookup_key, "path": str(somalia_lookup_path)},
-        "somalia_area_id_count": int(somalia_area_id_count),
+        "country_filtered_before_modeling": bool(scope_selection.country_filtered),
+        "country_filter": country_filter,
+        "country_lookup_source": country_lookup_source,
+        "country_area_id_count": len(scope_selection.region_area_ids or ()),
+        "metrics_scope": metrics_scope,
+        "somalia_filtered_before_modeling": scope_selection.selected_country_iso3 == "SOM",
+        "somalia_lookup_source": country_lookup_source if somalia_metrics else None,
+        "somalia_area_id_count": len(scope_selection.metric_scope_area_ids) if somalia_metrics else 0,
         "split_rule": SPLIT_RULE,
         "test_years": list(test_years),
         "target_columns": list(TARGET_COLUMNS),
@@ -459,6 +561,11 @@ def build_metadata(
         "phase_threshold": float(phase_threshold),
         "identifier_feature_source": {"key": identifier_source_key, "path": str(identifier_source)} if identifier_source else None,
         "identifier_feature_columns": list(add_identifier_feature_columns),
+        "seed": int(seed),
+        "hyperparameter_sources": {
+            "standard_targets": str(paths.CONFIG_DIR / "forecasting_hyperparameters.json"),
+            "phase3_target": str(paths.CONFIG_DIR / "forecasting_hyperparameters_p3.json"),
+        },
         "weight_diagnostics": list(weight_diagnostics_rows),
         "output_locations": {
             "base_dir": str(output_plan.base_dir),
@@ -540,12 +647,12 @@ def build_phase3_shap_callback(
 
 def print_dry_run_summary(
     dataset_path: Path,
-    somalia_lookup_path: Path,
+    country_lookup_path: Path,
     df: pd.DataFrame,
     feature_columns: Sequence[str],
     diagnostics: pd.DataFrame,
     weight_rows: Sequence[Mapping[str, object]],
-    somalia_area_ids: Sequence[object],
+    scope_selection: ScopeSelection,
     output_plan,
 ) -> None:
     print("Deep-feature weighted-decay forecasting dry run")
@@ -553,8 +660,12 @@ def print_dry_run_summary(
     print(f"Rows loaded: {len(df):,}")
     print(f"Feature count: {len(feature_columns):,}")
     print(f"Target columns: {', '.join(TARGET_COLUMNS)}")
-    print(f"Somalia lookup source: {somalia_lookup_path}")
-    print(f"Somalia area_id count: {len(somalia_area_ids):,}")
+    print(f"Country lookup source: {country_lookup_path}")
+    print(f"Modeling scope: {scope_selection.region_scope_name}")
+    if scope_selection.country_filtered:
+        print(f"Filtered country area_id count: {len(scope_selection.region_area_ids or ()):,}")
+    print(f"Metric scope: {scope_selection.metric_scope_name} ({scope_selection.metric_scope_iso3})")
+    print(f"Metric scope area_id count: {len(scope_selection.metric_scope_area_ids):,}")
     print("\nSplit diagnostics:")
     print(diagnostics.to_string(index=False))
     print("\nWeight diagnostics:")
@@ -573,18 +684,17 @@ def run(args: argparse.Namespace) -> int:
     validate_sample_type(args.shap_sample)
     if args.raw_shap_max_rows <= 0:
         raise ValueError("--raw-shap-max-rows must be positive")
-    dataset_path, dataset_key = resolve_dataset_selection(args)
-    somalia_lookup_path, somalia_lookup_key = resolve_somalia_lookup(args)
     crosswalk_path, crosswalk_source = resolve_crosswalk_source(args)
+    dataset_path, dataset_key = resolve_dataset_selection(args)
+    country_lookup_path, country_lookup_key = resolve_country_lookup(args)
     identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
-    output_plan = resolve_output_plan(args, test_years)
+    country_lookup_df = pd.read_csv(country_lookup_path)
+    scope_selection = resolve_scope_selection(args, country_lookup_df)
+    output_plan = resolve_output_plan(args, test_years, scope_selection)
     check_existing_outputs(output_plan, args.overwrite, args.dry_run, args.enable_shap)
     ensure_output_dirs(output_plan, args.enable_shap)
 
-    somalia_lookup_df = pd.read_csv(somalia_lookup_path)
-    somalia_area_ids = extract_somalia_area_ids(somalia_lookup_df)
-    region_area_ids = somalia_area_ids if args.region_scope == 1 else None
-    raw_df = load_dataset(dataset_path, args.sample_rows, region_area_ids)
+    raw_df = load_dataset(dataset_path, args.sample_rows, scope_selection.region_area_ids)
     df = prepare_forecasting_dataset(raw_df)
     identifier_feature_columns: List[str] = []
     if args.add_identifier_features:
@@ -625,7 +735,7 @@ def run(args: argparse.Namespace) -> int:
     write_split_diagnostics(diagnostics, output_plan)
 
     metrics_overall = None
-    metrics_somalia = None
+    metrics_scope = None
     predictions_by_year: Dict[int, pd.DataFrame] = {}
     shap_diagnostics: List[Mapping[str, object]] = list(crosswalk_diagnostics)
     shap_summaries: List[Mapping[str, object]] = []
@@ -646,7 +756,7 @@ def run(args: argparse.Namespace) -> int:
     )
 
     if args.dry_run:
-        print_dry_run_summary(dataset_path, somalia_lookup_path, df, feature_columns, diagnostics, weight_rows, somalia_area_ids, output_plan)
+        print_dry_run_summary(dataset_path, country_lookup_path, df, feature_columns, diagnostics, weight_rows, scope_selection, output_plan)
     else:
         hyperparams, hyperparams_p3 = load_hyperparameters()
         metrics_by_year: Dict[int, Mapping[str, object]] = {}
@@ -668,7 +778,13 @@ def run(args: argparse.Namespace) -> int:
             predictions_by_year[year] = predictions
             metrics_by_year[year] = compute_metrics(predictions, year, "overall")
         metrics_overall = write_metrics_outputs(metrics_by_year, output_plan)
-        metrics_somalia = write_somalia_metrics(predictions_by_year, somalia_area_ids, output_plan)
+        metrics_scope = write_scope_metrics(
+            predictions_by_year,
+            scope_selection.metric_scope_area_ids,
+            scope_selection.metric_scope_slug,
+            scope_selection.metric_scope_name,
+            output_plan,
+        )
         if args.enable_shap:
             if shap_per_feature_frames:
                 pd.concat(shap_per_feature_frames, ignore_index=True).to_csv(output_plan.shap_feature_summary_csv, index=False)
@@ -690,11 +806,10 @@ def run(args: argparse.Namespace) -> int:
         dataset_path,
         dataset_key,
         args.fs,
-        args.region_scope,
+        scope_selection,
         len(df),
-        args.region_scope == 1,
-        somalia_lookup_path,
-        somalia_lookup_key,
+        country_lookup_path,
+        country_lookup_key,
         test_years,
         feature_columns,
         output_plan,
@@ -704,7 +819,7 @@ def run(args: argparse.Namespace) -> int:
         identifier_source_path,
         args.identifier_source_key,
         args.dry_run,
-        len(somalia_area_ids),
+        args.seed,
         weight_rows,
     )
     metadata["shap"] = {
@@ -731,7 +846,7 @@ def run(args: argparse.Namespace) -> int:
     if args.enable_shap and not args.dry_run:
         write_json(output_plan.shap_metadata_json, metadata["shap"])
     write_json(output_plan.run_metadata_json, metadata)
-    write_report(metrics_overall, metrics_somalia, metadata, output_plan)
+    write_report(metrics_overall, metrics_scope, metadata, output_plan)
     return 0
 
 

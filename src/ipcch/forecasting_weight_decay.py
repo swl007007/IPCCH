@@ -67,12 +67,12 @@ class OutputPlan:
     prediction_paths: Mapping[int, Path]
     metrics_json_paths: Mapping[int, Path]
     metrics_overall_csv: Path
-    metrics_somalia_csv: Path
+    metrics_scope_csv: Path
     split_diagnostics_csv: Path
     run_metadata_json: Path
     summary_report: Path
     report_metrics_overall_csv: Path
-    report_metrics_somalia_csv: Path
+    report_metrics_scope_csv: Path
     shap_result_dir: Path
     shap_report_dir: Path
     shap_feature_summary_csv: Path
@@ -82,6 +82,16 @@ class OutputPlan:
     shap_raw_values_csv: Path
     shap_matrix_paths: Mapping[str, Path]
     shap_heatmap_paths: Mapping[str, Path]
+
+    @property
+    def metrics_somalia_csv(self) -> Path:
+        """Backward-compatible alias for legacy Somalia callers."""
+        return self.metrics_scope_csv
+
+    @property
+    def report_metrics_somalia_csv(self) -> Path:
+        """Backward-compatible alias for legacy Somalia callers."""
+        return self.report_metrics_scope_csv
 
 
 def resolve_input_path(explicit_path: Optional[str], key: str) -> Path:
@@ -428,7 +438,12 @@ def flatten_metric_result(result: Mapping[str, object]) -> Dict[str, object]:
     return row
 
 
-def plan_outputs(base_dir: Optional[str] = None, report_dir: Optional[str] = None, test_years: Sequence[int] = DEFAULT_TEST_YEARS) -> OutputPlan:
+def plan_outputs(
+    base_dir: Optional[str] = None,
+    report_dir: Optional[str] = None,
+    test_years: Sequence[int] = DEFAULT_TEST_YEARS,
+    metric_scope: str = "somalia",
+) -> OutputPlan:
     base = Path(base_dir).expanduser() if base_dir else paths.RESULTS_DIR / "experiments" / "deep_feature_weight_decay_forecasting"
     report = Path(report_dir).expanduser() if report_dir else paths.REPORTS_DIR / "deep_feature_weight_decay_forecasting"
     prediction_dir = base / "predictions"
@@ -438,6 +453,7 @@ def plan_outputs(base_dir: Optional[str] = None, report_dir: Optional[str] = Non
     shap_report_dir = report / "shap" / "phase3"
     years = validate_test_years(test_years)
     scopes = tuple(FS_DATASET_KEYS)
+    metric_scope_slug = _scope_slug(metric_scope)
     return OutputPlan(
         base_dir=base,
         prediction_dir=prediction_dir,
@@ -447,12 +463,12 @@ def plan_outputs(base_dir: Optional[str] = None, report_dir: Optional[str] = Non
         prediction_paths={year: prediction_dir / f"predictions_{year}.csv" for year in years},
         metrics_json_paths={year: metrics_dir / f"metrics_{year}.json" for year in years},
         metrics_overall_csv=metrics_dir / "metrics_overall.csv",
-        metrics_somalia_csv=metrics_dir / "metrics_somalia.csv",
+        metrics_scope_csv=metrics_dir / f"metrics_{metric_scope_slug}.csv",
         split_diagnostics_csv=metadata_dir / "split_diagnostics.csv",
         run_metadata_json=metadata_dir / "run_metadata.json",
         summary_report=report / "summary.md",
         report_metrics_overall_csv=report / "metrics_overall.csv",
-        report_metrics_somalia_csv=report / "metrics_somalia.csv",
+        report_metrics_scope_csv=report / f"metrics_{metric_scope_slug}.csv",
         shap_result_dir=shap_result_dir,
         shap_report_dir=shap_report_dir,
         shap_feature_summary_csv=shap_result_dir / "phase3_worse_feature_summary.csv",
@@ -485,12 +501,12 @@ def check_existing_outputs(output_plan: OutputPlan, overwrite: bool, dry_run: bo
         *output_plan.prediction_paths.values(),
         *output_plan.metrics_json_paths.values(),
         output_plan.metrics_overall_csv,
-        output_plan.metrics_somalia_csv,
+        output_plan.metrics_scope_csv,
         output_plan.run_metadata_json,
         output_plan.split_diagnostics_csv,
         output_plan.summary_report,
         output_plan.report_metrics_overall_csv,
-        output_plan.report_metrics_somalia_csv,
+        output_plan.report_metrics_scope_csv,
     ]
     if include_shap:
         paths_to_check.extend(
@@ -509,28 +525,87 @@ def check_existing_outputs(output_plan: OutputPlan, overwrite: bool, dry_run: bo
         raise FileExistsError("Output paths already exist; rerun with --overwrite to replace: " + "; ".join(existing))
 
 
-def extract_somalia_area_ids(lookup_df: pd.DataFrame) -> List[object]:
+def extract_country_area_ids(
+    lookup_df: pd.DataFrame,
+    country_iso3: str,
+    country_name: Optional[str] = None,
+) -> List[object]:
     area_column = _lookup_area_id_column(lookup_df)
+    iso3 = _normalize_country_iso3(country_iso3)
     iso_columns = [column for column in lookup_df.columns if column.lower() in {"iso3", "country_iso3", "iso3_code", "adm0_iso3"}]
     matches = pd.Series(False, index=lookup_df.index)
     for column in iso_columns:
-        matches = matches | (lookup_df[column].astype(str).str.strip().str.upper() == "SOM")
-    if not matches.any():
+        matches = matches | (lookup_df[column].astype(str).str.strip().str.upper() == iso3)
+    if not matches.any() and country_name:
+        normalized_country_name = _normalize_country_name(country_name)
         country_columns = [column for column in lookup_df.columns if "country" in column.lower() or column.lower() in {"adm0_name", "admin0", "country_en"}]
         for column in country_columns:
             normalized = lookup_df[column].map(_normalize_country_name)
-            matches = matches | (normalized == "somalia")
+            matches = matches | (normalized == normalized_country_name)
     ids = lookup_df.loc[matches, area_column].dropna().drop_duplicates().tolist()
     if not ids:
-        raise ValueError("No Somalia area_id values found in lookup source")
+        suffix = f" ({country_name})" if country_name else ""
+        raise ValueError(f"No area_id values found for country ISO3 {iso3}{suffix} in lookup source")
     return ids
+
+
+def extract_country_name(
+    lookup_df: pd.DataFrame,
+    country_iso3: str,
+    fallback_name: Optional[str] = None,
+) -> str:
+    iso3 = _normalize_country_iso3(country_iso3)
+    iso_columns = [column for column in lookup_df.columns if column.lower() in {"iso3", "country_iso3", "iso3_code", "adm0_iso3"}]
+    matches = pd.Series(False, index=lookup_df.index)
+    for column in iso_columns:
+        matches = matches | (lookup_df[column].astype(str).str.strip().str.upper() == iso3)
+    if not matches.any() and fallback_name:
+        normalized_fallback = _normalize_country_name(fallback_name)
+        country_columns = [column for column in lookup_df.columns if "country" in column.lower() or column.lower() in {"adm0_name", "admin0", "country_en"}]
+        for column in country_columns:
+            matches = matches | (lookup_df[column].map(_normalize_country_name) == normalized_fallback)
+    if not matches.any():
+        raise ValueError(f"No country rows found for ISO3 {iso3} in lookup source")
+
+    columns_by_priority = ("country_en", "country", "adm0_name", "admin0")
+    columns = {column.lower(): column for column in lookup_df.columns}
+    for candidate in columns_by_priority:
+        column = columns.get(candidate)
+        if column is None:
+            continue
+        names = lookup_df.loc[matches, column].dropna().astype(str).str.strip()
+        names = names[names != ""]
+        if not names.empty:
+            return names.iloc[0]
+    return iso3
+
+
+def extract_somalia_area_ids(lookup_df: pd.DataFrame) -> List[object]:
+    try:
+        return extract_country_area_ids(lookup_df, "SOM", "Somalia")
+    except ValueError as exc:
+        raise ValueError("No Somalia area_id values found in lookup source") from exc
 
 
 def _lookup_area_id_column(lookup_df: pd.DataFrame) -> str:
     for column in ("area_id", "admin_code"):
         if column in lookup_df.columns:
             return column
-    raise ValueError("Somalia lookup is missing area_id or equivalent admin_code column")
+    raise ValueError("Country lookup is missing area_id or equivalent admin_code column")
+
+
+def _normalize_country_iso3(value: object) -> str:
+    iso3 = str(value).strip().upper()
+    if not re.fullmatch(r"[A-Z]{3}", iso3):
+        raise ValueError(f"Country ISO3 must contain exactly three letters; received {value!r}")
+    return iso3
+
+
+def _scope_slug(value: object) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", str(value).strip().lower()).strip("_")
+    if not slug:
+        raise ValueError("Metric scope label must contain at least one letter or number")
+    return slug
 
 
 def _normalize_country_name(value: object) -> str:

@@ -37,6 +37,20 @@ def test_help_includes_shap_options():
         assert option in help_text
 
 
+def test_help_includes_generic_country_scope_options():
+    result = run_cli("--help")
+    assert result.returncode == 0
+    for option in (
+        "--country-iso3",
+        "--country-name",
+        "--country-lookup",
+        "--country-lookup-key",
+        "--somalia-lookup",
+        "--somalia-lookup-key",
+    ):
+        assert option in result.stdout
+
+
 def test_help_has_no_local_absolute_dropbox_defaults():
     result = run_cli("--help")
     assert result.returncode == 0
