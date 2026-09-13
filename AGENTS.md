@@ -1,19 +1,15 @@
 <claude-mem-context>
 # Memory Context
 
-# [IPCCH] recent context, 2026-08-25 3:16pm EDT
+# [IPCCH] recent context, 2026-09-07 6:25pm EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (20,932t read) | 458,352t work | 95% savings
+Stats: 50 obs (20,638t read) | 434,347t work | 95% savings
 
 ### May 28, 2026
-187 9:51p 🔵 Root Cause of `codex_apps` MCP Failure: Plugin-Provided Server with No Workspace Selected
-188 9:52p 🔵 `codex doctor` Reveals Network Sandbox Blocks ChatGPT Backend — Root Cause of `codex_apps` MCP Failure
-191 " ✅ `github@openai-curated` Plugin Removed to Eliminate `codex_apps` MCP Startup Error
-193 " ✅ `codex_apps` Tool Cache Backed Up After Plugin Removal
 190 9:53p 🔵 Root Cause of OOM: load_comprehensive_source Uses Plain pd.read_csv with No dtype Optimization
 192 " 🔵 launch_nowcasting.py Model Architecture: Cumulative XGBoost with Time-Decay Weighting
 195 " 🔵 IPCCH Launch Config Constants and CSV Column Structure Confirmed
@@ -48,7 +44,6 @@ Stats: 50 obs (20,932t read) | 458,352t work | 95% savings
 224 " 🔴 Basemap Fix Verified: zoom-level-21 Warning Eliminated After EPSG:3857 Reproject
 223 " 🔴 launch_visualizations.py _panel() Fixed: EPSG:3857 Reproject + Africa Extent Filter Added
 225 10:52p 🟣 Crisis Map PNG Now Includes Basemap Tiles — File Size Increased from 1.17MB to 1.89MB
-S38 Threshold sweep diagnostic on April 2026 nowcast — investigating whether lowering th from 0.20 to 0.12 improves Phase 4 detection (May 28, 10:52 PM)
 226 10:53p 🔵 Prediction Output CSV Schema: Dual Prediction Columns (worse + cumulative) Plus Full Metadata
 227 " 🔵 reconstruct_phase_from_cumulative: Last-Phase-Wins Threshold Algorithm — Phase 4 Requires phase4_worse_pred ≥ 0.2
 228 10:54p 🔵 Threshold Sweep Diagnostic: Phase 4 Recall Reaches 38% at th=0.10 but Overall Accuracy Drops to 39%
@@ -70,17 +65,16 @@ S45 Session start - user said "hello" (May 28, 11:28 PM)
 S46 Run full April 2026 forecast-weather launch pipelines for 3m, 6m, and 12m scopes after validating the historical-weather fallback (May 28, 11:49 PM)
 ### Jun 2, 2026
 237 5:07p 🔵 IPCCH completed raw data file location identified
-S47 Validate and run full April 2026 forecast-weather launch pipelines for scopes 3m, 6m, and 12m after implementing the historical-weather fallback (Jun 2, 5:43 PM)
-**Investigated**: Scope 12 validate-only output was observed, along with task state transitions and the launch of full production background jobs for scopes 3, 6, and 12. The commands used the real comprehensive deep-feature CSV, forecasted weather mode, the IPCCH admin geometry shapefile, --approve-training, --overwrite, and shared output/report roots.
+S47 Validate and run full April 2026 forecast-weather launch pipelines for scopes 3m, 6m, and 12m after implementing the historical-weather fallback (Jun 2, 5:39 PM)
+### Sep 5, 2026
+S50 User asked whether Fable 5 (claude-fable-5-1) is visible in the Claude Code endpoint and whether it has been published/released (Sep 5, 2:25 AM)
+278 2:25a 🔵 Claude Code CLI Version Confirmed on WSL Environment
+279 " 🔵 Claude Code CLI --model Flag Accepts 'fable' as a Valid Alias
+280 2:26a 🔵 claude-fable-5-1 Model ID Silently Falls Back to claude-opus-5
+### Sep 7, 2026
+281 6:22p 🔵 IPC vs CH Country Coverage Analysis in Acute Food Crisis Dataset
 
-**Learned**: Scope 12 forecast-weather validate-only completed successfully with status=validated, train_rows=49538, april_rows=6188, and features=406. As with other scopes, it emitted a non-fatal Train/X_test feature schema warning where only_train contains month dummy columns and year dummy columns through 2022, while only_xtest is empty. This remains expected because model-aligned reindexing handles missing X-test dummy columns.
-
-**Completed**: Task 10 was marked completed, indicating the validation phase finished. Tasks 11, 12, and 13 were moved to in_progress for the full production pipeline phase. Full background production runs were started for scope 3 with backgroundTaskId bjvp1o15u, scope 6 with backgroundTaskId b7oz792er, and scope 12 with backgroundTaskId bvip9ju8p. Earlier completed work includes the forecast-weather training proxy fallback to assembled_IPCCH/raw/IPCCH_2026_completed.csv, passing unit tests with 35 passed, and successful validate-only runs for the relevant scopes.
-
-**Next Steps**: Monitor or wait for the three background production jobs to complete. After completion, inspect each scope output directory and corresponding report directory, then summarize run summaries, predictions, validation summaries, feature schema, model-aligned X-test files, maps, markdown reports, runtime/resource usage, and any warnings or failures.
-
-
-Access 458k tokens of past work via get_observations([IDs]) or mem-search skill.
+Access 434k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
 
 # Project Guidance Addendum
