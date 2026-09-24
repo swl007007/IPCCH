@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "status": "accepted_2026_09_24",
+  "selection_metric": "phase3plus_f2",
+  "tie_break": "candidate_order",
+  "phase_threshold": 0.2,
+  "half_life_months": 24,
+  "weight_reference": "each_inner_or_outer_fit_origin",
+  "common_runtime": {
+    "objective": "reg:squarederror",
+    "random_state": 42,
+    "tree_method": "hist",
+    "n_jobs": 1
+  },
+  "candidates": [
+    {
+      "id": "X1",
+      "common": {
+        "max_depth": 3,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 5,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 3,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    },
+    {
+      "id": "X2",
+      "common": {
+        "max_depth": 5,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 5,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 5,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    },
+    {
+      "id": "X3",
+      "common": {
+        "max_depth": 5,
+        "n_estimators": 500,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 5,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 5,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    },
+    {
+      "id": "X4",
+      "common": {
+        "max_depth": 7,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 5,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 7,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    },
+    {
+      "id": "X5",
+      "common": {
+        "max_depth": 7,
+        "n_estimators": 500,
+        "learning_rate": 0.05,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 5,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 7,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    },
+    {
+      "id": "X6",
+      "common": {
+        "max_depth": 11,
+        "n_estimators": 200,
+        "learning_rate": 0.1,
+        "subsample": 1.0,
+        "colsample_bytree": 0.5,
+        "gamma": 0.0,
+        "min_child_weight": 0,
+        "scale_pos_weight": 1
+      },
+      "phase3_overrides": {
+        "max_depth": 9,
+        "subsample": 0.5,
+        "colsample_bytree": 0.7,
+        "gamma": 0.1
+      }
+    }
+  ],
+  "phase_threshold_comparison": "greater_than_or_equal",
+  "prediction_precision": "unrounded_for_selection_and_evaluation"
+}
