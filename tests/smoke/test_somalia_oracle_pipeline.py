@@ -119,3 +119,15 @@ def test_cli_end_to_end_synthetic(tmp_path, tiny_candidates):
     draws = np.load(out / "metrics" / "bootstrap_draws.npz")
     assert any(key.endswith("__multiplicities") for key in draws.files)
     assert (report / "metrics.csv").exists()
+
+    # Replay must fail when a frozen-cohort prediction is missing (close-audit A01).
+    from importlib import util as _util
+
+    replay_spec = _util.spec_from_file_location("replay", str(md.paths.PROJECT_ROOT / "scripts" / "postprocessing" / "replay_somalia_oracle.py"))
+    replay_mod = _util.module_from_spec(replay_spec)
+    replay_spec.loader.exec_module(replay_mod)
+    checks, *_ = replay_mod.replay(out)
+    assert checks["pass"].all()
+    dropped = predictions.drop(index=predictions.index[(predictions["arm"] == "A")][:1])
+    bad_checks, *_ = replay_mod.replay(out, predictions_override=dropped)
+    assert not bad_checks.loc[bad_checks["check"] == "prediction_coverage", "pass"].all()

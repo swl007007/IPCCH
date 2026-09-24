@@ -55,6 +55,12 @@ def sk_metrics(truth_phase, truth_crisis, pred_phase, q3=None, q3_pred=None):
     return out
 
 
+def required_contrasts(cohort: str) -> list:
+    if cohort == "primary":
+        return ["B-A", "C-B", "D-C"] + [f"{arm}-always_crisis" for arm in ARMS]
+    return [f"{arm}-persistence" for arm in ARMS] + [f"{arm}-always_crisis" for arm in ARMS]
+
+
 def weighted_f2(y: np.ndarray, p: np.ndarray, w: np.ndarray) -> np.ndarray:
     tp = (w * (y & p)).sum(axis=1)
     fp = (w * (~y & p)).sum(axis=1)
@@ -64,8 +70,10 @@ def weighted_f2(y: np.ndarray, p: np.ndarray, w: np.ndarray) -> np.ndarray:
         return np.where(d > 0, 5 * tp / d, np.nan)
 
 
-def replay(out: Path):
+def replay(out: Path, predictions_override: "pd.DataFrame | None" = None):
     predictions, cohort, ledger, provenance, metrics, contrasts, draws = load(out)
+    if predictions_override is not None:
+        predictions = predictions_override
     truth = ledger.set_index(["area_id", "target_ord"])
     checks = []
     replayed = []
@@ -87,7 +95,9 @@ def replay(out: Path):
                 if sub.index.duplicated().any():
                     raise AssertionError("duplicate prediction keys")
                 pr = sub.reindex(idx)
-                if pr["phase_pred"].isna().any():
+                missing = int(pr["phase_pred"].isna().sum())
+                checks.append({"check": "prediction_coverage", "year": year, "horizon": horizon, "arm": arm, "cohort": name, "pass": missing == 0, "detail": f"{missing} frozen cohort keys without predictions"})
+                if missing:
                     continue
                 # Phase must be reproducible from raw (unrounded) cumulative predictions.
                 q = pr[["q2_pred", "q3_pred", "q4_pred", "q5_pred"]].to_numpy()
@@ -106,7 +116,9 @@ def replay(out: Path):
                 vectors["persistence"] = pp >= 3
                 replayed.append({"test_year": year, "horizon": horizon, "cohort": name, "specification": "persistence", **sk_metrics(t["overall_phase"].to_numpy(), y, pp)})
             key = f"y{year}_h{horizon:02d}_{name}"
-            if f"{key}__multiplicities" not in draws.files:
+            has_bundle = f"{key}__multiplicities" in draws.files
+            checks.append({"check": "bootstrap_bundle_present", "year": year, "horizon": horizon, "cohort": name, "pass": has_bundle or frame["area_id"].nunique() < 2})
+            if not has_bundle:
                 continue
             areas = draws[f"{key}__areas"]
             saved_keys = draws[f"{key}__cohort_keys"]
@@ -115,9 +127,14 @@ def replay(out: Path):
             order = frame.reset_index(drop=True)
             w = draws[f"{key}__multiplicities"][:, np.searchsorted(areas, order["area_id"].to_numpy())].astype(float)
             sub_c = contrasts.loc[(contrasts["test_year"] == year) & (contrasts["horizon"] == horizon) & (contrasts["cohort"] == name)]
+            required = required_contrasts(name)
+            present = set(sub_c["contrast"])
+            for contrast in required:
+                checks.append({"check": "contrast_present", "year": year, "horizon": horizon, "cohort": name, "contrast": contrast, "pass": contrast in present})
             for row in sub_c.itertuples(index=False):
                 a, b = row.contrast.split("-", 1)
                 if a not in vectors or b not in vectors:
+                    checks.append({"check": "contrast_vectors_available", "year": year, "horizon": horizon, "cohort": name, "contrast": row.contrast, "pass": False})
                     continue
                 # Reorder saved-cohort vectors to the replay order (saved order == prediction merge order).
                 delta = weighted_f2(y, vectors[a], w) - weighted_f2(y, vectors[b], w)

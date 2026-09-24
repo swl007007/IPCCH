@@ -354,3 +354,45 @@ def test_bootstrap_unavailable_with_one_area_or_undefined_draws():
     cohort2 = pd.DataFrame({"area_id": [1, 2], "target_ord": [1, 1]})
     rows2, _ = ev.paired_bootstrap(cohort2, np.array([1, 0], dtype=bool), {"A": np.array([0, 0], dtype=bool), "B": np.array([1, 1], dtype=bool)}, [("A", "B")], draws=200)
     assert rows2[0]["interval_status"] == "unavailable" and rows2[0]["undefined_draws"] > 0
+
+
+# --- Audit repair regressions ---------------------------------------------------
+
+
+def test_history_crisis_state_exact_at_twenty_percent_boundary():
+    # 5*(.12+.08+0) == .59+.21+.12+.08+0 == 1 exactly -> strict '>' keeps it noncrisis,
+    # even though the float sum of the five shares is 0.9999999999999999.
+    frames = _mr_rows([[1602, 2019, 7, 2, 0.59, 0.21, 0.12, 0.08, 0.0, 10.0], [1603, 2019, 7, 3, 0.58, 0.21, 0.13, 0.08, 0.0, 10.0]])
+    ledger = sd.build_label_ledger(frames, set()).set_index("area_id")
+    assert ledger.loc[1602, "history_crisis_state"] == 0
+    assert ledger.loc[1603, "history_crisis_state"] == 1
+
+
+def test_history_qc_follows_g4_without_component_upper_bound():
+    frames = _mr_rows([[5, 2023, 1, 1, 1.2, 0.3, 0.0, 0.0, 0.0, 10.0], [6, 2023, 1, 1, 1.0, -0.1, 0.1, 0.0, 0.0, 10.0]])
+    ledger = sd.build_label_ledger(frames, set()).set_index("area_id")
+    assert ledger.loc[5, "valid_target"] and ledger.loc[5, "valid_history"]
+    assert ledger.loc[5, "h_p1"] == pytest.approx(0.8) and ledger.loc[5, "h_p2"] == pytest.approx(0.2)
+    assert ledger.loc[6, "history_invalid_reason"] == "nonfinite_or_negative_component"
+
+
+def test_category_history_masked_when_source_label_invalid():
+    ledger = pd.DataFrame(
+        {"area_id": [1917, 1917, 7], "target_ord": [sd.month_ord(2026, 1).item(), sd.month_ord(2025, 10).item(), sd.month_ord(2026, 1).item()], "valid_phase": [False, True, True]}
+    )
+    frame = pd.DataFrame(
+        {
+            "area_id": [1917, 1917, 7, 7],
+            "target_ord": [sd.month_ord(2026, 4).item(), sd.month_ord(2026, 1).item(), sd.month_ord(2026, 4).item(), sd.month_ord(2026, 7).item()],
+            "overall_phase_prev_observed_asof_s3": [2.0, 3.0, 4.0, 1.0],
+        }
+    )
+    masked, count = sd.mask_unverified_category_history(frame, ledger, 3)
+    values = masked["overall_phase_prev_observed_asof_s3"].tolist()
+    assert np.isnan(values[0])  # source 2026-01 for area 1917 is provenance-invalid
+    assert values[1] == 3.0  # source 2025-10 is valid
+    assert values[2] == 4.0  # area 7 source 2026-01 is valid
+    assert np.isnan(values[3])  # source 2026-04 absent from the ledger
+    assert count == 2
+    h0, _ = sd.mask_unverified_category_history(frame.rename(columns={"overall_phase_prev_observed_asof_s3": "overall_phase_prev_observed_asof_s0"}), ledger, 0)
+    assert np.isnan(h0["overall_phase_prev_observed_asof_s0"].iloc[1])  # H=0 source is T-1 = 2025-12, not a valid label

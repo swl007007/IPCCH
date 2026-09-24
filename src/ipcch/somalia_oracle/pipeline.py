@@ -162,6 +162,7 @@ def prepare(input_paths: Mapping[str, Path], log=print, hash_inputs: bool = True
     oracle_ledgers: Dict[int, pd.DataFrame] = {}
     cohort_rows = []
     job_rows = []
+    category_masks: Dict[int, int] = {}
     for horizon in HORIZONS:
         fs = fs_frames[HORIZON_FS[horizon]]
         base_columns = sd.base_feature_columns(fs)
@@ -170,6 +171,8 @@ def prepare(input_paths: Mapping[str, Path], log=print, hash_inputs: bool = True
             ledger.loc[:, ledger_columns], on=["area_id", "target_ord"], how="inner", validate="one_to_one"
         )
         rows = rows.loc[rows["valid_target"] & (rows["target_ord"] // 12 >= FIRST_MODEL_YEAR)].copy()
+        rows, masked_category = sd.mask_unverified_category_history(rows, ledger, horizon)
+        category_masks[horizon] = masked_category
         rows = rows.sort_values(["target_ord", "area_id"], kind="mergesort").reset_index(drop=True)
         rows["horizon"] = horizon
         rows["origin_ord"] = rows["target_ord"] - horizon
@@ -253,6 +256,7 @@ def prepare(input_paths: Mapping[str, Path], log=print, hash_inputs: bool = True
         "weather_status_counts_from_2021": weather.loc[weather["month_ord"] >= (FIRST_MODEL_YEAR - 1) * 12, "weather_status"].value_counts().to_dict(),
         "v2_somalia_areas_without_rows": 0,
         "blocked_base_features": list(BLOCKED_BASE_FEATURES),
+        "category_history_values_masked_by_horizon": category_masks,
         "history_width": len(history_names),
     }
     return Prepared(

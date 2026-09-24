@@ -94,10 +94,15 @@ def read_area_rows(path: Path, area_ids: Set[int], id_column: str, usecols: Opti
 # --------------------------------------------------------------------------
 
 
-def _exact_crisis_state(p3: float, p4: float, p5: float, total: float) -> int:
-    """Reference history convention ``5 * (P3 + P4 + P5) > S`` without float rounding."""
-    exact = [Decimal(repr(float(v))) for v in (p3, p4, p5)]
-    return int(Decimal(5) * sum(exact) > Decimal(repr(float(total))))
+def _exact_crisis_state(components: Sequence[float]) -> int:
+    """Reference history convention ``5 * (P3 + P4 + P5) > S`` in exact decimal arithmetic.
+
+    Both sides are summed from the same exact decimal source components (the
+    shortest round-trip text of each parsed value), never from a float total, so a
+    distribution exactly at 20% (e.g. .59/.21/.12/.08/0) stays negative.
+    """
+    exact = [Decimal(repr(float(v))) for v in components]
+    return int(Decimal(5) * (exact[2] + exact[3] + exact[4]) > sum(exact, Decimal(0)))
 
 
 def build_label_ledger(model_ready: Mapping[str, pd.DataFrame], raw_labeled_keys: Set[Tuple[int, int]]) -> pd.DataFrame:
@@ -171,9 +176,9 @@ def build_label_ledger(model_ready: Mapping[str, pd.DataFrame], raw_labeled_keys
     derived = share_phase(ledger[list(CUMULATIVE_COLUMNS)].to_numpy(dtype=np.float64))
     ledger["share_derived_phase"] = np.where(ledger["valid_target"], derived, np.nan)
 
-    # Reference history QC: P1..P4 observed, missing P5 -> 0 (flagged), shares in
-    # [0, 1], positive population, positive sum. The reference's [.90, 1.10] sum gate
-    # is superseded by grill G4 proportional normalization.
+    # Reference history QC: P1..P4 observed, missing P5 -> 0 (flagged), positive
+    # population. Grill G4 supersedes the reference's [0, 1] component and [.90, 1.10]
+    # sum gates: finite nonnegative components with a positive sum are normalized.
     p1_4_missing = np.isnan(values[:, :4]).any(axis=1)
     p5_filled = ~p1_4_missing & np.isnan(values[:, 4])
     filled = values.copy()
@@ -183,8 +188,8 @@ def build_label_ledger(model_ready: Mapping[str, pd.DataFrame], raw_labeled_keys
     history_reason = np.full(len(ledger), "", dtype=object)
     history_reason[unreconciled] = "provenance_unreconciled"
     history_reason[(history_reason == "") & p1_4_missing] = "missing_phase_1_to_4"
-    bounds = np.isfinite(filled).all(axis=1) & (filled >= 0).all(axis=1) & (filled <= 1).all(axis=1)
-    history_reason[(history_reason == "") & ~bounds] = "phase_share_out_of_bounds"
+    bounds = np.isfinite(filled).all(axis=1) & (filled >= 0).all(axis=1)
+    history_reason[(history_reason == "") & ~bounds] = "nonfinite_or_negative_component"
     history_reason[(history_reason == "") & ~(np.isfinite(population) & (population > 0))] = "population_not_positive"
     history_reason[(history_reason == "") & ~(filled_total > 0)] = "nonpositive_sum"
     ledger["history_invalid_reason"] = history_reason
@@ -196,7 +201,7 @@ def build_label_ledger(model_ready: Mapping[str, pd.DataFrame], raw_labeled_keys
         ledger[f"h_p{index + 1}"] = np.where(ledger["valid_history"], history_normalized[:, index], np.nan)
     states = np.full(len(ledger), np.nan)
     for row in np.flatnonzero(ledger["valid_history"].to_numpy()):
-        states[row] = _exact_crisis_state(filled[row, 2], filled[row, 3], filled[row, 4], filled_total[row])
+        states[row] = _exact_crisis_state(filled[row])
     ledger["history_crisis_state"] = states
     return ledger
 
@@ -332,6 +337,29 @@ def base_feature_columns(frame: pd.DataFrame) -> List[str]:
     if leaked:
         raise DataContractError(f"Blocked predictors survived selection: {leaked}")
     return columns
+
+
+def mask_unverified_category_history(frame: pd.DataFrame, ledger: pd.DataFrame, horizon: int) -> Tuple[pd.DataFrame, int]:
+    """Blank ``overall_phase_prev_observed_asof_sH`` unless its source key is a valid reported phase.
+
+    Upstream defines the field as the exact calendar month ``T - max(1, H)``; a value
+    whose source label is invalid or provenance-unreconciled in the ledger must not
+    enter any arm.
+    """
+    columns = [c for c in frame.columns if c.startswith("overall_phase_prev_observed_asof_s")]
+    if not columns:
+        return frame, 0
+    lag = max(1, int(horizon))
+    valid = set(zip(ledger.loc[ledger["valid_phase"], "area_id"].astype(int), ledger.loc[ledger["valid_phase"], "target_ord"].astype(int)))
+    source = frame["target_ord"].to_numpy(dtype=np.int64) - lag
+    ok = np.array([(int(a), int(m)) in valid for a, m in zip(frame["area_id"], source)])
+    out = frame.copy()
+    masked = 0
+    for column in columns:
+        drop = out[column].notna().to_numpy() & ~ok
+        masked += int(drop.sum())
+        out.loc[drop, column] = np.nan
+    return out, masked
 
 
 def persistence_lookup(ledger: pd.DataFrame, area_id: np.ndarray, origin_ord: np.ndarray, target_ord: np.ndarray) -> pd.DataFrame:
