@@ -60,3 +60,7 @@ PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_oracle
 - Gate after step 7: if the common cohort is empty for a cell, report it unavailable (no relaxation).
 - Gate after step 8: pilot runtime extrapolation must fit the machine (15 GB RAM, 32 cores); otherwise reduce workers, never the candidate budget.
 - Rollback: all changes are additive (new package, script, config, tests); revert the implementation commit. External sources are read-only.
+
+## Execution record (2026-09-24)
+
+Steps 1–10 completed: implementation commit `a0c792e65ed6`; evidence run and independent replay recorded in `evidence/evidence.md` (80/80 arm cells completed; replay 480/480; outputs reproducible byte-for-byte). Step 11 (close + audits) follows this commit.

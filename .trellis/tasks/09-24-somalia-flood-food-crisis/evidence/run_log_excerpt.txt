@@ -1,0 +1,49 @@
+[prepare] Somalia areas: 905
+[prepare] raw rows 177364; weather verified share 0.934 (11s)
+[prepare] fs0: (6741, 522) (15s)
+[prepare] fs1: (6759, 523) (18s)
+[prepare] fs2: (6759, 523) (21s)
+[prepare] fs3: (6741, 388) (24s)
+[prepare] H=0: frame (5837, 1032), A/B/C/D widths [511, 525, 525, 997] (25s)
+[prepare] H=3: frame (5837, 1038), A/B/C/D widths [511, 525, 531, 1003] (25s)
+[prepare] H=6: frame (5837, 1044), A/B/C/D widths [511, 525, 537, 1009] (25s)
+[prepare] H=12: frame (5837, 909), A/B/C/D widths [376, 390, 402, 874] (26s)
+ test_year  horizon  excluded  primary  wider_only                  primary_target_month_counts
+      2025        0         0     1876           0 2025-04:904;2025-07:64;2025-09:4;2025-10:904
+      2025        3         0      275        1601           2025-04:132;2025-07:11;2025-10:132
+      2025        6         0      275        1601           2025-04:132;2025-07:11;2025-10:132
+      2025       12         0     1100         776           2025-04:904;2025-07:64;2025-10:132
+      2026        0         1      904           0                                  2026-04:904
+      2026        3         1        0         904                                          NaN
+      2026        6         1        0         904                                          NaN
+      2026       12         1      132         772                                  2026-04:132
+            job_id  n_eval_rows  n_primary_rows  n_fit_pool fit_pool_max_target
+y2025_h00_o2025-04          904             904        3057             2024-07
+y2025_h00_o2025-07           64              64        3057             2024-07
+y2025_h00_o2025-09            4               4        3057             2024-07
+y2025_h00_o2025-10          904             904        3057             2024-07
+y2026_h00_o2026-04          904             904        3804             2025-10
+y2025_h03_o2025-01          904             132        3057             2024-07
+y2025_h03_o2025-04           64              11        3057             2024-07
+y2025_h03_o2025-06            4               0        3057             2024-07
+y2025_h03_o2025-07          904             132        3057             2024-07
+y2026_h03_o2026-01          904               0        3804             2025-10
+y2025_h06_o2024-10          904             132        3057             2024-07
+y2025_h06_o2025-01           64              11        3057             2024-07
+y2025_h06_o2025-03            4               0        3057             2024-07
+y2025_h06_o2025-04          904             132        3057             2024-07
+y2026_h06_o2025-10          904               0        3804             2025-10
+y2025_h12_o2024-04          904             904        2702             2024-01
+y2025_h12_o2024-07           64              64        3057             2024-07
+y2025_h12_o2024-09            4               0        3057             2024-07
+y2025_h12_o2024-10          904             132        3057             2024-07
+y2026_h12_o2025-04          904             132        2832             2025-04
+done in 3454s -> /mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1
+EXIT=0
+replay checks: 480/480 passed
+REPLAY_EXIT=0
+[execute] 71/75 y2026_h12_o2025-04 C: completed 214s
+[execute] 72/75 y2025_h12_o2024-10 B: completed 324s
+[execute] 73/75 y2026_h12_o2025-04 D: completed 231s
+[execute] 74/75 y2026_h06_o2025-10 D: completed 925s
+[execute] 75/75 y2025_h12_o2024-10 D: completed 336s
