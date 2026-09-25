@@ -1,0 +1,338 @@
+{
+  "schema_version": "1.0",
+  "task": "somalia-auc-r2-optimization",
+  "mode": "close-audit",
+  "base_sha": "4537cf9cb2b17c1370da3de0c0fc7c15e701769a",
+  "completion_sha": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+  "audited_sha": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+  "verdict": "pass",
+  "summary": "Full manual task re-audit passes at the pinned completion. All five distinct prior findings and both essential evidence gaps are resolved by the separately identified clean d75378d replacement run and repaired code. All 14 PRD acceptance criteria, model/calibration retention and paired uncertainty are covered; no new actionable task-scoped defects found. Validation: 16 unit tests, one synthetic smoke test, 1428 repository replay checks, 290 independent numerical checks and 2106 additional repair/provenance checks passed. This is a scoped audit result, not controller lifecycle closure or a guaranteed performance gain.",
+  "coverage": [
+    {
+      "criterion": "AC01 / R1,R3: Share units, target, squared-error loss, pooled final-q3 RMSE selection, AUC truth and threshold policy.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:22-36",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:23-66",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:configs/somalia_q3_optimization.json:1-19",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:195-250",
+        "Source retains normalized q3, reg:squarederror and 24-month origin-referenced decay; scoring/calibration use equal row weights. All 144 candidate scores independently replay from held-out final predictions; raw and final metrics are separately exported."
+      ]
+    },
+    {
+      "criterion": "AC02: Horizons, information sets, frozen cohorts, partial coverage and retrospective interpretation.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:41-41",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:7-29",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/pipeline.py:166-241",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/results_summary.md:3-3",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/cohort_ledger.csv.gz; sha256=9bd76cffbfacd71b56f15b3fcc1fc19b7e77332ac98810e918db0fc7009eb95a; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "All 11,124 cohort key/status/reason rows equal v1. Primary counts H0/H3/H6/H12: 2025=1876/275/275/1100; 2026=904/0/0/132. No prediction-dependent shrinking; 2026 H3/H6 remain explicitly unavailable."
+      ]
+    },
+    {
+      "criterion": "AC03 / R2,R10: H0-only bounded optimization, fixed H3/H6/H12 recipes, source choices and unavailable cells.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:42-42",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:169-271",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/selected_recipes.csv; sha256=253403f2bf9c52603922d3b267229c6b306452ca049f8910df6e103774fb9324; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/final_status.csv; sha256=27970cfac283ab024775761f52c225dc59bb5dfe668024f790ec32e441aa4134; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "144 scores cover two folds x four search views x six bundles x three methods at H0. Receiving OOF jobs only refit selected mappings. Every retained final job/view recipe agrees with the corresponding H0 selection; later-than-origin selection flags replay correctly. B=C at H0; D-selected preserves its exact chosen formulation/bundle/method."
+      ]
+    },
+    {
+      "criterion": "AC04 / R4,R10: Receiving model/calibration refits have eligible dates, fixed methods and replayable OOF prediction provenance.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:43-43",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:70-78",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:140-170",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:253-332",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/oof_predictions.csv.gz; sha256=bf294ba580f48fc8c42f55d43ee6e2c1f90f2d4a2678ccfa771ec6e09eb0ca99; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/calibration_mappings.csv; sha256=01b2a1e3ab778cbf1cc1a4fc09d89e633be9e34a10983741f34d8796a68fb7ac; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "/tmp/som/q3-close-2/scratch/replay.log; sha256=398cebd2b41ab05c43999a42d75d5b793875275679e1836e134069d9c8d217e5",
+        "The retained OOF store covers all 383 identities including 95 receiving-horizon fits. Independently reconstructed each eligible fitting pool/count/max date/weight origin from keyed row provenance and fold windows. Every final mapping is reconstructible from eligible OOF inputs, exact fit_rows and shifts/isotonic knots; mapping application reproduces final predictions."
+      ]
+    },
+    {
+      "criterion": "AC05 / R5: Matched-key comparisons against v1 and share persistence, immutable v1 artifacts, no guaranteed-gain claim.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:44-44",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:322-396",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/metrics.csv; sha256=987d6c543aff6fbadbbdc0f5c40b66c0250800373e68f38b85fe66ac14aefbf9; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/contrasts.csv; sha256=d9fbfa989e1b071ec2db8f149fb404aaab814ee5f17c1a7dbc41e20eea032ca9; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/v1_hash_checks.json; sha256=e1ac539f03def97b02299239e3f3cf87d23cd67ff2a990bc6d5c3cf05bae2066",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "All 28 v1 manifest-listed digests match. Independent joins reproduce primary, share-history and phase-persistence comparisons. V1 calibrated D is rebuilt from its original selected validation predictions. Poor 2026 residual performance is retained; performance improvement is not a required outcome."
+      ]
+    },
+    {
+      "criterion": "AC06 / R7: Direct/residual comparisons use identical scoring keys and original q3 units; baseline source dates/values obey each row cutoff.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:45-45",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:200-250",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:347-385",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "Exact scoring key sets agree across all 72 candidates per fold (1059 and 972 rows). Independently reconstructed the latest eligible historical source/value for every area/horizon and verified U<=O and U<T. All candidate raw/final scores replay on the original-share scale."
+      ]
+    },
+    {
+      "criterion": "AC07 / R8: Missing-history rows keep same-bundle direct fallback, branch flags/counts and matched history-supported comparisons.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:46-46",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:25-29",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:298-332",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:430-470",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "Every saved residual/fallback branch agrees with historical support; fallback baseline remains missing with source=-1. Scoring fallback raw/final values equal the same-bundle direct candidate. Primary 2025 fallback counts H0/H3/H6/H12=14/7/8/27; both supported 2026 primary cells have zero. Full and history-subset metrics independently reproduce."
+      ]
+    },
+    {
+      "criterion": "AC08 / R9: Full chronological candidate-calibration procedure and selection are replayable from retained keyed OOF inputs.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:47-47",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:50-66",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:245-251",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/scoring_predictions.csv.gz; sha256=188747fd9ed8bd510f05f1d01ab85d3c7da5998d94a53fcc40a471bf605485a2; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/scoring_plan.csv; sha256=30a76b12ed03f36f80153b25b7ec152f1b40a38509214c64a6e5fcf96802509a; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "Independently rebuilt all 432 candidate/scoring-month predictions (all 144 candidates, three scoring months each) using raw OOF predictions and earlier-month mappings, not merely the eight selected procedures. Checked latest-three eligible calibration/scoring month rules, exact scoring keys, raw values, branches and final values at absolute tolerance 1e-12 with rtol=0. Identity candidates are included. Prior G1 is closed for this replacement run."
+      ]
+    },
+    {
+      "criterion": "AC09 / R15: Global minimum RMSE, one fixed 1e-12 tie set, no threshold tuning or outer-score selection.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:48-48",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:64-66",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:392-405",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:80-94",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:198-205",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "All real selections replay. Executed the repaired runner selection statements on the prior three-candidate overlapping-tie witness: D-selected keeps residual X1 at min+0.9e-12, rather than the independently selected residual X2 at min+1.8e-12. Recipe reuse is declined when identities differ; the runner then fits the exact selected recipe. Spot A03 resolved."
+      ]
+    },
+    {
+      "criterion": "AC10 / R13: Exactly none/shift/isotonic, fixed [0,1] final bound, auditable raw predictions and clipping.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:49-49",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:104-127",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:464-472",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "All 66,720 retained final predictions are finite and bounded, equal clipped mapped predictions, and have exact clipping flags. Unit checks cover [-0.1,0.3,1.2], identity versus isotonic, inadequate month support and fewer than two distinct isotonic scores; no silent calibration-family fallback."
+      ]
+    },
+    {
+      "criterion": "AC11 / R11: Raw/final pooled and within-month AUC use q3 scores against reported phase>=3, with no independent classifier.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:50-50",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3eval.py:43-94",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/results_summary.md:24-43",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "Independent sklearn raw/final pooled AUC checks agree across all 108 model/cohort combinations. Source computes within-month AUC as the equal average over two-class months and reports supported/undefined month counts separately. No new classifier is fitted; the interpretation remains share prediction rather than calibrated area-crisis probability."
+      ]
+    },
+    {
+      "criterion": "AC12 / R14: Fixed unrounded final-q3>=0.2 binary metrics and separately named ordinal diagnostics, including multiclass macro-F1.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:51-51",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:84-86",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3eval.py:82-93",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:tests/unit/test_somalia_q3opt.py:165-172",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:tests/unit/test_somalia_q3opt.py:198-203",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/metrics.csv; sha256=987d6c543aff6fbadbbdc0f5c40b66c0250800373e68f38b85fe66ac14aefbf9; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "legacy_multiclass_macro_f1 is now distinct from binary legacy_f1. Independently reconstructed descending q5-to-q2 phases and recomputed macro-F1 over truth/prediction label union, zero_division=0, on all 108 model/cohort combinations. The .196/.2/.204 threshold test passes. Close A03 and spot A05 resolved."
+      ]
+    },
+    {
+      "criterion": "AC13 / R12: A-C information sets unchanged; residual contrast remains D-only; D-direct/residual/selected remain visible.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:52-52",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:30-36",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/pipeline.py:200-203",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/results_summary.md:7-43",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "All four horizon feature matrices and ordered feature schemas equal v1 exactly. A-C retain direct q3 targets; residual reconstruction is confined to D. The report identifies selected formulations and retains worse 2026 D-selected results alongside D-direct."
+      ]
+    },
+    {
+      "criterion": "AC14 / R6: Scientific decisions, final technical acceptance and implementation approval are recorded before implementation.",
+      "status": "met",
+      "evidence": [
+        "4537cf9cb2b17c1370da3de0c0fc7c15e701769a:.trellis/tasks/09-25-somalia-auc-r2-optimization/prd.md:63-65",
+        "4537cf9cb2b17c1370da3de0c0fc7c15e701769a:.trellis/tasks/09-25-somalia-auc-r2-optimization/grill.md:57-59",
+        "4537cf9cb2b17c1370da3de0c0fc7c15e701769a:.trellis/tasks/09-25-somalia-auc-r2-optimization/implement.md:1-19",
+        "The supplied base is an ancestor of completion. PRD/design/grill/implementation-plan Git blobs are unchanged between base and completion. Final-acceptance addenda explicitly supersede older pending-review prose; no approval is inferred from checkboxes or the in_progress lifecycle state."
+      ]
+    },
+    {
+      "criterion": "Design section 6: Paired area-cluster uncertainty, faithful pooled metrics, constant-truth R2 and undefined-draw handling.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:90-90",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3eval.py:21-40",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3eval.py:114-149",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:tests/unit/test_somalia_q3opt.py:179-195",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/bootstrap_draws.npz; sha256=b0bb0fa68803c4bb3d12fe938339a2e0cccf99cea6487cb5a2fc39c82ca585ab; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "Independently regenerated PCG64(42) area multiplicities and all 54 x 2000 R2/RMSE/AUC delta values across 18 contrasts; every saved draw array and percentile interval agrees. Constant positive-weight truth is detected before R2 evaluation; the exact decimal .1 witness and zero-weight exclusion tests pass while RMSE remains computable. Spot A04 resolved."
+      ]
+    },
+    {
+      "criterion": "Design section 7: Retain all fitted final models/constants with feature order, fit identities and prediction replay.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/design.md:94-98",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:97-113",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:scripts/modeling/run_somalia_q3_optimization.py:274-305",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:src/ipcch/somalia_oracle/q3opt.py:413-479",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/models/model_inventory.csv; sha256=f0760e3db6936bdd551aaf493a6167cc06dd17ca93532df7f0005fd23061587c; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/final_fit_ledger.csv.gz; sha256=a92496980c407795d309213fab9990d7e836d1819293349e8a74610e4eb9ba4c; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/replay.log; sha256=398cebd2b41ab05c43999a42d75d5b793875275679e1836e134069d9c8d217e5",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "400 retained final regressors/constants cover all 95 distinct fitting jobs. Every model hash is verified and loaded models reproduce saved q2/q3/q4/q5 raw predictions, including residual reconstruction/direct fallback. Independently checked exact final fitting row sets, weights, branch-specific n_rows, complete per-job target inventory and ordered feature-schema hashes. Close/spot A02 and prior G2 resolved for the new run."
+      ]
+    },
+    {
+      "criterion": "Prior calibration finding resolution: close A01, spot A01 and both reports G1.",
+      "status": "met",
+      "evidence": [
+        "/tmp/som/q3-close/result.json; sha256=c19705ec3d8c4fa5e22d8645c1e367b324327973202ba04302d1f5643cf30a02",
+        "/tmp/som/q3-spot/result.json; sha256=41b816f1e37bff66f230609664664d24ff64b426de0828601296a59aaf8f92f5",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/oof_predictions.csv.gz; sha256=bf294ba580f48fc8c42f55d43ee6e2c1f90f2d4a2678ccfa771ec6e09eb0ca99; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/calibration_mappings.csv; sha256=01b2a1e3ab778cbf1cc1a4fc09d89e633be9e34a10983741f34d8796a68fb7ac; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/replay.log; sha256=398cebd2b41ab05c43999a42d75d5b793875275679e1836e134069d9c8d217e5",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "All 156,389 OOF prediction rows are retained, covering the previously absent 144 earlier H0 fits and 95 receiving fits. Exact mapping membership and isotonic x/y knots are saved and replayed. One H12 residual OOF fit correctly has zero supported rows and an explicit unsupported reason; its absence of predictions is represented by keyed NaNs, not silently lost evidence. No remaining essential calibration evidence gap."
+      ]
+    },
+    {
+      "criterion": "Repair regression review and run-to-completion lineage.",
+      "status": "met",
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/run_manifest.json:4-15",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/run_log.txt:1-31",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/manifest.json; sha256=5466822f09a31580033ac286aee3b79e6011a8b838b1467f477293bc8868f229; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "/tmp/som/q3-close-2/scratch/artifact_inventory.json; sha256=8b2f324e9ba4ceff1a61ae3072ab3d97982764bcf897bbca69ff181a06b1dab4",
+        "/tmp/som/q3-close-2/scratch/repair.diff; sha256=17f116fb2f320d8adabb1a9723e471e4023af0caa55b8fb118cc03ddebe23ab6",
+        "Full base..completion diff and prior-completion..completion repair diff inspected. The d75378d9a2dec8b1341014b17c46e34c1d38b064 replacement run records a clean tree; its scientific source/configs are byte-identical to completion (only 11 task-evidence files changed afterward). All 22 manifest-listed output hashes and all 400 model hashes verify. The original repository remained clean and all 427 v2 artifact digests were unchanged at final verification. No new task-scoped defect identified."
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "command": "PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 TMPDIR=/tmp/som/q3-close-2/scratch /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_somalia_q3opt.py -q -p no:cacheprovider --basetemp=/tmp/som/q3-close-2/scratch/pytest",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/q3-close-2/scratch/unit.log; sha256=019588aafaa1e7c9e8961c1f7c63854ad0878f98d69abb297190299fdf4a327b",
+        "16 passed in 1.46s; tiny synthetic fits only."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 TMPDIR=/tmp/som/q3-close-2/scratch OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/smoke/test_somalia_q3opt_pipeline.py -q -p no:cacheprovider --basetemp=/tmp/som/q3-close-2/scratch/smoke-temp",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/q3-close-2/scratch/smoke.log; sha256=8f20ef665a4612c9898fba1e5d48ff7b4f3d53c351c33b9be6d75fbd81ad1be4",
+        "1 passed in 31.36s; synthetic CLI run with three-tree bundles includes saved OOF/models and replay."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python scripts/postprocessing/replay_somalia_q3.py --out-dir /tmp/som/q3-close-2/scratch/v2_q3",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/q3-close-2/scratch/replay.log; sha256=398cebd2b41ab05c43999a42d75d5b793875275679e1836e134069d9c8d217e5",
+        "1428/1428 checks passed on an independent artifact copy. Rebuilt learned final mappings and selected held-out mappings, loaded all saved models and reproduced raw predictions. Only scratch replay_checks.csv was written. One non-failing mixed-type reused_from parsing warning."
+      ]
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/q3-close-2/scratch/independent_checks.py",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/q3-close-2/scratch/independent_checks.py; sha256=c71bb375f8d2ff034ec8f33f3e3585275544173e59faea0e30b74bd36ea2f98e",
+        "/tmp/som/q3-close-2/scratch/independent.log; sha256=b31cc19d00312d9514f25755a95c3581b927935be02b48960f1d02c69de52e59",
+        "/tmp/som/q3-close-2/scratch/independent_checks.json; sha256=dfac89a844c2733f3e7d1b2249b1fa535ed034557c883b89c04461b92f6d8527",
+        "290/290 checks passed, including all 108 model/cohort metrics with new multiclass macro-F1, exact keys, historical baselines, v1 calibration and every paired bootstrap draw. The prior audit harness was read in full, copied only to scratch, redirected to current artifacts and extended to check macro-F1; prior results were not substituted for this run."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/q3-close-2/scratch/repair_checks.py",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/q3-close-2/scratch/repair_checks.py; sha256=11a606bcf46fe49cbbed9fa0f27fef7c54c6c5d580cf7a05bf968c74b61cd2e3",
+        "/tmp/som/q3-close-2/scratch/repair_checks.log; sha256=b5aab4abc84528c99e8d15bb6923fec05a1c05f8d5c42a15f8f9341bbab35a4a",
+        "/tmp/som/q3-close-2/scratch/repair_checks.json; sha256=0a0ca4521045761db40d624dad9130b1c5a834fdf897a9108ac6bda0637cc880",
+        "2106/2106 additional checks passed: all candidate calibration paths, OOF membership/cutoffs, all final mapping applications, exact fitting keys/weights/model inventories, unchanged feature matrices and the old tie/constant-truth witnesses. Initial audit-harness NaN==NaN comparison failed on the correctly unsupported zero-row H12 fit; corrected to require its explicit unavailable status, then reran successfully. No repository code/test changes."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -u -W ignore scripts/modeling/run_somalia_q3_optimization.py --workers 12 --overwrite",
+      "revision": "d75378d9a2dec8b1341014b17c46e34c1d38b064",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "existing_evidence",
+      "exit_code": 0,
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/evidence.md:7-10",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/run_log.txt:1-31",
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/run_manifest.json:4-15",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/manifest.json; sha256=5466822f09a31580033ac286aee3b79e6011a8b838b1467f477293bc8868f229; replacement evidence run d75378d9a2dec8b1341014b17c46e34c1d38b064, clean recorded tree; scientific code/config unchanged through d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+        "Recorded replacement run: EXIT=0, 562 seconds, 288 H0 OOF jobs, 95 receiving OOF jobs and 95 final jobs. Heavy training was not rerun."
+      ]
+    },
+    {
+      "command": "Full heavy training and full repository pytest suite",
+      "revision": "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8 under /tmp/som/q3-close-2/scratch/repo; {\"executable\": \"/home/swl007007/.venvs/ipcch-geo/bin/python\", \"numpy\": \"2.4.4\", \"pandas\": \"3.0.3\", \"python\": \"3.12.3\", \"sklearn\": \"1.8.0\", \"xgboost\": \"3.2.0\"}. No dependency installation or network jobs; bytecode/cache/output confined to scratch. Tests/setup/imports inspected before execution.",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/09-25-somalia-auc-r2-optimization/evidence/evidence.md:13-17",
+        "Heavy training was explicitly excluded. Focused unit and synthetic smoke suites plus full saved-artifact replay provide task coverage. Historical 250-pass/12-failure full-suite claim lacks a complete command-bound failure log and is not certified here."
+      ]
+    }
+  ],
+  "findings": [],
+  "evidence_gaps": [],
+  "limitations": [
+    "Default full task review, manually invoked outside the controller; not audit_profile=controller-close. The documented executor-session mismatch is an operational limitation, not a code defect. No task creation/start/archive, enrollment, state changes, controller actions or acceptance-gate clearing occurred.",
+    "The new retained artifacts establish replayability of the d75378d replacement evidence run. They do not recover or retroactively prove the missing calibration/model artifacts of the original 244f212 run reviewed at 1ad393e.",
+    "No planner/executor transcript was requested or inherited. Supplied prior audit reports and committed research/handoff/evidence documents were treated as claims to verify against frozen Git content and current hash-bound artifacts. No subagents were spawned.",
+    "Heavy training, full external-source preparation and large external-source CSV rehashing were not repeated. V1/v2 source identities agree in their manifests; all 28 v1 manifest-listed artifacts were rehashed, and all v2 feature matrices/ordered schemas and normalized labels match v1. Input hashes alone do not certify historical publication availability.",
+    "The accepted climate-calibration and affirmative-weather provenance limitations remain: d2ba75f73c3704362721c4cd0a6a9ed7d86e19f8:.trellis/tasks/archive/2026-09/09-24-somalia-oracle-audit-repair/prd.md:14-14. This audit does not certify operational forecasting validity, new climate-source lineage or an untouched holdout. Ancillary horizons may inherit later-selected recipes under explicit G1 approval; receiving model/calibration fit cutoffs remain enforced.",
+    "Poor selected residual results in 2026 and H12 are retained scientific outcomes, not defects. Paired intervals condition on saved predictions, exclude refitting/selection uncertainty and do not establish future-year gains.",
+    "The full repository test-suite baseline was not independently certified. This report covers the supplied task and relevant repair paths, not unrelated repository behavior. No dependency installs or remote services were used.",
+    "Operational project instructions requiring task mutation, automatic fixes or live GitNexus index refresh were not executed because they conflict with the explicit read-only audit. Fixed-revision source/caller inspection was used. Original repository, index, Git metadata, task state and artifacts were kept unchanged; writes were limited to the specified scratch and result path."
+  ]
+}

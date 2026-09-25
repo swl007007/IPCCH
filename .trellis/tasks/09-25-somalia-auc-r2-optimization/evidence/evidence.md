@@ -19,6 +19,7 @@ An intermediate rerun concurrently with the full pytest suite died with `BrokenP
 ## Audit history
 
 - Codex gpt-6-astra (reasoning high) manual spot-audit and manual close-audit of completion `1ad393e` (`audits/spot_audit_1.json`, `audits/close_audit_manual_1.json`): both `incomplete` with two major evidence-retention findings (calibration OOF inputs/mapping parameters and final models not persisted) and minor findings (D_selected tie-set composition, constant-truth R², missing multiclass macro-F1). No numerical error in reported metrics or selected recipes was found. All findings addressed in `d75378d`; the current evidence run and replay above cover them.
+- Re-audit (Codex gpt-6-astra high, same Skill, full task profile) of completion `d2ba75f`: spot-audit **pass** and manual close-audit **pass** (`audits/spot_audit_2.json`, `audits/close_audit_manual_2.json`); all five prior findings and both evidence gaps resolved, no new findings.
 - Controller close (`trellis-audit close`) is blocked: the active run `b909fb2c` is bound to Claude session `5ac278d6…`, while this pane now runs session `4816e4c6…`; the controller refuses executor replacement during an active run. Resolution requires the user (re-register/recover). The manual Codex audits were run with the same Skill outside the controller.
 
 ## Acceptance mapping (PRD acceptance list)
