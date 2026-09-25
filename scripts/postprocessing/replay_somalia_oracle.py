@@ -83,6 +83,13 @@ def replay(out: Path, predictions_override: "pd.DataFrame | None" = None):
         cohorts = {"primary": primary}
         pers_ok = prov.reindex(pd.MultiIndex.from_frame(primary))["persistence_available"].fillna(False).to_numpy(dtype=bool)
         cohorts["persistence_subset"] = primary.loc[pers_ok]
+        wider = keys.loc[keys["status"].isin(["primary", "wider_only"]), ["area_id", "target_ord"]]
+        if not wider.empty:
+            widx = pd.MultiIndex.from_frame(wider)
+            for arm in ("A", "B"):
+                sub = predictions.loc[(predictions["test_year"] == year) & (predictions["horizon"] == horizon) & (predictions["arm"] == arm)].set_index(["area_id", "target_ord"])
+                missing = int(sub.reindex(widx)["phase_pred"].isna().sum())
+                checks.append({"check": "prediction_coverage", "year": year, "horizon": horizon, "arm": arm, "cohort": "wider_labeled", "pass": missing == 0, "detail": f"{missing} wider-cohort keys without predictions"})
         for name, frame in cohorts.items():
             if frame.empty:
                 continue
@@ -115,6 +122,10 @@ def replay(out: Path, predictions_override: "pd.DataFrame | None" = None):
                 pp = prov.reindex(idx)["persistence_phase"].to_numpy()
                 vectors["persistence"] = pp >= 3
                 replayed.append({"test_year": year, "horizon": horizon, "cohort": name, "specification": "persistence", **sk_metrics(t["overall_phase"].to_numpy(), y, pp)})
+            sub_c = contrasts.loc[(contrasts["test_year"] == year) & (contrasts["horizon"] == horizon) & (contrasts["cohort"] == name)]
+            present = set(sub_c["contrast"])
+            for contrast in required_contrasts(name):
+                checks.append({"check": "contrast_present", "year": year, "horizon": horizon, "cohort": name, "contrast": contrast, "pass": contrast in present})
             key = f"y{year}_h{horizon:02d}_{name}"
             has_bundle = f"{key}__multiplicities" in draws.files
             checks.append({"check": "bootstrap_bundle_present", "year": year, "horizon": horizon, "cohort": name, "pass": has_bundle or frame["area_id"].nunique() < 2})
@@ -126,11 +137,6 @@ def replay(out: Path, predictions_override: "pd.DataFrame | None" = None):
             checks.append({"check": "bootstrap_cohort_keys_match", "year": year, "horizon": horizon, "cohort": name, "pass": bool(same_keys)})
             order = frame.reset_index(drop=True)
             w = draws[f"{key}__multiplicities"][:, np.searchsorted(areas, order["area_id"].to_numpy())].astype(float)
-            sub_c = contrasts.loc[(contrasts["test_year"] == year) & (contrasts["horizon"] == horizon) & (contrasts["cohort"] == name)]
-            required = required_contrasts(name)
-            present = set(sub_c["contrast"])
-            for contrast in required:
-                checks.append({"check": "contrast_present", "year": year, "horizon": horizon, "cohort": name, "contrast": contrast, "pass": contrast in present})
             for row in sub_c.itertuples(index=False):
                 a, b = row.contrast.split("-", 1)
                 if a not in vectors or b not in vectors:

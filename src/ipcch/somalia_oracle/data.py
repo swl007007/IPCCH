@@ -191,7 +191,7 @@ def build_label_ledger(model_ready: Mapping[str, pd.DataFrame], raw_labeled_keys
     bounds = np.isfinite(filled).all(axis=1) & (filled >= 0).all(axis=1)
     history_reason[(history_reason == "") & ~bounds] = "nonfinite_or_negative_component"
     history_reason[(history_reason == "") & ~(np.isfinite(population) & (population > 0))] = "population_not_positive"
-    history_reason[(history_reason == "") & ~(filled_total > 0)] = "nonpositive_sum"
+    history_reason[(history_reason == "") & ~(np.isfinite(filled_total) & (filled_total > 0))] = "nonpositive_or_nonfinite_sum"
     ledger["history_invalid_reason"] = history_reason
     ledger["valid_history"] = history_reason == ""
     ledger["history_p5_filled"] = p5_filled & ledger["valid_history"].to_numpy()

@@ -396,3 +396,41 @@ def test_category_history_masked_when_source_label_invalid():
     assert count == 2
     h0, _ = sd.mask_unverified_category_history(frame.rename(columns={"overall_phase_prev_observed_asof_s3": "overall_phase_prev_observed_asof_s0"}), ledger, 0)
     assert np.isnan(h0["overall_phase_prev_observed_asof_s0"].iloc[1])  # H=0 source is T-1 = 2025-12, not a valid label
+
+
+def test_history_qc_rejects_overflowing_total():
+    frames = _mr_rows([[8, 2023, 1, 1, 1e308, 1e308, 0.0, 0.0, 0.0, 10.0]])
+    ledger = sd.build_label_ledger(frames, set()).set_index("area_id")
+    assert not ledger.loc[8, "valid_history"]
+    assert ledger.loc[8, "history_invalid_reason"] == "nonpositive_or_nonfinite_sum"
+
+
+def test_replay_flags_missing_contrast_and_wider_prediction(tmp_path):
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("replay_mod", str(md.paths.PROJECT_ROOT / "scripts" / "postprocessing" / "replay_somalia_oracle.py"))
+    replay = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(replay)
+    out = tmp_path
+    for d in ("predictions", "ledgers", "metrics"):
+        (out / d).mkdir()
+    t1, t2 = sd.month_ord(2025, 4).item(), sd.month_ord(2025, 10).item()
+    cohort = pd.DataFrame({"test_year": 2025, "horizon": 3, "area_id": [1, 1], "target_ord": [t1, t2], "status": ["primary", "wider_only"], "reason": None})
+    cohort.to_csv(out / "ledgers" / "cohort_ledger.csv.gz", index=False)
+    ledger = pd.DataFrame({"area_id": [1, 1], "target_ord": [t1, t2], "valid_score": True, "overall_phase": [3, 2], "actual_crisis": [1.0, 0.0], "q3": [0.4, 0.1]})
+    ledger.to_csv(out / "ledgers" / "label_ledger.csv.gz", index=False)
+    prov = pd.DataFrame({"area_id": [1, 1], "target_ord": [t1, t2], "persistence_available": [False, False], "persistence_phase": [np.nan, np.nan]})
+    for h in (0, 3, 6, 12):
+        prov.to_csv(out / "ledgers" / f"row_provenance_h{h:02d}.csv.gz", index=False)
+    rows = []
+    for arm in ("A", "B", "C", "D"):
+        rows.append({"test_year": 2025, "horizon": 3, "arm": arm, "area_id": 1, "target_ord": t1, "q2_pred": 0.6, "q3_pred": 0.3, "q4_pred": 0.0, "q5_pred": 0.0, "phase_pred": 3})
+    pd.DataFrame(rows).to_csv(out / "predictions" / "predictions.csv.gz", index=False)  # wider key t2 missing for A/B
+    pd.DataFrame(columns=["test_year", "horizon", "cohort", "specification", "status", "f2", "precision", "recall", "accuracy", "r2_q3"]).to_csv(out / "metrics" / "metrics.csv", index=False)
+    pd.DataFrame(columns=["test_year", "horizon", "cohort", "contrast", "point_delta_f2", "ci_low", "ci_high", "interval_status"]).to_csv(out / "metrics" / "contrasts.csv", index=False)
+    np.savez_compressed(out / "metrics" / "bootstrap_draws.npz", placeholder=np.zeros(1))
+    checks, *_ = replay.replay(out)
+    failed = set(checks.loc[~checks["pass"], "check"])
+    assert "contrast_present" in failed  # single-area primary cohort, no contrasts published
+    wider = checks.loc[(checks["check"] == "prediction_coverage") & (checks["cohort"] == "wider_labeled")]
+    assert len(wider) == 2 and not wider["pass"].any()
