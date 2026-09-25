@@ -1,0 +1,347 @@
+{
+  "schema_version": "1.0",
+  "task": "somalia-flood-food-crisis",
+  "mode": "spot-audit",
+  "base_sha": "476de00723b0f2ea33b5cece1d4e5fb108f13b52",
+  "completion_sha": "264a986d953d65752d7aa93c933d257e512522b0",
+  "audited_sha": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+  "verdict": "incomplete",
+  "summary": "Full task spot-audit found one major and two minor original-task defects: inexact history crisis-state construction changes real D features; history normalization retains a superseded upper-component gate; and an excluded January-2026 label re-enters base category history and changes a wider-cohort prediction. The 20 focused tests pass, saved-model predictions and all reported nonempty metrics/90 bootstrap contrasts reproduce, and later commits only archive the task. V2 build/calibration lineage and affirmative realized-weather provenance remain material evidence gaps, so numerical reproducibility does not establish full acceptance.",
+  "coverage": [
+    {
+      "criterion": "AC1: Somalia-only A-D; folds 2025/2026; horizons 0/3/6/12; four cumulative regressors and H=0 B/C identity",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:13-45",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:114-124",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:319-360",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/jobs.csv (verified SHA-256 32d4c7e4904d42b95d333b8d9c632a81bf546bf6704198f36a08d936da3de7e9; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/fits/arm_job_status.csv (verified SHA-256 d0c1a41d9da180ad3528a3b392ce003799704844872f9ac91710d184555f76e5; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "20 origin jobs / 80 arm records, including five H=0 C reuses. Saved B/C raw predictions are identical at H=0; four target models are recorded per job/arm."
+      ]
+    },
+    {
+      "criterion": "AC1b: G4 proportional normalization of all finite nonnegative positive-sum vectors for targets and history",
+      "status": "violated",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:17-17",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:33-35",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:59-63",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/label_ledger.csv.gz (verified SHA-256 0279ce4aa8a9c74a165ce46a5db4cc39f9f2a02658658fe7f6d88f7b5b6c1b8d; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "All 6,738 valid supervised ledger rows recompute correctly; 414 normalization changes are preserved. A02 demonstrates that history still rejects an individually >1 component before normalization, contrary to the adopted finite/nonnegative/positive-sum rule.",
+        "/tmp/som/spot-audit/scratch/normalization-boundary.log (SHA-256 34e182474f1a1cee496a44b295d9e9b7f17ba61050da6a32d0ed325c1d7c31a1)"
+      ]
+    },
+    {
+      "criterion": "AC2: Supervised training/selection labels remain in candidate years and at or before each outer/inner origin",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:36-45",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/modeling.py:128-153",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:280-289",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/fits/final_fit_ledger.csv.gz (verified SHA-256 ae881152f5b608ea86fcd4f002b4815fbc56f933009805a7afd2d1c52a1f30f5; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/fits/inner_folds.csv (verified SHA-256 bdbde99e47da021cefb2a248576c5d506fd3a75185034f82ef4e6ab17f38713d; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "251,204 saved final-fit row records satisfy the job-specific year and origin bounds; all 240 inner-fold records satisfy min(validation-H, validation-1). No outer-test-year fitting labels were found."
+      ]
+    },
+    {
+      "criterion": "AC3: Exactly 14 V2 ensemble fields; latest completed season chosen by exclusive end date; missing blocks retained",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:47-57",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:277-321",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/features/feature_schema.json (verified SHA-256 39e292b50e33b3dc15b56db996f89365e57a3492bc1faa9ae28efb0cef5055d5; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "Independent selection from the hashed V2 CSV checked all 23,348 feature rows across four horizons, including selected keys and values, month-end boundary, no-prior-season and incomplete-export handling.",
+        "/tmp/som/spot-audit/scratch/remaining-checks.json (SHA-256 0790cc5de451c655514e1183e2ced6d37de0e296ee9311c3b153b9c90223ae7a)"
+      ]
+    },
+    {
+      "criterion": "Design section 2 / AC9: V2 anomaly, z-score, SPI/SPEI calibration and seasonal-export provenance establish the allowed information set",
+      "status": "unverified",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:25-29",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:140-152",
+        "The manifest binds the V2 CSV bytes but supplies no generating code/build manifest binding its calibration periods, actual observations, or fitted transformations to that CSV. The adjacent climate_agriculture_varlist.xlsx (SHA-256 681bf7b4c39552c018279c58090c3ce289edf88e202f4edcea4a993ace54b19e) proposes fixed 1991-2020 meteorological normals, 2001-2020 soil normals, 2003-2020 vegetation normals and 1983-2020 drought fitting; it is a variable/protocol specification, not evidence that this V2 build used those periods. See evidence gap G1."
+      ]
+    },
+    {
+      "criterion": "AC4: Oracle month offsets, original rain/temperature pair and source-value lookup",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:59-63",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:245-269",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/weather_ledger.csv.gz (verified SHA-256 d6659c8ea298be83c6049c004df6a769ff14668ff5abe8f44ca7b7d710cabb21; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "Every saved oracle ledger date equals T-H+k, with k=1..min(H,6); all saved oracle feature values match the corresponding weather ledger value or declared unverified NaN. H=0 has no oracle columns. No forecast-file fallback occurs."
+      ]
+    },
+    {
+      "criterion": "AC4: A month called verified has affirmative realized-observation provenance",
+      "status": "unverified",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:51-55",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:221-241",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/implement.md:17-18",
+        "The implemented and preflight-documented rule is finite rain/temperature and not both identical to the preceding month. This reproduces the saved screening statuses, but neither that negative screen nor a hash of a completed panel establishes affirmative source-month observation lineage. See evidence gap G2; no claim that the nonrepeating values are proven fabricated is made."
+      ]
+    },
+    {
+      "criterion": "AC5: Reference rich-history formulas, exact crisis-state convention, source slots and U<=O,U<T; exclusion policy applies to existing category history",
+      "status": "violated",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:65-73",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:59-69",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/implement.md:16-21",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:97-100",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:165-180",
+        "All six saved history slots and persistence sources were independently reconstructed and obey temporal bounds. The 468-column synthetic reference parity test passes, but bypasses source crisis-state construction. A01 demonstrates a real source-threshold error affecting D matrices; A03 demonstrates an excluded source label re-entering baseline category history.",
+        "/tmp/som/spot-audit/scratch/confirmed-findings-checks.json (SHA-256 d392debf2895ac63e6e1997463dc7025a64d0b163e749ec14f630405340b3b01)"
+      ]
+    },
+    {
+      "criterion": "AC6: Six equal-budget bundles; pooled temporal F2 selection, first-candidate ties, unrounded 0.2 conversion and 24-month origin-based decay",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:75-85",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/modeling.py:29-73",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/modeling.py:190-249",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/fits/candidate_scores.csv (verified SHA-256 8c53bc95d06b5b7641c3aa4301bdcd4de7fac4a29e52145b92bc38f0cf094618; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/fits/validation_predictions.csv.gz (verified SHA-256 f2328e9e341a6959334ce8cae9a68576101963583a4b220d01fd06d6a5be8ee2; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "All 480 candidate-score records were independently recomputed from 515,160 validation predictions; the selected bundle is the first maximum in predeclared order. Unit tests exercise threshold .196/.2/.204, constant target, unsupported selection and origin-based decay."
+      ]
+    },
+    {
+      "criterion": "AC7: Frozen within-year/horizon comparison keys, phase-1 retention and no prediction-dependent exclusions",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:87-91",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:202-239",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:379-438",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/cohort_ledger.csv.gz (verified SHA-256 2af995629777a754ad2d9b856fee94f502180ec7c5d2962082e292509f67aabe; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "Every primary key has one prediction per A-D arm. Primary keys are constructed before execute(); missing predictions produce incomplete metrics rather than a smaller intersection. Phase-1 truth remains in scored cohorts. All 82 nonempty metric rows, including wider A/B cohorts, independently reproduce."
+      ]
+    },
+    {
+      "criterion": "AC7b: Latest eligible reported-phase persistence, no-history status and identical supported comparison keys",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:32-32",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:337-357",
+        "All 23,348 row-provenance persistence source keys, phases and availability flags were checked against the full saved valid-phase ledger. Separate persistence-subset model scores and baseline metrics reproduce; no-history keys do not shrink the primary A-D cohort.",
+        "/tmp/som/spot-audit/scratch/artifact-checks.json (SHA-256 ae0f9d4a28280b8915c19fe78382e3c2f031eb34263883da7c139b4615ddc5a2)"
+      ]
+    },
+    {
+      "criterion": "AC7c: Always-crisis binary reference uses exactly the declared primary/persistence cohorts",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:34-34",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/evaluation.py:86-91",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/metrics/metrics.csv (verified SHA-256 1310671f8881fde7b93aabfc5b02ec86261e57f0011e54db0c97bf9709c77bfc; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "Independent replay verifies TP=actual positives, FP=actual negatives, FN=TN=0, prevalence and binary scores on all nonempty declared cohorts; ordinal accuracy and share R-squared remain not applicable."
+      ]
+    },
+    {
+      "criterion": "AC7d: Paired whole-area bootstrap, 2,000 PCG64(42) draws, shared multiplicities and linear 95% percentile intervals",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:128-136",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/evaluation.py:99-157",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/metrics/bootstrap_draws.npz (verified SHA-256 a43b94719a3b20f86e877994f6657b11ed964b36a6ee50b536257ac740cc26dc; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/metrics/contrasts.csv (verified SHA-256 e7f73a48c3eefee8f32ab1b05183799e9ae9c1a041ba2b9e2d09d80fbb89b850; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "All 12 bundles reproduce the recorded ascending area order and all 2,000 multiplicity vectors exactly. All 90 draw-indexed contrast sequences and intervals independently reproduce, with zero undefined draws; no sorting away draw identity was used in the auditor check. H=0 C-B is exactly zero. Focused tests also cover one-area and undefined-draw intervals."
+      ]
+    },
+    {
+      "criterion": "AC8: Partial 2026 coverage, unavailable cells, negative results and conditional/noncausal interpretation are disclosed",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:87-95",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/evidence/results_summary.md:1-18",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/evidence/results_summary.md:194-198",
+        "2026 results cover April only; H=3/6 primary cohorts are empty and reported unavailable. The report keeps negative/mixed within-horizon contrasts and the always-crisis reference and makes no cross-horizon ranking or operational/causal claim. Affirmative source-provenance qualifications remain unresolved separately in G1/G2; this met status concerns the enumerated reporting items."
+      ]
+    },
+    {
+      "criterion": "AC9: Saved inputs, schemas, selected models, keyed predictions and reported numerical outputs are audit-accessible and replayable",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:91-91",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:140-150",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/predictions/predictions.csv.gz (verified SHA-256 7284477177662d19ab086159bdbc1a2149fd0e70b48e40fe5087d589b186ec42; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/models/model_inventory.csv (verified SHA-256 e5247469ea9669c4eaed506c6e11a757667605cc19b411adcd45d89f2b31f96a; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "All seven input hashes, all 28 manifest-listed artifact hashes and all 320 model-inventory records (300 unique model files; H=0 reuse accounts for duplicates) were verified. Re-evaluating every recorded model on its saved ordered matrix reproduced its saved raw predictions without fitting. Reproduction establishes the implemented computation, not correctness of A01-A03 or completion of G1/G2."
+      ]
+    },
+    {
+      "criterion": "AC10: Approved planning documents precede implementation; durable bound start and close records match supplied SHAs",
+      "status": "met",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/implement.md:3-4",
+        "Planning commit 83d4d78e319a553bbf26e1b0d9769a09e8376c59 is an ancestor of base 476de00723b0f2ea33b5cece1d4e5fb108f13b52; task implementation is subsequently added in the reviewed two-endpoint diff.",
+        "/tmp/som/spot-audit/scratch/lifecycle.json (SHA-256 76fd4a836837ce1e8b863d99521c0967589e266a4df25d0d76d9da1e2528392b)",
+        "Read-only copy of the controller runs row e21d6f75672d4ed09838742e0a60d757 records created=1790282982.236845, the exact registered repository, base SHA, Claude session 5ac278d6-9e26-49b5-8d96-7e54266aa71e / terminal term_65c3ebdc967b05, closed_at=1790292931.22322 and completion SHA. Close snapshot SHA-256 8006467f0bfbfba57153bb4523aa026086a047254ccd5cd64480a0ed1cf5b521 matches the captured completion. This confirms lifecycle evidence, not an accepted audit verdict."
+      ]
+    },
+    {
+      "criterion": "Spot-audit: completion-to-audited changes preserve implementation and task evidence",
+      "status": "met",
+      "evidence": [
+        "Two-endpoint diffs reviewed: 476de00723b0f2ea33b5cece1d4e5fb108f13b52..264a986d953d65752d7aa93c933d257e512522b0 and 264a986d953d65752d7aa93c933d257e512522b0..bdeaef217304ac9a59661ecf1d2bfda8505689b3.",
+        "The latter diff only moves the task documents/evidence into .trellis/tasks/archive/2026-09/09-24-somalia-flood-food-crisis/ and changes task status/completedAt. Source, configs, scripts and tests are unchanged; findings are original task changes, not later regressions."
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "command": "PYTHONPATH=src PYTHONDONTWRITEBYTECODE=1 TMPDIR=/tmp/som/spot-audit/scratch /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_somalia_oracle.py -q",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch. Reference packages/configs were independently byte-copied into the scratch sibling directory from Food_Crisis_Cluster@85bc505a5b99d8cf3eb301bcaf86b0e0a3c830e3; reference prepare_data.py and schema hashes match the task pins.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/spot-audit/scratch/unit-tests-with-parity.log (SHA-256 5edaffea3dd3aa2808094cf08a77b2ebb552abc3d8caf232d9eb61bd2942d590)",
+        "20 passed in 1.30s. The initial isolated run had 19 passed/1 skipped before the reference copy was provided; the final run executes all 20 tests."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=/tmp/som/spot-audit/scratch/clone/src PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/spot-audit/scratch/check_artifacts.py",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/spot-audit/scratch/artifact-checks.json (SHA-256 ae0f9d4a28280b8915c19fe78382e3c2f031eb34263883da7c139b4615ddc5a2)",
+        "Hashes, raw target normalization, cohort/prediction keys, history/persistence source keys, oracle offsets/value lookup, label cutoffs, 480 candidate scores and the existing independent 480-check replay verified."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=/tmp/som/spot-audit/scratch/clone/src PYTHONDONTWRITEBYTECODE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/spot-audit/scratch/check_remaining.py",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/spot-audit/scratch/remaining-checks.json (SHA-256 0790cc5de451c655514e1183e2ced6d37de0e296ee9311c3b153b9c90223ae7a)",
+        "23,348 V2 selections/values, predictions from 320 recorded model entries, all 82 nonempty metric rows (including F1 and wider cohorts), and all 90 exact draw-indexed bootstrap contrasts reproduced without model fitting."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=/tmp/som/spot-audit/scratch/clone/src PYTHONDONTWRITEBYTECODE=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/spot-audit/scratch/check_findings.py",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/spot-audit/scratch/confirmed-findings-checks.json (SHA-256 d392debf2895ac63e6e1997463dc7025a64d0b163e749ec14f630405340b3b01)",
+        "This diagnostic succeeds by confirming the defects: the exact 20% source is mislabelled, correcting it changes real D feature rows, and an explicitly excluded label survives in a base history field."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=/tmp/som/spot-audit/scratch/clone/src PYTHONDONTWRITEBYTECODE=1 /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som/spot-audit/scratch/check_normalization_boundary.py",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som/spot-audit/scratch/normalization-boundary.log (SHA-256 34e182474f1a1cee496a44b295d9e9b7f17ba61050da6a32d0ed325c1d7c31a1)",
+        "Confirms A02: target normalization accepts (1.2,.3,0,0,0), while history rejects it."
+      ]
+    },
+    {
+      "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/smoke/test_somalia_oracle_pipeline.py -q; full model training and repository-wide suite",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "environment": "Independent --no-hardlinks clone at bdeaef217304ac9a59661ecf1d2bfda8505689b3 under /tmp/som/spot-audit/scratch/clone; /home/swl007007/.venvs/ipcch-geo/bin/python; Python 3.12.3, numpy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, xgboost 3.2.0; PYTHONDONTWRITEBYTECODE=1; caches/temp files confined to scratch.",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "Heavy training was prohibited. The smoke test was read but not rerun (the committed evidence reports 806 seconds); the unrelated full suite was not rerun. Current unit tests, full saved-model inference and numerical/artifact checks provide focused verification. Historical smoke/full-suite outcomes in 264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/evidence/evidence.md:16-20 are self-reports, not fresh auditor test passes."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "somalia-flood-food-crisis-A01",
+      "severity": "major",
+      "category": "correctness",
+      "origin": "task_change",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "file": "src/ipcch/somalia_oracle/data.py",
+      "lines": {
+        "start": 97,
+        "end": 100
+      },
+      "claim": "The supposedly exact history crisis threshold compares against a binary-float total and changes the reference boundary on real data.",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:61-67",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:178-199",
+        "The hashed fs0 input /mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_0m_model_ready.csv (SHA-256 221a559e90d0b4d72a2d1855c0f6d614bdb6c10e2c4a7d3b9bf57683fcc151e5), CSV line 23412, contains area 1602 / 2019-07 shares 0.59,0.21,0.12,0.08,0.0. Exact 5*(P3+P4+P5)=S=1, so the reference strict-greater-than state is 0. NumPy sums S to 0.9999999999999999; converting that rounded total to Decimal makes this implementation and the saved ledger assign state 1.",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/label_ledger.csv.gz (verified SHA-256 0279ce4aa8a9c74a165ce46a5db4cc39f9f2a02658658fe7f6d88f7b5b6c1b8d; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "Correcting only this source state in scratch changes three feature rows per horizon for area 1602. At target 2026-04, saved hist_crisis_all_fraction is 0.4545454545454545 instead of 0.36363636363636365 at H=0/3/6, and 0.5 instead of 0.4 at H=12; prior binary slots also differ.",
+        "/tmp/som/spot-audit/scratch/confirmed-findings-checks.json (SHA-256 d392debf2895ac63e6e1997463dc7025a64d0b163e749ec14f630405340b3b01)",
+        "The reference source at Food_Crisis_Cluster@85bc505a5b99d8cf3eb301bcaf86b0e0a3c830e3:IPCCHGeoRFExperiment/prepare_data.py:198-222,273-280 sums source Decimals before cross-multiplication. The passing parity test at bdeaef217304ac9a59661ecf1d2bfda8505689b3:tests/unit/test_somalia_oracle.py:148-153 and bdeaef217304ac9a59661ecf1d2bfda8505689b3:tests/unit/test_somalia_oracle.py:188-220 supplies an already constructed state and does not exercise this path."
+      ],
+      "impact": "The real D-arm feature matrices violate the required reference crisis-state recipe, including features used in fitting and evaluation. Replaying saved predictions faithfully reproduces the defect and cannot establish correct D-arm results. The audit did not refit models and does not quantify the downstream change in fitted-model scores.",
+      "remediation": "Compute S and P3+ from the same exact source components before any float summation, preserving source precision; add the observed 20% boundary regression. Regenerate affected history matrices and D-arm fits/predictions/evaluation under the authorized repair workflow."
+    },
+    {
+      "id": "somalia-flood-food-crisis-A02",
+      "severity": "minor",
+      "category": "contract_violation",
+      "origin": "task_change",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "file": "src/ipcch/somalia_oracle/data.py",
+      "lines": {
+        "start": 174,
+        "end": 191
+      },
+      "claim": "History retains a pre-normalization component<=1 gate despite the G4 finite-nonnegative-positive-sum normalization contract.",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/prd.md:17-17",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/grill.md:39-39",
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/design.md:59-63",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:186-187",
+        "/tmp/som/spot-audit/scratch/normalization-boundary.log (SHA-256 34e182474f1a1cee496a44b295d9e9b7f17ba61050da6a32d0ed325c1d7c31a1)",
+        "A source row with shares (1.2,0.3,0,0,0), positive population and an eligible source month is accepted as a supervised target and normalized to (0.8,0.2,0,0,0), but valid_history=False with phase_share_out_of_bounds, leaving its history shares missing."
+      ],
+      "impact": "A source distribution explicitly covered by the adopted G4 rule is silently omitted from history while remaining eligible for targets. No individually >1 component was found among the current saved valid targets, so this finding is a contract boundary defect rather than a demonstrated change to this run.",
+      "remediation": "Apply finite/nonnegative/positive-finite-sum checks consistently before history normalization, retaining the separately authorized missing-P5 and positive-population rules; remove the raw upper-component bound and add this focused boundary check."
+    },
+    {
+      "id": "somalia-flood-food-crisis-A03",
+      "severity": "minor",
+      "category": "data_integrity",
+      "origin": "task_change",
+      "revision": "bdeaef217304ac9a59661ecf1d2bfda8505689b3",
+      "file": "src/ipcch/somalia_oracle/pipeline.py",
+      "lines": {
+        "start": 165,
+        "end": 172
+      },
+      "claim": "The excluded area-1917 January-2026 label re-enters predictions through the untouched base categorical-history feature.",
+      "evidence": [
+        "264a986d953d65752d7aa93c933d257e512522b0:.trellis/tasks/09-24-somalia-flood-food-crisis/implement.md:16-16",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/data.py:145-169",
+        "bdeaef217304ac9a59661ecf1d2bfda8505689b3:src/ipcch/somalia_oracle/pipeline.py:165-172",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/features/feature_matrix_h03.csv.gz (verified SHA-256 da8e03e7a3d1d0e65dd907b907e22fcf188c03c1f483d41f092e69ea889e79d5; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v1/ledgers/label_ledger.csv.gz (verified SHA-256 0279ce4aa8a9c74a165ce46a5db4cc39f9f2a02658658fe7f6d88f7b5b6c1b8d; run HEAD a0c792e65ed6cb7a81684092b8b4f52a8428b95e, task source/config/scripts/tests identical at audited SHA)",
+        "For area_id=1917, target=2026-04, H=3, overall_phase_prev_observed_asof_s3 is 2.0, sourced from 2026-01. The same source key is marked provenance_unreconciled and invalid for targets, phase persistence and rich history; baseline features are merged without applying that source-key exclusion.",
+        "/tmp/som/spot-audit/scratch/category-inference-counterfactual.json (SHA-256 fe2e47b51ba6ce88d09720efb0a314e3eb4105430ab6381fc25ad7140f8ae22f)",
+        "With the saved B model and all other features fixed, replacing only this inadmissible category by NaN changes q3_pred from 0.18497835099697113 to 0.23174341022968292, flipping the predicted phase from 2 to 3. A/C raw predictions also change. This is an inference-only demonstration; no fitting or repository edit was performed."
+      ],
+      "impact": "The claimed exclusion everywhere is false and the published 2026 H=3 wider-labeled A/B results depend on an explicitly unreconciled source label. The primary cohort for this year/horizon is empty, so this demonstrated classification effect is confined to the wider-cohort reporting.",
+      "remediation": "Resolve each retained categorical-history field to its source area/month and apply the same provenance/valid-phase mask used by the label ledger before any arm matrix is built. Recompute affected predictions/metrics and add a check that the excluded January key cannot enter any history feature."
+    }
+  ],
+  "evidence_gaps": [
+    "G1 (essential; design section 2, AC3/AC9): Provide a V2 generation/version manifest or equivalent source evidence bound to CSV SHA-256 fda5f0a0605d4fe536b69740b5c498d435a0194cfb12c6fbeba6a7c023a60ad3 that records and substantiates the actual climatology/threshold/distribution-fitting periods, calibration inputs, source observation windows and permitted preprocessing. The adjacent variable-list workbook supplies proposed fixed periods but no verified build linkage; the experiment manifest only hashes the finished CSV. Thus no-leakage acceptance for these non-oracle covariates remains unverified.",
+    "G2 (essential; AC4): Provide source-product/extraction evidence bound to the canonical raw weather hash ae696087c3bbb280537ae269a05924133acdb51060d31290523404fa8a717673 and its area/month keys establishing which retained months are independent realized observations. Finite/nonrepeating values are only a screen; April and frozen months were conservatively excluded, but the remaining weather is called verified without the affirmative identity evidence required by design section 4. The audit does not infer that these remaining observations are necessarily wrong."
+  ],
+  "limitations": [
+    "Read-only review: no source-repository files, index/Git metadata or Trellis/controller state were intentionally changed; the original worktree was clean at collection and after verification. Scratch scripts, clone, reference copies and copied controller state are confined to /tmp/som/spot-audit/scratch; only the requested result is published outside scratch.",
+    "No planner/executor transcript or other audit findings were used as acceptance evidence. Historical contracts came from completion/base Git blobs; source was read at the frozen audited SHA. Root AGENTS.md contains unrelated historical notes, which were not used to determine the verdict.",
+    "The run manifest is produced at a0c792e65ed6cb7a81684092b8b4f52a8428b95e and lists dirty task/spec metadata. Git confirms the source, tests, configs and scripts are unchanged through completion and audited SHA; all manifest/input/model hashes were checked. This binds numerical replay, not the missing upstream scientific provenance.",
+    "No model training/refitting, dependency installation, network services, task mutations or agents were launched. Existing models were loaded for inference only. The downstream score impact of repairing A01 has not been estimated by retraining.",
+    "The preflight plan explicitly retains fitting/validation rows with missing oracle values. The saved artifacts contain 1,601 such unique fitting keys and 829 validation keys at each of H=3/6; evaluation weather exclusions remain separate. This is disclosed as the recorded implementation policy, not silently treated as a later regression or a complete-information training dataset.",
+    "The baseline-versus-completion design change from lexical to ascending integer bootstrap area order was disclosed; the actual ordered area arrays and draws were replayed exactly. The acceptance evidence concerns those saved comparisons, not byte identity to a hypothetical lexical-order run."
+  ]
+}

@@ -1,0 +1,289 @@
+{
+ "experiment": "somalia_oracle_v1",
+ "task": "somalia-flood-food-crisis",
+ "git": {
+  "head": "f576e69023f3651f6fd4182087ed46f75d91ac2d",
+  "dirty_paths": [
+   "M .trellis/tasks/09-24-somalia-oracle-audit-repair/task.json"
+  ]
+ },
+ "runtime": {
+  "python": "3.12.3",
+  "numpy": "2.4.4",
+  "pandas": "3.0.3",
+  "sklearn": "1.8.0",
+  "xgboost": "3.2.0",
+  "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+  "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "cpu_count": "32"
+ },
+ "inputs": {
+  "fs0": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_0m_model_ready.csv",
+   "role": "H=0 base predictors (upstream _s0 features, latest source month T)",
+   "sha256": "221a559e90d0b4d72a2d1855c0f6d614bdb6c10e2c4a7d3b9bf57683fcc151e5"
+  },
+  "fs1": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_3m_model_ready.csv",
+   "role": "H=3 base predictors (_s3, latest source month T-3)",
+   "sha256": "fa19b03d28f2429ed60fb449e479a837451117b41601e597c10eea59f6b663a3"
+  },
+  "fs2": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_6m_model_ready.csv",
+   "role": "H=6 base predictors (_s6, latest source month T-6)",
+   "sha256": "5af7d7d1f587e3db3d1b3ff67bc56bb5ed583cceb452dbb2c0ac5c88b6d023d1"
+  },
+  "fs3": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_forecasting_ready.csv",
+   "role": "H=12 base predictors (asof12/l12+, latest source month T-12)",
+   "sha256": "a5b452035f552a7c9c4c66cf9c89fef9997009e59305d271a13a0787d47362f2"
+  },
+  "raw": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/raw/IPCCH_2026_completed.csv",
+   "role": "raw canonical panel: realized monthly weather and 2025+ label provenance",
+   "sha256": "ae696087c3bbb280537ae269a05924133acdb51060d31290523404fa8a717673"
+  },
+  "lookup": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/country_area_id_lookup.csv",
+   "role": "area_id -> country lookup (Somalia filter)",
+   "sha256": "e2baf6ae9481b42b127db5ce81f3c53ad784bb08ae56dfa56cea74e416b44c90"
+  },
+  "v2": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_2022_2026_FINAL_MODEL_READY_V2.csv",
+   "role": "V2 growing-season climate aggregates (14 ensemble means)",
+   "sha256": "fda5f0a0605d4fe536b69740b5c498d435a0194cfb12c6fbeba6a7c023a60ad3"
+  }
+ },
+ "candidate_config_sha256": "9d572793a3815baa42aa8c85a3304b0cc5aef8b52f191b1f7d3b7924aca9ef0f",
+ "history_schema_sha256": "18f31b94976cafa102506f70f5940e44308033310629ad64e7e960770da29b8a",
+ "folds": {
+  "2025": [
+   2022,
+   2023,
+   2024
+  ],
+  "2026": [
+   2023,
+   2024,
+   2025
+  ]
+ },
+ "horizons": [
+  0,
+  3,
+  6,
+  12
+ ],
+ "arms": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ],
+ "notes": {
+  "somalia_areas": 905,
+  "ledger_keys": 6759,
+  "normalization_changed_valid_rows": 414,
+  "target_invalid_reasons": {
+   "nonpositive_sum": 20,
+   "provenance_unreconciled": 1
+  },
+  "history_invalid_reasons": {
+   "nonpositive_sum": 15,
+   "population_not_positive": 5,
+   "provenance_unreconciled": 1
+  },
+  "history_p5_filled": 0,
+  "reported_vs_share_phase_disagreements": 105,
+  "weather_status_counts_from_2021": {
+   "verified": 46192,
+   "repeats_previous_month": 11712
+  },
+  "v2_somalia_areas_without_rows": 0,
+  "blocked_base_features": [
+   "overall_phase_lag1",
+   "estimated_population"
+  ],
+  "category_history_values_masked_by_horizon": {
+   "0": 0,
+   "3": 4,
+   "6": 3,
+   "12": 0
+  },
+  "history_width": 472
+ },
+ "written": {
+  "label_ledger": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/label_ledger.csv.gz",
+   "rows": 6759,
+   "sha256": "71ec24c8a52b6ca6544b1a279e905f98718142912c9cd8b38d8e4b7fed1a6e07"
+  },
+  "weather_ledger": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/weather_ledger.csv.gz",
+   "rows": 177364,
+   "sha256": "de314f47e39dd4d2e14a6722d5966a9123213af4131b4785322023e88a4f8a64"
+  },
+  "cohort_ledger": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/cohort_ledger.csv.gz",
+   "rows": 11124,
+   "sha256": "851e8cdab4dda44fe1a6684f13958f96da7650a9d747528a7f7d5aacf6a3ee1e"
+  },
+  "jobs": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/jobs.csv",
+   "rows": 20,
+   "sha256": "32d4c7e4904d42b95d333b8d9c632a81bf546bf6704198f36a08d936da3de7e9"
+  },
+  "row_provenance_h00": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/row_provenance_h00.csv.gz",
+   "rows": 5837,
+   "sha256": "891dfec52a55eae22f0c3703c68a4c3937ed4d1fcf07174c5c86c0729271ce2e"
+  },
+  "oracle_ledger_h00": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/oracle_weather_ledger_h00.csv.gz",
+   "rows": 0,
+   "sha256": "5f40a08c336c523919699ccec9beaaf63f45416b08e91ce2248aa5502248e6c2"
+  },
+  "feature_matrix_h00": {
+   "path": "results/experiments/somalia_oracle/v1/features/feature_matrix_h00.csv.gz",
+   "rows": 5837,
+   "sha256": "1b25f451f2bc43cae0c8747c843ed4567e74cf35cf98be417b8d9b37c1770939"
+  },
+  "row_provenance_h03": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/row_provenance_h03.csv.gz",
+   "rows": 5837,
+   "sha256": "3cf63932e26b2f185912b6f38f7806df772b21621d39ef9e295e6e8ebb95b5bf"
+  },
+  "oracle_ledger_h03": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/oracle_weather_ledger_h03.csv.gz",
+   "rows": 17511,
+   "sha256": "b58a867ecab4ce27e7781f10618d5317cbdcf224bfb8413ce9173c0cd319c89b"
+  },
+  "feature_matrix_h03": {
+   "path": "results/experiments/somalia_oracle/v1/features/feature_matrix_h03.csv.gz",
+   "rows": 5837,
+   "sha256": "b59e5c8631077d96544bd5c67536c25a3a891d5e7d9b8b6f27c3a271c01c8419"
+  },
+  "row_provenance_h06": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/row_provenance_h06.csv.gz",
+   "rows": 5837,
+   "sha256": "8401c37450e67eceb5bbca60885d2650e1b85d4f7d490be5ae0a8cb46638864c"
+  },
+  "oracle_ledger_h06": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/oracle_weather_ledger_h06.csv.gz",
+   "rows": 35022,
+   "sha256": "10ca2e80abc9040e21fdd7c944fb3d2c617ae40f49772a106a9ce44ccd844102"
+  },
+  "feature_matrix_h06": {
+   "path": "results/experiments/somalia_oracle/v1/features/feature_matrix_h06.csv.gz",
+   "rows": 5837,
+   "sha256": "0a3e01e220411d4c37d0800eabb362f86350f4f09e539f55fb19297d82e385da"
+  },
+  "row_provenance_h12": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/row_provenance_h12.csv.gz",
+   "rows": 5837,
+   "sha256": "21670468e040e0a9d72d383283f51a8fc25b5764408407d801778dd18ee9f8eb"
+  },
+  "oracle_ledger_h12": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/oracle_weather_ledger_h12.csv.gz",
+   "rows": 35022,
+   "sha256": "2845e04e80d35714ef546733a8cbe8283b9da4296f51f21b11d62c6b71eace23"
+  },
+  "feature_matrix_h12": {
+   "path": "results/experiments/somalia_oracle/v1/features/feature_matrix_h12.csv.gz",
+   "rows": 5837,
+   "sha256": "cad7ecf8071be3da93f3fe5697529027e2cca46a645d940872c2236a9530a9bd"
+  },
+  "feature_schema": {
+   "path": "features/feature_schema.json",
+   "widths": {
+    "h00_A": 511,
+    "h00_B": 525,
+    "h00_C": 525,
+    "h00_D": 997,
+    "h03_A": 511,
+    "h03_B": 525,
+    "h03_C": 531,
+    "h03_D": 1003,
+    "h06_A": 511,
+    "h06_B": 525,
+    "h06_C": 537,
+    "h06_D": 1009,
+    "h12_A": 376,
+    "h12_B": 390,
+    "h12_C": 402,
+    "h12_D": 874
+   },
+   "sha256": "39e292b50e33b3dc15b56db996f89365e57a3492bc1faa9ae28efb0cef5055d5"
+  },
+  "coverage": {
+   "path": "results/experiments/somalia_oracle/v1/ledgers/coverage_summary.csv",
+   "rows": 8,
+   "sha256": "0eadbba075f2e8f92caa652cd62504cbfc13bfae6b88cc2c86b9a2b279c89417"
+  },
+  "arm_job_status": {
+   "path": "results/experiments/somalia_oracle/v1/fits/arm_job_status.csv",
+   "rows": 80,
+   "sha256": "c8d2969556856216a0ea558be2cc73ff1e46c8eb2f67b1e35aac4043c579141d"
+  },
+  "inner_folds": {
+   "path": "results/experiments/somalia_oracle/v1/fits/inner_folds.csv",
+   "rows": 240,
+   "sha256": "bdbde99e47da021cefb2a248576c5d506fd3a75185034f82ef4e6ab17f38713d"
+  },
+  "candidate_scores": {
+   "path": "results/experiments/somalia_oracle/v1/fits/candidate_scores.csv",
+   "rows": 480,
+   "sha256": "3d4aa13c4c4ebe6b94849c6d5ffb5652673644f26414ec756ac527184a394bb9"
+  },
+  "validation_predictions": {
+   "path": "results/experiments/somalia_oracle/v1/fits/validation_predictions.csv.gz",
+   "rows": 515160,
+   "sha256": "3cfe8b31a7a83c2e49de989cd16cdd793ff5b467071b48ca05aab65b280c4c10"
+  },
+  "fit_ledger": {
+   "path": "results/experiments/somalia_oracle/v1/fits/final_fit_ledger.csv.gz",
+   "rows": 251204,
+   "sha256": "84c26aa0d91aa151585b0cd1c827abb30463a7c6c9446b016aeb771bd8f81c33"
+  },
+  "model_inventory": {
+   "path": "results/experiments/somalia_oracle/v1/models/model_inventory.csv",
+   "rows": 320,
+   "sha256": "1fe2a175cad2aeb5436ac329f3f97cf94c346579becdf85ca783d2335e5a62c3"
+  },
+  "predictions": {
+   "path": "results/experiments/somalia_oracle/v1/predictions/predictions.csv.gz",
+   "rows": 44480,
+   "sha256": "124a701a83954df257a6413aa89487f9442a0212bb42935aa318a6a79dca223f"
+  },
+  "metrics": {
+   "path": "results/experiments/somalia_oracle/v1/metrics/metrics.csv",
+   "rows": 86,
+   "sha256": "7f0eee3f83e0534a699f1148422aaf3951724b68835c45af69b8f0609f72f7a2"
+  },
+  "contrasts": {
+   "path": "results/experiments/somalia_oracle/v1/metrics/contrasts.csv",
+   "rows": 90,
+   "sha256": "8c0208b5dc9fd5d05f6d994afec8035ca003a35297fe65623b9ac44ddeddd877"
+  },
+  "bootstrap_draws": {
+   "path": "metrics/bootstrap_draws.npz",
+   "bundles": [
+    "y2025_h00_persistence_subset",
+    "y2025_h00_primary",
+    "y2025_h03_persistence_subset",
+    "y2025_h03_primary",
+    "y2025_h06_persistence_subset",
+    "y2025_h06_primary",
+    "y2025_h12_persistence_subset",
+    "y2025_h12_primary",
+    "y2026_h00_persistence_subset",
+    "y2026_h00_primary",
+    "y2026_h12_persistence_subset",
+    "y2026_h12_primary"
+   ],
+   "sha256": "504934b2a45f786df9160c135de42fd23a5ba84b5a15fe126dbe6a9eae812b37"
+  }
+ },
+ "elapsed_seconds": 3614.209272146225,
+ "mode": "full"
+}
