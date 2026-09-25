@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/09-25-somalia-auc-r2-optimization/research.md", "reason": "Verified code anchors, chronological support counts and runtime boundary"}
+{"file": ".trellis/tasks/archive/2026-09/09-24-somalia-flood-food-crisis/design.md", "reason": "v1 technical contract (temporal rules, cohorts, bootstrap) that this round preserves"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Leakage, lineage and testing rules"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse existing somalia_oracle helpers additively"}

@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/09-25-somalia-auc-r2-optimization/research.md", "reason": "Evidence the implementation must stay consistent with"}
+{"file": ".trellis/tasks/archive/2026-09/09-24-somalia-flood-food-crisis/prd.md", "reason": "v1 acceptance criteria that must not regress"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Quality and leakage checklist"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Data-flow consistency across OOF, calibration, selection and reporting"}
