@@ -1,0 +1,31 @@
+[14:51:20] [prepare] Somalia areas: 905
+[14:51:34] [prepare] raw rows 177364; weather verified share 0.934 (13s)
+[14:51:38] [prepare] fs0: (6741, 522) (18s)
+[14:51:43] [prepare] fs1: (6759, 523) (23s)
+[14:51:47] [prepare] fs2: (6759, 523) (27s)
+[14:51:50] [prepare] fs3: (6741, 388) (30s)
+[14:51:51] [prepare] H=0: frame (5837, 1032), A/B/C/D widths [511, 525, 525, 997] (31s)
+[14:51:51] [prepare] H=3: frame (5837, 1038), A/B/C/D widths [511, 525, 531, 1003] (31s)
+[14:51:52] [prepare] H=6: frame (5837, 1044), A/B/C/D widths [511, 525, 537, 1009] (31s)
+[14:51:52] [prepare] H=12: frame (5837, 909), A/B/C/D widths [376, 390, 402, 874] (32s)
+[14:52:00] cohort ledger identical to v1
+[14:52:01] H0 OOF fits: 288
+[14:53:16] H0 OOF done
+[14:53:16] fold 2025 A: direct X3 shift rmse=0.16713
+[14:53:16] fold 2025 B: direct X1 shift rmse=0.17039
+[14:53:16] fold 2025 D_direct: direct X1 none rmse=0.17132
+[14:53:16] fold 2025 D_residual: residual X6 isotonic rmse=0.15630
+[14:53:16] fold 2025 C: direct X1 shift rmse=0.17039
+[14:53:16] fold 2025 D_selected: residual X6 isotonic rmse=0.15630
+[14:53:17] fold 2026 A: direct X2 isotonic rmse=0.12712
+[14:53:17] fold 2026 B: direct X6 isotonic rmse=0.12818
+[14:53:17] fold 2026 D_direct: direct X1 shift rmse=0.11772
+[14:53:17] fold 2026 D_residual: residual X1 shift rmse=0.10970
+[14:53:17] fold 2026 C: direct X6 isotonic rmse=0.12818
+[14:53:17] fold 2026 D_selected: residual X1 shift rmse=0.10970
+[14:53:18] receiving-horizon OOF fits (mapping refits only): 95
+[14:53:39] final fits: 95
+[15:00:14] done in 534s
+EXIT=0
+replay checks: 426/426 passed
+REPLAY_EXIT=0
