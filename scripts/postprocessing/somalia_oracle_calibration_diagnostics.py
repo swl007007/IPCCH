@@ -18,6 +18,7 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import f1_score, roc_auc_score
 
 from ipcch import paths
+from ipcch.somalia_oracle import evaluation as ev
 
 OUT = paths.RESULTS_DIR / "experiments" / "somalia_oracle" / "v1"
 REPORT = paths.REPORTS_DIR / "somalia_oracle" / "v1"
@@ -90,11 +91,57 @@ def calibrate(val_pred, val_true, test_pred, kind):
     return out
 
 
+def benchmark_comparison(adjusted: pd.DataFrame, out: Path) -> tuple:
+    """Calibrated D vs persistence and always-crisis on identical keys.
+
+    Persistence carries forward the latest valid reported phase (U <= O, U < T); its
+    share analogue carries forward the latest valid history observation's q3
+    (``hist_q3_obs1``) and is the only benchmark with an R². Always-crisis is
+    binary-only. Paired area-cluster bootstrap (2,000 draws, PCG64(42)) intervals are
+    for Phase 3+ F2 differences.
+    """
+    specs = {"D_raw": "canonical_0.2", "D_calibrated": "val_isotonic_calib_0.2"}
+    rows, contrast_rows = [], []
+    for h in sorted(adjusted["horizon"].unique()):
+        prov = pd.read_csv(out / "ledgers" / f"row_provenance_h{h:02d}.csv.gz", usecols=["area_id", "target_ord", "persistence_available", "persistence_phase"])
+        hist = pd.read_csv(out / "features" / f"feature_matrix_h{h:02d}.csv.gz", usecols=["area_id", "target_ord", "hist_q3_obs1"])
+        for year in sorted(adjusted.loc[adjusted["horizon"] == h, "test_year"].unique()):
+            d = {name: adjusted.loc[(adjusted["test_year"] == year) & (adjusted["horizon"] == h) & (adjusted["arm"] == "D") & (adjusted["method"] == m)] for name, m in specs.items()}
+            base = d["D_calibrated"][["area_id", "target_ord", "overall_phase", "q3", "phase_adj", "q3_adj"]].rename(columns={"phase_adj": "D_calibrated_phase", "q3_adj": "D_calibrated_q3"})
+            base = base.merge(d["D_raw"][["area_id", "target_ord", "phase_adj", "q3_adj"]].rename(columns={"phase_adj": "D_raw_phase", "q3_adj": "D_raw_q3"}), on=["area_id", "target_ord"])
+            base = base.merge(prov, on=["area_id", "target_ord"], how="left").merge(hist, on=["area_id", "target_ord"], how="left")
+            for cohort, frame in (("primary", base), ("persistence_subset", base.loc[base["persistence_available"].fillna(False).astype(bool)])):
+                if frame.empty:
+                    continue
+                frame = frame.sort_values(["area_id", "target_ord"]).reset_index(drop=True)
+                truth = frame["overall_phase"].to_numpy().astype(int)
+                meta = {"test_year": year, "horizon": h, "cohort": cohort, "n": len(frame), "n_areas": frame["area_id"].nunique()}
+                vectors = {}
+                for name in ("D_raw", "D_calibrated"):
+                    phase = frame[f"{name}_phase"].to_numpy()
+                    rows.append({**meta, "benchmark": name, **scores(truth, phase), "r2_q3": r2(frame["q3"].to_numpy(), frame[f"{name}_q3"].to_numpy()), "r2_n": len(frame)})
+                    vectors[name] = phase >= 3
+                rows.append({**meta, "benchmark": "always_crisis", **scores(truth, np.full(len(frame), 3)), "accuracy": np.nan, "macro_f1": np.nan, "pred_p3_share": np.nan, "r2_q3": np.nan, "r2_n": 0})
+                vectors["always_crisis"] = np.ones(len(frame), dtype=bool)
+                if cohort == "persistence_subset":
+                    phase = frame["persistence_phase"].to_numpy().astype(int)
+                    share = frame["hist_q3_obs1"].to_numpy()
+                    ok = np.isfinite(share)
+                    rows.append({**meta, "benchmark": "persistence", **scores(truth, phase), "r2_q3": r2(frame["q3"].to_numpy()[ok], share[ok]) if ok.sum() > 1 else np.nan, "r2_n": int(ok.sum())})
+                    vectors["persistence"] = phase >= 3
+                    # D on the share-persistence rows, so the R² comparison uses identical keys.
+                    rows.append({**meta, "benchmark": "D_calibrated_on_share_persistence_rows", "n": int(ok.sum()), "r2_q3": r2(frame["q3"].to_numpy()[ok], frame["D_calibrated_q3"].to_numpy()[ok]) if ok.sum() > 1 else np.nan, "r2_n": int(ok.sum())})
+                contrasts = [("D_calibrated", b) for b in ("persistence", "always_crisis", "D_raw") if b in vectors]
+                crows, _ = ev.paired_bootstrap(frame, truth >= 3, vectors, contrasts)
+                contrast_rows += [{**meta, **c} for c in crows]
+    return pd.DataFrame(rows), pd.DataFrame(contrast_rows)
+
+
 def _fmt(v):
     return "—" if pd.isna(v) else f"{v:.3f}"
 
 
-def write_report(res: pd.DataFrame, auc: pd.DataFrame, path: Path) -> None:
+def write_report(res: pd.DataFrame, auc: pd.DataFrame, bench: pd.DataFrame, bench_contrasts: pd.DataFrame, path: Path) -> None:
     """Group-meeting section: isotonic-calibrated arm D, emphasis on H=0 and H=3."""
     view = res.set_index(["test_year", "horizon", "arm", "method"])
     lines = [
@@ -131,18 +178,41 @@ def write_report(res: pd.DataFrame, auc: pd.DataFrame, path: Path) -> None:
         )
     lines += [
         "",
+        "## Calibrated D versus simple benchmarks",
+        "",
+        "Identical keys within each year/horizon. Persistence = latest valid reported phase with U <= O and U < T; its R² uses the carried-forward q3 share of the latest valid history observation (`hist_q3_obs1`), and the D R² in brackets is recomputed on exactly those rows. Always-crisis predicts Phase 3+ everywhere (binary only). Δ F2 intervals: paired area-cluster bootstrap, 2,000 draws, PCG64(42).",
+        "",
+        "| Year | H | Cohort | n | Benchmark | F2 | Precision | Recall | Accuracy | Macro-F1 | R² q3 |",
+        "|---|---|---|---:|---|---:|---:|---:|---:|---:|---|",
+    ]
+    order = {"D_calibrated": 0, "D_raw": 1, "persistence": 2, "always_crisis": 3}
+    same_rows = bench.loc[bench["benchmark"] == "D_calibrated_on_share_persistence_rows"].set_index(["test_year", "horizon", "cohort"])
+    for r in bench.loc[bench["benchmark"].isin(order)].assign(o=lambda x: x["benchmark"].map(order)).sort_values(["test_year", "horizon", "cohort", "o"]).itertuples(index=False):
+        r2_text = _fmt(r.r2_q3)
+        if r.benchmark == "persistence":
+            r2_text = f"{_fmt(r.r2_q3)} (n={int(r.r2_n)}; D calibrated {_fmt(same_rows.loc[(r.test_year, r.horizon, r.cohort), 'r2_q3'])})"
+        lines.append(f"| {r.test_year} | {r.horizon} | {r.cohort} | {r.n} | {r.benchmark} | {_fmt(r.f2)} | {_fmt(r.precision)} | {_fmt(r.recall)} | {_fmt(r.accuracy)} | {_fmt(r.macro_f1)} | {r2_text} |")
+    lines += ["", "| Year | H | Cohort | Contrast | Δ F2 | 95% interval |", "|---|---|---|---|---:|---|"]
+    for r in bench_contrasts.itertuples(index=False):
+        interval = f"[{_fmt(r.ci_low)}, {_fmt(r.ci_high)}]" if r.interval_status == "ok" else r.interval_reason
+        lines.append(f"| {r.test_year} | {r.horizon} | {r.cohort} | {r.contrast} | {_fmt(r.point_delta_f2)} | {interval} |")
+    lines += [
+        "",
         "## Findings",
         "",
         "- Discrimination, not calibration, is the bottleneck for A/B/C (crisis AUC mostly ≈0.5). D is the only specification with consistently useful within-month ranking.",
         "- Isotonic calibration on inner validation removes most of the upward bias in q3 predictions at H=0/3/6, lifting D's R² to 0.21 (2026 H=0) and 0.10 (2025 H=0). At H=12 the validation bias does not transfer across years and calibration hurts R².",
         "- Per-phase thresholds mainly trade F2 for macro-F1; Phase 4 recall stays <0.1 without an F2-style low threshold. Even the leaky test-tuned ceiling keeps accuracy ≤0.63.",
         "- Phase 3+ F2 is a poor selection criterion here: with crisis prevalence 0.45–0.60 and many shares near 0.2, F2-optimal models collapse to predicting Phase 3 almost everywhere and cannot beat always-crisis.",
+        "- Against simple benchmarks: calibrated D beats persistence on F2 at H=0/3/6 in 2025 (Δ +0.12 to +0.20, intervals exclude zero) and on share R² everywhere except 2026 H=0, where carried-forward q3 is as good (0.220 vs 0.214). Persistence has higher accuracy and macro-F1 than calibrated D at H=0 in both years (2026: 0.606 vs 0.480; 0.492 vs 0.356) because it predicts Phase 2 and 4 when those were last observed.",
+        "- Calibrated D never significantly beats always-crisis on F2 (2025 H=0 Δ −0.001 [−0.011, 0.010]); at 2026 H=0 and at H=12 it is significantly worse on F2.",
+        "- The R² of 0.21 at 2026 H=0 is therefore not a gain over the naive share-persistence benchmark; the 2025 H=0/H=3 R² gains over persistence (0.106 vs −0.624; 0.095 vs −0.464) are.",
         "",
         "## Recommendations",
         "",
-        "- Present calibrated D at H=0 and H=3 as the main result for the next group meeting.",
-        "- Do not select future models on F2. Use calibrated share R², crisis AUC / within-month AUC and macro-F1 as primary criteria; report F2 only alongside them.",
-        "- Judge new signals (e.g. flooding) by within-month AUC and calibrated R² gains over calibrated D.",
+        "- Present calibrated D at H=0 and H=3 for the next group meeting together with persistence and always-crisis on the same keys; frame 2025 H=0/H=3 as the evidence of added value and 2026 H=0 as matching persistence.",
+        "- Do not select future models on F2. Use calibrated share R², crisis AUC / within-month AUC and macro-F1 as primary criteria, always reported relative to persistence and always-crisis on identical keys.",
+        "- Judge new signals (e.g. flooding) by within-month AUC and calibrated R² gains over calibrated D and over share persistence, and by whether they close the accuracy/macro-F1 gap to persistence.",
     ]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -221,7 +291,10 @@ def main(argv=None):
         auc_rows.append({"test_year": year, "horizon": h, "arm": arm, "auc_crisis": roc_auc_score(crisis, g["q3_pred"]) if len(set(crisis)) == 2 else np.nan, "within_month_auc": float(np.mean(months)) if months else np.nan})
     auc = pd.DataFrame(auc_rows)
     auc.to_csv(diag / "discrimination_auc.csv", index=False)
-    write_report(res, auc, args.report_dir / "calibration_diagnostics.md")
+    bench, bench_contrasts = benchmark_comparison(adjusted, out)
+    bench.to_csv(diag / "calibrated_d_vs_benchmarks.csv", index=False)
+    bench_contrasts.to_csv(diag / "calibrated_d_vs_benchmarks_contrasts.csv", index=False)
+    write_report(res, auc, bench, bench_contrasts, args.report_dir / "calibration_diagnostics.md")
     res.to_csv(diag / "calibration_threshold_metrics.csv", index=False)
     pd.DataFrame(thresholds).to_csv(diag / "calibration_thresholds.csv", index=False)
     pd.set_option("display.width", 250)
