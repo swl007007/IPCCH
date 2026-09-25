@@ -157,8 +157,14 @@ def main(argv=None):
             best, _ = qo.select_candidate(scores, tol, np.unique(crisis).size == 2)
             per_view[view] = best
         d_all = pd.concat([s for s in score_tables if s["test_year"].iloc[0] == year and s["view"].iloc[0] in ("D_direct", "D_residual")])
-        best_d, _ = qo.select_candidate(d_all, tol, True)
+        best_d, _ = qo.select_candidate(d_all, tol, np.unique(crisis).size == 2)
         per_view["C"] = per_view["B"]
+        # D_selected = the formulation view whose own selection attains the D minimum (same fits/predictions).
+        if best_d is not None:
+            src = "D_residual" if best_d["formulation"] == "residual" else "D_direct"
+            if per_view[src] is None or abs(per_view[src]["rmse"] - best_d["rmse"]) > tol:
+                raise qo.Q3OptError("D_selected formulation view does not attain the D RMSE minimum")
+            best_d = per_view[src]
         per_view["D_selected"] = best_d
         selections[year] = per_view
         for view, row in per_view.items():
@@ -244,6 +250,12 @@ def main(argv=None):
             raise qo.Q3OptError("D_selected recipe does not equal its formulation view's selection")
         dsel.append(preds.loc[(preds["test_year"] == year) & (preds["view"] == src)].assign(view="D_selected", reused_from=src))
     preds = pd.concat([preds, *dsel], ignore_index=True)
+    for year, per_view in selections.items():
+        best = per_view["D_selected"]
+        if best is None:
+            continue
+        src = "D_residual" if best["formulation"] == "residual" else "D_direct"
+        status_rows += [{**r, "view": "D_selected", "reused_from": src} for r in list(status_rows) if r.get("view") == src and r.get("test_year") == year]
     written["final_predictions"] = write(preds, out / "predictions" / "final_predictions.csv.gz")
     written["final_status"] = write(pd.DataFrame(status_rows), out / "fits" / "final_status.csv")
     written["mappings"] = write(pd.DataFrame(mapping_rows), out / "fits" / "calibration_mappings.csv")
@@ -287,7 +299,7 @@ def evaluate(prepared, preds, v1_dir, cfg):
                 rows.append({**base, "cohort": "primary", "view": view, "status": "incomplete", "reason": f"{int(m['q3_raw'].isna().sum())} primary keys without predictions"})
                 continue
             if (m["calibration_status"] != "ok").any():
-                diag = m.assign(q3_final=np.clip(m["q3_raw"], 0, 1))
+                diag = m.assign(q3_final=np.clip(m["q3_raw"], 0, 1), clipped=np.clip(m["q3_raw"], 0, 1) != m["q3_raw"])
                 rows.append({**base, "cohort": "primary", "view": view, "status": "calibrated_unavailable", "reason": "fixed calibration method could not be fitted; raw-bounded diagnostic", **qe.model_view_metrics(diag)})
                 continue
             views[view] = m
@@ -378,6 +390,7 @@ def write_report(metrics, contrasts, selected, path: Path, manifest):
     for r in contrasts.itertuples(index=False):
         interval = f"[{_f(r.ci_low, 4)}, {_f(r.ci_high, 4)}]" if r.interval_status == "ok" else r.interval_reason
         lines.append(f"| {r.test_year} | {r.horizon} | {r.contrast} | {r.metric} | {_f(r.point_delta, 4)} | {interval} |")
+    lines += ["", "Missing-history rows in D-residual use the same-bundle D-direct model; that fallback branch's calibration mapping is fitted on all direct OOF rows of its calibration months (not only on no-history rows), as specified in design section 2.", ""]
     lines += ["", "Binary F1/recall use final q3 ≥ 0.2 against reported phase ≥ 3 (no threshold tuning). Legacy ordinal metrics are in `metrics.csv` (`legacy_*`). Climate-variable lineage was waived (2026-09-24). 2026 H3/H6 have no verified-oracle primary rows."]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
