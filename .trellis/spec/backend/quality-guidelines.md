@@ -64,3 +64,9 @@ silent sample changes, not crashes. Checks favour explicit contracts over conven
 - Are fitting, tuning and threshold choices free of test-year labels?
 - Are sample exclusions decided before predictions, identically across compared arms?
 - Are undefined metrics reported as undefined (not zero, not dropped)?
+
+## Lessons from the q3-first optimization (2026-09-25)
+
+- Reading saved float predictions with `pd.read_csv` default parsing can change the last bit and split isotonic-calibration ties; replays of saved scores must use `float_precision="round_trip"`.
+- Don't run the full pytest suite and a 12–14 worker XGBoost run concurrently on the 15 GB machine; the worker pool dies (`BrokenProcessPool`).
+- Training-period validation choices (e.g. residual vs direct q3) can fail to transfer to the outer year; always report non-selected formulations alongside the selected view.
