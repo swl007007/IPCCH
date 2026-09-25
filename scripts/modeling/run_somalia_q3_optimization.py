@@ -8,6 +8,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import multiprocessing as mp
 import subprocess
@@ -76,6 +77,42 @@ def fold_pool_check(prepared, year, window):
     return int(frame.loc[frame["target_year"].isin(window), "target_ord"].max())
 
 
+def recipe_arm_form(view, recipe):
+    if view == "D_selected":
+        return "D", recipe["formulation"]
+    return qo.VIEW_SPEC[view]
+
+
+def reuse_source(view, recipe, per_view, horizon):
+    """A view whose fixed recipe equals an already-fitted formulation view's recipe reuses its fits."""
+    if view != "D_selected":
+        return None
+    src = "D_residual" if recipe["formulation"] == "residual" else "D_direct"
+    other = per_view.get(src)
+    if other is not None and (other["bundle"], other["method"], other["formulation"]) == (recipe["bundle"], recipe["method"], recipe["formulation"]):
+        return src
+    return None
+
+
+def save_models(res, task, model_dir, feature_order):
+    """Persist every final regressor (XGBoost UBJSON or constant JSON) with a hash inventory."""
+    model_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for target, model in res["models"].items():
+        if model is None:
+            continue
+        stem = model_dir / f"{task['job_id']}_{task['view']}_{target}"
+        if model.kind == "xgboost":
+            path = stem.with_suffix(".ubj")
+            model.model.save_model(str(path))
+        else:
+            path = stem.with_suffix(".json")
+            path.write_text(json.dumps({"kind": "constant", "value": model.constant, "n_rows": model.n_rows}), encoding="utf-8")
+        rows.append({"job_id": task["job_id"], "view": task["view"], "target": target, "bundle": task["bundle"], "kind": model.kind, "n_rows": model.n_rows,
+                     "path": path.name, "sha256": sd.sha256_file(path), "feature_order_sha256": hashlib.sha256("\n".join(feature_order).encode()).hexdigest()})
+    return rows
+
+
 def oof_tasks(scope, horizon, window, arm_forms, months):
     tasks = []
     for arm, formulation in arm_forms:
@@ -97,6 +134,11 @@ def main(argv=None):
     input_paths = pl.resolve_input_paths(overrides)
     prepared = pl.prepare(input_paths, log=log, hash_inputs=not args.skip_input_hash)
     written = {"cohort_ledger": write(prepared.cohort_ledger, out / "ledgers" / "cohort_ledger.csv.gz")}
+    written["label_ledger"] = write(prepared.ledger[["area_id", "target_ord", "overall_phase", "valid_score", "actual_crisis", "q2", "q3", "q4", "q5"]], out / "ledgers" / "label_ledger.csv.gz")
+    for h, f in prepared.frames.items():
+        written[f"row_provenance_h{h:02d}"] = write(f[["area_id", "target_ord", "origin_ord", "hist_q3_obs1", "history_obs1_source_ord"]], out / "ledgers" / f"row_provenance_h{h:02d}.csv.gz")
+        written[f"feature_matrix_h{h:02d}"] = write(f[["area_id", "target_ord", *prepared.schemas[(h, "D")]]], out / "features" / f"feature_matrix_h{h:02d}.csv.gz")
+    (out / "features" / "feature_schema.json").write_text(json.dumps({f"h{h:02d}_{a}": c for (h, a), c in prepared.schemas.items()}, indent=1))
     if not args.no_v1_check:
         v1 = pd.read_csv(args.v1_dir / "ledgers" / "cohort_ledger.csv.gz")
         mine = prepared.cohort_ledger.reset_index(drop=True)
@@ -159,12 +201,7 @@ def main(argv=None):
         d_all = pd.concat([s for s in score_tables if s["test_year"].iloc[0] == year and s["view"].iloc[0] in ("D_direct", "D_residual")])
         best_d, _ = qo.select_candidate(d_all, tol, np.unique(crisis).size == 2)
         per_view["C"] = per_view["B"]
-        # D_selected = the formulation view whose own selection attains the D minimum (same fits/predictions).
-        if best_d is not None:
-            src = "D_residual" if best_d["formulation"] == "residual" else "D_direct"
-            if per_view[src] is None or abs(per_view[src]["rmse"] - best_d["rmse"]) > tol:
-                raise qo.Q3OptError("D_selected formulation view does not attain the D RMSE minimum")
-            best_d = per_view[src]
+        # D_selected keeps the exact globally selected D recipe (formulation, bundle, method).
         per_view["D_selected"] = best_d
         selections[year] = per_view
         for view, row in per_view.items():
@@ -188,15 +225,15 @@ def main(argv=None):
         year, h = job["test_year"], job["horizon"]
         window = list(FOLDS[year])
         rplan = qo.receiving_plan(prepared.frames[h], window, h, job["origin_ord"], cfg) if h > 0 else {"final": plans[year]["final"]}
-        for view in MODEL_VIEWS:
-            recipe = selections[year][qo.RECIPE_SOURCE[view] if h > 0 else view]
+        for view in (*MODEL_VIEWS, "D_selected"):
+            recipe = selections[year][qo.RECIPE_SOURCE.get(view, view) if h > 0 else view]
             receiving.append({"job": job, "view": view, "recipe": recipe, "months": rplan["final"]})
     need = {}
     for item in receiving:
         h = item["job"]["horizon"]
         if h == 0 or item["recipe"] is None or item["recipe"]["method"] == "none":
             continue
-        arm, formulation = qo.VIEW_SPEC[item["view"]]
+        arm, formulation = recipe_arm_form(item["view"], item["recipe"])
         forms = [("direct",), ("direct", "residual")][formulation == "residual"]
         for f in forms:
             for v in item["months"]:
@@ -206,6 +243,12 @@ def main(argv=None):
     for r in run_pool(qo.oof_task, rtasks, args.workers):
         store.add(r)
     written["oof_ledger"] = write(pd.DataFrame(store.ledger), out / "selection" / "oof_fit_ledger.csv")
+    oof_rows = []
+    for (scope, h, arm, form, bundle, v), (idx, raw) in store.data.items():
+        f = prepared.frames[h]
+        oof_rows.append(pd.DataFrame({"scope": scope, "horizon": h, "arm": arm, "formulation": form, "bundle": bundle, "v": v, "row": idx,
+                                      "area_id": f["area_id"].to_numpy()[idx], "target_ord": f["target_ord"].to_numpy()[idx], "raw_q3": raw}))
+    written["oof_predictions"] = write(pd.concat(oof_rows, ignore_index=True), out / "selection" / "oof_predictions.csv.gz")
 
     # ---------------- final fits ----------------
     ftasks, skipped = [], []
@@ -218,48 +261,48 @@ def main(argv=None):
             continue
         if h == 0 and view == "C":
             continue  # reused from B below
-        arm, formulation = qo.VIEW_SPEC[view]
+        src = reuse_source(view, recipe, selections[year], h)
+        if src is not None:
+            continue  # identical recipe already fitted under another view; reused below
+        arm, formulation = recipe_arm_form(view, recipe)
         frame = prepared.frames[h]
         mappings = qo.fit_branch_mappings(store, frame, year, h, arm, formulation, recipe["bundle"], recipe["method"], item["months"], cfg)
         ftasks.append({**base, "arm": arm, "formulation": formulation, "bundle": recipe["bundle"], "method": recipe["method"], "window": list(FOLDS[year]), "origin_ord": job["origin_ord"], "mappings": mappings,
                        "recipe_selection_max_label_ord": int(max(plans[year]["scoring"])), "mapping_months": list(item["months"])})
     log(f"final fits: {len(ftasks)}")
     finals = run_pool(qo.final_task, ftasks, args.workers)
-    pred_parts, mapping_rows, status_rows, fit_parts = [], [], list(skipped), []
+    pred_parts, mapping_rows, status_rows, fit_parts, model_rows = [], [], list(skipped), [], []
     for task, res in zip(ftasks, finals):
         meta = {"job_id": task["job_id"], "view": task["view"], "horizon": task["horizon"], "test_year": task["test_year"], "formulation": task["formulation"], "bundle": task["bundle"], "method": task["method"],
-                "recipe_source_view": qo.RECIPE_SOURCE[task["view"]] if task["horizon"] > 0 else task["view"], "recipe_selection_max_label": sd.ord_label(task["recipe_selection_max_label_ord"]),
+                "recipe_source_view": qo.RECIPE_SOURCE.get(task["view"], task["view"]) if task["horizon"] > 0 else task["view"], "recipe_selection_max_label": sd.ord_label(task["recipe_selection_max_label_ord"]),
                 "receiving_origin": sd.ord_label(task["origin_ord"]), "selection_uses_later_labels": bool(task["recipe_selection_max_label_ord"] > task["origin_ord"]), "mapping_months": ";".join(sd.ord_labels(task["mapping_months"]))}
         status_rows.append({**meta, "status": res["status"], "reason": res.get("reason"), "calibration_status": res.get("calibration_status"), "calibration_reason": res.get("calibration_reason")})
         if res["status"] != "completed":
             continue
         pred_parts.append(res["predictions"].assign(**{k: meta[k] for k in ("job_id", "view", "horizon", "test_year")}, calibration_status=res["calibration_status"]))
+        model_rows.extend(save_models(res, task, out / "models", prepared.schemas[(task["horizon"], task["arm"])]))
         mapping_rows += res["mappings"]
         fit_parts.append(res["fit_ledger"].assign(job_id=task["job_id"], view=task["view"]))
     preds = pd.concat(pred_parts, ignore_index=True)
     h0c = preds.loc[(preds["horizon"] == 0) & (preds["view"] == "B")].assign(view="C", reused_from="B")
     preds = pd.concat([preds, h0c], ignore_index=True)
-    dsel = []
-    for year, per_view in selections.items():
-        best = per_view["D_selected"]
-        if best is None:
+    copies = []
+    for item in receiving:
+        job, view, recipe = item["job"], item["view"], item["recipe"]
+        if recipe is None:
             continue
-        src = "D_residual" if best["formulation"] == "residual" else "D_direct"
-        chosen = per_view[src]
-        if chosen is None or (chosen["bundle"], chosen["method"]) != (best["bundle"], best["method"]):
-            raise qo.Q3OptError("D_selected recipe does not equal its formulation view's selection")
-        dsel.append(preds.loc[(preds["test_year"] == year) & (preds["view"] == src)].assign(view="D_selected", reused_from=src))
-    preds = pd.concat([preds, *dsel], ignore_index=True)
-    for year, per_view in selections.items():
-        best = per_view["D_selected"]
-        if best is None:
+        src = reuse_source(view, recipe, selections[job["test_year"]], job["horizon"])
+        if src is None:
             continue
-        src = "D_residual" if best["formulation"] == "residual" else "D_direct"
-        status_rows += [{**r, "view": "D_selected", "reused_from": src} for r in list(status_rows) if r.get("view") == src and r.get("test_year") == year]
+        rows = preds.loc[(preds["job_id"] == job["job_id"]) & (preds["view"] == src)].assign(view=view, reused_from=src)
+        copies.append(rows)
+        status_rows += [{**r, "view": view, "reused_from": src} for r in list(status_rows) if r.get("view") == src and r.get("job_id") == job["job_id"]]
+    preds = pd.concat([preds, *copies], ignore_index=True)
     written["final_predictions"] = write(preds, out / "predictions" / "final_predictions.csv.gz")
     written["final_status"] = write(pd.DataFrame(status_rows), out / "fits" / "final_status.csv")
     written["mappings"] = write(pd.DataFrame(mapping_rows), out / "fits" / "calibration_mappings.csv")
     written["final_fit_ledger"] = write(pd.concat(fit_parts, ignore_index=True), out / "fits" / "final_fit_ledger.csv.gz")
+    written["model_inventory"] = write(pd.DataFrame(model_rows), out / "models" / "model_inventory.csv")
 
     # ---------------- evaluation ----------------
     metrics, contrasts, arrays = evaluate(prepared, preds, args.v1_dir, cfg)

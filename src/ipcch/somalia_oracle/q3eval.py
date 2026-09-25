@@ -6,7 +6,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.isotonic import IsotonicRegression
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import f1_score, roc_auc_score
 
 from ipcch.somalia_oracle import evaluation as ev
 from ipcch.somalia_oracle import modeling as md
@@ -28,8 +28,10 @@ def share_metrics(truth: np.ndarray, pred: np.ndarray, weights: Optional[np.ndar
     err = pred - truth
     mean_t = (w * truth).sum() / total
     ss_tot = (w * (truth - mean_t) ** 2).sum()
+    active = truth[w > 0]
+    constant_truth = active.size == 0 or np.all(active == active[0])  # exact check; roundoff cannot fake variance
     return {
-        "r2": float(1 - (w * err ** 2).sum() / ss_tot) if ss_tot > 0 else np.nan,
+        "r2": float(1 - (w * err ** 2).sum() / ss_tot) if (ss_tot > 0 and not constant_truth) else np.nan,
         "rmse": float(np.sqrt((w * err ** 2).sum() / total)),
         "mae": float((w * np.abs(err)).sum() / total),
         "bias": float((w * err).sum() / total),
@@ -81,6 +83,9 @@ def model_view_metrics(frame: pd.DataFrame) -> Dict[str, object]:
     out.update({f"bin_{k}": v for k, v in binary_metrics(frame["actual_crisis"], binary).items()})
     legacy = md.phase_from_predictions(frame[["q2_raw", "q3_raw", "q4_raw", "q5_raw"]].to_numpy())
     out["legacy_phase_accuracy"] = float((legacy == frame["overall_phase"].to_numpy()).mean())
+    # Multiclass macro-F1 over phases present in truth or legacy prediction (labels 1-5, zero_division=0).
+    reported = frame["overall_phase"].to_numpy().astype(int)
+    out["legacy_multiclass_macro_f1"] = float(f1_score(reported, legacy, labels=sorted(set(reported) | set(legacy)), average="macro", zero_division=0))
     out.update({f"legacy_{k}": v for k, v in binary_metrics(frame["actual_crisis"], legacy >= 3).items()})
     out["q3_binary_vs_legacy_disagreements"] = int((binary != (legacy >= 3)).sum())
     out["n_clipped"] = int(frame["clipped"].sum())

@@ -75,6 +75,7 @@ class Q3Mapping:
     iso: object = None
     months: Tuple[int, ...] = ()
     n_rows: int = 0
+    fit_rows: Tuple[int, ...] = ()
 
     @property
     def ok(self) -> bool:
@@ -94,6 +95,9 @@ class Q3Mapping:
         out = {"method": self.method, "status": self.status, "reason": self.reason, "calibration_months": ";".join(sd.ord_labels(self.months)), "calibration_rows": self.n_rows, "shift": self.shift}
         if self.iso is not None:
             out["isotonic_thresholds"] = int(len(self.iso.X_thresholds_))
+            out["isotonic_x"] = json.dumps([float(v) for v in self.iso.X_thresholds_])
+            out["isotonic_y"] = json.dumps([float(v) for v in self.iso.y_thresholds_])
+        out["fit_rows"] = json.dumps([int(r) for r in self.fit_rows])
         return out
 
 
@@ -310,7 +314,7 @@ def fit_branch_mappings(store: OOFStore, frame: pd.DataFrame, scope, horizon, ar
     mappings = {}
     branches = ("direct",) if formulation == "direct" else ("residual", "fallback_direct")
     for branch in branches:
-        raws, truths, ms = [], [], []
+        raws, truths, ms, rows = [], [], [], []
         source = "direct" if branch in ("direct", "fallback_direct") else formulation
         for c in months:
             if not store.supported(scope, horizon, arm, source, bundle, c):
@@ -321,9 +325,11 @@ def fit_branch_mappings(store: OOFStore, frame: pd.DataFrame, scope, horizon, ar
                 idx, raw = idx[keep], raw[keep]
             if idx.size == 0:
                 continue
-            raws.append(raw), truths.append(q3[idx]), ms.append(np.full(idx.size, c))
+            raws.append(raw), truths.append(q3[idx]), ms.append(np.full(idx.size, c)), rows.append(idx)
         raw = np.concatenate(raws) if raws else np.array([])
-        mappings[branch] = fit_mapping(method, raw, np.concatenate(truths) if truths else np.array([]), np.concatenate(ms) if ms else np.array([]), min_months)
+        mapping = fit_mapping(method, raw, np.concatenate(truths) if truths else np.array([]), np.concatenate(ms) if ms else np.array([]), min_months)
+        mapping.fit_rows = tuple(int(r) for r in (np.concatenate(rows) if rows else []))
+        mappings[branch] = mapping
     return mappings
 
 
@@ -416,11 +422,13 @@ def final_task(task: Mapping[str, object]) -> Dict[str, object]:
     out = {k: task[k] for k in ("job_id", "view", "horizon", "test_year", "arm", "formulation", "bundle", "method")}
     weights = md.decay_weights(months[fit_idx], origin)
     X = _STATE["X"][(h, arm)]
-    others = {}
+    others, models = {}, {}
     for target in OTHER_TARGETS:
         y = frame[target].to_numpy(dtype=np.float64)[fit_idx]
-        others[target] = md.fit_regressor(X[fit_idx], y, weights, _params(bundle_id, target), target).predict(X[pred_idx])
+        models[target] = md.fit_regressor(X[fit_idx], y, weights, _params(bundle_id, target), target)
+        others[target] = models[target].predict(X[pred_idx])
     direct_model, direct_info = fit_q3(h, arm, "direct", bundle_id, fit_idx, origin)
+    models["q3_direct"] = direct_model
     raw = predict_q3(h, arm, "direct", direct_model, pred_idx)
     branch = np.full(pred_idx.size, "direct", dtype=object)
     fit_info = {"direct": direct_info}
@@ -430,6 +438,7 @@ def final_task(task: Mapping[str, object]) -> Dict[str, object]:
         if res_model is None:
             out.update(status="unsupported", reason=res_info["reason"])
             return out
+        models["q3_residual_delta"] = res_model
         res = predict_q3(h, arm, "residual", res_model, pred_idx)
         branch = np.where(np.isfinite(res), "residual", "fallback_direct").astype(object)
         raw = np.where(np.isfinite(res), res, raw)
@@ -465,5 +474,7 @@ def final_task(task: Mapping[str, object]) -> Dict[str, object]:
     out["mappings"] = [{"job_id": task["job_id"], "view": task["view"], "branch": name, **m.describe()} for name, m in mappings.items()]
     out["fit_ledger"] = pd.DataFrame({"row": fit_idx, "target_ord": months[fit_idx], "weight": weights, "baseline_supported": supported[fit_idx]})
     out["fit_info"] = fit_info
+    out["models"] = models
+    out["pred_idx"] = pred_idx
     out["status"], out["reason"] = "completed", None
     return out

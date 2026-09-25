@@ -81,3 +81,16 @@ def test_q3opt_cli_end_to_end_synthetic(tmp_path, tiny_config):
     contrasts = pd.read_csv(out / "metrics" / "contrasts.csv")
     assert {"D_residual-D_direct", "D_selected-share_persistence"} <= set(contrasts["contrast"])
     assert (report / "summary.md").exists()
+    inv = pd.read_csv(out / "models" / "model_inventory.csv")
+    assert {"q2", "q3_direct", "q4", "q5"} <= set(inv["target"]) and (out / "models" / inv["path"].iloc[0]).exists()
+    oofp = pd.read_csv(out / "selection" / "oof_predictions.csv.gz")
+    assert len(oofp) and set(oofp["horizon"]) >= {0}
+    maps = pd.read_csv(out / "fits" / "calibration_mappings.csv")
+    assert "fit_rows" in maps.columns
+    replay_spec = util.spec_from_file_location("q3replay", str(paths.PROJECT_ROOT / "scripts" / "postprocessing" / "replay_somalia_q3.py"))
+    replay = util.module_from_spec(replay_spec)
+    replay_spec.loader.exec_module(replay)
+    assert replay.main(["--out-dir", str(out)]) == 0
+    checks = pd.read_csv(out / "metrics" / "replay_checks.csv")
+    assert checks["check"].str.startswith("mapping_").any() and checks["check"].str.startswith("model_predicts_").any()
+    assert checks["check"].str.startswith("heldout_rebuild_").any()

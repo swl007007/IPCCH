@@ -34,14 +34,13 @@ def ordl(label: str) -> int:
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out-dir", type=Path, default=OUT)
-    parser.add_argument("--v1-dir", type=Path, default=paths.RESULTS_DIR / "experiments" / "somalia_oracle" / "v1")
     args = parser.parse_args(argv)
     out = args.out_dir
     checks = []
     add = lambda name, ok, detail="": checks.append({"check": name, "pass": bool(ok), "detail": detail})
 
-    ledger = read(args.v1_dir / "ledgers" / "label_ledger.csv.gz")[["area_id", "target_ord", "q3", "actual_crisis"]]
-    prov = read(args.v1_dir / "ledgers" / "row_provenance_h00.csv.gz")[["area_id", "target_ord"]]
+    ledger = read(out / "ledgers" / "label_ledger.csv.gz")[["area_id", "target_ord", "q3", "actual_crisis"]]
+    prov = read(out / "ledgers" / "row_provenance_h00.csv.gz")[["area_id", "target_ord"]]
     sp = read(out / "selection" / "scoring_predictions.csv.gz")
     scores = read(out / "selection" / "candidate_scores.csv")
     sel = read(out / "selection" / "selected_recipes.csv")
@@ -134,6 +133,100 @@ def main(argv=None):
         mk = f"y{r.test_year}_h{r.horizon:02d}_{r.contrast}__multiplicities"
         if mk in draws.files:
             add(f"bootstrap_whole_area_{key}", (draws[mk].sum(axis=1) == r.n_areas).all())
+
+    # (6) calibration mappings rebuilt from saved OOF predictions (fit rows, shift, isotonic knots)
+    from sklearn.isotonic import IsotonicRegression
+    import json as _json
+
+    oofp = read(out / "selection" / "oof_predictions.csv.gz")
+    truth = ledger.set_index(["area_id", "target_ord"])["q3"]
+    maps = read(out / "fits" / "calibration_mappings.csv")
+    status_by = status.drop_duplicates(["job_id", "view"]).set_index(["job_id", "view"])
+    for r in maps.itertuples(index=False):
+        if r.method == "none" or r.status != "ok":
+            continue
+        st = status_by.loc[(r.job_id, r.view)]
+        form = "direct" if r.branch in ("direct", "fallback_direct") else "residual"
+        arm = "D" if str(r.view).startswith("D") else ("B" if r.view == "C" and st["horizon"] == 0 else r.view)
+        months = [ordl(x) for x in str(st["mapping_months"]).split(";") if x]
+        sub = oofp.loc[(oofp["scope"] == st["test_year"]) & (oofp["horizon"] == st["horizon"]) & (oofp["arm"] == arm) & (oofp["formulation"] == form) & (oofp["bundle"] == st["bundle"]) & oofp["v"].isin(months)]
+        sub = sub.loc[np.isfinite(sub["raw_q3"])]
+        y = truth.reindex(pd.MultiIndex.from_frame(sub[["area_id", "target_ord"]])).to_numpy()
+        add(f"mapping_fit_rows_{r.job_id}_{r.view}_{r.branch}", sorted(sub["row"].tolist()) == sorted(_json.loads(r.fit_rows)))
+        if r.method == "shift":
+            add(f"mapping_shift_{r.job_id}_{r.view}_{r.branch}", np.isclose(np.mean(sub["raw_q3"].to_numpy() - y), r.shift, atol=1e-12))
+        else:
+            iso = IsotonicRegression(y_min=0, y_max=1, out_of_bounds="clip").fit(sub["raw_q3"].to_numpy(), y)
+            add(f"mapping_isotonic_{r.job_id}_{r.view}_{r.branch}", np.allclose(iso.X_thresholds_, _json.loads(r.isotonic_x)) and np.allclose(iso.y_thresholds_, _json.loads(r.isotonic_y)))
+    # held-out scoring predictions rebuilt for selected candidates from OOF predictions + earlier-month mappings
+    splan = plan.loc[plan["scoring_month"] != "FINAL_MAPPING"]
+    for srow in sel.itertuples(index=False):
+        if srow.status != "ok" or srow.view in ("C", "D_selected"):
+            continue
+        arm, form = ("D", srow.formulation) if str(srow.view).startswith("D") else (srow.view, "direct")
+        for pr in splan.loc[splan["test_year"] == srow.test_year].itertuples(index=False):
+            v, cal = ordl(pr.scoring_month), [ordl(x) for x in str(pr.calibration_months).split(";") if x]
+            def raw_at(month, f):
+                g = oofp.loc[(oofp["scope"] == srow.test_year) & (oofp["horizon"] == 0) & (oofp["arm"] == arm) & (oofp["formulation"] == f) & (oofp["bundle"] == srow.bundle) & (oofp["v"] == month)]
+                return g.set_index("row")["raw_q3"]
+            direct_v, res_v = raw_at(v, "direct"), (raw_at(v, "residual") if form == "residual" else None)
+            branch = pd.Series("direct", index=direct_v.index) if res_v is None else pd.Series(np.where(np.isfinite(res_v.reindex(direct_v.index)), "residual", "fallback_direct"), index=direct_v.index)
+            raw = direct_v if res_v is None else res_v.reindex(direct_v.index).where(branch == "residual", direct_v)
+            final = pd.Series(np.nan, index=raw.index)
+            for b in branch.unique():
+                bf = "residual" if b == "residual" else "direct"
+                parts = [raw_at(c, bf) for c in cal]
+                cr = pd.concat(parts) if parts else pd.Series(dtype=float)
+                cr = cr[np.isfinite(cr)]
+                keys = oofp.drop_duplicates(["horizon", "row"]).loc[lambda d: d["horizon"] == 0].set_index("row").loc[cr.index, ["area_id", "target_ord"]]
+                cy = truth.reindex(pd.MultiIndex.from_frame(keys)).to_numpy()
+                idx = branch.index[branch == b]
+                if srow.method == "none":
+                    mapped = raw.loc[idx]
+                elif srow.method == "shift":
+                    mapped = raw.loc[idx] - np.mean(cr.to_numpy() - cy)
+                else:
+                    mapped = pd.Series(IsotonicRegression(y_min=0, y_max=1, out_of_bounds="clip").fit(cr.to_numpy(), cy).predict(raw.loc[idx].to_numpy()), index=idx)
+                final.loc[idx] = np.clip(mapped, 0, 1)
+            saved = sp.loc[(sp["test_year"] == srow.test_year) & (sp["view"] == srow.view) & (sp["bundle"] == srow.bundle) & (sp["method"] == srow.method) & (sp["target_ord"] == v)].set_index("row")["final_q3"]
+            add(f"heldout_rebuild_{srow.test_year}_{srow.view}_{pr.scoring_month}", np.allclose(final.reindex(saved.index).to_numpy(), saved.to_numpy(), atol=1e-12))
+
+    # (7) saved final models reproduce saved raw predictions
+    import xgboost as xgb
+
+    inv = read(out / "models" / "model_inventory.csv")
+    schema = _json.loads((out / "features" / "feature_schema.json").read_text())
+    fmats = {}
+    target_col = {"q2": "q2_raw", "q4": "q4_raw", "q5": "q5_raw"}
+    for (job_id, view), g in inv.groupby(["job_id", "view"]):
+        st = status_by.loc[(job_id, view)]
+        h = int(st["horizon"])
+        if h not in fmats:
+            fmats[h] = read(out / "features" / f"feature_matrix_h{h:02d}.csv.gz")
+        arm = "D" if str(view).startswith("D") else view
+        cols = schema[f"h{h:02d}_{arm}"]
+        pr = preds.loc[(preds["job_id"] == job_id) & (preds["view"] == view) & preds["reused_from"].isna()] if "reused_from" in preds else preds.loc[(preds["job_id"] == job_id) & (preds["view"] == view)]
+        X = pr[["area_id", "target_ord"]].merge(fmats[h], on=["area_id", "target_ord"], how="left")[cols].to_numpy(dtype=np.float32)
+        out_pred = {}
+        for r in g.itertuples(index=False):
+            path = out / "models" / r.path
+            add(f"model_hash_{r.path}", __import__("hashlib").sha256(path.read_bytes()).hexdigest() == r.sha256)
+            if r.kind == "xgboost":
+                m = xgb.XGBRegressor()
+                m.load_model(str(path))
+                out_pred[r.target] = m.predict(X).astype(np.float64)
+            else:
+                out_pred[r.target] = np.full(len(X), _json.loads(path.read_text())["value"])
+        for t, col in target_col.items():
+            if t in out_pred:
+                add(f"model_predicts_{job_id}_{view}_{t}", np.allclose(out_pred[t], pr[col].to_numpy(), atol=1e-6))
+        if "q3_direct" in out_pred:
+            direct = out_pred["q3_direct"]
+            if "q3_residual_delta" in out_pred:
+                recon = np.where(pr["branch"].to_numpy() == "residual", pr["baseline_q3"].to_numpy() + out_pred["q3_residual_delta"], direct)
+            else:
+                recon = direct
+            add(f"model_predicts_{job_id}_{view}_q3", np.allclose(recon, pr["q3_raw"].to_numpy(), atol=1e-6))
 
     checks = pd.DataFrame(checks)
     (out / "metrics").mkdir(exist_ok=True)

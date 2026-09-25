@@ -185,3 +185,29 @@ def test_paired_share_bootstrap_deterministic_and_shared():
     assert same["rmse"]["point"] == 0 and same["rmse"]["ci_low"] == same["rmse"]["ci_high"] == 0
     one = qe.paired_share_bootstrap(f.loc[f["area_id"] == 1], "q3", "actual_crisis", "a", "b", 50, 42)
     assert one["r2"]["status"] == "unavailable"
+
+
+def test_constant_truth_r2_is_undefined_despite_roundoff():
+    truth = np.array([0.1, 0.1, 0.1]) * 3 / 3
+    m = qe.share_metrics(truth, np.array([0.2, 0.1, 0.0]))
+    assert np.isnan(m["r2"]) and m["rmse"] > 0
+    weighted = qe.share_metrics(np.array([0.1, 0.1, 0.4]), np.array([0.1, 0.2, 0.4]), np.array([2.0, 1.0, 0.0]))
+    assert np.isnan(weighted["r2"])  # active (positive-weight) truths are identical
+
+
+def test_legacy_multiclass_macro_f1_is_separate_from_binary():
+    frame = pd.DataFrame({"area_id": [1, 2, 3, 4], "target_ord": [1] * 4, "q3": [0.1, 0.3, 0.5, 0.05], "actual_crisis": [0, 1, 1, 0], "overall_phase": [2, 3, 4, 1],
+                          "q3_raw": [0.1, 0.3, 0.5, 0.05], "q3_final": [0.1, 0.3, 0.5, 0.05], "q2_raw": [0.5, 0.6, 0.9, 0.1], "q4_raw": [0.0, 0.0, 0.3, 0.0], "q5_raw": [0.0] * 4, "clipped": [False] * 4, "branch": ["direct"] * 4})
+    out = qe.model_view_metrics(frame)
+    assert out["legacy_multiclass_macro_f1"] == pytest.approx(1.0)
+    assert out["legacy_f1"] == pytest.approx(1.0) and "legacy_multiclass_macro_f1" != "legacy_f1"
+
+
+def test_mapping_records_fit_rows_and_isotonic_knots():
+    raw, truth = np.array([0.3, 0.4, 0.5, 0.6]), np.array([0.2, 0.3, 0.4, 0.5])
+    m = qo.fit_mapping("isotonic", raw, truth, np.array([1, 1, 2, 2]), 2)
+    m.fit_rows = (5, 6, 7, 8)
+    d = m.describe()
+    import json
+
+    assert json.loads(d["fit_rows"]) == [5, 6, 7, 8] and len(json.loads(d["isotonic_x"])) == d["isotonic_thresholds"]
