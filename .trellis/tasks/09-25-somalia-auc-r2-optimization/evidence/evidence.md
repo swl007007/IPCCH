@@ -6,15 +6,20 @@ Evidence Status: Ready. Validation Status: Executed.
 
 | Item | Code | Command | Outcome |
 |---|---|---|---|
-| Evidence run | `244f212` (only this task's `task.json` dirty; `run_manifest.json`) | `PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python -u -W ignore scripts/modeling/run_somalia_q3_optimization.py --workers 12 --overwrite` | exit 0, 534 s; 288 H0 OOF fits, 95 receiving-horizon OOF fits, 95 final fits |
-| Reproducibility | first run at `d1509a8` (differs only in report text/status metadata) | same CLI, 14 workers | final predictions, metrics, candidate scores and selected recipes byte-identical |
-| Replay | `244f212` | `scripts/postprocessing/replay_somalia_q3.py` | 426/426 checks (`replay_checks.csv`) |
+| Evidence run (current) | `d75378d`, clean tree (`run_manifest.json`) | `PYTHONPATH=src ~/.venvs/ipcch-geo/bin/python -u -W ignore scripts/modeling/run_somalia_q3_optimization.py --workers 12 --overwrite` | exit 0, 562 s; 288 H0 OOF fits, 95 receiving OOF fits, 95 final fits; 400 saved final models (`model_inventory.csv`); 156,389 saved OOF predictions |
+| Replay (current) | `d75378d` | `scripts/postprocessing/replay_somalia_q3.py` | 1428/1428 checks: candidate scores, selection, primary metrics, chronology, bootstrap, calibration mappings rebuilt from saved OOF predictions (fit rows, shifts, isotonic knots), held-out calibrated scores rebuilt, saved-model predictions reproduced (`replay_checks.csv`) |
+| Reproducibility | runs at `d1509a8`, `244f212`, `d75378d` | same CLI | every metric identical (max difference 0.0); selected recipes identical |
 | Cohort gate | `d1509a8` | `--prepare-only` | cohort ledger identical to v1 |
-| Unit tests | — | `pytest tests/unit/test_somalia_q3opt.py` | 13 passed |
-| Smoke | — | `pytest tests/smoke/test_somalia_q3opt_pipeline.py` | 1 passed |
-| Full suite | — | `pytest tests` | 12 failed / 250 passed; the 12 failures are the pre-existing baseline (alert-risk maps, launch CLI) |
+| Unit tests | `d75378d` | `pytest tests/unit/test_somalia_q3opt.py` | 16 passed |
+| Smoke | `d75378d` | `pytest tests/smoke/test_somalia_q3opt_pipeline.py` | 1 passed (includes replay on synthetic run) |
+| Full suite | `244f212` | `pytest tests` | 12 failed / 250 passed; the 12 failures are the pre-existing baseline |
 
-An intermediate rerun concurrently with the full pytest suite died with `BrokenProcessPool` (memory contention on the 15 GB machine); it wrote no outputs over the saved run. The evidence run above was executed alone.
+An intermediate rerun concurrently with the full pytest suite died with `BrokenProcessPool` (memory contention); evidence runs were executed alone.
+
+## Audit history
+
+- Codex gpt-6-astra (reasoning high) manual spot-audit and manual close-audit of completion `1ad393e` (`audits/spot_audit_1.json`, `audits/close_audit_manual_1.json`): both `incomplete` with two major evidence-retention findings (calibration OOF inputs/mapping parameters and final models not persisted) and minor findings (D_selected tie-set composition, constant-truth R², missing multiclass macro-F1). No numerical error in reported metrics or selected recipes was found. All findings addressed in `d75378d`; the current evidence run and replay above cover them.
+- Controller close (`trellis-audit close`) is blocked: the active run `b909fb2c` is bound to Claude session `5ac278d6…`, while this pane now runs session `4816e4c6…`; the controller refuses executor replacement during an active run. Resolution requires the user (re-register/recover). The manual Codex audits were run with the same Skill outside the controller.
 
 ## Acceptance mapping (PRD acceptance list)
 
@@ -41,4 +46,4 @@ An intermediate rerun concurrently with the full pytest suite died with `BrokenP
 - 2026 H0: D-selected (residual) R² 0.062, RMSE 17.34 pp, bias −5.4 pp, worse than D-direct (0.213) and share persistence (0.220): ΔR² vs persistence −0.158 [−0.207, −0.109]. The training-period validation choice did not transfer to April 2026; D-direct matches v1 calibrated D (ΔR² −0.002 [−0.024, 0.020]).
 - H12 residual transfers poorly (2025 R² −0.90; 2026 −1.65, strong negative bias); these are ancillary results, not optimized.
 - 2026 H3/H6 primary cohorts remain empty (no verified oracle weather).
-- Minor check notes addressed in `244f212`; the fallback-branch mapping is fitted on all direct OOF rows of its calibration months (disclosed in the report).
+- Minor check notes addressed in `244f212`; audit findings addressed in `d75378d`. The fallback-branch mapping is fitted on all direct OOF rows of its calibration months (disclosed in the report). Legacy multiclass macro-F1 at H0: 2025 D-selected 0.335, 2026 0.282.

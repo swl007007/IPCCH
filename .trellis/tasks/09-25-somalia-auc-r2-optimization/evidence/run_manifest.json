@@ -1,10 +1,8 @@
 {
  "experiment": "somalia_oracle_v2_q3",
  "task": "somalia-auc-r2-optimization",
- "git_head": "244f2129b54b956809de2c282b9bb4d372650bde",
- "git_dirty": [
-  " M .trellis/tasks/09-25-somalia-auc-r2-optimization/task.json"
- ],
+ "git_head": "d75378d9a2dec8b1341014b17c46e34c1d38b064",
+ "git_dirty": [],
  "runtime": {
   "python": "3.12.3",
   "numpy": "2.4.4",
@@ -54,12 +52,57 @@
   "sha256": "9d572793a3815baa42aa8c85a3304b0cc5aef8b52f191b1f7d3b7924aca9ef0f"
  },
  "mode": "full",
- "elapsed_seconds": 534.1305952072144,
+ "elapsed_seconds": 561.5824973583221,
  "written": {
   "cohort_ledger": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/cohort_ledger.csv.gz",
    "rows": 11124,
-   "sha256": "f6561dfa32ea9c4d84b299fc6d49563bd05bbfdad2899fdaca5953f48ccd8a0b"
+   "sha256": "9bd76cffbfacd71b56f15b3fcc1fc19b7e77332ac98810e918db0fc7009eb95a"
+  },
+  "label_ledger": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/label_ledger.csv.gz",
+   "rows": 6759,
+   "sha256": "ae512fb6db95afe81059107109c2548e08b0f37e8c5137b9ba422814571b50a2"
+  },
+  "row_provenance_h00": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/row_provenance_h00.csv.gz",
+   "rows": 5837,
+   "sha256": "01c02e9e6a159d7640b501b1da460fbad602eb286a75904b2fd4b5cba72e3ffb"
+  },
+  "feature_matrix_h00": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/features/feature_matrix_h00.csv.gz",
+   "rows": 5837,
+   "sha256": "011a225c32aa79bf7696786aae106a6efcd4dd8deba14a09b8e84fdaf2784e39"
+  },
+  "row_provenance_h03": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/row_provenance_h03.csv.gz",
+   "rows": 5837,
+   "sha256": "a484672c1a80d32bb30277c2403401fcedf48a8111777c9de7f8db95c2025b03"
+  },
+  "feature_matrix_h03": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/features/feature_matrix_h03.csv.gz",
+   "rows": 5837,
+   "sha256": "9cab3449d000b66e25102cf4382a73a53eb54dc8ce0b1bb7a74321d4dfddb571"
+  },
+  "row_provenance_h06": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/row_provenance_h06.csv.gz",
+   "rows": 5837,
+   "sha256": "137b94efd46915ca7ad027311d1485933c2adf145c53535db3ae2a5ce2a915bc"
+  },
+  "feature_matrix_h06": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/features/feature_matrix_h06.csv.gz",
+   "rows": 5837,
+   "sha256": "79afd1839b761825c832827641595fef7b15cef11a76ba0b91c9d6ef827ec8bc"
+  },
+  "row_provenance_h12": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/ledgers/row_provenance_h12.csv.gz",
+   "rows": 5837,
+   "sha256": "d0631c73db5ec34772ede35fa69942f2f0821549f925077f8af5a208cbbd61ec"
+  },
+  "feature_matrix_h12": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/features/feature_matrix_h12.csv.gz",
+   "rows": 5837,
+   "sha256": "f7bca9277a4c6afaed44a19fe84a87e6c825b2d84a4a0a7bec6bdbf023fb4a33"
   },
   "candidate_scores": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/candidate_scores.csv",
@@ -69,7 +112,7 @@
   "scoring_predictions": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/scoring_predictions.csv.gz",
    "rows": 146232,
-   "sha256": "ac1acdba47813f8d4c440ec38b430b7c992d0ae67454fbf4da929285883a4359"
+   "sha256": "188747fd9ed8bd510f05f1d01ab85d3c7da5998d94a53fcc40a471bf605485a2"
   },
   "selected_recipes": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/selected_recipes.csv",
@@ -81,30 +124,40 @@
    "rows": 383,
    "sha256": "65f7e70ed9e143c87e981387fe5ea6098f34679c6888d5788aa3f69eb4c2fe1c"
   },
+  "oof_predictions": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/selection/oof_predictions.csv.gz",
+   "rows": 156389,
+   "sha256": "bf294ba580f48fc8c42f55d43ee6e2c1f90f2d4a2678ccfa771ec6e09eb0ca99"
+  },
   "final_predictions": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/predictions/final_predictions.csv.gz",
    "rows": 66720,
-   "sha256": "eda37a4ae384deb7af275da39579aca6e756a683d873ffd2cd8bfd6f2212c5c3"
+   "sha256": "db9abf8eb8837cc90d661413fdd0bd08dfdea407e91e319280dd51fd81b2470e"
   },
   "final_status": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/final_status.csv",
    "rows": 115,
-   "sha256": "b534aef8020aaab2d50643e67d9a80ee5b2c163217bc6005dfbe48ee8d5e84b5"
+   "sha256": "27970cfac283ab024775761f52c225dc59bb5dfe668024f790ec32e441aa4134"
   },
   "mappings": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/calibration_mappings.csv",
    "rows": 115,
-   "sha256": "572bce23672023b09f3b3b522e2cb7a9994753ec72a4b5221ff91c3f9a3db0d3"
+   "sha256": "01b2a1e3ab778cbf1cc1a4fc09d89e633be9e34a10983741f34d8796a68fb7ac"
   },
   "final_fit_ledger": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/fits/final_fit_ledger.csv.gz",
    "rows": 297973,
-   "sha256": "475cbf7b29fe6aec505ff1265847f99b7b43f69571e950a8e5fd366fb1416b56"
+   "sha256": "a92496980c407795d309213fab9990d7e836d1819293349e8a74610e4eb9ba4c"
+  },
+  "model_inventory": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/models/model_inventory.csv",
+   "rows": 400,
+   "sha256": "f0760e3db6936bdd551aaf493a6167cc06dd17ca93532df7f0005fd23061587c"
   },
   "metrics": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/metrics.csv",
    "rows": 140,
-   "sha256": "d28e834b3ff99efc734160d24585201c653898063c91e571eadf623a0d632d10"
+   "sha256": "987d6c543aff6fbadbbdc0f5c40b66c0250800373e68f38b85fe66ac14aefbf9"
   },
   "contrasts": {
    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/somalia_oracle/v2_q3/metrics/contrasts.csv",

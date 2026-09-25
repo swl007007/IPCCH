@@ -1,6 +1,6 @@
 # Somalia q3-first optimization (v2_q3) — results
 
-Code `244f2129b54b956809de2c282b9bb4d372650bde`; xgboost 3.2.0. D is the main specification; A–C are baselines. H0 recipes were selected by pooled held-out final-q3 RMSE on training-window chronological OOF predictions only (AUC breaks numerical ties). H3/H6/H12 are ancillary fixed-recipe refits whose recipes used labels later than their origins (disclosed leakage); they are not optimized or ranked. 2025/2026 outcomes were inspected in v1, so these are retrospective comparisons, not an untouched holdout.
+Code `d75378d9a2dec8b1341014b17c46e34c1d38b064`; xgboost 3.2.0. D is the main specification; A–C are baselines. H0 recipes were selected by pooled held-out final-q3 RMSE on training-window chronological OOF predictions only (AUC breaks numerical ties). H3/H6/H12 are ancillary fixed-recipe refits whose recipes used labels later than their origins (disclosed leakage); they are not optimized or ranked. 2025/2026 outcomes were inspected in v1, so these are retrospective comparisons, not an untouched holdout.
 
 ## Selected H0 recipes
 
