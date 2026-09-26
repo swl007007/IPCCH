@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "task": "somalia-validity-label-augmentation",
+  "validity_snapshot": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step0_Initialization_and_construct_Scaffold/curl_new_data/outputs/areas_combined_2026-05-15.geojson",
+  "validity_snapshot_sha256": "f5418154a0aafd8d353fb0ce1f379ba5f95cad212725d4961bc90d5d52016214",
+  "api_filter": {"country": "SO", "condition": "A", "ipc_period": "C"},
+  "augmentation_years": [2022, 2026],
+  "excluded_raw_months": {"2025-07": "cross-border nearest-centroid spillover (research.md)"},
+  "q3_config": "configs/somalia_q3_optimization.json",
+  "q3_config_sha256": "581cb2a90eb66c76ae85b10b8e1c5f24a9c0863a1c0e48e6218eca0e4b50bbc6",
+  "selection_rounds": 3,
+  "min_selection_rounds": 2,
+  "calibration_rounds": 3,
+  "min_calibration_rounds": 2,
+  "branches": ["original", "augmented"],
+  "bootstrap": {"draws": 2000, "seed": 42}
+}
