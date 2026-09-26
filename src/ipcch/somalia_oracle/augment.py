@@ -103,7 +103,12 @@ def augment_labels(raw: pd.DataFrame, links: pd.DataFrame, year_range: Tuple[int
     keys = raw.set_index(["area_id", "target_ord"])
     candidates = []
     linked = links.loc[links["link_status"] == "linked"]
-    originals = raw.loc[full]
+    # An augmentable source must pass the existing target/phase QC (valid reported phase,
+    # finite nonnegative shares with a positive sum); other complete blocks are not copied.
+    vals = raw[list(PERCENT_COLUMNS)].to_numpy(dtype=float)
+    qc_ok = full & raw["overall_phase"].isin([1, 2, 3, 4, 5]).to_numpy() & np.isfinite(vals).all(axis=1) & (vals >= 0).all(axis=1) & (np.nan_to_num(vals).sum(axis=1) > 0)
+    raw["source_qc_ok"] = qc_ok
+    originals = raw.loc[qc_ok]
     for link in linked.itertuples(index=False):
         src = originals.loc[originals["target_ord"] == link.original_month_ord]
         months = [m for m in range(int(link.valid_from_ord), int(link.valid_to_ord) + 1) if m != link.original_month_ord and lo <= m <= hi]
@@ -111,9 +116,17 @@ def augment_labels(raw: pd.DataFrame, links: pd.DataFrame, year_range: Tuple[int
             for rec in src.itertuples(index=False):
                 candidates.append({"area_id": rec.area_id, "target_ord": m, "original_month_ord": int(link.original_month_ord), "anl_id": link.anl_id, **{f: getattr(rec, f) for f in LABEL_FIELDS}})
     cand = pd.DataFrame(candidates)
-    decisions = []
+    decisions: List[Dict[str, object]] = []
+    invalid_src = raw.loc[full & ~qc_ok]
+    for link in linked.itertuples(index=False):
+        bad = invalid_src.loc[invalid_src["target_ord"] == link.original_month_ord]
+        for rec in bad.itertuples(index=False):
+            for m in range(int(link.valid_from_ord), int(link.valid_to_ord) + 1):
+                if m != link.original_month_ord and lo <= m <= hi:
+                    decisions.append({"area_id": rec.area_id, "target_ord": m, "n_candidates": 1, "candidates": f"{sd.ord_label(link.original_month_ord)}:{link.anl_id}", "decision": "source_invalid", "winner_month_ord": -1})
     if cand.empty:
-        return raw, pd.DataFrame(columns=["area_id", "target_ord", "decision"])
+        raw["source_available_ord"] = np.where(raw["original_month_ord"] >= 0, raw["original_month_ord"], -1)
+        return raw, pd.DataFrame(decisions, columns=["area_id", "target_ord", "n_candidates", "candidates", "decision", "winner_month_ord"])
     for (area, m), g in cand.groupby(["area_id", "target_ord"], sort=True):
         base = {"area_id": area, "target_ord": m, "n_candidates": len(g), "candidates": ";".join(f"{sd.ord_label(o)}:{a}" for o, a in zip(g["original_month_ord"], g["anl_id"]))}
         if (area, m) not in keys.index:

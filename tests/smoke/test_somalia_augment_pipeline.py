@@ -65,6 +65,10 @@ def test_augmentation_cli_end_to_end_synthetic(tmp_path, configs, monkeypatch):
     deep_path = _deep(inputs, tmp_path)
     from ipcch.somalia_oracle import monthly_features as mf
 
+    for name in ("fs0", "fs1", "fs2"):  # synthetic scope files mirror the H12 columns used below
+        f = pd.read_csv(inputs[name])
+        f3 = pd.read_csv(inputs["fs3"])
+        f.merge(f3[["area_id", "year", "month", "feat__l12"]], on=["area_id", "year", "month"], how="left").to_csv(inputs[name], index=False)
     orig_scope = mf.scope_frame
     monkeypatch.setattr(mf, "scope_frame", lambda deep, h: orig_scope(deep, 12))  # synthetic panel has no upstream scope columns
     monkeypatch.setattr(mf, "parity_check", lambda rec, ref, skip: pd.DataFrame({"column": ["x"], "status": ["ok"], "n_mismatch": [0]}))

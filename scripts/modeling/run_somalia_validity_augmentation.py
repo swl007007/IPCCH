@@ -90,6 +90,7 @@ def main(argv=None):
     written["cohort"] = write(prep.cohort, out / "ledgers" / "cohort_ledger.csv.gz")
     written["jobs"] = write(prep.jobs, out / "ledgers" / "jobs.csv")
     written["feature_parity"] = write(prep.parity, out / "ledgers" / "feature_parity.csv")
+    written["label_diff_raw_vs_fs"] = write(prep.label_diff, out / "ledgers" / "label_diff_raw_vs_fs.csv.gz")
     fam = prep.ledger.groupby("source_family").agg(n_rows=("target_ord", "size"), n_copies=("is_copy", "sum"), original_month=("original_month_ord", "first")).reset_index()
     written["source_families"] = write(fam, out / "ledgers" / "source_families.csv")
     for h, f in prep.frames.items():
@@ -273,7 +274,7 @@ def evaluate(prep, preds, cfg):
         f = prep.frames[h]
         truth = primary.merge(f[["area_id", "target_ord", "q3", "actual_crisis", "overall_phase", "hist_q3_obs1", "history_obs1_source_ord", "persistence_available", "persistence_phase"]], on=["area_id", "target_ord"])
         share_ok = (np.isfinite(truth["hist_q3_obs1"]) & (truth["history_obs1_source_ord"] >= 0)).to_numpy()
-        views = {}
+        views, rowstatus = {}, {}
         for branch in ax.BRANCHES:
             for view in ax.MODEL_VIEWS:
                 p = preds.loc[(preds["test_year"] == year) & (preds["horizon"] == h) & (preds["label_branch"] == branch) & (preds["view"] == view)]
@@ -286,6 +287,7 @@ def evaluate(prep, preds, cfg):
                     m = m.assign(q3_final=np.clip(m["q3_raw"], 0, 1), clipped=np.clip(m["q3_raw"], 0, 1) != m["q3_raw"])
                     st = "calibrated_unavailable"
                 views[(branch, view)] = m
+                rowstatus[f"{branch}_{view}"] = st
                 rows.append({**base, "cohort": "primary", "branch": branch, "view": view, "status": st, "reason": None, **qe.model_view_metrics(m)})
                 if share_ok.any():
                     rows.append({**base, "cohort": "share_history_subset", "branch": branch, "view": view, "status": st, **qe.model_view_metrics(m.loc[share_ok])})
@@ -308,6 +310,8 @@ def evaluate(prep, preds, cfg):
                 s = views[(branch, "D_selected")].loc[share_ok]
                 pairs.append((f"{branch}_D_selected-share_persistence", "share_history_subset", s.assign(b=s["hist_q3_obs1"].to_numpy())))
         for name, cname, fr in pairs:
+            first, second = name.split("-", 1)
+            side_status = lambda s: "ok" if s == "share_persistence" else rowstatus.get(s, "unknown")
             res = qe.paired_share_bootstrap(fr, "q3", "actual_crisis", "q3_final", "b", draws, seed)
             key = f"y{year}_h{h:02d}_{name}"
             arrays[f"{key}__areas"] = res["areas"]
@@ -317,7 +321,8 @@ def evaluate(prep, preds, cfg):
                 e = res[metric]
                 if "draws" in e:
                     arrays[f"{key}__{metric}"] = e["draws"]
-                crows.append({"test_year": year, "horizon": h, "cohort": cname, "contrast": name, "metric": metric, "n": res["n"], "n_areas": res["n_areas"], "point_delta": e["point"], "ci_low": e["ci_low"], "ci_high": e["ci_high"], "interval_status": e["status"], "interval_reason": e["reason"]})
+                crows.append({"test_year": year, "horizon": h, "cohort": cname, "contrast": name, "metric": metric, "n": res["n"], "n_areas": res["n_areas"], "point_delta": e["point"], "ci_low": e["ci_low"], "ci_high": e["ci_high"], "interval_status": e["status"], "interval_reason": e["reason"],
+                              "first_calibration": side_status(first), "second_calibration": side_status(second), "diagnostic_only": side_status(first) != "ok" or side_status(second) != "ok"})
     return pd.DataFrame(rows), pd.DataFrame(crows), arrays
 
 
@@ -347,6 +352,11 @@ def write_report(metrics, contrasts, selected, prep, path, manifest):
     lines += ["", "## Paired area-cluster bootstrap (2,000 draws, PCG64(42)); Δ = first minus second", "", "| Year | H | Contrast | Metric | Δ | 95% interval |", "|---|---|---|---|---:|---|"]
     for r in contrasts.itertuples(index=False):
         lines.append(f"| {r.test_year} | {r.horizon} | {r.contrast} | {r.metric} | {_f(r.point_delta, 4)} | {'[' + _f(r.ci_low, 4) + ', ' + _f(r.ci_high, 4) + ']' if r.interval_status == 'ok' else r.interval_reason} |")
+    diff = n.get("raw_vs_fs_label_diff", {})
+    lines += ["", "## Label source and support disclosures", "",
+              "Labels come from the raw panel. Raw vs target-corrected fs labels on shared Somalia keys (differing / shared): " + ", ".join(f"{y}: {int(d['differ'])}/{int(d['shared'])}" for y, d in sorted(diff.items())) + " (`ledgers/label_diff_raw_vs_fs.csv.gz`). The original branch therefore differs from v2 in labels as well as in report isolation.",
+              "Fold-2026 H0 selection/calibration rounds include 2025-07 (64 cross-border spillover rows, excluded from augmentation) and 2025-09 (4 rows); they satisfy the distinct-round rule but carry little Somalia-specific support.",
+              "At H12 early rounds have no history before T−12, so residual OOF fits are unsupported there and H12 residual/selected cells may be raw-clipped diagnostics (`calibrated_unavailable`); contrasts involving such cells are flagged `diagnostic_only` in `metrics/contrasts.csv`."]
     lines += ["", "Copied labels are validity-period copies of one assessment, not independent monthly observations; area resampling does not model shared report dependence. Labels come from the raw panel (v1/v2 used the target-corrected fs ledger), so v2 numbers are context, not an unchanged comparator. Climate-variable lineage was waived (2026-09-24)."]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

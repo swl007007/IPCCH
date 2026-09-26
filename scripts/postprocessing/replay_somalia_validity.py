@@ -78,7 +78,10 @@ def main(argv=None):
     oof = read(out / "selection" / "oof_fit_ledger.csv")
     ok = oof.loc[oof["status"] == "ok"]
     add("oof_labels_before_round_origin", ((ok["fit_max_target_ord"] <= ok["fit_label_cutoff"]) & (ok["fit_label_cutoff"] < ok["round"]) & (ok["fit_label_cutoff"] <= ok["round"] - ok["horizon"])).all())
-    add("oof_available_by_origin", (ok["available_by"] == ok["round"] - ok["horizon"]).all())
+    add("oof_available_by_origin", (ok["available_by"] == ok["round"] - ok["horizon"]).all() and (ok["pool_max_source_available_ord"] <= ok["available_by"]).all())
+    iso = [not (set(str(e).split(";")) & set(str(pf).split(";"))) for e, pf in zip(ok["excluded_families"], ok["pool_families"])]
+    add("oof_pools_exclude_round_families", all(iso))
+    add("original_branch_oof_pools_have_no_copies", (ok.loc[ok["branch"] == "original", "pool_n_copies"] == 0).all())
     fits = read(out / "fits" / "final_fit_ledger.csv.gz")
     status = read(out / "fits" / "final_status.csv")
     fm = fits.merge(status[["job_id", "branch", "view", "receiving_origin", "test_year"]].rename(columns={"branch": "label_branch"}), on=["job_id", "label_branch", "view"])
@@ -136,7 +139,8 @@ def main(argv=None):
         y = prov[int(s["horizon"])]["q3"].to_numpy()[g["row"].to_numpy()]
         add(f"mapping_rows_{r.job_id}_{r.branch}_{r.view}_{r.prediction_branch}", len(g) == len(rows))
         o = s["receiving_origin"]
-        add(f"mapping_rows_available_{r.job_id}_{r.branch}_{r.view}_{r.prediction_branch}", (g["target_ord"] <= ordl(o)).all())
+        avail = ledger.set_index(["area_id", "target_ord"])["source_available_ord"].reindex(pd.MultiIndex.from_frame(g[["area_id", "target_ord"]])).to_numpy()
+        add(f"mapping_rows_available_{r.job_id}_{r.branch}_{r.view}_{r.prediction_branch}", (g["target_ord"] <= ordl(o)).all() and (avail <= ordl(o)).all())
         if r.method == "shift":
             add(f"mapping_shift_{r.job_id}_{r.branch}_{r.view}_{r.prediction_branch}", np.isclose(np.mean(g["raw_q3"].to_numpy() - y), r.shift, atol=1e-12))
         else:

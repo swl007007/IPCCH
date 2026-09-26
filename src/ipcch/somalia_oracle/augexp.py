@@ -50,6 +50,7 @@ class AugPrepared:
     rounds_api: pd.DataFrame
     frames: Dict[int, pd.DataFrame]
     schemas: Dict[int, List[str]]
+    label_diff: pd.DataFrame
     cohort: pd.DataFrame
     jobs: pd.DataFrame
     parity: pd.DataFrame
@@ -141,6 +142,9 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
             raise AugExpError(f"H={h}: recovered monthly features differ from the saved fs file on valid keys")
         parity_rows.append(par)
         base_cols = [c for c in sd.base_feature_columns(scope) if c not in ("target_ord",)]
+        extra = sorted(set(base_cols) - set(ref.columns))
+        if extra:
+            raise AugExpError(f"H={h}: recovered predictors absent from the saved fs file: {extra[:5]}")
         cat = f"overall_phase_prev_observed_asof_s{h}"
         model = ledger.loc[ledger["valid_target"] & (ledger["target_ord"] // 12 >= FIRST_MODEL_YEAR)]
         frame = model.merge(scope[["area_id", "target_ord", *base_cols]], on=["area_id", "target_ord"], how="inner", validate="one_to_one")
@@ -196,7 +200,18 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
             for o, g in scorable.groupby("origin_ord"):
                 job_rows.append({"job_id": f"y{year}_h{h:02d}_o{sd.ord_label(o)}", "test_year": year, "horizon": h, "origin_ord": int(o), "n_eval_rows": len(g)})
         log(f"[prepare] H={h}: frame {frame.shape}, D width {len(schemas[h])}, parity bad cols {int((par['status'] != 'ok').sum())} ({time.time()-t0:.0f}s)")
+    fs_labels = pd.concat([sd.read_area_rows(input_paths[n], som, "area_id")[["area_id", "year", "month", *au.LABEL_FIELDS]] for n in ("fs0", "fs1")]).drop_duplicates(["area_id", "year", "month"])
+    fs_labels["target_ord"] = sd.month_ord(fs_labels["year"], fs_labels["month"])
+    diff = originals[["area_id", "target_ord", *au.LABEL_FIELDS]].merge(fs_labels[["area_id", "target_ord", *au.LABEL_FIELDS]], on=["area_id", "target_ord"], how="outer", suffixes=("_raw", "_fs"), indicator=True)
+    both = diff["_merge"] == "both"
+    a = diff[[f"{c}_raw" for c in au.LABEL_FIELDS]].to_numpy(dtype=float)
+    b = diff[[f"{c}_fs" for c in au.LABEL_FIELDS]].to_numpy(dtype=float)
+    diff["values_differ"] = both & ~np.isclose(a, b, atol=1e-9, equal_nan=True).all(axis=1)
+    diff["key_status"] = diff["_merge"].map({"both": "both", "left_only": "raw_only", "right_only": "fs_only"}).astype(str)
+    diff["year"] = diff["target_ord"] // 12
+    label_diff = diff.drop(columns="_merge")
     notes = {
+        "raw_vs_fs_label_diff": label_diff.groupby("year").agg(shared=("key_status", lambda s: int((s == "both").sum())), differ=("values_differ", "sum"), raw_only=("key_status", lambda s: int((s == "raw_only").sum())), fs_only=("key_status", lambda s: int((s == "fs_only").sum()))).to_dict("index"),
         "n_copies": n_add,
         "copies_by_month": ledger.loc[ledger["is_copy"]].groupby(ledger["target_ord"].map(sd.ord_label)).size().to_dict(),
         "decisions": decisions["decision"].value_counts().to_dict() if len(decisions) else {},
@@ -204,7 +219,7 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
     }
     hashes = {n: (sd.sha256_file(p) if hash_inputs else "not_computed") for n, p in input_paths.items()}
     hashes["validity_snapshot"] = cfg.get("validity_snapshot_sha256")
-    return AugPrepared(ledger, decisions, links, rounds_api, frames, schemas, pd.DataFrame(cohort_rows), pd.DataFrame(job_rows), pd.concat(parity_rows, ignore_index=True), hashes, notes)
+    return AugPrepared(ledger, decisions, links, rounds_api, frames, schemas, label_diff, pd.DataFrame(cohort_rows), pd.DataFrame(job_rows), pd.concat(parity_rows, ignore_index=True), hashes, notes)
 
 
 # --------------------------------------------------------------------------
@@ -332,7 +347,7 @@ def fit_predict_q3(h: int, formulation: str, bundle: str, fit_idx: np.ndarray, p
 
 def oof_task(t: Mapping[str, object]) -> Dict[str, object]:
     _, raw, info = fit_predict_q3(t["horizon"], t["formulation"], t["bundle"], np.asarray(t["fit_idx"]), np.asarray(t["pred_idx"]), t["weight_origin"])
-    return {**{k: t[k] for k in ("branch", "fold", "horizon", "formulation", "bundle", "round", "pool_hash", "fit_label_cutoff", "available_by")}, **info, "pred_idx": np.asarray(t["pred_idx"]), "raw_q3": raw}
+    return {**{k: t[k] for k in ("branch", "fold", "horizon", "formulation", "bundle", "round", "pool_hash", "fit_label_cutoff", "available_by", "excluded_families", "pool_families", "pool_max_source_available_ord", "pool_n_copies")}, **info, "pred_idx": np.asarray(t["pred_idx"]), "raw_q3": raw}
 
 
 def final_task(t: Mapping[str, object]) -> Dict[str, object]:
@@ -388,7 +403,7 @@ class RoundStore:
         k = self.key(res["branch"], res["fold"], res["horizon"], res["formulation"], res["bundle"], res["round"])
         self.data[k] = (res["pred_idx"], np.asarray(res["raw_q3"], dtype=float))
         self.status[k] = res["status"]
-        self.ledger.append({c: res.get(c) for c in ("branch", "fold", "horizon", "formulation", "bundle", "round", "pool_hash", "fit_label_cutoff", "available_by", "status", "n_fit", "n_fit_used", "fit_max_target_ord", "model_kind")})
+        self.ledger.append({c: res.get(c) for c in ("branch", "fold", "horizon", "formulation", "bundle", "round", "pool_hash", "fit_label_cutoff", "available_by", "excluded_families", "pool_families", "pool_max_source_available_ord", "pool_n_copies", "status", "n_fit", "n_fit_used", "fit_max_target_ord", "model_kind")})
 
     def ok(self, *k) -> bool:
         return self.status.get(self.key(*k)) == "ok"
@@ -399,8 +414,12 @@ class RoundStore:
 
 def oof_task_spec(frame, branch, fold, window, h, formulation, bundle, r) -> Dict[str, object]:
     fit_idx = round_pool(frame, branch, window, r, h)
+    fams = frame["source_family"].to_numpy()[fit_idx]
     return {"branch": branch, "fold": fold, "horizon": h, "formulation": formulation, "bundle": bundle, "round": r, "fit_idx": fit_idx, "pred_idx": round_rows(frame, branch, window, r),
-            "weight_origin": r - h, "pool_hash": pool_hash(fit_idx, frame), "fit_label_cutoff": qo.fit_cutoff(r, h), "available_by": r - h}
+            "weight_origin": r - h, "pool_hash": pool_hash(fit_idx, frame), "fit_label_cutoff": qo.fit_cutoff(r, h), "available_by": r - h,
+            "excluded_families": ";".join(round_families(frame, r)), "pool_families": ";".join(sorted(set(fams))),
+            "pool_max_source_available_ord": int(frame["source_available_ord"].to_numpy()[fit_idx].max()) if fit_idx.size else -1,
+            "pool_n_copies": int(frame["is_copy"].to_numpy()[fit_idx].sum())}
 
 
 def branch_round_predictions(store, frame, key_prefix, formulation, bundle, r):

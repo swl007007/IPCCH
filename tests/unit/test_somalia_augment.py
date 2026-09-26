@@ -134,3 +134,11 @@ def test_config_pins_snapshot_and_q3_contract():
     cfg = au.load_config()
     assert cfg["api_filter"] == {"country": "SO", "condition": "A", "ipc_period": "C"}
     assert cfg["selection_rounds"] == 3 and cfg["min_selection_rounds"] == 2 and "2025-07" in cfg["excluded_raw_months"]
+
+
+def test_invalid_original_is_not_an_augmentation_source():
+    bad = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # sentinel phase 0, zero-sum shares
+    raw = _raw([[1, M(2024, 1), *bad], [1, M(2024, 2), *BLANK]])
+    aug, led = au.augment_labels(raw, _links(M(2024, 1), M(2024, 1), M(2024, 2)), (2022, 2026))
+    assert not aug["is_copy"].any()
+    assert (led["decision"] == "source_invalid").sum() == 1
