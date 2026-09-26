@@ -54,3 +54,7 @@ Conclusion: under report isolation and round-level linking, validity-period copi
 - Fold-2026 selection rounds include 2025-07 (64 cross-border spillover rows) and 2025-09 (4 rows).
 - H12 residual OOF support is absent for early rounds; 12 contrast rows are flagged `diagnostic_only`.
 - Copies of one assessment are not independent observations; area-cluster bootstrap does not model shared report dependence.
+
+## Closure (2026-09-26)
+
+User instruction: "彻底关掉这个task，跳过audit". The task had already been archived by `trellis-audit close` (completion `0ca97fe`), which queued controller close-audit job `077d9615e4fc14c427b496ca`. Its Codex reviewer (attempt 1) exited without writing `result.json`, leaving the job in `attention` and pausing the controller queue. Under the user's explicit waiver, the job was marked `waived` in the controller state DB (no audit result exists; the gate was not open; DB backed up as `state.db.bak-20260926-before-waive`), and the reviewer's Herdr workspace was closed. No audit verdict is claimed for this task.
