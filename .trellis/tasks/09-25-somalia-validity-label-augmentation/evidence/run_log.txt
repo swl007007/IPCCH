@@ -1,0 +1,26 @@
+[23:47:41] [prepare] raw Somalia rows 177364 (9s)
+[23:47:47] [prepare] augmentation: 3789 copies; decisions {'filled': 3789, 'no_covariate_row': 1808, 'recipient_original': 49, 'source_invalid': 18}
+[23:48:44] [prepare] deep monthly panel (177364, 387) (72s)
+[23:48:49] [prepare] H=0: frame (9017, 1062), D width 997, parity bad cols 0 (78s)
+[23:48:54] [prepare] H=3: frame (9017, 1068), D width 1003, parity bad cols 0 (83s)
+[23:48:59] [prepare] H=6: frame (9017, 1074), D width 1009, parity bad cols 0 (87s)
+[23:49:02] [prepare] H=12: frame (9017, 939), D width 874, parity bad cols 0 (90s)
+[23:49:45] H0 OOF fits: 288
+[23:51:11] original 2025 D_direct: direct X1 shift rmse=0.15475
+[23:51:11] original 2025 D_residual: residual X1 isotonic rmse=0.15840
+[23:51:11] original 2025 D_selected: direct X1 shift rmse=0.15475
+[23:51:11] original 2026 D_direct: direct X6 shift rmse=0.11037
+[23:51:11] original 2026 D_residual: residual X4 shift rmse=0.11540
+[23:51:11] original 2026 D_selected: direct X6 shift rmse=0.11037
+[23:51:11] augmented 2025 D_direct: direct X1 none rmse=0.15458
+[23:51:11] augmented 2025 D_residual: residual X3 isotonic rmse=0.15722
+[23:51:11] augmented 2025 D_selected: direct X1 none rmse=0.15458
+[23:51:11] augmented 2026 D_direct: direct X3 isotonic rmse=0.12041
+[23:51:11] augmented 2026 D_residual: residual X2 shift rmse=0.11585
+[23:51:11] augmented 2026 D_selected: residual X2 shift rmse=0.11585
+[23:51:13] mapping OOF fits: 94
+[23:51:40] final fits: 120
+[23:59:07] done in 695s
+EXIT=0
+replay checks: 933/933 passed
+REPLAY_EXIT=0

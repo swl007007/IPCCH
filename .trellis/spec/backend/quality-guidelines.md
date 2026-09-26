@@ -70,3 +70,9 @@ silent sample changes, not crashes. Checks favour explicit contracts over conven
 - Reading saved float predictions with `pd.read_csv` default parsing can change the last bit and split isotonic-calibration ties; replays of saved scores must use `float_precision="round_trip"`.
 - Don't run the full pytest suite and a 12–14 worker XGBoost run concurrently on the 15 GB machine; the worker pool dies (`BrokenProcessPool`).
 - Training-period validation choices (e.g. residual vs direct q3) can fail to transfer to the outer year; always report non-selected formulations alongside the selected view.
+
+## Lessons from validity-label augmentation (2026-09-26)
+
+- Never reuse a column name for two meanings: the per-row prediction branch (`direct/residual/fallback_direct`) was overwritten by the label branch (`original/augmented`); keep them as separate columns (`branch` vs `label_branch`).
+- Augmentation sources must pass the same QC as supervised targets (sentinel phase 0 / zero-sum shares are complete but invalid blocks).
+- Upstream `build_multiscope_ipcch_features` functions can recover scope features for unlabeled months in memory; gate on exact parity with the saved fs files on valid keys.

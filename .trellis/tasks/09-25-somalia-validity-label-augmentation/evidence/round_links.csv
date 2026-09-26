@@ -1,0 +1,15 @@
+original_month_ord,original_month,link_status,reason,anl_id,valid_from_ord,valid_to_ord
+24264,2022-01,linked,,24755659,24264.0,24264.0
+24268,2022-05,linked,,25817951,24268.0,24268.0
+24270,2022-07,linked,,26601265,24270.0,24272.0
+24273,2022-10,linked,,26777665,24273.0,24275.0
+24276,2023-01,linked,,33607389,24276.0,24278.0
+24278,2023-03,linked,,54775925,24278.0,24278.0
+24283,2023-08,linked,,59090932,24283.0,24284.0
+24288,2024-01,linked,,65024769,24288.0,24290.0
+24294,2024-07,linked,,69455744,24294.0,24296.0
+24303,2025-04,no_current_round,no current analysis starts in this month,,,
+24306,2025-07,excluded,cross-border nearest-centroid spillover (research.md),,,
+24308,2025-09,no_current_round,no current analysis starts in this month,,,
+24309,2025-10,no_current_round,no current analysis starts in this month,,,
+24315,2026-04,linked,,87143416,24315.0,24317.0
