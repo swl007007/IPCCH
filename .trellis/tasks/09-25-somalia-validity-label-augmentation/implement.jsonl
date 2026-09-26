@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/09-25-somalia-validity-label-augmentation/research.md", "reason": "Source snapshot, label lineage, round links, feature recovery constraints"}
+{"file": ".trellis/tasks/archive/2026-09/09-25-somalia-auc-r2-optimization/design.md", "reason": "Inherited q3-first selection/calibration contract"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Leakage, lineage, replay and resource rules"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse somalia_oracle and upstream builders additively"}

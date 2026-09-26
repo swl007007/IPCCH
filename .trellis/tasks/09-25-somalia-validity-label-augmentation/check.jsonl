@@ -1,0 +1,4 @@
+{"file": ".trellis/tasks/09-25-somalia-validity-label-augmentation/research.md", "reason": "Evidence the implementation must match"}
+{"file": ".trellis/tasks/archive/2026-09/09-25-somalia-auc-r2-optimization/prd.md", "reason": "Inherited q3 acceptance behaviors"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Quality checklist"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Label ledger -> features -> pools -> metrics consistency"}
