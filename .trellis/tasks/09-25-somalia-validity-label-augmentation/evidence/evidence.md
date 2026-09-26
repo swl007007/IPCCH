@@ -10,6 +10,7 @@ Evidence Status: Ready. Validation Status: Executed.
 | Replay | `1f3bfce` | `scripts/postprocessing/replay_somalia_validity.py` | 933/933 checks (`replay_checks.csv`): augmentation rules vs raw panel, OOF/final isolation and availability, rounds, candidate scores and selection, mappings rebuilt from saved OOF predictions, primary metrics, identical outer keys, bootstrap, saved H0 models reproduce predictions |
 | Reproducibility | previous run at `4d8474d` (differs by check fixes that remove 18 invalid-source copies which never entered any fit) | same CLI | every metric identical (max difference 0.0) |
 | Unit / smoke | `1f3bfce` | `pytest tests/unit/test_somalia_augment.py tests/smoke/test_somalia_augment_pipeline.py` | 11 passed; 1 passed |
+| Full suite | `aa2b5a1` | `pytest tests` | 12 failed / 265 passed; the 12 failures are the known pre-existing baseline |
 | Feature parity gate | run | built into prepare | H0/H3/H6 recovered scope features and H12 deep features equal fs0/fs1/fs2/fs3 on all valid-phase keys (510/510/510/376 columns, 0 unmatched); 18 phase-0 fs1/fs2 rows excluded from the check |
 
 ## Acceptance mapping (PRD)
