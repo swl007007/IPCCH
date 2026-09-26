@@ -48,3 +48,7 @@ An intermediate rerun concurrently with the full pytest suite died with `BrokenP
 - H12 residual transfers poorly (2025 R² −0.90; 2026 −1.65, strong negative bias); these are ancillary results, not optimized.
 - 2026 H3/H6 primary cohorts remain empty (no verified oracle weather).
 - Minor check notes addressed in `244f212`; audit findings addressed in `d75378d`. The fallback-branch mapping is fitted on all direct OOF rows of its calibration months (disclosed in the report). Legacy multiclass macro-F1 at H0: 2025 D-selected 0.335, 2026 0.282.
+
+## Closure (2026-09-25)
+
+User instruction: "完全close掉现在这个task，任务已结束。授权跳过审计。" The controller close wrapper remained blocked by the executor-session change, so the task was closed with native Trellis `finish`/`archive` under this explicit waiver. No controller close-audit job exists for this task; the independent Codex re-audits above (spot pass, manual close pass) are the audit record. Controller run `b909fb2c` is left untouched and still shows `active` in the controller until the user recovers or re-registers it.
