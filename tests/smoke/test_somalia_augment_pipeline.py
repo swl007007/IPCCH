@@ -90,9 +90,10 @@ def test_augmentation_cli_end_to_end_synthetic(tmp_path, configs, monkeypatch):
     scores = pd.read_csv(out / "selection" / "candidate_scores.csv")
     assert scores.groupby("branch").size().nunique() == 1  # equal search budgets
     fits = pd.read_csv(out / "fits" / "final_fit_ledger.csv.gz")
-    assert not fits.loc[fits["branch"] == "original", "is_copy"].any()
+    assert not fits.loc[fits["label_branch"] == "original", "is_copy"].any()
     preds = pd.read_csv(out / "predictions" / "final_predictions.csv.gz")
-    k = preds.groupby(["job_id", "view", "branch"])["target_ord"].count().unstack("branch")
+    assert set(preds["branch"]) <= {"direct", "residual", "fallback_direct"}  # per-row prediction branch is preserved
+    k = preds.groupby(["job_id", "view", "label_branch"])["target_ord"].count().unstack("label_branch")
     assert (k["original"] == k["augmented"]).all()  # identical outer keys
     metrics = pd.read_csv(out / "metrics" / "metrics.csv")
     assert {"share_persistence", "phase_persistence", "always_crisis"} <= set(metrics["view"])

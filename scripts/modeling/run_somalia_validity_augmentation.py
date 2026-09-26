@@ -220,8 +220,10 @@ def main(argv=None):
         status_rows.append({**m, "status": res["status"], "calibration_status": res.get("calibration_status"), "calibration_reason": res.get("calibration_reason")})
         if res["status"] != "completed":
             continue
-        preds.append(res["predictions"].assign(**{k: m[k] for k in ("job_id", "branch", "view", "horizon", "test_year")}, calibration_status=res["calibration_status"]))
-        fits.append(res["fit_ledger"].assign(job_id=m["job_id"], branch=m["branch"], view=m["view"]))
+        # "branch" in predictions is the per-row prediction branch (direct/residual/fallback_direct);
+        # the label branch (original/augmented) is stored separately as "label_branch".
+        preds.append(res["predictions"].assign(**{k: m[k] for k in ("job_id", "view", "horizon", "test_year")}, label_branch=m["branch"], calibration_status=res["calibration_status"]))
+        fits.append(res["fit_ledger"].assign(job_id=m["job_id"], label_branch=m["branch"], view=m["view"]))
         for target, model in res["models"].items():
             if model is None:
                 continue
@@ -274,7 +276,7 @@ def evaluate(prep, preds, cfg):
         views = {}
         for branch in ax.BRANCHES:
             for view in ax.MODEL_VIEWS:
-                p = preds.loc[(preds["test_year"] == year) & (preds["horizon"] == h) & (preds["branch"] == branch) & (preds["view"] == view)]
+                p = preds.loc[(preds["test_year"] == year) & (preds["horizon"] == h) & (preds["label_branch"] == branch) & (preds["view"] == view)]
                 m = truth.merge(p[["area_id", "target_ord", "q2_raw", "q3_raw", "q4_raw", "q5_raw", "q3_final", "clipped", "branch", "calibration_status"]], on=["area_id", "target_ord"], how="left")
                 if m["q3_raw"].isna().any():
                     rows.append({**base, "cohort": "primary", "branch": branch, "view": view, "status": "incomplete", "reason": f"{int(m['q3_raw'].isna().sum())} keys without predictions"})
