@@ -45,10 +45,13 @@ def candidate_params(config: Mapping[str, object], candidate: Mapping[str, objec
     return params
 
 
-def decay_weights(target_ord: np.ndarray, fit_origin_ord: int, half_life: float = HALF_LIFE_MONTHS) -> np.ndarray:
+def decay_weights(target_ord: np.ndarray, fit_origin_ord: int, half_life: Optional[float] = HALF_LIFE_MONTHS) -> np.ndarray:
+    """``0.5 ** (age / half_life)``; ``half_life=None`` means no decay (every weight exactly 1)."""
     distance = int(fit_origin_ord) - np.asarray(target_ord, dtype=np.int64)
     if (distance < 0).any():
         raise ModelingError("a fitting label is after its fit origin")
+    if half_life is None:
+        return np.ones(distance.shape, dtype=np.float64)
     return np.power(0.5, distance.astype(np.float64) / float(half_life))
 
 

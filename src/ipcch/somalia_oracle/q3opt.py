@@ -389,8 +389,12 @@ def _bundle_ids(cfg) -> List[str]:
     return [c["id"] for c in _STATE["bundles"]["candidates"]]
 
 
-def select_candidate(scores: pd.DataFrame, tolerance: float, auc_defined: bool) -> Tuple[Optional[pd.Series], pd.DataFrame]:
-    """Strict minimum RMSE; AUC only inside the numerical tie set, then fixed order."""
+def select_candidate(scores: pd.DataFrame, tolerance: float, auc_defined: bool, extra_order: Sequence[str] = ()) -> Tuple[Optional[pd.Series], pd.DataFrame]:
+    """Strict minimum RMSE; AUC only inside the numerical tie set, then fixed order.
+
+    ``extra_order`` appends further ascending order columns after the formulation
+    order (v4: ``decay_order``); the legacy callers pass none.
+    """
     ok = scores.loc[scores["status"] == "ok"].copy()
     if ok.empty:
         return None, ok
@@ -399,8 +403,8 @@ def select_candidate(scores: pd.DataFrame, tolerance: float, auc_defined: bool) 
     keys, ascending = [], []
     if auc_defined and len(tie) > 1 and tie["auc"].notna().all():
         keys.append("auc"), ascending.append(False)
-    keys += ["method_order", "bundle_order", "formulation_order"]
-    ascending += [True, True, True]
+    keys += ["method_order", "bundle_order", "formulation_order", *extra_order]
+    ascending += [True] * (3 + len(extra_order))
     tie = tie.sort_values(keys, ascending=ascending, kind="mergesort")
     return tie.iloc[0], tie
 

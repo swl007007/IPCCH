@@ -23,7 +23,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 
-from ipcch.somalia_oracle import CUMULATIVE_COLUMNS, FOLDS, HORIZONS, PERCENT_COLUMNS, V2_FEATURES, oracle_feature_names
+from ipcch.somalia_oracle import CUMULATIVE_COLUMNS, FOLDS, HALF_LIFE_MONTHS, HORIZONS, PERCENT_COLUMNS, V2_FEATURES, oracle_feature_names
 from ipcch.somalia_oracle import augment as au
 from ipcch.somalia_oracle import data as sd
 from ipcch.somalia_oracle import history as hist
@@ -89,7 +89,10 @@ def persistence_with_cutoff(originals: pd.DataFrame, area: np.ndarray, origin: n
     return out
 
 
-def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=print, hash_inputs: bool = True, deep: Optional[pd.DataFrame] = None) -> AugPrepared:
+def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=print, hash_inputs: bool = True, deep: Optional[pd.DataFrame] = None,
+            first_model_year: Optional[int] = FIRST_MODEL_YEAR, folds: Mapping[int, Sequence[int]] = FOLDS) -> AugPrepared:
+    """``first_model_year=None`` keeps every valid label row (v4); ``folds`` drives the v3 cohort/jobs
+    (v4 passes ``{}`` and freezes its own per-setting cohorts)."""
     t0 = time.time()
     lookup = pd.read_csv(input_paths["lookup"])
     som = sd.somalia_area_ids(lookup)
@@ -146,7 +149,7 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
         if extra:
             raise AugExpError(f"H={h}: recovered predictors absent from the saved fs file: {extra[:5]}")
         cat = f"overall_phase_prev_observed_asof_s{h}"
-        model = ledger.loc[ledger["valid_target"] & (ledger["target_ord"] // 12 >= FIRST_MODEL_YEAR)]
+        model = ledger.loc[ledger["valid_target"] & ((ledger["target_ord"] // 12 >= first_model_year) if first_model_year is not None else True)]
         frame = model.merge(scope[["area_id", "target_ord", *base_cols]], on=["area_id", "target_ord"], how="inner", validate="one_to_one")
         if len(frame) != len(model):
             raise AugExpError(f"H={h}: {len(model) - len(frame)} label rows lack a monthly feature row")
@@ -182,7 +185,7 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
         frame["history_cutoff_ord"] = cutoff
         frames[h] = frame
         schemas[h] = list(base_cols) + list(V2_FEATURES) + oracle_feature_names(h) + history_names
-        for year, window in FOLDS.items():
+        for year, window in folds.items():
             test = ledger.loc[(ledger["target_ord"] // 12 == year) & ~ledger["is_copy"]]
             verified = dict(zip(zip(frame["area_id"], frame["target_ord"]), frame["oracle_all_verified"]))
             for r in test.itertuples(index=False):
@@ -320,7 +323,7 @@ def _baseline(frame: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     return b, ok
 
 
-def fit_predict_q3(h: int, formulation: str, bundle: str, fit_idx: np.ndarray, pred_idx: np.ndarray, weight_origin: int, keep_model: bool = False):
+def fit_predict_q3(h: int, formulation: str, bundle: str, fit_idx: np.ndarray, pred_idx: np.ndarray, weight_origin: int, keep_model: bool = False, half_life: Optional[float] = HALF_LIFE_MONTHS):
     frame = _STATE["frames"][h]
     X = _STATE["X"][h]
     q3 = frame["q3"].to_numpy(dtype=np.float64)
@@ -337,7 +340,7 @@ def fit_predict_q3(h: int, formulation: str, bundle: str, fit_idx: np.ndarray, p
     info.update(n_fit_used=int(fit_idx.size), fit_max_target_ord=int(months[fit_idx].max()) if fit_idx.size else None)
     if fit_idx.size == 0:
         return None, np.full(pred_idx.size, np.nan), {**info, "status": "unsupported"}
-    model = md.fit_regressor(X[fit_idx], y, md.decay_weights(months[fit_idx], weight_origin), _params(bundle, target), target)
+    model = md.fit_regressor(X[fit_idx], y, md.decay_weights(months[fit_idx], weight_origin, half_life), _params(bundle, target), target)
     raw = model.predict(X[pred_idx])
     if formulation == "residual":
         b, ok = _baseline(frame)
@@ -500,3 +503,501 @@ def score_view(store, frame, plan, key_prefix, formulation, cfg, bundles) -> Tup
                 p[k] = v
             preds.append(p)
     return pd.DataFrame(rows), (pd.concat(preds, ignore_index=True) if preds else pd.DataFrame())
+
+
+# ==========================================================================
+# v4 calibrated D (task somalia-v4-calibrated-d, design sections 3-7)
+#
+# Two label scenarios (``original`` observed labels only; ``augmented`` observed
+# labels plus permitted validity copies) in every label role, expanding annual
+# folds (all eligible labels through Y-1), independent origin-valid selection at
+# every horizon, and a 6 bundle x 4 decay x 2 formulation x 3 calibration search.
+#
+# Every OOF prediction is made by a *unit*: one fit on a pool fixed by a PoolSpec
+# (setting, horizon, label cutoff, source-availability cutoff, fold upper year,
+# excluded source families) for one (formulation, bundle, half-life). A row's pool
+# uses the row's own target month v: labels <= min(v-H, v-1), sources available
+# <= v-H, weights anchored at v-H, and it excludes the row's own family, the
+# scoring family it serves and the outer context's test families. Specs are
+# normalized (ineffective fold bound / exclusions dropped) so identical pools share
+# one fit; the normalized spec, not a legacy cache key, is the dependency identity.
+# ==========================================================================
+
+V4_HALF_LIVES: Tuple[Optional[int], ...] = (12, 24, 48, None)
+V4_DECAY_ORDER = {None: 0, 48: 1, 24: 2, 12: 3}  # deterministic tie order: no decay, 48, 24, 12
+
+
+def half_life_label(half_life: Optional[float]) -> str:
+    return "none" if half_life is None else str(int(half_life))
+
+
+def parse_half_life(label: str) -> Optional[int]:
+    return None if label in ("none", None) else int(label)
+
+
+@dataclass(frozen=True)
+class PoolSpec:
+    setting: str
+    horizon: int
+    label_cutoff: int
+    available_by: int
+    max_year: Optional[int]
+    excluded: Tuple[str, ...]
+
+    @property
+    def id(self) -> str:
+        text = json.dumps([self.setting, int(self.horizon), int(self.label_cutoff), int(self.available_by), self.max_year, list(self.excluded)])
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+    def describe(self) -> Dict[str, object]:
+        return {"spec_id": self.id, "setting": self.setting, "horizon": int(self.horizon), "label_cutoff_ord": int(self.label_cutoff), "available_by_ord": int(self.available_by),
+                "max_year": self.max_year, "excluded_families": ";".join(self.excluded)}
+
+
+class PoolIndex:
+    """Normalizes pool specifications of one (setting, horizon) frame and caches their rows."""
+
+    def __init__(self, frame: pd.DataFrame, setting: str, horizon: int):
+        self.setting, self.horizon = setting, int(horizon)
+        self.setting_mask = branch_mask(frame, setting)
+        self.target = frame["target_ord"].to_numpy(dtype=np.int64)
+        self.avail = frame["source_available_ord"].to_numpy(dtype=np.int64)
+        self.family = frame["source_family"].to_numpy(dtype=object)
+        self.target_year = self.target // 12
+        self.original_year = frame["original_month_ord"].to_numpy(dtype=np.int64) // 12
+        self._rows: Dict[PoolSpec, np.ndarray] = {}
+        self._memo: Dict[Tuple, PoolSpec] = {}
+
+    def normalize(self, label_cutoff: int, available_by: int, max_year: Optional[int], excluded: Sequence[str]) -> PoolSpec:
+        memo_key = (int(label_cutoff), int(available_by), max_year, frozenset(excluded))
+        if memo_key not in self._memo:
+            self._memo[memo_key] = self._normalize(label_cutoff, available_by, max_year, excluded)
+        return self._memo[memo_key]
+
+    def _normalize(self, label_cutoff: int, available_by: int, max_year: Optional[int], excluded: Sequence[str]) -> PoolSpec:
+        base = self.setting_mask & (self.target <= label_cutoff) & (self.avail <= available_by)
+        if max_year is not None and label_cutoff <= int(max_year) * 12 + 11:
+            max_year = None  # target <= cutoff already implies target and source year <= max_year
+        if max_year is not None:
+            base &= (self.target_year <= max_year) & (self.original_year <= max_year)
+        present = set(self.family[base])
+        eff = tuple(sorted(f for f in set(excluded) if f in present))
+        spec = PoolSpec(self.setting, self.horizon, int(label_cutoff), int(available_by), None if max_year is None else int(max_year), eff)
+        if spec not in self._rows:
+            m = base & ~np.isin(self.family, list(eff)) if eff else base
+            self._rows[spec] = np.flatnonzero(m)
+        return spec
+
+    def rows(self, spec: PoolSpec) -> np.ndarray:
+        return self._rows[spec]
+
+
+def v4_row_spec(pools: PoolIndex, v: int, h: int, max_year: int, excluded: Sequence[str]) -> PoolSpec:
+    """Pool for predicting a row with target month v at horizon h (its own origin v-h)."""
+    return pools.normalize(qo.fit_cutoff(v, h), int(v) - int(h), max_year, excluded)
+
+
+@dataclass
+class V4Context:
+    setting: str
+    year: int
+    horizon: int
+    origin: int
+    test_families: Tuple[str, ...]
+    status: str
+    reason: Optional[str]
+    rounds: List[int]
+    scoring: List[int]
+    members: pd.DataFrame  # row, round, target_ord, spec_id (scoring keys, frozen before scores)
+    calibration: pd.DataFrame  # scoring_round, scoring_target_ord, row, round, target_ord, spec_id
+    final_calibration: pd.DataFrame  # row, round, target_ord, spec_id
+    fit_spec: Optional[PoolSpec]
+    specs: Dict[str, PoolSpec]
+
+    @property
+    def selection_signature(self) -> str:
+        cols_m = self.members[["row", "round", "spec_id"]].to_numpy().tolist()
+        cols_c = self.calibration[["scoring_round", "scoring_target_ord", "row", "round", "spec_id"]].to_numpy().tolist()
+        text = json.dumps([self.setting, int(self.horizon), self.status, cols_m, cols_c], default=str)
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+
+    @property
+    def context_id(self) -> str:
+        return f"{self.setting}_y{self.year}_h{self.horizon:02d}_o{sd.ord_label(self.origin)}"
+
+
+def v4_label_mask(frame: pd.DataFrame, setting: str, year: int, origin: int, test_families: Sequence[str]) -> np.ndarray:
+    """Eligible supervised labels of an outer context: setting role, fold window (<= Y-1 for
+    recipient and source year), recipient target and source availability <= origin, no test family."""
+    m = branch_mask(frame, setting)
+    m &= (frame["target_year"].to_numpy() <= year - 1) & (frame["original_year"].to_numpy() <= year - 1)
+    m &= (frame["target_ord"].to_numpy() <= origin) & (frame["source_available_ord"].to_numpy() <= origin)
+    if len(test_families):
+        m &= ~frame["source_family"].isin(list(test_families)).to_numpy()
+    return m
+
+
+def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: int, h: int, origin: int, test_families: Sequence[str], cfg: Mapping[str, object]) -> V4Context:
+    """Frozen from label/pool support only, before any candidate is scored."""
+    test_families = tuple(sorted(set(test_families)))
+    max_year = year - 1
+    L = v4_label_mask(frame, setting, year, origin, test_families)
+    target = frame["target_ord"].to_numpy(dtype=np.int64)
+    rnd = frame["original_month_ord"].to_numpy(dtype=np.int64)
+    fam = frame["source_family"].to_numpy(dtype=object)
+    valid = frame["valid_score"].to_numpy(dtype=bool)
+    specs: Dict[str, PoolSpec] = {}
+
+    def spec_for(i: int, extra: Sequence[str]) -> PoolSpec:
+        sp = v4_row_spec(pools, int(target[i]), h, max_year, (*test_families, fam[i], *extra))
+        specs[sp.id] = sp
+        return sp
+
+    rounds = sorted(int(r) for r in np.unique(rnd[L]))
+    eligible = []
+    for r in rounds:
+        mem = np.flatnonzero(L & (rnd == r) & valid)
+        if mem.size and all(pools.rows(spec_for(i, ())).size > 0 for i in mem):
+            eligible.append(r)
+    scoring = eligible[-int(cfg["selection_rounds"]):]
+    members, cal_rows = [], []
+    for r in scoring:
+        mem = np.flatnonzero(L & (rnd == r) & valid)
+        for i in mem:
+            members.append({"row": int(i), "round": r, "target_ord": int(target[i]), "spec_id": spec_for(i, ()).id})
+        for v in sorted(set(int(x) for x in target[mem])):
+            chosen = 0
+            for c in reversed([c for c in rounds if c < r]):
+                lim = v - h
+                cand = np.flatnonzero(L & (rnd == c) & (target < v) & (target <= lim) & (frame["source_available_ord"].to_numpy() <= lim))
+                keep = [i for i in cand if pools.rows(spec_for(i, (fam[mem[0]],))).size > 0]
+                if not keep:
+                    continue
+                for i in keep:
+                    cal_rows.append({"scoring_round": r, "scoring_target_ord": v, "row": int(i), "round": c, "target_ord": int(target[i]), "spec_id": spec_for(i, (fam[mem[0]],)).id})
+                chosen += 1
+                if chosen >= int(cfg["calibration_rounds"]):
+                    break
+    final_rows, chosen = [], 0
+    for c in reversed(rounds):
+        cand = np.flatnonzero(L & (rnd == c))
+        keep = [i for i in cand if pools.rows(spec_for(i, ())).size > 0]
+        if not keep:
+            continue
+        final_rows += [{"row": int(i), "round": c, "target_ord": int(target[i]), "spec_id": spec_for(i, ()).id} for i in keep]
+        chosen += 1
+        if chosen >= int(cfg["calibration_rounds"]):
+            break
+    fit_spec = pools.normalize(origin, origin, max_year, test_families)
+    specs[fit_spec.id] = fit_spec
+    ok = len(scoring) >= int(cfg["min_selection_rounds"])
+    status, reason = ("ok", None) if ok else ("unsupported", f"{len(scoring)} supported selection rounds; {cfg['min_selection_rounds']} required")
+    if pools.rows(fit_spec).size == 0:
+        status, reason = "unsupported", "empty outer fitting pool"
+    cols_m, cols_c, cols_f = ["row", "round", "target_ord", "spec_id"], ["scoring_round", "scoring_target_ord", "row", "round", "target_ord", "spec_id"], ["row", "round", "target_ord", "spec_id"]
+    return V4Context(setting, year, h, origin, test_families, status, reason, rounds, scoring, pd.DataFrame(members, columns=cols_m), pd.DataFrame(cal_rows, columns=cols_c),
+                     pd.DataFrame(final_rows, columns=cols_f), fit_spec, specs)
+
+
+def v4_unit_key(spec_id: str, formulation: str, bundle: str, half_life: Optional[float]) -> Tuple[str, str, str, str]:
+    return (spec_id, formulation, bundle, half_life_label(half_life))
+
+
+def v4_unit_id(key: Tuple[str, str, str, str]) -> str:
+    return hashlib.sha256("|".join(key).encode("utf-8")).hexdigest()[:16]
+
+
+def v4_unit_task(t: Mapping[str, object]) -> Dict[str, object]:
+    """One OOF fit (worker)."""
+    fit_idx, pred_idx = np.asarray(t["fit_idx"]), np.asarray(t["pred_idx"])
+    hl = parse_half_life(t["half_life"])
+    _, raw, info = fit_predict_q3(t["horizon"], t["formulation"], t["bundle"], fit_idx, pred_idx, t["weight_origin"], half_life=hl)
+    frame = _STATE["frames"][t["horizon"]]
+    months = frame["target_ord"].to_numpy(dtype=np.int64)
+    used = fit_idx
+    if t["formulation"] == "residual":
+        _, ok = _baseline(frame)
+        used = fit_idx[ok[fit_idx]]
+    w = md.decay_weights(months[used], t["weight_origin"], hl) if used.size else np.array([])
+    return {"key": t["key"], "status": info["status"], "pred_idx": pred_idx, "raw_q3": np.asarray(raw, dtype=np.float64), "n_fit": info["n_fit"], "n_fit_used": info["n_fit_used"],
+            "fit_max_target_ord": info["fit_max_target_ord"], "model_kind": info.get("model_kind"), "sum_weight": float(w.sum()), "min_weight": float(w.min()) if w.size else np.nan}
+
+
+class V4UnitStore:
+    def __init__(self):
+        self.units: Dict[Tuple[str, str, str, str], Dict[str, object]] = {}
+
+    def add(self, res: Mapping[str, object]) -> None:
+        order = np.argsort(res["pred_idx"], kind="mergesort")
+        self.units[tuple(res["key"])] = {"status": res["status"], "rows": np.asarray(res["pred_idx"])[order], "raw": np.asarray(res["raw_q3"], dtype=np.float64)[order],
+                                          **{k: res[k] for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight")}}
+
+    def ok(self, key) -> bool:
+        return key in self.units and self.units[key]["status"] == "ok"
+
+    def raw(self, key, rows: np.ndarray) -> np.ndarray:
+        """Raw q3 for ``rows``; NaN where the unit is unsupported or a row was not requested."""
+        rows = np.asarray(rows, dtype=np.int64)
+        out = np.full(rows.size, np.nan)
+        u = self.units.get(key)
+        if u is None or u["status"] != "ok" or rows.size == 0:
+            return out
+        pos = np.searchsorted(u["rows"], rows)
+        hit = (pos < u["rows"].size) & (u["rows"][np.minimum(pos, u["rows"].size - 1)] == rows)
+        out[hit] = u["raw"][pos[hit]]
+        return out
+
+
+def v4_candidate_raw(store: V4UnitStore, rows: np.ndarray, spec_ids: np.ndarray, formulation: str, bundle: str, half_life) -> Tuple[np.ndarray, np.ndarray, bool]:
+    """Raw q3, prediction branch and whether every needed unit was fitted."""
+    raw = np.full(rows.size, np.nan)
+    lab = np.full(rows.size, "direct" if formulation == "direct" else "fallback_direct", dtype=object)
+    supported = True
+    for sid in np.unique(spec_ids):
+        sel = spec_ids == sid
+        dkey = v4_unit_key(sid, "direct", bundle, half_life)
+        supported &= store.ok(dkey)
+        d = store.raw(dkey, rows[sel])
+        if formulation == "direct":
+            raw[sel] = d
+            continue
+        rkey = v4_unit_key(sid, "residual", bundle, half_life)
+        supported &= store.ok(rkey)
+        r = store.raw(rkey, rows[sel])
+        raw[sel] = np.where(np.isfinite(r), r, d)
+        lab[sel] = np.where(np.isfinite(r), "residual", "fallback_direct")
+    return raw, lab, bool(supported)
+
+
+def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, formulation: str, bundle: str, half_life, method: str, min_rounds: int) -> Dict[str, qo.Q3Mapping]:
+    """Branch mappings fitted on calibration rows' own OOF predictions (residual: finite
+    residual predictions; fallback_direct: direct predictions of all calibration rows)."""
+    q3 = frame["q3"].to_numpy(dtype=np.float64)
+    rows = cal["row"].to_numpy(dtype=np.int64)
+    rounds = cal["round"].to_numpy(dtype=np.int64)
+    sids = cal["spec_id"].to_numpy(dtype=object)
+    d = np.full(rows.size, np.nan)
+    r = np.full(rows.size, np.nan)
+    for sid in np.unique(sids) if rows.size else []:
+        sel = sids == sid
+        d[sel] = store.raw(v4_unit_key(sid, "direct", bundle, half_life), rows[sel])
+        if formulation == "residual":
+            r[sel] = store.raw(v4_unit_key(sid, "residual", bundle, half_life), rows[sel])
+    out = {}
+    sources = {"direct": d} if formulation == "direct" else {"residual": r, "fallback_direct": d}
+    for name, raw in sources.items():
+        keep = np.isfinite(raw)
+        mapping = qo.fit_mapping(method, raw[keep], q3[rows[keep]], rounds[keep], min_rounds)
+        mapping.fit_rows = tuple(int(x) for x in rows[keep])
+        out[name] = mapping
+    return out
+
+
+def v4_candidates(bundles: Mapping[str, object]) -> List[Dict[str, object]]:
+    out = []
+    for bo, b in enumerate([c["id"] for c in bundles["candidates"]]):
+        for hl in V4_HALF_LIVES:
+            for formulation in FORMULATIONS:
+                for method in qo.METHOD_ORDER:
+                    out.append({"bundle": b, "bundle_order": bo, "half_life": half_life_label(hl), "decay_order": V4_DECAY_ORDER[hl], "formulation": formulation,
+                                "formulation_order": qo.FORMULATION_ORDER.index(formulation), "method": method, "method_order": qo.METHOD_ORDER.index(method)})
+    return out
+
+
+def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bundles: Mapping[str, object], cfg: Mapping[str, object]) -> Tuple[pd.DataFrame, Dict[Tuple, pd.DataFrame]]:
+    """Every declared recipe on the frozen scoring keys; returns scores and per-candidate predictions."""
+    from sklearn.metrics import roc_auc_score
+
+    q3 = frame["q3"].to_numpy(dtype=np.float64)
+    crisis = frame["actual_crisis"].to_numpy(dtype=np.float64)
+    min_rounds = int(cfg["min_calibration_rounds"])
+    groups = [(r, v, g) for (r, v), g in ctx.members.groupby(["round", "target_ord"], sort=True)]
+    cal_by = {k: g for k, g in ctx.calibration.groupby(["scoring_round", "scoring_target_ord"], sort=True)}
+    empty_cal = ctx.calibration.iloc[0:0]
+    rows_out, preds = [], {}
+    for cand in v4_candidates(bundles):
+        b, hl, form, method = cand["bundle"], parse_half_life(cand["half_life"]), cand["formulation"], cand["method"]
+        finals, truths, crs, parts, reason = [], [], [], [], None
+        for r, v, g in groups:
+            idx = g["row"].to_numpy(dtype=np.int64)
+            raw, lab, supported = v4_candidate_raw(store, idx, g["spec_id"].to_numpy(dtype=object), form, b, hl)
+            if not supported or not np.isfinite(raw).all():
+                reason = f"base OOF fit unsupported at scoring month {sd.ord_label(v)} (round {sd.ord_label(r)})"
+                break
+            maps = v4_fit_mappings(store, frame, cal_by.get((r, v), empty_cal), form, b, hl, method, min_rounds)
+            mapped, why = qo.apply_branches(raw, lab, maps)
+            if mapped is None:
+                reason = f"{why} at scoring month {sd.ord_label(v)} (round {sd.ord_label(r)})"
+                break
+            fin, clipped = qo.bound_share(mapped)
+            finals.append(fin), truths.append(q3[idx]), crs.append(crisis[idx])
+            parts.append(pd.DataFrame({"row": idx, "round": r, "target_ord": v, "raw_q3": raw, "final_q3": fin, "clipped": clipped, "prediction_branch": lab}))
+        base = {"context_id": ctx.context_id, "selection_signature": ctx.selection_signature, **cand}
+        if reason:
+            rows_out.append({**base, "status": "unsupported", "reason": reason, "n": 0, "rmse": np.nan, "auc": np.nan})
+            continue
+        f, t, c = np.concatenate(finals), np.concatenate(truths), np.concatenate(crs)
+        auc = float(roc_auc_score(c == 1, f)) if np.unique(c).size == 2 else np.nan
+        rows_out.append({**base, "status": "ok", "reason": None, "n": int(f.size), "rmse": float(np.sqrt(np.mean((f - t) ** 2))), "auc": auc})
+        preds[(b, cand["half_life"], form, method)] = pd.concat(parts, ignore_index=True)
+    return pd.DataFrame(rows_out), preds
+
+
+def v4_final_task(t: Mapping[str, object]) -> Dict[str, object]:
+    """Fit the selected recipe on the outer pool and predict the job's frozen test rows (worker)."""
+    h, formulation, bundle = t["horizon"], t["formulation"], t["bundle"]
+    hl = parse_half_life(t["half_life"])
+    frame = _STATE["frames"][h]
+    X = _STATE["X"][h]
+    fit_idx, pred_idx = np.asarray(t["fit_idx"]), np.asarray(t["pred_idx"])
+    months = frame["target_ord"].to_numpy(dtype=np.int64)
+    w = md.decay_weights(months[fit_idx], t["origin_ord"], hl)
+    models, others = {}, {}
+    for target in ("q2", "q4", "q5"):
+        models[target] = md.fit_regressor(X[fit_idx], frame[target].to_numpy(dtype=float)[fit_idx], w, _params(bundle, target), target)
+        others[target] = models[target].predict(X[pred_idx])
+    dm, raw, _ = fit_predict_q3(h, "direct", bundle, fit_idx, pred_idx, t["origin_ord"], keep_model=True, half_life=hl)
+    models["q3_direct"] = dm
+    branch = np.full(pred_idx.size, "direct", dtype=object)
+    status, reason = "completed", None
+    if formulation == "residual":
+        rm, res, _ = fit_predict_q3(h, "residual", bundle, fit_idx, pred_idx, t["origin_ord"], keep_model=True, half_life=hl)
+        if rm is None:
+            status, reason = "unsupported", "no baseline-supported outer fitting rows"
+            res = np.full(pred_idx.size, np.nan)
+        models["q3_residual_delta"] = rm
+        branch = np.where(np.isfinite(res), "residual", "fallback_direct").astype(object)
+        raw = np.where(np.isfinite(res), res, raw)
+    pred = pd.DataFrame({"row": pred_idx, "area_id": frame["area_id"].to_numpy()[pred_idx], "target_ord": months[pred_idx], "q2_raw": others["q2"], "q3_raw": raw, "q4_raw": others["q4"], "q5_raw": others["q5"],
+                         "prediction_branch": branch, "baseline_q3": np.where(branch == "residual", frame["hist_q3_obs1"].to_numpy()[pred_idx], np.nan)})
+    mapped, why = (None, reason) if status != "completed" else qo.apply_branches(raw, branch, t["mappings"])
+    if mapped is None:
+        pred["q3_final"], pred["clipped"], cal = np.nan, False, ("unavailable", why)
+    else:
+        final, clipped = qo.bound_share(mapped)
+        pred["q3_final"], pred["clipped"], cal = final, clipped, ("ok", None)
+    ledger = pd.DataFrame({"row": fit_idx, "area_id": frame["area_id"].to_numpy()[fit_idx], "target_ord": months[fit_idx], "source_family": frame["source_family"].to_numpy()[fit_idx],
+                           "source_available_ord": frame["source_available_ord"].to_numpy()[fit_idx], "is_copy": frame["is_copy"].to_numpy()[fit_idx], "weight": w})
+    return {"key": t["key"], "status": status, "reason": reason, "calibration_status": cal[0], "calibration_reason": cal[1], "predictions": pred, "fit_ledger": ledger, "models": models}
+
+
+def v4_freeze_cohorts(ledger: pd.DataFrame, frames: Mapping[int, pd.DataFrame], settings: Sequence[str], years: Sequence[int], horizons: Sequence[int]) -> pd.DataFrame:
+    """Per-setting outer cohorts, frozen from labels/sources before any fit.
+
+    original: observed labels of year Y only; augmented: observed labels plus permitted
+    copies of year Y. Exclusions: invalid target shares, invalid reported phase, and
+    (H>0) unverified realized weather at the oracle offsets.
+    """
+    out = []
+    for h in horizons:
+        f = frames[h]
+        verified = dict(zip(zip(f["area_id"].astype(int), f["target_ord"].astype(int)), f["oracle_all_verified"].astype(bool)))
+        for setting in settings:
+            for year in years:
+                m = ledger["target_ord"] // 12 == year
+                if setting == "original":
+                    m &= ~ledger["is_copy"]
+                for r in ledger.loc[m].itertuples(index=False):
+                    key = (int(r.area_id), int(r.target_ord))
+                    if not r.valid_target:
+                        status, reason = "excluded", f"target:{r.target_invalid_reason}"
+                    elif not r.valid_score:
+                        status, reason = "excluded", "invalid_reported_phase"
+                    elif h > 0 and not verified.get(key, False):
+                        status, reason = "excluded", "oracle_weather_unverified"
+                    else:
+                        status, reason = "primary", None
+                    out.append({"data_setting": setting, "outer_year": year, "horizon": h, "area_id": key[0], "target_ord": key[1], "is_copy": bool(r.is_copy),
+                                "source_family": r.source_family, "original_month_ord": int(r.original_month_ord), "status": status, "reason": reason})
+    cohort = pd.DataFrame(out)
+    if cohort.duplicated(["data_setting", "outer_year", "horizon", "area_id", "target_ord"]).any():
+        raise AugExpError("duplicate canonical cohort keys")
+    if cohort.loc[cohort["data_setting"] == "original", "is_copy"].any():
+        raise AugExpError("a copied label entered the original outer cohort")
+    return cohort
+
+
+def cohort_digest(keys: pd.DataFrame) -> str:
+    k = keys[["area_id", "target_ord"]].astype(np.int64).sort_values(["area_id", "target_ord"], kind="mergesort").to_numpy()
+    return hashlib.sha256(np.ascontiguousarray(k).tobytes()).hexdigest()
+
+
+def v4_jobs(cohort: pd.DataFrame, frames: Mapping[int, pd.DataFrame]) -> pd.DataFrame:
+    """One outer job per (setting, year, H, origin) over the frozen primary keys."""
+    rows = []
+    prim = cohort.loc[cohort["status"] == "primary"]
+    for (setting, year, h), g in prim.groupby(["data_setting", "outer_year", "horizon"], sort=True):
+        g = g.assign(origin_ord=g["target_ord"] - h)
+        for o, gg in g.groupby("origin_ord", sort=True):
+            rows.append({"job_id": f"{setting}_y{year}_h{h:02d}_o{sd.ord_label(o)}", "data_setting": setting, "outer_year": int(year), "horizon": int(h), "origin_ord": int(o),
+                         "n_test": len(gg), "n_test_copies": int(gg["is_copy"].sum()), "test_families": ";".join(sorted(set(gg["source_family"])))})
+    return pd.DataFrame(rows)
+
+
+def v4_slot_metrics(m: pd.DataFrame) -> Dict[str, object]:
+    """Metrics of one keyed truth/prediction frame (q3, actual_crisis, q3_raw, q3_final, ...)."""
+    from ipcch.somalia_oracle import q3eval as qe
+
+    out: Dict[str, object] = {"n": int(len(m)), "n_areas": int(m["area_id"].nunique()), "n_months": int(m["target_ord"].nunique()), "n_original_reports": int(m["source_family"].nunique()),
+                              "n_originals": int((~m["is_copy"]).sum()), "n_copies": int(m["is_copy"].sum())}
+    for kind in ("raw", "final"):
+        sm = qe.share_metrics(m["q3"], m[f"q3_{kind}"])
+        out.update({f"{kind}_{k}": v for k, v in sm.items()})
+        out[f"{kind}_r2_reason"] = "constant truth" if not np.isfinite(sm["r2"]) else None
+        out[f"{kind}_auc"] = qe.pooled_auc(m["actual_crisis"], m[f"q3_{kind}"])
+        out[f"{kind}_auc_reason"] = "one crisis class" if not np.isfinite(out[f"{kind}_auc"]) else None
+    out.update({f"bin_{k}": v for k, v in qe.binary_metrics(m["actual_crisis"], m["q3_final"].to_numpy() >= qe.BINARY_THRESHOLD).items()})
+    out["n_clipped"] = int(m["clipped"].astype(bool).sum())
+    out["n_fallback_direct"] = int((m["prediction_branch"] == "fallback_direct").sum())
+    out["n_residual_branch"] = int((m["prediction_branch"] == "residual").sum())
+    return out
+
+
+def v4_evaluate(cohort: pd.DataFrame, preds: pd.DataFrame, frames: Mapping[int, pd.DataFrame], settings, years, horizons) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Annual slots per (setting, year, H) and pooled slots per (setting, H).
+
+    Truth and predictions are joined on explicit keys with one-to-one validation. A
+    missing or non-finite required final prediction makes the slot, and its setting/H
+    pooled result, incomplete (G9); raw predictions never replace final ones.
+    """
+    truth_cols = ["area_id", "target_ord", "q3", "actual_crisis"]
+    annual, pooled_parts, pooled_status = [], {}, {}
+    for setting in settings:
+        for h in horizons:
+            f = frames[h][truth_cols]
+            parts, bad = [], []
+            for year in years:
+                c = cohort.loc[(cohort["data_setting"] == setting) & (cohort["outer_year"] == year) & (cohort["horizon"] == h)]
+                prim = c.loc[c["status"] == "primary", ["area_id", "target_ord", "is_copy", "source_family"]]
+                base = {"data_setting": setting, "outer_year": year, "horizon": h, "n_cohort": len(c), "n_primary": len(prim), "n_excluded": int((c["status"] != "primary").sum()),
+                        "cohort_sha256": cohort_digest(prim)}
+                if prim.empty:
+                    annual.append({**base, "status": "empty_cohort", "reason": "no source-eligible rows"})
+                    continue
+                p = preds.loc[(preds["data_setting"] == setting) & (preds["outer_year"] == year) & (preds["horizon"] == h)]
+                if p.duplicated(["area_id", "target_ord"]).any():
+                    raise AugExpError(f"duplicate prediction keys in {setting}/{year}/H{h}")
+                m = prim.merge(f, on=["area_id", "target_ord"], how="left", validate="one_to_one")
+                m = m.merge(p[["area_id", "target_ord", "q3_raw", "q3_final", "clipped", "prediction_branch", "job_id"]], on=["area_id", "target_ord"], how="left", validate="one_to_one")
+                missing = ~np.isfinite(m["q3_final"].to_numpy(dtype=float))
+                if missing.any():
+                    annual.append({**base, "status": "incomplete", "reason": f"{int(missing.sum())} of {len(m)} required final predictions missing or unavailable"})
+                    bad.append(year)
+                    continue
+                annual.append({**base, "status": "complete", "reason": None, **v4_slot_metrics(m)})
+                parts.append(m.assign(outer_year=year))
+            key = (setting, h)
+            pooled_parts[key] = pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
+            pooled_status[key] = bad
+    pooled = []
+    for (setting, h), m in pooled_parts.items():
+        base = {"data_setting": setting, "horizon": h, "years": ";".join(str(y) for y in years)}
+        if pooled_status[(setting, h)]:
+            pooled.append({**base, "status": "incomplete", "reason": "annual slots incomplete: " + ";".join(str(y) for y in pooled_status[(setting, h)])})
+            continue
+        if m.empty:
+            pooled.append({**base, "status": "empty_cohort", "reason": "no source-eligible rows in any year"})
+            continue
+        comp = m.groupby("outer_year").size()
+        pooled.append({**base, "status": "complete", "reason": None, "rows_by_year": ";".join(f"{y}:{n}" for y, n in comp.items()), "cohort_sha256": cohort_digest(m), **v4_slot_metrics(m)})
+    return pd.DataFrame(annual), pd.DataFrame(pooled)
