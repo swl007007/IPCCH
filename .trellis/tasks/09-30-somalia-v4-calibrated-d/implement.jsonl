@@ -1,0 +1,6 @@
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/prd.md","reason":"Approved v1.3 scope including G8's corrected scenarios, G9 failure semantics, acceptance criteria and lifecycle-only execution boundary"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/design.md","reason":"V4 setting-specific label/test policies, folds, nested isolation, independent horizons, search and separate scenario reporting"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/candidate-configs.json","reason":"Frozen 144-recipe inventory and numerical/runtime constants"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/implement.md","reason":"Ordered implementation and validation plan; lifecycle-only current authorization"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/research.md","reason":"Current source evidence, reuse anchors and demonstrated v3 behavior that must change"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Temporal lineage, runtime, float round-trip and regression guidelines; G2 overrides non-selected outer views and G8 overrides shared-cohort/paired-reporting conventions"}

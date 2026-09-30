@@ -1,0 +1,6 @@
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/prd.md","reason":"Acceptance criteria and exact authorized scope"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/design.md","reason":"Scientific contracts for source/round isolation, original-only versus augmented scoring cohorts and independent pooled metrics"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/candidate-configs.json","reason":"Replayable inventory, runtime, thresholds and per-setting label-role policies; no cross-setting comparison"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/implement.md","reason":"Meaningful contract checks and honest evidence/status handling"}
+{"file":".trellis/tasks/09-30-somalia-v4-calibrated-d/research.md","reason":"Current implementation anchors and preflight evidence gaps"}
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Leakage, sample preservation and float precision checks; honor task-specific G2 and G8 reporting overrides"}
