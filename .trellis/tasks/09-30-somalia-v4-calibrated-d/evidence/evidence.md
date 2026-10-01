@@ -79,6 +79,15 @@ Both audits of `fef36dd` returned `findings`. Classification (user rule: does it
 
 Numeric effect of the repair (all other 38 annual and 7 pooled slots identical to round 1): augmented 2023 H0 final R² −0.192 → −0.209, RMSE 22.68 → 22.84 pp, AUC 0.826 → 0.824; augmented pooled H0 final R² 0.170 → 0.166, AUC 0.749 → 0.747.
 
+## Audit round 2 (`audits/close_audit_2.json`, `audits/spot_audit_2.json`, completion `6fde76f`) and closure decision
+
+Both round-2 audits confirm that the result-changing round-1 defect (held-out history; all 49 affected rows) and the partial-original omission are resolved, and that production labels, memberships, seasonal values, repaired features and metrics match their independent checks. Remaining findings, none of which changes a reported number:
+
+- major, reproducibility (both audits): the replay can still pass on deliberately damaged artifacts (contexts/recipes relabelled unsupported skip selection replay; a deleted final-fit ledger passes vacuously; derived truth/QC fields and calibration memberships are trusted rather than rebuilt);
+- minor: some reported metric metadata (coverage counts, F2, undefined-metric reasons, pooled years, cells of incomplete slots) is not compared; the evaluator silently drops predictions placed in empty or undeclared slots; `--final-workers` is not capped by `max_workers` (the run used 10/4).
+
+Under the user's repair-loop rule (same class reported again in round 2) the executor stopped and asked. Cost so far: two manual audit rounds, one repair pass, two complete and two aborted production runs (~15 h wall time); numbers changed only by the round-1 repair (augmented 2023 H0 and augmented pooled H0). **User decision (2026-10-01): "Close now"** — keep the round-2 findings as audit debt (reproducibility/minor are non-gating under the controller policy) and close through `trellis-audit close`, without a further repair loop.
+
 ## Known limitations
 
 - Oracle information (ideal label availability, realized future weather); retrospective on years partly inspected in v1-v3.
