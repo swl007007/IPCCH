@@ -1,0 +1,8 @@
+{
+ "checks": 95,
+ "passed": 95,
+ "failed": [],
+ "candidates_replayed": 8928,
+ "probe_rows": 43864,
+ "run_mode": "full"
+}
