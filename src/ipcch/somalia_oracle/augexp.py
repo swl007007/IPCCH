@@ -748,46 +748,69 @@ class V4UnitStore:
         return out
 
 
-def v4_candidate_raw(store: V4UnitStore, rows: np.ndarray, spec_ids: np.ndarray, formulation: str, bundle: str, half_life) -> Tuple[np.ndarray, np.ndarray, bool]:
-    """Raw q3, prediction branch and whether every needed unit was fitted."""
+def v4_candidate_raw(store: V4UnitStore, rows: np.ndarray, spec_ids: np.ndarray, formulation: str, bundle: str, half_life, has_base: np.ndarray) -> Tuple[np.ndarray, np.ndarray, bool]:
+    """Raw q3, prediction branch and whether every *required* unit was fitted.
+
+    A residual model is required exactly on rows with a permitted history baseline
+    (``has_base``); rows without one use the same-bundle/decay direct model
+    (``fallback_direct``). A baseline row whose residual unit could not be fitted makes
+    the candidate unsupported -- it is never relabelled as missing history.
+    """
     raw = np.full(rows.size, np.nan)
-    lab = np.full(rows.size, "direct" if formulation == "direct" else "fallback_direct", dtype=object)
+    lab = np.full(rows.size, "direct", dtype=object)
+    if formulation == "residual":
+        lab[:] = np.where(has_base, "residual", "fallback_direct")
     supported = True
     for sid in np.unique(spec_ids):
         sel = spec_ids == sid
-        dkey = v4_unit_key(sid, "direct", bundle, half_life)
-        supported &= store.ok(dkey)
-        d = store.raw(dkey, rows[sel])
-        if formulation == "direct":
-            raw[sel] = d
-            continue
-        rkey = v4_unit_key(sid, "residual", bundle, half_life)
-        supported &= store.ok(rkey)
-        r = store.raw(rkey, rows[sel])
-        raw[sel] = np.where(np.isfinite(r), r, d)
-        lab[sel] = np.where(np.isfinite(r), "residual", "fallback_direct")
+        need_direct = sel & (lab != "residual")
+        if need_direct.any():
+            dkey = v4_unit_key(sid, "direct", bundle, half_life)
+            supported &= store.ok(dkey)
+            raw[need_direct] = store.raw(dkey, rows[need_direct])
+        need_res = sel & (lab == "residual")
+        if need_res.any():
+            rkey = v4_unit_key(sid, "residual", bundle, half_life)
+            supported &= store.ok(rkey)
+            raw[need_res] = store.raw(rkey, rows[need_res])
     return raw, lab, bool(supported)
 
 
 def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, formulation: str, bundle: str, half_life, method: str, min_rounds: int) -> Dict[str, qo.Q3Mapping]:
-    """Branch mappings fitted on calibration rows' own OOF predictions (residual: finite
-    residual predictions; fallback_direct: direct predictions of all calibration rows)."""
+    """Branch mappings fitted on the calibration keys' own OOF predictions.
+
+    direct / fallback_direct: direct predictions of every calibration key; residual:
+    residual predictions of the calibration keys with a permitted baseline. A learned
+    mapping whose required unit is unsupported on any of its keys is unsupported (the
+    key set never shrinks after a failure); ``none`` needs no calibration.
+    """
     q3 = frame["q3"].to_numpy(dtype=np.float64)
+    _, base_ok = _baseline(frame)
     rows = cal["row"].to_numpy(dtype=np.int64)
     rounds = cal["round"].to_numpy(dtype=np.int64)
     sids = cal["spec_id"].to_numpy(dtype=object)
-    d = np.full(rows.size, np.nan)
-    r = np.full(rows.size, np.nan)
-    for sid in np.unique(sids) if rows.size else []:
-        sel = sids == sid
-        d[sel] = store.raw(v4_unit_key(sid, "direct", bundle, half_life), rows[sel])
-        if formulation == "residual":
-            r[sel] = store.raw(v4_unit_key(sid, "residual", bundle, half_life), rows[sel])
+    names = ("direct",) if formulation == "direct" else ("residual", "fallback_direct")
     out = {}
-    sources = {"direct": d} if formulation == "direct" else {"residual": r, "fallback_direct": d}
-    for name, raw in sources.items():
-        keep = np.isfinite(raw)
-        mapping = qo.fit_mapping(method, raw[keep], q3[rows[keep]], rounds[keep], min_rounds)
+    for name in names:
+        if method == "none":
+            out[name] = qo.fit_mapping("none", np.array([]), np.array([]), np.array([]), min_rounds)
+            continue
+        form = "residual" if name == "residual" else "direct"
+        keep = base_ok[rows] if name == "residual" else np.ones(rows.size, dtype=bool)
+        raw = np.full(rows.size, np.nan)
+        failed = []
+        for sid in np.unique(sids[keep]) if keep.any() else []:
+            sel = keep & (sids == sid)
+            key = v4_unit_key(sid, form, bundle, half_life)
+            if not store.ok(key):
+                failed.append(sid)
+                continue
+            raw[sel] = store.raw(key, rows[sel])
+        if failed or not np.isfinite(raw[keep]).all():
+            mapping = qo.Q3Mapping(method, "unsupported", f"{form} OOF unit unsupported for {len(failed)} calibration pool spec(s)" if failed else "missing calibration OOF prediction",
+                                   months=tuple(sorted({int(r) for r in rounds[keep]})), n_rows=int(keep.sum()))
+        else:
+            mapping = qo.fit_mapping(method, raw[keep], q3[rows[keep]], rounds[keep], min_rounds)
         mapping.fit_rows = tuple(int(x) for x in rows[keep])
         out[name] = mapping
     return out
@@ -810,6 +833,7 @@ def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bu
 
     q3 = frame["q3"].to_numpy(dtype=np.float64)
     crisis = frame["actual_crisis"].to_numpy(dtype=np.float64)
+    _, base_ok = _baseline(frame)
     min_rounds = int(cfg["min_calibration_rounds"])
     groups = [(r, v, g) for (r, v), g in ctx.members.groupby(["round", "target_ord"], sort=True)]
     cal_by = {k: g for k, g in ctx.calibration.groupby(["scoring_round", "scoring_target_ord"], sort=True)}
@@ -820,7 +844,7 @@ def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bu
         finals, truths, crs, parts, reason = [], [], [], [], None
         for r, v, g in groups:
             idx = g["row"].to_numpy(dtype=np.int64)
-            raw, lab, supported = v4_candidate_raw(store, idx, g["spec_id"].to_numpy(dtype=object), form, b, hl)
+            raw, lab, supported = v4_candidate_raw(store, idx, g["spec_id"].to_numpy(dtype=object), form, b, hl, base_ok[idx])
             if not supported or not np.isfinite(raw).all():
                 reason = f"base OOF fit unsupported at scoring month {sd.ord_label(v)} (round {sd.ord_label(r)})"
                 break
@@ -861,13 +885,14 @@ def v4_final_task(t: Mapping[str, object]) -> Dict[str, object]:
     branch = np.full(pred_idx.size, "direct", dtype=object)
     status, reason = "completed", None
     if formulation == "residual":
+        _, base_ok = _baseline(frame)
+        need = base_ok[pred_idx]
         rm, res, _ = fit_predict_q3(h, "residual", bundle, fit_idx, pred_idx, t["origin_ord"], keep_model=True, half_life=hl)
-        if rm is None:
-            status, reason = "unsupported", "no baseline-supported outer fitting rows"
-            res = np.full(pred_idx.size, np.nan)
+        if rm is None and need.any():
+            status, reason = "unsupported", "no baseline-supported outer fitting rows for test rows with a baseline"
         models["q3_residual_delta"] = rm
-        branch = np.where(np.isfinite(res), "residual", "fallback_direct").astype(object)
-        raw = np.where(np.isfinite(res), res, raw)
+        branch = np.where(need, "residual", "fallback_direct").astype(object)
+        raw = np.where(need, res, raw)
     pred = pd.DataFrame({"row": pred_idx, "area_id": frame["area_id"].to_numpy()[pred_idx], "target_ord": months[pred_idx], "q2_raw": others["q2"], "q3_raw": raw, "q4_raw": others["q4"], "q5_raw": others["q5"],
                          "prediction_branch": branch, "baseline_q3": np.where(branch == "residual", frame["hist_q3_obs1"].to_numpy()[pred_idx], np.nan)})
     mapped, why = (None, reason) if status != "completed" else qo.apply_branches(raw, branch, t["mappings"])

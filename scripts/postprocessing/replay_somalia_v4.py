@@ -202,43 +202,50 @@ def main(argv=None):
         s = oof_idx.get(uid)
         return s.reindex(pd.MultiIndex.from_frame(keys[["area_id", "target_ord"]])).to_numpy(dtype=float)
 
-    def cand_raw(frame, form, bundle, hl):
+    base_by_h = {h: (np.isfinite(p["hist_q3_obs1"].to_numpy(float)) & (p["history_obs1_source_ord"].to_numpy() >= 0)) for h, p in prov.items()}
+    base_idx = {h: pd.Series(base_by_h[h], index=pd.MultiIndex.from_frame(p[["area_id", "target_ord"]])) for h, p in prov.items()}
+
+    def has_base(keys, h):
+        return base_idx[h].reindex(pd.MultiIndex.from_frame(keys[["area_id", "target_ord"]])).to_numpy(dtype=bool)
+
+    def cand_raw(frame, form, bundle, hl, h):
+        """Residual required exactly on rows with a permitted baseline; others use direct."""
+        lab = np.where(has_base(frame, h), "residual", "fallback_direct").astype(object) if form == "residual" else np.full(len(frame), "direct", dtype=object)
         raw = np.full(len(frame), np.nan)
-        lab = np.full(len(frame), "direct", dtype=object)
         for sid, g in frame.groupby("spec_id"):
             pos = frame.index.get_indexer(g.index)
-            d = unit_raw(sid, "direct", bundle, hl, g)
-            if d is None:
-                return None, None
-            if form == "direct":
-                raw[pos] = d
-                continue
-            r = unit_raw(sid, "residual", bundle, hl, g)
-            if r is None:
-                return None, None
-            raw[pos] = np.where(np.isfinite(r), r, d)
-            lab[pos] = np.where(np.isfinite(r), "residual", "fallback_direct")
+            for unit_form, want in (("direct", lab[pos] != "residual"), ("residual", lab[pos] == "residual")):
+                if not want.any():
+                    continue
+                vals = unit_raw(sid, unit_form, bundle, hl, g.loc[want])
+                if vals is None:
+                    return None, None
+                raw[pos[want]] = vals
         return raw, lab
 
-    def maps_for(calrows, form, bundle, hl, method):
+    def maps_for(calrows, form, bundle, hl, method, h):
         cr = calrows.reset_index(drop=True)
+        names = ("direct",) if form == "direct" else ("residual", "fallback_direct")
+        if method == "none":
+            return {n: fit_map("none", None, None, None, min_cal) for n in names}
         y = truth.loc[list(zip(cr["area_id"], cr["target_ord"])), "q3"].to_numpy(dtype=float) if len(cr) else np.array([])
-        d = np.full(len(cr), np.nan)
-        r = np.full(len(cr), np.nan)
-        for sid, g in cr.groupby("spec_id"):
-            pos = g.index.to_numpy()
-            dd = unit_raw(sid, "direct", bundle, hl, g)
-            if dd is not None:
-                d[pos] = dd
-            if form == "residual":
-                rr = unit_raw(sid, "residual", bundle, hl, g)
-                if rr is not None:
-                    r[pos] = rr
-        srcs = {"direct": d} if form == "direct" else {"residual": r, "fallback_direct": d}
+        hb = has_base(cr, h) if len(cr) else np.array([], dtype=bool)
         out = {}
-        for name, raw in srcs.items():
-            k = np.isfinite(raw)
-            out[name] = fit_map(method, raw[k], y[k], cr["round"].to_numpy()[k], min_cal)
+        for name in names:
+            unit_form = "residual" if name == "residual" else "direct"
+            keep = hb if name == "residual" else np.ones(len(cr), dtype=bool)
+            raw = np.full(len(cr), np.nan)
+            failed = False
+            for sid, g in cr.loc[keep].groupby("spec_id"):
+                vals = unit_raw(sid, unit_form, bundle, hl, g)
+                if vals is None:
+                    failed = True
+                    break
+                raw[g.index.to_numpy()] = vals
+            if failed or not np.isfinite(raw[keep]).all():
+                out[name] = ("unsupported", None, None)
+                continue
+            out[name] = fit_map(method, raw[keep], y[keep], cr["round"].to_numpy()[keep], min_cal)
         return out
 
     sel_mis, score_mis, n_cand = [], [], 0
@@ -251,7 +258,7 @@ def main(argv=None):
         for bundle in sorted(sc["bundle"].unique()):
             for hl in ("12", "24", "48", "none"):
                 for form in FORMS:
-                    raw, lab = cand_raw(m, form, bundle, hl)
+                    raw, lab = cand_raw(m, form, bundle, hl, int(g["horizon"].iloc[0]))
                     for method in METHODS:
                         n_cand += 1
                         if raw is None or not np.isfinite(raw).all():
@@ -261,7 +268,7 @@ def main(argv=None):
                         fail = False
                         for (rr, v), gg in m.groupby(["round", "target_ord"]):
                             pos = gg.index.to_numpy()
-                            mp = maps_for(cc.loc[(cc["scoring_round"] == rr) & (cc["scoring_target_ord"] == v)], form, bundle, hl, method)
+                            mp = maps_for(cc.loc[(cc["scoring_round"] == rr) & (cc["scoring_target_ord"] == v)], form, bundle, hl, method, int(g["horizon"].iloc[0]))
                             for name in np.unique(lab[pos]):
                                 st, fn, _ = mp[name]
                                 if st != "ok":
@@ -305,7 +312,7 @@ def main(argv=None):
     fmis = []
     for job_id, g in preds.groupby("job_id"):
         s = selected.loc[selected["job_id"] == job_id].iloc[0]
-        mp = maps_for(fcal.loc[fcal["job_id"] == job_id], s["formulation"], s["bundle"], str(s["half_life"]), s["method"])
+        mp = maps_for(fcal.loc[fcal["job_id"] == job_id], s["formulation"], s["bundle"], str(s["half_life"]), s["method"], int(s["horizon"]))
         exp = np.full(len(g), np.nan)
         ok_all = True
         for name in g["prediction_branch"].unique():
@@ -406,7 +413,14 @@ def main(argv=None):
                 if not ((np.isnan(v) and pd.isna(got[k])) or np.isclose(v, got[k], rtol=1e-9, atol=1e-12)):
                     mmis.append((r.data_setting, "pooled", r.horizon, k))
     R.check("annual_and_pooled_metrics_replayed", not mmis, mmis[:8])
-    R.check("no_cross_setting_outputs", not any("augmented_" in c and "original" in c for c in annual.columns), "")
+    leak = []
+    for s_, g_ in preds.groupby("data_setting"):
+        allowed = set(zip(cohort.loc[(cohort["data_setting"] == s_) & (cohort["status"] == "primary"), "area_id"], cohort.loc[(cohort["data_setting"] == s_) & (cohort["status"] == "primary"), "target_ord"]))
+        if not set(zip(g_["area_id"], g_["target_ord"])) <= allowed:
+            leak.append(s_)
+    orig_pred_copies = preds.loc[preds["data_setting"] == "original"].merge(led[["area_id", "target_ord", "is_copy"]], on=["area_id", "target_ord"])["is_copy"].any()
+    R.check("predictions_stay_in_own_setting_cohort", not leak and not orig_pred_copies, leak)
+    R.check("no_cross_setting_contrast_outputs", not any(c.startswith(("delta", "contrast")) or "bootstrap" in c for c in [*annual.columns, *pooled.columns]) and not (args.out_dir / "metrics" / "contrasts.csv").exists())
 
     rep = pd.DataFrame(R.rows)
     (args.out_dir / "replay").mkdir(exist_ok=True)

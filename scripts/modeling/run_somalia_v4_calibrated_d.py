@@ -360,6 +360,9 @@ def main(argv=None):
 
     # ---------------- annual and pooled evaluation ----------------
     annual, pooled = ax.v4_evaluate(cohort, preds, prep.frames, active, years, horizons)
+    for s in [x for x in settings if x not in active]:  # keep every requested slot visible
+        annual = pd.concat([annual, pd.DataFrame([{"data_setting": s, "outer_year": y, "horizon": h, "status": "augmentation_unavailable", "reason": "no permissible added labels"} for y in years for h in horizons])], ignore_index=True)
+        pooled = pd.concat([pooled, pd.DataFrame([{"data_setting": s, "horizon": h, "status": "augmentation_unavailable", "reason": "no permissible added labels"} for h in horizons])], ignore_index=True)
     if args.pilot:
         annual = annual.loc[[(s, str(y), str(h)) in {tuple(p.split(":")) for p in args.pilot} for s, y, h in zip(annual["data_setting"], annual["outer_year"], annual["horizon"])]]
         pooled = pooled.iloc[0:0]
@@ -380,6 +383,8 @@ def _f(v, d=3):
 def write_report(annual, pooled, selected, cohort, manifest, path):
     lines = ["# Somalia v4 calibrated D — results", "",
              f"Code `{manifest['git_head']}`; mode `{manifest['mode']}`. Two distinct label scenarios, each evaluated on its own population: **original** uses observed raw labels only in every role (fit, selection, calibration, test); **augmented** also admits permitted validity-period copies in every role. Score differences between the settings are not augmentation effects and are not ranked. Each (setting, outer year, horizon, origin) selected its own recipe from 6 bundles × 4 half-lives × direct/residual × none/shift/isotonic by pooled training-period OOF final-q3 RMSE (AUC only breaks numerical ties). Retrospective oracle-information evaluation (ideal label availability, realized future weather); not operational forecast skill.", "",
+             "Outer cohorts at H>0 keep only rows whose realized weather at the oracle offsets is verified (inherited rule, frozen before fitting). Rows removed by this rule (removed / cohort): " + (", ".join(
+                 f"{s} {y} H{h} {int((g['reason'] == 'oracle_weather_unverified').sum())}/{len(g)}" for (s, y, h), g in cohort.groupby(["data_setting", "outer_year", "horizon"]) if (g["reason"] == "oracle_weather_unverified").any()) or "none") + ". Pooled H>0 results are therefore weighted towards the years with verified weather.", "",
              f"Copies admitted to the augmented scenario: {manifest['n_copies']} ({', '.join(f'{y}: {n}' for y, n in manifest['copies_by_year'].items())}). Earliest supervised label year: {manifest['earliest_supervised_year']}.", ""]
     for setting in sorted(set(annual["data_setting"])):
         lines += [f"## {setting}: annual (each year's own frozen cohort)", "", "| Year | H | Status | n (copies) | Final R² | Raw R² | RMSE (pp) | MAE (pp) | Bias (pp) | Final AUC | F1 | Precision | Recall |", "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
@@ -388,12 +393,12 @@ def write_report(annual, pooled, selected, cohort, manifest, path):
                 lines.append(f"| {r['outer_year']} | {r['horizon']} | {r['status']}: {r.get('reason')} | {r.get('n_primary', 0)} | | | | | | | | | |")
                 continue
             lines.append(f"| {r['outer_year']} | {r['horizon']} | complete | {r['n']} ({r['n_copies']}) | {_f(r['final_r2'])} | {_f(r['raw_r2'])} | {_f(r['final_rmse'] * 100, 2)} | {_f(r['final_mae'] * 100, 2)} | {_f(r['final_bias'] * 100, 2)} | {_f(r['final_auc'])} | {_f(r['bin_f1'])} | {_f(r['bin_precision'])} | {_f(r['bin_recall'])} |")
-        lines += ["", f"## {setting}: pooled 2022-2026 (concatenated annual out-of-sample rows, equal weight per area-month)", "", "| H | Status | Rows by year | n (copies) | Final R² | Raw R² | RMSE (pp) | Bias (pp) | Final AUC | F1 | Precision | Recall |", "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        lines += ["", f"## {setting}: pooled 2022-2026 (concatenated annual out-of-sample rows, equal weight per area-month)", "", "| H | Status | Rows by year | n (copies) | Final R² | Raw R² | RMSE (pp) | MAE (pp) | Bias (pp) | Final AUC | F1 | Precision | Recall |", "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
         for r in pooled.loc[pooled["data_setting"] == setting].sort_values("horizon").to_dict("records"):
             if r["status"] != "complete":
-                lines.append(f"| {r['horizon']} | {r['status']}: {r.get('reason')} | | | | | | | | | | |")
+                lines.append(f"| {r['horizon']} | {r['status']}: {r.get('reason')} | | | | | | | | | | | |")
                 continue
-            lines.append(f"| {r['horizon']} | complete | {r['rows_by_year']} | {r['n']} ({r['n_copies']}) | {_f(r['final_r2'])} | {_f(r['raw_r2'])} | {_f(r['final_rmse'] * 100, 2)} | {_f(r['final_bias'] * 100, 2)} | {_f(r['final_auc'])} | {_f(r['bin_f1'])} | {_f(r['bin_precision'])} | {_f(r['bin_recall'])} |")
+            lines.append(f"| {r['horizon']} | complete | {r['rows_by_year']} | {r['n']} ({r['n_copies']}) | {_f(r['final_r2'])} | {_f(r['raw_r2'])} | {_f(r['final_rmse'] * 100, 2)} | {_f(r['final_mae'] * 100, 2)} | {_f(r['final_bias'] * 100, 2)} | {_f(r['final_auc'])} | {_f(r['bin_f1'])} | {_f(r['bin_precision'])} | {_f(r['bin_recall'])} |")
         lines.append("")
     lines += ["## Selected recipes (per job)", "", "| Job | Status | Formulation | Bundle | Half-life | Calibration | Validation RMSE | Validation AUC |", "|---|---|---|---|---|---|---:|---:|"]
     for r in selected.sort_values(["data_setting", "horizon", "outer_year", "origin"]).to_dict("records"):

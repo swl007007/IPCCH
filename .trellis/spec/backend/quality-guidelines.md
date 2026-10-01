@@ -76,3 +76,10 @@ silent sample changes, not crashes. Checks favour explicit contracts over conven
 - Never reuse a column name for two meanings: the per-row prediction branch (`direct/residual/fallback_direct`) was overwritten by the label branch (`original/augmented`); keep them as separate columns (`branch` vs `label_branch`).
 - Augmentation sources must pass the same QC as supervised targets (sentinel phase 0 / zero-sum shares are complete but invalid blocks).
 - Upstream `build_multiscope_ipcch_features` functions can recover scope features for unlabeled months in memory; gate on exact parity with the saved fs files on valid keys.
+
+## Lessons from v4 calibrated D (2026-09-30)
+
+- A validity round spans several target months. Every copied row needs its own origin `v-H` (labels `<= min(v-H, v-1)`, sources available `<= v-H`, decay anchored at `v-H`) and its own OOF fit; never reuse the round month's origin for its copies.
+- Report isolation is transitive: a row's OOF pool must exclude its own source family, the scoring family it calibrates for, and the outer test families. Express each pool as an explicit spec (setting, H, label cutoff, availability cutoff, fold upper year, excluded families), normalize away ineffective constraints so identical pools share one fit, and persist the spec plus a key hash so a replay can rebuild every pool.
+- Setting-specific label roles: filter copies per setting in every role (fit, selection, calibration, outer test). A blanket "exclude copies" filter silently turns the augmented scenario into the original one.
+- An exhaustive per-origin search is large: 142 outer jobs → 62 unique selection contexts → 10,320 OOF XGBoost fits on ~1,000 D features. With 12 workers the 15 GB machine dropped to ~200 MB free during final fits; use ≤10 workers and run a measured pilot before a full run.

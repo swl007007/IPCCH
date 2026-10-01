@@ -34,6 +34,15 @@ def _frame(rows):
     return f
 
 
+def _with_baseline(f, rows_without=()):
+    f = f.copy()
+    f["hist_q3_obs1"] = 0.3
+    f["history_obs1_source_ord"] = f["target_ord"] - 6
+    f.loc[list(rows_without), ["hist_q3_obs1"]] = np.nan
+    f.loc[list(rows_without), ["history_obs1_source_ord"]] = -1
+    return f
+
+
 def _panel():
     """Two areas; semiannual originals 2019-2021 (Jan/Jul), a Jul-Sep 2020 validity window
     with copies, and an outer-year 2022 report with a copy."""
@@ -162,7 +171,7 @@ def test_context_with_fewer_than_two_rounds_is_unsupported_not_shrunk():
 # ---------------- candidate scoring ----------------
 
 
-def _store_for(ctx, f, residual_ok=True, drop_row=None):
+def _store_for(ctx, f, residual_ok=True, drop_row=None, residual_unsupported_specs=()):
     store = ax.V4UnitStore()
     need = pd.concat([ctx.members[["row", "spec_id"]], ctx.calibration[["row", "spec_id"]], ctx.final_calibration[["row", "spec_id"]]])
     for sid, g in need.groupby("spec_id"):
@@ -172,16 +181,18 @@ def _store_for(ctx, f, residual_ok=True, drop_row=None):
                 for form in ax.FORMULATIONS:
                     raw = f["q3"].to_numpy()[rows] + (0.01 if form == "direct" else 0.02)
                     if form == "residual":
-                        raw = np.where(rows % 2 == 0, raw, np.nan)  # half the rows lack a baseline
+                        _, base = ax._baseline(f)
+                        raw = np.where(base[rows], raw, np.nan)  # residual predictions exist only where a baseline exists
                     if drop_row is not None and form == "direct" and b == "X1":
                         raw = np.where(rows == drop_row, np.nan, raw)
-                    status = "ok" if (form == "direct" or residual_ok) else "unsupported"
+                    status = "ok" if (form == "direct" or (residual_ok and sid not in residual_unsupported_specs)) else "unsupported"
                     store.add({"key": ax.v4_unit_key(sid, form, b, hl), "status": status, "pred_idx": rows, "raw_q3": raw, "n_fit": 1, "n_fit_used": 1, "fit_max_target_ord": 0, "model_kind": "x", "sum_weight": 1.0, "min_weight": 1.0})
     return store
 
 
 def test_residual_rows_without_baseline_fall_back_and_unsupported_residual_fails_the_candidate():
     f = _panel()
+    f = _with_baseline(f, rows_without=[i for i in range(len(f)) if i % 2 == 1])
     p = ax.PoolIndex(f, "original", 0)
     ctx = ax.v4_plan_context(f, p, "original", 2022, 0, M(2022, 1), [], CFG)
     scores, preds = ax.v4_score_context(_store_for(ctx, f), f, ctx, BUNDLES, CFG)
@@ -194,14 +205,14 @@ def test_residual_rows_without_baseline_fall_back_and_unsupported_residual_fails
 
 
 def test_candidate_missing_one_scoring_key_is_unsupported_not_rescored_on_fewer_rows():
-    f = _panel()
+    f = _with_baseline(_panel(), rows_without=[i for i in range(len(_panel())) if i % 2 == 1])
     p = ax.PoolIndex(f, "original", 0)
     ctx = ax.v4_plan_context(f, p, "original", 2022, 0, M(2022, 1), [], CFG)
     row = int(ctx.members["row"].iloc[0])
     scores, _ = ax.v4_score_context(_store_for(ctx, f, drop_row=row), f, ctx, BUNDLES, CFG)
     bad = scores.loc[(scores["bundle"] == "X1") & (scores["formulation"] == "direct")]
     assert (bad["status"] == "unsupported").all() and (bad["n"] == 0).all()
-    # residual candidates only need the direct model on fallback rows; this row has a residual prediction
+    # residual candidates need the direct model only on fallback (no-baseline) rows
     fallback_row = int(ctx.members.loc[ctx.members["row"] % 2 == 1, "row"].iloc[0])
     scores_fb, _ = ax.v4_score_context(_store_for(ctx, f, drop_row=fallback_row), f, ctx, BUNDLES, CFG)
     assert (scores_fb.loc[scores_fb["bundle"] == "X1", "status"] == "unsupported").all()
@@ -279,3 +290,35 @@ def test_threshold_and_isotonic_ties_survive_csv_round_trip():
     m = ax.v4_slot_metrics(pd.DataFrame({"area_id": [1, 2], "target_ord": [1, 1], "source_family": ["a", "a"], "is_copy": [False, False], "q3": [0.3, 0.3], "actual_crisis": [1.0, 1.0],
                                          "q3_raw": [0.2, 0.4], "q3_final": [0.2, 0.4], "clipped": [False, False], "prediction_branch": ["direct", "direct"]}))
     assert np.isnan(m["final_r2"]) and m["final_r2_reason"] == "constant truth" and np.isnan(m["final_auc"]) and m["bin_tp"] == 2
+
+
+def test_unsupported_residual_unit_on_a_baseline_calibration_key_makes_learned_residual_mappings_unavailable():
+    f = _with_baseline(_panel())
+    p = ax.PoolIndex(f, "original", 0)
+    ctx = ax.v4_plan_context(f, p, "original", 2022, 0, M(2022, 1), [], CFG)
+    cal_only = set(ctx.calibration["spec_id"]) - set(ctx.members["spec_id"])
+    assert cal_only
+    scores, _ = ax.v4_score_context(_store_for(ctx, f, residual_unsupported_specs=cal_only), f, ctx, BUNDLES, CFG)
+    res = scores.loc[scores["formulation"] == "residual"]
+    assert (res.loc[res["method"] != "none", "status"] == "unsupported").all()  # not refit on the remaining calibration rows
+    assert (res.loc[res["method"] == "none", "status"] == "ok").all()
+    assert (scores.loc[scores["formulation"] == "direct", "status"] == "ok").all()
+    maps = ax.v4_fit_mappings(_store_for(ctx, f, residual_unsupported_specs=cal_only), f, ctx.calibration, "residual", "X1", 24, "shift", 2)
+    assert maps["residual"].status == "unsupported" and maps["fallback_direct"].ok
+
+
+def test_scoring_row_without_baseline_does_not_need_its_residual_unit():
+    f0 = _panel()
+    p0 = ax.PoolIndex(f0, "original", 0)
+    ctx0 = ax.v4_plan_context(f0, p0, "original", 2022, 0, M(2022, 1), [], CFG)
+    r0 = ctx0.scoring[0]
+    rows_r0 = ctx0.members.loc[ctx0.members["round"] == r0, "row"].tolist()
+    f = _with_baseline(f0, rows_without=rows_r0)
+    p = ax.PoolIndex(f, "original", 0)
+    ctx = ax.v4_plan_context(f, p, "original", 2022, 0, M(2022, 1), [], CFG)
+    specs_r0 = set(ctx.members.loc[ctx.members["round"] == r0, "spec_id"])
+    scores, preds = ax.v4_score_context(_store_for(ctx, f, residual_unsupported_specs=specs_r0), f, ctx, BUNDLES, CFG)
+    ok = scores.loc[(scores["formulation"] == "residual") & (scores["method"] == "none")]
+    assert (ok["status"] == "ok").all()
+    pr = preds[("X1", "24", "residual", "none")]
+    assert set(pr.loc[pr["round"] == r0, "prediction_branch"]) == {"fallback_direct"}
