@@ -1,0 +1,115 @@
+[21:12:58] deep monthly panel (177364, 387)
+[21:13:10] [prepare] raw Somalia rows 177364 (12s)
+[21:13:15] [prepare] augmentation: 4409 copies; decisions {'filled': 4409, 'no_covariate_row': 1808, 'recipient_original': 49, 'source_invalid': 18}
+[21:13:16] [prepare] deep monthly panel (177364, 387) (17s)
+[21:13:22] [prepare] H=0: frame (10312, 1062), D width 997, parity bad cols 0 (24s)
+[21:13:28] [prepare] H=3: frame (10312, 1068), D width 1003, parity bad cols 0 (30s)
+[21:13:34] [prepare] H=6: frame (10312, 1074), D width 1009, parity bad cols 0 (35s)
+[21:13:37] [prepare] H=12: frame (10312, 939), D width 874, parity bad cols 0 (39s)
+[21:14:56] jobs 142; contexts ok 142; unique selection signatures 62; pool specs 331
+[21:15:01] OOF units: 10320 requested, 10320 to fit
+[21:21:45]   OOF units: 516/10320 (405s)
+[21:26:48]   OOF units: 1032/10320 (708s)
+[21:30:59]   OOF units: 1548/10320 (959s)
+[21:34:55]   OOF units: 2064/10320 (1194s)
+[21:37:57]   OOF units: 2580/10320 (1377s)
+[21:40:46]   OOF units: 3096/10320 (1545s)
+[21:43:24]   OOF units: 3612/10320 (1703s)
+[21:45:52]   OOF units: 4128/10320 (1852s)
+[21:48:00]   OOF units: 4644/10320 (1980s)
+[21:49:50]   OOF units: 5160/10320 (2090s)
+[21:51:32]   OOF units: 5676/10320 (2191s)
+[21:53:21]   OOF units: 6192/10320 (2301s)
+[21:55:08]   OOF units: 6708/10320 (2408s)
+[21:56:43]   OOF units: 7224/10320 (2503s)
+[21:58:11]   OOF units: 7740/10320 (2591s)
+[21:59:42]   OOF units: 8256/10320 (2681s)
+[22:01:05]   OOF units: 8772/10320 (2764s)
+[22:02:23]   OOF units: 9288/10320 (2842s)
+[22:03:37]   OOF units: 9804/10320 (2917s)
+[22:04:34]   OOF units: 10320/10320 (2973s)
+[22:04:34] OOF units: 10320 done in 2973s
+[22:04:46] select augmented_y2022_h00_o2022-01 [7e0c1deb7d312c3a]: 144/144 supported -> residual X5 hl=none shift rmse=0.07281 tie=1
+[22:04:48] select augmented_y2022_h03_o2021-10 [4b6d74dc34df263b]: 144/144 supported -> direct X3 hl=none none rmse=0.07697 tie=1
+[22:04:49] select augmented_y2022_h06_o2021-07 [8a217c55e3cc71be]: 144/144 supported -> residual X1 hl=none shift rmse=0.08278 tie=1
+[22:04:51] select augmented_y2022_h06_o2021-11 [322cfbe6cfba9dc9]: 144/144 supported -> residual X1 hl=none shift rmse=0.08170 tie=1
+[22:04:52] select augmented_y2022_h12_o2021-01 [5b6ebecc597cb121]: 96/144 supported -> direct X6 hl=12 isotonic rmse=0.07619 tie=1
+[22:04:53] select augmented_y2022_h12_o2021-05 [bc0bbf648ffaf7ea]: 96/144 supported -> direct X6 hl=12 isotonic rmse=0.09202 tie=1
+[22:04:54] select augmented_y2022_h12_o2021-07 [2743ff51db450927]: 96/144 supported -> direct X1 hl=12 none rmse=0.09543 tie=1
+[22:04:54] select augmented_y2022_h12_o2021-08 [f06c76b6127e056d]: 96/144 supported -> direct X1 hl=12 none rmse=0.09599 tie=1
+[22:04:56] select augmented_y2022_h12_o2021-09 [427606f22ce689b8]: 96/144 supported -> direct X1 hl=12 none rmse=0.09667 tie=1
+[22:04:57] select augmented_y2023_h00_o2023-01 [b9681f47ce25cce0]: 144/144 supported -> residual X3 hl=24 shift rmse=0.17021 tie=1
+[22:04:58] select augmented_y2023_h03_o2022-10 [47e165153a8fed41]: 144/144 supported -> residual X6 hl=24 shift rmse=0.20289 tie=1
+[22:04:59] select augmented_y2023_h03_o2022-11 [5daaae1feabc3158]: 144/144 supported -> residual X6 hl=24 shift rmse=0.18619 tie=1
+[22:05:01] select augmented_y2023_h03_o2022-12 [c43c70f219b5c1e9]: 144/144 supported -> residual X6 hl=24 shift rmse=0.17398 tie=1
+[22:05:01] select augmented_y2023_h06_o2022-07 [40654e5826b142f3]: 144/144 supported -> direct X1 hl=none shift rmse=0.24292 tie=1
+[22:05:02] select augmented_y2023_h06_o2022-08 [da212bda8e12b89e]: 144/144 supported -> residual X3 hl=none shift rmse=0.24718 tie=1
+[22:05:03] select augmented_y2023_h06_o2022-09 [f24dd811907e9ae5]: 144/144 supported -> residual X2 hl=none shift rmse=0.26014 tie=1
+[22:05:04] select augmented_y2023_h06_o2023-02 [c76bc149c4071164]: 144/144 supported -> residual X6 hl=12 isotonic rmse=0.25615 tie=1
+[22:05:06] select augmented_y2023_h12_o2022-01 [674865689f04b919]: 144/144 supported -> residual X6 hl=12 shift rmse=0.10597 tie=1
+[22:05:06] select augmented_y2023_h12_o2022-08 [5104c993f17b5797]: 144/144 supported -> direct X6 hl=12 shift rmse=0.32262 tie=2
+[22:05:08] select augmented_y2023_h12_o2022-09 [aedc6a370b7150fd]: 144/144 supported -> direct X6 hl=12 shift rmse=0.32124 tie=2
+[22:05:10] select augmented_y2024_h00_o2024-01 [4190f429011e4262]: 144/144 supported -> direct X6 hl=24 none rmse=0.18169 tie=1
+[22:05:13] select augmented_y2024_h03_o2023-10 [097fa784b0975739]: 144/144 supported -> direct X6 hl=none none rmse=0.18440 tie=1
+[22:05:14] select augmented_y2024_h06_o2023-07 [f145f0091b47df0c]: 144/144 supported -> residual X6 hl=12 isotonic rmse=0.22954 tie=1
+[22:05:16] select augmented_y2024_h06_o2023-08 [dad406769607fb4b]: 96/144 supported -> residual X1 hl=48 none rmse=0.18945 tie=1
+[22:05:17] select augmented_y2024_h06_o2023-09 [8481107f03f1cdb3]: 96/144 supported -> residual X2 hl=none none rmse=0.19083 tie=1
+[22:05:19] select augmented_y2024_h12_o2023-01 [0d8b308e75306093]: 144/144 supported -> direct X6 hl=12 shift rmse=0.30847 tie=2
+[22:05:21] select augmented_y2024_h12_o2023-02 [286e53567b658cb5]: 144/144 supported -> direct X6 hl=12 shift rmse=0.29960 tie=2
+[22:05:22] select augmented_y2024_h12_o2023-03 [764f464de690be79]: 144/144 supported -> direct X1 hl=12 shift rmse=0.27147 tie=2
+[22:05:23] select augmented_y2024_h12_o2023-08 [100ccfb7bfea75c1]: 96/144 supported -> direct X3 hl=none isotonic rmse=0.24381 tie=1
+[22:05:24] select augmented_y2024_h12_o2023-09 [6482ab1a7c54b39e]: 96/144 supported -> direct X3 hl=12 none rmse=0.24578 tie=1
+[22:05:27] select augmented_y2025_h00_o2025-04 [4dc93e5d245d4c52]: 144/144 supported -> direct X6 hl=24 none rmse=0.14525 tie=1
+[22:05:31] select augmented_y2025_h03_o2025-01 [f74883526cc880ed]: 144/144 supported -> direct X1 hl=none none rmse=0.15224 tie=1
+[22:05:33] select augmented_y2025_h06_o2024-10 [cc66059808bb363d]: 96/144 supported -> direct X6 hl=none none rmse=0.16421 tie=1
+[22:05:35] select augmented_y2025_h12_o2024-04 [104718283386f982]: 96/144 supported -> direct X3 hl=12 none rmse=0.21933 tie=1
+[22:05:37] select augmented_y2025_h12_o2024-07 [a0730748b399b845]: 96/144 supported -> direct X5 hl=24 none rmse=0.20206 tie=1
+[22:05:39] select augmented_y2025_h12_o2024-10 [46b38aa6e680d3b4]: 96/144 supported -> residual X5 hl=none none rmse=0.18870 tie=1
+[22:05:40] select augmented_y2026_h00_o2026-04 [379ea939915361e1]: 144/144 supported -> residual X6 hl=24 shift rmse=0.10762 tie=1
+[22:05:42] select augmented_y2026_h12_o2025-04 [3671981036a1249d]: 96/144 supported -> direct X5 hl=24 none rmse=0.17234 tie=1
+[22:05:43] select original_y2022_h00_o2022-01 [df8cab2b1e2d8f6e]: 144/144 supported -> residual X3 hl=none none rmse=0.07528 tie=1
+[22:05:43] select original_y2022_h03_o2021-10 [aa5533b0d00604e4]: 144/144 supported -> direct X1 hl=none none rmse=0.07558 tie=1
+[22:05:44] select original_y2022_h06_o2021-07 [f763971392964231]: 144/144 supported -> residual X6 hl=12 none rmse=0.08004 tie=1
+[22:05:44] select original_y2022_h12_o2021-01 [d9476b229cbc898c]: 96/144 supported -> direct X2 hl=12 none rmse=0.09549 tie=2
+[22:05:45] select original_y2022_h12_o2021-07 [7ef28e38b5b9ff7d]: 96/144 supported -> direct X1 hl=24 none rmse=0.09251 tie=1
+[22:05:45] select original_y2023_h00_o2023-01 [73f9af8d8cdb886b]: 144/144 supported -> residual X4 hl=none shift rmse=0.17766 tie=1
+[22:05:46] select original_y2023_h03_o2022-10 [adf7cd1bbc029996]: 144/144 supported -> residual X5 hl=none shift rmse=0.20208 tie=1
+[22:05:46] select original_y2023_h06_o2022-07 [87dba735e817348f]: 144/144 supported -> direct X1 hl=none shift rmse=0.24794 tie=1
+[22:05:47] select original_y2023_h06_o2023-02 [7b761f0abbf207fa]: 144/144 supported -> direct X1 hl=none shift rmse=0.26072 tie=1
+[22:05:47] select original_y2023_h12_o2022-01 [c9048e01ec0040f3]: 144/144 supported -> direct X5 hl=none none rmse=0.11920 tie=1
+[22:05:48] select original_y2023_h12_o2022-08 [80b8a796ef517d57]: 144/144 supported -> direct X1 hl=none isotonic rmse=0.31435 tie=2
+[22:05:49] select original_y2024_h00_o2024-01 [1fd3184ab7ba9a7f]: 144/144 supported -> direct X5 hl=none none rmse=0.18173 tie=1
+[22:05:50] select original_y2024_h03_o2023-10 [8d802a6b50dfd69c]: 144/144 supported -> direct X1 hl=48 none rmse=0.18203 tie=1
+[22:05:50] select original_y2024_h06_o2023-07 [77e77501de5b36fd]: 144/144 supported -> direct X2 hl=24 isotonic rmse=0.24224 tie=1
+[22:05:51] select original_y2024_h06_o2024-01 [b0337c1a532eeb2a]: 96/144 supported -> residual X1 hl=48 none rmse=0.20322 tie=1
+[22:05:52] select original_y2024_h12_o2023-01 [82efbea1cf52247f]: 144/144 supported -> direct X1 hl=none isotonic rmse=0.29345 tie=2
+[22:05:52] select original_y2024_h12_o2023-07 [9bcc39981bb91f43]: 144/144 supported -> direct X6 hl=12 shift rmse=0.26252 tie=2
+[22:05:53] select original_y2025_h00_o2025-04 [98c4519a9eb56746]: 144/144 supported -> direct X6 hl=none none rmse=0.13839 tie=1
+[22:05:54] select original_y2025_h03_o2025-01 [15cae756431f2095]: 144/144 supported -> direct X4 hl=48 none rmse=0.14262 tie=1
+[22:05:55] select original_y2025_h06_o2024-10 [1ea32c5cadf35903]: 96/144 supported -> direct X4 hl=none none rmse=0.18010 tie=1
+[22:05:55] select original_y2025_h12_o2024-04 [c5c5656122484d1b]: 96/144 supported -> residual X6 hl=12 none rmse=0.21301 tie=1
+[22:05:56] select original_y2025_h12_o2024-07 [78f9a209ea668025]: 96/144 supported -> direct X6 hl=12 none rmse=0.18045 tie=1
+[22:05:57] select original_y2026_h00_o2026-04 [135bf5ff0d6cfe05]: 144/144 supported -> residual X1 hl=none shift rmse=0.10306 tie=1
+[22:05:58] select original_y2026_h12_o2025-04 [f90cac1354f0d091]: 96/144 supported -> direct X6 hl=24 none rmse=0.15813 tie=1
+[22:07:14]   final fits: 7/142 (73s)
+[22:08:00]   final fits: 14/142 (119s)
+[22:08:15]   final fits: 21/142 (135s)
+[22:08:47]   final fits: 28/142 (167s)
+[22:09:23]   final fits: 35/142 (202s)
+[22:12:08]   final fits: 42/142 (367s)
+[22:13:00]   final fits: 49/142 (419s)
+[22:16:00]   final fits: 56/142 (599s)
+[22:21:20]   final fits: 63/142 (919s)
+[22:22:08]   final fits: 70/142 (967s)
+[22:25:00]   final fits: 77/142 (1140s)
+[22:28:35]   final fits: 84/142 (1355s)
+[22:31:32]   final fits: 91/142 (1532s)
+[22:31:32]   final fits: 98/142 (1532s)
+[22:31:32]   final fits: 105/142 (1532s)
+[22:32:01]   final fits: 112/142 (1560s)
+[22:32:24]   final fits: 119/142 (1584s)
+[22:33:23]   final fits: 126/142 (1642s)
+[22:36:02]   final fits: 133/142 (1802s)
+[22:37:38]   final fits: 140/142 (1898s)
+[22:38:00] final fits: 142 done in 1920s
+[22:38:13] done in 5180s

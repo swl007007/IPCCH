@@ -1,48 +1,13 @@
 check,ok,detail
-copies_keep_source_availability,True,
+config_digest_matches_manifest,True,
+input_digests_match_manifest,True,[]
+validity_snapshot_digest,True,
+label_keys_rebuilt_from_raw_and_snapshot,True,saved 10321 rebuilt 10321; only saved [] only rebuilt []
+label_values_lineage_and_availability_rebuilt,True,0 rows differ
 copies_never_history,True,
 copies_in_pre2022_years,True,"{2024: 1420, 2022: 1374, 2023: 995, 2020: 296, 2021: 178, 2019: 146}"
+oracle_weather_verification_rebuilt,True,0
 original_cohort_has_no_copies,True,
-cohort_rebuilt_augmented_2022_h0,True,2094 vs 2094
-cohort_digest_augmented_2022_h0,True,
-cohort_rebuilt_augmented_2022_h3,True,2094 vs 2094
-cohort_digest_augmented_2022_h3,True,
-cohort_rebuilt_augmented_2022_h6,True,2094 vs 2094
-cohort_digest_augmented_2022_h6,True,
-cohort_rebuilt_augmented_2022_h12,True,2094 vs 2094
-cohort_digest_augmented_2022_h12,True,
-cohort_rebuilt_augmented_2023_h0,True,2013 vs 2013
-cohort_digest_augmented_2023_h0,True,
-cohort_rebuilt_augmented_2023_h3,True,2013 vs 2013
-cohort_digest_augmented_2023_h3,True,
-cohort_rebuilt_augmented_2023_h6,True,2013 vs 2013
-cohort_digest_augmented_2023_h6,True,
-cohort_rebuilt_augmented_2023_h12,True,2013 vs 2013
-cohort_digest_augmented_2023_h12,True,
-cohort_rebuilt_augmented_2024_h0,True,2130 vs 2130
-cohort_digest_augmented_2024_h0,True,
-cohort_rebuilt_augmented_2024_h3,True,2130 vs 2130
-cohort_digest_augmented_2024_h3,True,
-cohort_rebuilt_augmented_2024_h6,True,2130 vs 2130
-cohort_digest_augmented_2024_h6,True,
-cohort_rebuilt_augmented_2024_h12,True,2130 vs 2130
-cohort_digest_augmented_2024_h12,True,
-cohort_rebuilt_augmented_2025_h0,True,1876 vs 1876
-cohort_digest_augmented_2025_h0,True,
-cohort_rebuilt_augmented_2025_h3,True,275 vs 275
-cohort_digest_augmented_2025_h3,True,
-cohort_rebuilt_augmented_2025_h6,True,275 vs 275
-cohort_digest_augmented_2025_h6,True,
-cohort_rebuilt_augmented_2025_h12,True,1100 vs 1100
-cohort_digest_augmented_2025_h12,True,
-cohort_rebuilt_augmented_2026_h0,True,904 vs 904
-cohort_digest_augmented_2026_h0,True,
-cohort_rebuilt_augmented_2026_h3,True,0 vs 0
-cohort_digest_augmented_2026_h3,True,
-cohort_rebuilt_augmented_2026_h6,True,0 vs 0
-cohort_digest_augmented_2026_h6,True,
-cohort_rebuilt_augmented_2026_h12,True,132 vs 132
-cohort_digest_augmented_2026_h12,True,
 cohort_rebuilt_original_2022_h0,True,720 vs 720
 cohort_digest_original_2022_h0,True,
 cohort_rebuilt_original_2022_h3,True,720 vs 720
@@ -83,13 +48,58 @@ cohort_rebuilt_original_2026_h6,True,0 vs 0
 cohort_digest_original_2026_h6,True,
 cohort_rebuilt_original_2026_h12,True,132 vs 132
 cohort_digest_original_2026_h12,True,
-augmented_tests_admit_copies,True,15156
-pools_rebuilt_from_specs,True,[]
-temporal_and_report_isolation,True,[]
+cohort_rebuilt_augmented_2022_h0,True,2094 vs 2094
+cohort_digest_augmented_2022_h0,True,
+cohort_rebuilt_augmented_2022_h3,True,2094 vs 2094
+cohort_digest_augmented_2022_h3,True,
+cohort_rebuilt_augmented_2022_h6,True,2094 vs 2094
+cohort_digest_augmented_2022_h6,True,
+cohort_rebuilt_augmented_2022_h12,True,2094 vs 2094
+cohort_digest_augmented_2022_h12,True,
+cohort_rebuilt_augmented_2023_h0,True,2013 vs 2013
+cohort_digest_augmented_2023_h0,True,
+cohort_rebuilt_augmented_2023_h3,True,2013 vs 2013
+cohort_digest_augmented_2023_h3,True,
+cohort_rebuilt_augmented_2023_h6,True,2013 vs 2013
+cohort_digest_augmented_2023_h6,True,
+cohort_rebuilt_augmented_2023_h12,True,2013 vs 2013
+cohort_digest_augmented_2023_h12,True,
+cohort_rebuilt_augmented_2024_h0,True,2130 vs 2130
+cohort_digest_augmented_2024_h0,True,
+cohort_rebuilt_augmented_2024_h3,True,2130 vs 2130
+cohort_digest_augmented_2024_h3,True,
+cohort_rebuilt_augmented_2024_h6,True,2130 vs 2130
+cohort_digest_augmented_2024_h6,True,
+cohort_rebuilt_augmented_2024_h12,True,2130 vs 2130
+cohort_digest_augmented_2024_h12,True,
+cohort_rebuilt_augmented_2025_h0,True,1876 vs 1876
+cohort_digest_augmented_2025_h0,True,
+cohort_rebuilt_augmented_2025_h3,True,275 vs 275
+cohort_digest_augmented_2025_h3,True,
+cohort_rebuilt_augmented_2025_h6,True,275 vs 275
+cohort_digest_augmented_2025_h6,True,
+cohort_rebuilt_augmented_2025_h12,True,1100 vs 1100
+cohort_digest_augmented_2025_h12,True,
+cohort_rebuilt_augmented_2026_h0,True,904 vs 904
+cohort_digest_augmented_2026_h0,True,
+cohort_rebuilt_augmented_2026_h3,True,0 vs 0
+cohort_digest_augmented_2026_h3,True,
+cohort_rebuilt_augmented_2026_h6,True,0 vs 0
+cohort_digest_augmented_2026_h6,True,
+cohort_rebuilt_augmented_2026_h12,True,132 vs 132
+cohort_digest_augmented_2026_h12,True,
+augmented_tests_admit_copies,True,
+annual_slot_inventory,True,40
+pooled_slot_inventory,True,8
+every_job_has_one_context,True,
+jobs_cover_every_primary_origin,True,0
+pools_rebuilt_and_exposed_rows_recomputed,True,[]
+temporal_report_and_history_isolation,True,[]
+history_override_baselines_rebuilt,True,0 of 49
 final_fit_pools_and_decay_weights,True,[]
-candidate_scores_replayed,True,[]
+candidate_scores_replayed,True,"([], [], 8928)"
 selected_recipes_replayed,True,[]
-final_mappings_and_bounds_replayed,True,[]
+final_test_keys_mappings_and_bounds_replayed,True,[]
 saved_models_reproduce_predictions,True,[]
 annual_and_pooled_metrics_replayed,True,[]
 predictions_stay_in_own_setting_cohort,True,[]

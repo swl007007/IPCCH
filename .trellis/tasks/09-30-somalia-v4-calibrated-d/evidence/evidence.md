@@ -11,21 +11,23 @@ Execution authorized by the user's goal on 2026-09-30 ("完成目前落盘的spe
 | `e0757fc` | v4 implementation: `augexp` v4 section (PoolSpec/PoolIndex, contexts, OOF units, 144-recipe scoring, cohorts, keyed evaluation), `decay_weights(half_life=None)`, `select_candidate(extra_order)`, optional `prepare(first_model_year, folds)`; runner, replay, unit and smoke tests, `configs/somalia_v4_calibrated_d.json` |
 | `5fbe597` | Fix from the internal trellis-check review: a residual model is required exactly on rows with a permitted baseline (scoring, calibration, final); a learned mapping whose required unit failed on any calibration key is unsupported instead of being fitted on fewer keys. Replay mirrors the rule; stronger cross-setting check; augmentation-unavailable slots kept; spec lessons |
 | `a88a1f5` | `--final-workers` (resource only; recipe unchanged) after the OOM of attempt 2 |
+| `a787257` | Round-1 audit repairs (see below): context-specific history recomputation for rows exposed to an excluded report family; replay rebuilt from raw/snapshot sources with full dependency, slot and metric coverage; strict cohort keys in the evaluator; partial original reports kept for ledger QC |
 
 ## Runs and tests
 
 | Item | Code | Command | Outcome |
 |---|---|---|---|
-| Focused unit tests | `a88a1f5` | `pytest tests/unit/test_somalia_v4.py` | 19 passed |
-| Synthetic smoke + replay | `5fbe597` | `pytest tests/smoke/test_somalia_v4_pipeline.py` | 1 passed (full CLI on a synthetic 2016-2026 panel; replay of its output passes every check) |
-| Legacy Somalia regression | `5fbe597` | `pytest tests/unit/test_somalia_{q3opt,augment,oracle}.py tests/smoke/test_somalia_{augment,q3opt,oracle}_pipeline.py` | all passed (72 with v4 tests before the fix; 54-test subset after) |
+| Focused unit tests | `a787257` | `pytest tests/unit/test_somalia_v4.py` | 24 passed (incl. history recomputation identity/exclusion, history-only pool exclusions, key `hx`, strict cohort keys, partial originals) |
+| Synthetic smoke + replay | `a787257` + replay vectorization | `pytest tests/smoke/test_somalia_v4_pipeline.py` | 1 passed (synthetic 2016-2026 panel with an overlapping Jan-Mar 2023 window and partial March reports, so test-row history overrides occur; replay of its output passes every check) |
+| Legacy Somalia regression | `a787257` | `pytest tests/unit/test_somalia_{q3opt,augment,oracle}.py tests/smoke/test_somalia_{augment,q3opt,oracle}_pipeline.py` | 55 passed |
 | Real prepare-only | `e0757fc`+wip | `run_somalia_v4_calibrated_d.py --prepare-only --out-dir /tmp/somalia_v4_prepare` | inputs, cohorts, 142 jobs, 142 supported contexts (62 unique), 331 pool specs, 10,320 OOF fits planned, 0 empty pools |
 | Bounded real pilot | `e0757fc` | `--workers 12 --pilot augmented:2024:0 --pilot original:2023:12 --out-dir /tmp/somalia_v4_pilot` | exit 0, 611 s, 1,056 OOF fits, 9 final fits; replay 94/94 (`pilot_replay_summary.json`); free memory fell to ~200 MB in the final-fit phase |
 | Production attempt 1 | `e0757fc` | `--workers 10` | stopped by the executor at 50% OOF after the review finding (no outputs kept) |
 | Production attempt 2 | `5fbe597` | `--workers 10` | OOF + selection completed; final fits OOM-killed (BrokenProcessPool) at 35/142 (`run_attempt2_oom_log.txt`); outputs discarded |
-| **Production run (evidence)** | **`a88a1f5`** (only unrelated untracked `scripts/reporting/somalia_oracle_wrapup.py`) | `PYTHONPATH=src python -u scripts/modeling/run_somalia_v4_calibrated_d.py --workers 10 --final-workers 4` | exit 0, 5,180 s; 10,320 OOF fits, 62 selections × 144 recipes, 142 final fits (`run_manifest.json`, `run_log.txt`) |
-| Independent replay | `a88a1f5` | `scripts/postprocessing/replay_somalia_v4.py --out-dir results/experiments/somalia_oracle/v4_calibrated_d` | **95/95** checks (`replay_checks.csv`): cohorts rebuilt from the ledger + digests, every pool rebuilt from its spec (hash), member/calibration/final temporal and family isolation, final-fit decay weights, 8,928 candidate scores recomputed with independent isotonic/shift code, all 142 selections, final mappings/bounds, 43,864 saved-model probe rows, annual/pooled metrics (sklearn), setting-only prediction keys |
-| Full suite | `a88a1f5` | `pytest tests` | 12 failed / 285 passed; the 12 are the known pre-existing alert-risk-map / launch-CLI baseline (same tests as v3's 12/265) |
+| Production run, round 1 | `a88a1f5` | `--workers 10 --final-workers 4` | exit 0, 5,180 s; replay 95/95; superseded by the round-1 repairs (`round1_run/`) |
+| **Production run (evidence)** | **`a787257`** (only unrelated untracked `scripts/reporting/somalia_oracle_wrapup.py`) | `PYTHONPATH=src python -u scripts/modeling/run_somalia_v4_calibrated_d.py --workers 10 --final-workers 4 --overwrite` (output root held only an undeletable empty directory) | exit 0, 5,301 s; 10,320 OOF fits, 62 selections × 144 recipes, 142 final fits, 49 history-override test rows (`run_manifest.json`, `run_log.txt`, `history_overrides.csv.gz`); history identity gate identical at all horizons (`history_identity_check.csv`) |
+| Independent replay | `a787257` | `scripts/postprocessing/replay_somalia_v4.py --out-dir results/experiments/somalia_oracle/v4_calibrated_d` | **105/105** checks (`replay_checks.csv`): label ledger rebuilt from the raw panel + validity snapshot (keys, copies, lineage, availability, values), realized-weather verification rebuilt from raw, config/input/snapshot digests, 40/8 slot inventory, job/context reconciliation, cohorts + digests, every pool rebuilt from its spec with exposed rows recomputed, member/calibration/final-calibration/final-fit temporal, family and history isolation incl. `hx`, 49 override baselines rebuilt, final-fit decay weights, 8,928 candidate scores and all 142 selections, final test keys/mappings/bounds, 43,864 saved-model probe rows (49 with override features), every reported annual/pooled metric field and composition |
+| Full suite | `a787257` | `pytest tests` | 12 failed / 290 passed; the 12 are the known pre-existing alert-risk-map / launch-CLI baseline (`full_suite_result.txt`) |
 
 Inputs (sha256 prefix, `run_manifest.json`): climate 2015-2026 `f024a66c…` (pinned), raw `ae696087…`, deep `60610cd6…`, lookup `e2baf6ae…`, fs0-3 parity references, validity snapshot `f5418154…` (pinned), tree bundles `9d572793…` (pinned). Runtime: Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0 (checked against the config before running).
 
@@ -39,7 +41,7 @@ Inputs (sha256 prefix, `run_manifest.json`): climate 2015-2026 `f024a66c…` (pi
 | AC4 two scenarios | `v4_freeze_cohorts`: original cohorts have 0 copies, augmented admits copies (2022-2024 tests: 1,374 / 995 / 1,420 copies); 4,409 copies over 2019-2024 incl. 620 pre-2022 (`label_support_by_year.csv`); every pool spec of `original` excludes copies (replay `pools_rebuilt_from_specs`); `predictions_stay_in_own_setting_cohort`; no cross-setting outputs |
 | AC5 annual folds and isolation | Fold upper year Y-1 for recipient and source year, no lower bound (earliest supervised year 2017); per-row origin `v-H` for every scoring/calibration key incl. copies; own, served-scoring and outer-test families purged (`pool_specs.csv.gz`, replay `temporal_and_report_isolation`); `cohort_slots.csv` gives actual target coverage |
 | AC6 pooled results | `v4_evaluate` concatenates each setting/H's annual keyed rows (equal weight), recomputes metrics, records `rows_by_year` and cohort hash; replay recomputes pooled metrics from rows |
-| AC7 evidence/checks | Focused tests cover each boundary in implement.md §5 (19 unit tests incl. copied-row origin, transitive purge, H12 origin, unsupported-not-shrunk, residual-required-on-baseline, keyed joins, G9, round-trip floats); replay above |
+| AC7 evidence/checks | Focused tests cover each boundary in implement.md §5 (24 unit tests incl. context-specific history, copied-row origin, transitive purge, H12 origin, unsupported-not-shrunk, residual-required-on-baseline, keyed joins, G9, round-trip floats); replay above |
 | AC8 lifecycle | `lifecycle.md`; run `0e231056…`, executor session `7cea05f8…`, base `5b053ff` |
 
 ## Results (retrospective oracle-information evaluation; `results_summary.md`)
@@ -52,7 +54,7 @@ Pooled 2022-2026, each setting on its own population (not comparable across sett
 | original | 3 | 2,723 | −0.471 | 26.20 | 0.648 | 0.759 |
 | original | 6 | 2,723 | −0.618 | 27.48 | 0.542 | 0.619 |
 | original | 12 | 3,680 | −1.400 | 31.63 | 0.423 | 0.523 |
-| augmented | 0 | 9,017 | 0.170 | 18.95 | 0.749 | 0.793 |
+| augmented | 0 | 9,017 | 0.166 | 18.99 | 0.747 | 0.793 |
 | augmented | 3 | 6,512 | −0.193 | 24.22 | 0.671 | 0.736 |
 | augmented | 6 | incomplete | | | | |
 | augmented | 12 | 7,469 | −1.051 | 30.93 | 0.420 | 0.569 |
@@ -62,6 +64,20 @@ Annual slots: 35 complete, 4 structurally empty (2026 H3/H6 in both settings: no
 ### Incomplete slot (G9)
 
 `augmented 2023 H6` (origins 2023-02, 2023-03; 696 of 2,013 keys) selected residual X6 / 12-month / isotonic on its scoring keys. The final mapping must be refit on the latest three rounds (2022-05/07/10); at H6 the 348 areas first labelled in 2022-07 have no history before T−6, so the residual branch has 2 baseline rows in a single round (minimum two rounds). Per G9 the selected mapping stays unavailable — no clipped-raw substitution and no switch of method — so this annual slot and the augmented H6 pooled result are reported incomplete. The other 39 slots and seven pooled results are unaffected. Selecting only recipes whose final mapping is supported would be a change to the approved selection contract and was not made after seeing this outcome.
+
+## Audit round 1 (Codex gpt-6-astra, xhigh; `audits/close_audit_1.json`, `audits/spot_audit_1.json`) and repairs
+
+Both audits of `fef36dd` returned `findings`. Classification (user rule: does it change a result?):
+
+| Finding | Class | Changes a result? | Repair (`a787257`) |
+|---|---|---|---|
+| spot A02 / close A03: excluded report families still reach rows through precomputed history features / residual baselines | correctness | **Yes**: 49 outer test rows of `augmented_y2023_h00_o2023-03` used the held-out January 2023 report as history/baseline (no OOF pool affected) | `V4History`: rows of a context whose history contains an excluded family (fitting rows, OOF prediction rows, outer test rows) get rich history, residual baseline and categorical history recomputed without it; pool specs keep history-only exclusions; keys carry `hx`/`base_ok`; identity gate |
+| close A01 / spot A01: replay does not rebuild source labels or traverse history/final-calibration dependencies | reproducibility (evidence) | No | Replay rebuilds labels/copies from raw + snapshot and weather verification from raw, checks digests, traverses final calibration and history exposure, rebuilds override baselines |
+| close A02 / spot A03: replay misses slot inventory, some metric fields, context reconciliation | reproducibility (evidence) | No | 40/8 inventory, job/context/selection reconciliation (`n_cand == 144 × contexts`), every metric field + composition |
+| spot A05: evaluator silently ignores prediction keys outside the cohort | data integrity | No (production keys matched) | `v4_evaluate` raises; replay checks per-slot keys |
+| A04 (both): partial original reports dropped before history QC | contract (inherited) | No (no partial blocks in raw) | `mark_partial_originals` keeps them as originals for ledger QC |
+
+Numeric effect of the repair (all other 38 annual and 7 pooled slots identical to round 1): augmented 2023 H0 final R² −0.192 → −0.209, RMSE 22.68 → 22.84 pp, AUC 0.826 → 0.824; augmented pooled H0 final R² 0.170 → 0.166, AUC 0.749 → 0.747.
 
 ## Known limitations
 

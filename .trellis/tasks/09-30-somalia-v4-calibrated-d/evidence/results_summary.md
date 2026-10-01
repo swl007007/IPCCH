@@ -1,6 +1,6 @@
 # Somalia v4 calibrated D — results
 
-Code `a88a1f583c928064a3b565eb337b5ec7afb038b8`; mode `full`. Two distinct label scenarios, each evaluated on its own population: **original** uses observed raw labels only in every role (fit, selection, calibration, test); **augmented** also admits permitted validity-period copies in every role. Score differences between the settings are not augmentation effects and are not ranked. Each (setting, outer year, horizon, origin) selected its own recipe from 6 bundles × 4 half-lives × direct/residual × none/shift/isotonic by pooled training-period OOF final-q3 RMSE (AUC only breaks numerical ties). Retrospective oracle-information evaluation (ideal label availability, realized future weather); not operational forecast skill.
+Code `a78725763e696766bcbd47e30a508e39bef91c28`; mode `full`. Two distinct label scenarios, each evaluated on its own population: **original** uses observed raw labels only in every role (fit, selection, calibration, test); **augmented** also admits permitted validity-period copies in every role. Score differences between the settings are not augmentation effects and are not ranked. Each (setting, outer year, horizon, origin) selected its own recipe from 6 bundles × 4 half-lives × direct/residual × none/shift/isotonic by pooled training-period OOF final-q3 RMSE (AUC only breaks numerical ties). Retrospective oracle-information evaluation (ideal label availability, realized future weather); not operational forecast skill.
 
 Outer cohorts at H>0 keep only rows whose realized weather at the oracle offsets is verified (inherited rule, frozen before fitting). Rows removed by this rule (removed / cohort): augmented 2025 H3 1601/1876, augmented 2025 H6 1601/1876, augmented 2025 H12 776/1876, augmented 2026 H3 904/904, augmented 2026 H6 904/904, augmented 2026 H12 772/904, original 2025 H3 1601/1876, original 2025 H6 1601/1876, original 2025 H12 776/1876, original 2026 H3 904/904, original 2026 H6 904/904, original 2026 H12 772/904. Pooled H>0 results are therefore weighted towards the years with verified weather.
 
@@ -11,7 +11,7 @@ Copies admitted to the augmented scenario: 4409 (2019: 146, 2020: 296, 2021: 178
 | Year | H | Status | n (copies) | Final R² | Raw R² | RMSE (pp) | MAE (pp) | Bias (pp) | Final AUC | F1 | Precision | Recall |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 2022 | 0 | complete | 2094.0 (1374.0) | -0.197 | -0.586 | 24.41 | 20.28 | -16.55 | 0.765 | 0.924 | 0.898 | 0.952 |
-| 2023 | 0 | complete | 2013.0 (995.0) | -0.191 | 0.145 | 22.68 | 18.52 | 14.23 | 0.826 | 0.821 | 0.696 | 0.999 |
+| 2023 | 0 | complete | 2013.0 (995.0) | -0.208 | 0.134 | 22.84 | 18.68 | 14.41 | 0.824 | 0.820 | 0.695 | 0.999 |
 | 2024 | 0 | complete | 2130.0 (1420.0) | 0.367 | 0.367 | 12.49 | 9.97 | 1.32 | 0.761 | 0.675 | 0.592 | 0.786 |
 | 2025 | 0 | complete | 1876.0 (0.0) | 0.125 | 0.125 | 12.14 | 9.56 | 1.62 | 0.724 | 0.729 | 0.658 | 0.817 |
 | 2026 | 0 | complete | 904.0 (0.0) | -0.189 | 0.130 | 19.53 | 15.32 | -10.34 | 0.737 | 0.615 | 0.812 | 0.495 |
@@ -35,7 +35,7 @@ Copies admitted to the augmented scenario: 4409 (2019: 146, 2020: 296, 2021: 178
 
 | H | Status | Rows by year | n (copies) | Final R² | Raw R² | RMSE (pp) | MAE (pp) | Bias (pp) | Final AUC | F1 | Precision | Recall |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | complete | 2022:2094;2023:2013;2024:2130;2025:1876;2026:904 | 9017.0 (3789.0) | 0.170 | 0.164 | 18.95 | 14.72 | -1.06 | 0.749 | 0.793 | 0.732 | 0.865 |
+| 0 | complete | 2022:2094;2023:2013;2024:2130;2025:1876;2026:904 | 9017.0 (3789.0) | 0.166 | 0.162 | 18.99 | 14.76 | -1.01 | 0.747 | 0.793 | 0.732 | 0.865 |
 | 3 | complete | 2022:2094;2023:2013;2024:2130;2025:275 | 6512.0 (3789.0) | -0.193 | -0.081 | 24.22 | 18.70 | -2.89 | 0.671 | 0.736 | 0.701 | 0.775 |
 | 6 | incomplete: annual slots incomplete: 2023 | | | | | | | | | | | |
 | 12 | complete | 2022:2094;2023:2013;2024:2130;2025:1100;2026:132 | 7469.0 (3789.0) | -1.051 | -0.421 | 30.93 | 25.43 | 1.81 | 0.420 | 0.569 | 0.553 | 0.586 |

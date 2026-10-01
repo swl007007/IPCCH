@@ -1,8 +1,10 @@
 {
- "checks": 95,
- "passed": 95,
+ "checks": 105,
+ "passed": 105,
  "failed": [],
  "candidates_replayed": 8928,
  "probe_rows": 43864,
+ "probe_rows_with_history_overrides": 49,
+ "history_override_rows": 49,
  "run_mode": "full"
 }

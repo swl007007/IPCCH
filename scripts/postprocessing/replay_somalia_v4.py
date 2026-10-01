@@ -256,6 +256,19 @@ def main(argv=None):
                 out.add(f)
         return frozenset(out)
 
+    def exposed_mask(h, df, fams):
+        """Vectorized ``exposing`` over rows of df (area_id, target_ord, history_cutoff_ord, source_family)."""
+        area, cut = df["area_id"].to_numpy(), df["history_cutoff_ord"].to_numpy()
+        tgt, own = df["target_ord"].to_numpy(), df["source_family"].to_numpy(dtype=object)
+        out = np.zeros(len(df), dtype=bool)
+        for f in fams:
+            mm = pd.Series(rich.get(f, {}), dtype=float).reindex(area).to_numpy(float)
+            hit = np.isfinite(mm) & (mm <= cut)
+            if h < 12 and catp.get(f):
+                hit |= np.fromiter(((a, t - max(1, h)) in catp[f] for a, t in zip(area, tgt)), dtype=bool, count=len(df))
+            out |= hit & (own != f)
+        return out
+
     ovr = R.read("selection/history_overrides.csv.gz", dtype={"hx": str}) if (args.out_dir / "selection" / "history_overrides.csv.gz").stat().st_size > 30 else pd.DataFrame(
         columns=["scope", "role", "horizon", "area_id", "target_ord", "hx", "frame_hist_q3_obs1", "context_hist_q3_obs1", "context_obs1_source_ord", "context_base_ok"])
     ovr["hx"] = ovr["hx"].fillna("")
@@ -275,10 +288,10 @@ def main(argv=None):
             bad.append(("hash", r.spec_id))
         if r.setting == "original" and sub["is_copy"].any():
             bad.append(("copy", r.spec_id))
-        for q in sub.itertuples(index=False):  # every pool row exposed to an excluded family is fitted with recomputed history
-            if ex and exposing(r.horizon, q.area_id, q.history_cutoff_ord, q.target_ord, ex) and (f"spec:{r.spec_id}", q.area_id, q.target_ord) not in fit_ovr:
+        if ex and len(sub):  # every pool row exposed to an excluded family is fitted with recomputed history
+            hit = exposed_mask(r.horizon, sub, ex)
+            if any((f"spec:{r.spec_id}", a, t) not in fit_ovr for a, t in zip(sub["area_id"].to_numpy()[hit], sub["target_ord"].to_numpy()[hit])):
                 bad.append(("unrecomputed_exposed_pool_row", r.spec_id))
-                break
     R.check("pools_rebuilt_and_exposed_rows_recomputed", not bad, bad[:5])
     mem = R.read("selection/scoring_keys.csv.gz", dtype={"hx": str})
     cal = R.read("selection/calibration_keys.csv.gz", dtype={"hx": str})
@@ -288,6 +301,8 @@ def main(argv=None):
     fam_of = led.set_index(["area_id", "target_ord"])["source_family"]
     fam_by_round = led.loc[~led["is_copy"]].drop_duplicates("original_month_ord").set_index("original_month_ord")["source_family"]
     pv_cut = {h: p.set_index(["area_id", "target_ord"])["history_cutoff_ord"] for h, p in prov.items()}
+
+    hist_cache = {}
 
     def key_ok(r, h, origin, tf, served, kind):
         sp = spec_by.loc[r.spec_id]
@@ -300,10 +315,13 @@ def main(argv=None):
             errs.append(f"{kind}_after_origin")
         if nominal & set(sub["source_family"]):
             errs.append(f"{kind}_family_in_pool_labels")
-        for q in base.itertuples(index=False):
-            if q.source_family not in nominal and exposing(h, q.area_id, q.history_cutoff_ord, q.target_ord, nominal) - ex:
-                errs.append(f"{kind}_family_in_pool_history")
-                break
+        ck = (r.spec_id, frozenset(nominal))
+        if ck not in hist_cache:
+            rest = nominal - ex
+            keep = ~base["source_family"].isin(nominal).to_numpy()
+            hist_cache[ck] = bool(rest) and bool(exposed_mask(h, base.loc[keep], rest).any())
+        if hist_cache[ck]:
+            errs.append(f"{kind}_family_in_pool_history")
         if exposing(h, r.area_id, pv_cut[h][(r.area_id, r.target_ord)], r.target_ord, set(tf) | ({served} if served else set())) != hx_set(r.hx):
             errs.append(f"{kind}_hx")
         return errs
@@ -334,10 +352,10 @@ def main(argv=None):
             base, sub, ex = pool_rows[c.fit_spec_id]
             if sp.label_cutoff_ord != origin or sp.available_by_ord != origin or set(sub["source_family"]) & tf or (sub["target_ord"] // 12 > c.outer_year - 1).any():
                 viol.append(("fit_spec", c.job_id))
-            for q in sub.itertuples(index=False):
-                if tf and exposing(h, q.area_id, q.history_cutoff_ord, q.target_ord, tf) and (f"job:{c.job_id}", q.area_id, q.target_ord) not in fit_ovr:
+            if tf and len(sub):
+                hit = exposed_mask(h, sub, tf)
+                if any((f"job:{c.job_id}", a, t) not in fit_ovr for a, t in zip(sub["area_id"].to_numpy()[hit], sub["target_ord"].to_numpy()[hit])):
                     viol.append(("final_fit_history", c.job_id))
-                    break
     R.check("temporal_report_and_history_isolation", not viol, sorted(set(viol))[:6])
 
     # override values rebuilt independently: latest permitted original of the area at or before the cutoff

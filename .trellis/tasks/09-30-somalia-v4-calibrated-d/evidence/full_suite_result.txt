@@ -1,0 +1,13 @@
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_cli_smoke_generates_all_outputs_and_summary
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_missing_required_prediction_columns_fail_without_outputs
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_all_null_required_values_fail_without_outputs
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_no_2025_rows_fail_without_outputs
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_missing_temporal_fields_fail_without_outputs
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_unmatched_spatial_area_id_failure_without_outputs
+FAILED tests/integration/test_plot_2025_alert_risk_maps_cli.py::test_existing_output_conflict_without_overwrite
+FAILED tests/smoke/test_launch_cli.py::test_help_runs_without_computation - a...
+FAILED tests/smoke/test_launch_cli.py::test_invalid_scope_fails_before_workflow_steps
+FAILED tests/unit/test_alert_risk_maps.py::test_output_conflict_validation - ...
+FAILED tests/unit/test_alert_risk_maps.py::test_somalia_local_rejection - Fai...
+FAILED tests/unit/test_launch_scope_outputs.py::test_model_aligned_xtest_excludes_scope_months_metadata
+12 failed, 290 passed, 6 warnings in 1469.89s (0:24:29)
