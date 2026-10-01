@@ -35,6 +35,9 @@ DEFAULT_OUT = paths.RESULTS_DIR / "experiments" / "somalia_oracle" / "v4_calibra
 DEFAULT_REPORT = paths.REPORTS_DIR / "somalia_oracle" / "v4_calibrated_d"
 
 
+OVERRIDE_COLUMNS = ["scope", "role", "horizon", "area_id", "target_ord", "hx", "frame_hist_q3_obs1", "context_hist_q3_obs1", "context_obs1_source_ord", "context_base_ok"]
+
+
 class V4Error(RuntimeError):
     """A v4 run-level contract does not hold."""
 
@@ -183,7 +186,21 @@ def main(argv=None):
         active = [s for s in settings if s != "augmented"]
         jobs = jobs.loc[jobs["data_setting"] != "augmented"].reset_index(drop=True)
     # ---------------- contexts (frozen from label/pool support before any fit) ----------------
-    pools = {(s, h): ax.PoolIndex(prep.frames[h], s, h) for s in active for h in horizons}
+    history = ax.V4History(ledger, prep.frames, prep.schemas)
+    ident = []
+    for h in horizons:  # context-specific recomputation must equal the frame when nothing is excluded
+        f = prep.frames[h]
+        rows = np.arange(0, len(f), max(1, len(f) // 400))
+        Xr, br, sr, okr = history.features(h, rows, ())
+        X0 = f[prep.schemas[h]].to_numpy(dtype=np.float32)[rows]
+        b0, ok0 = ax._baseline(f)
+        same = bool(np.array_equal(Xr, X0, equal_nan=True) and np.array_equal(okr, ok0[rows]) and np.array_equal(br[okr], b0[rows][okr])
+                    and np.array_equal(sr, f["history_obs1_source_ord"].to_numpy(dtype=np.int64)[rows]))
+        ident.append({"horizon": h, "rows_checked": int(rows.size), "identical": same})
+        if not same:
+            raise V4Error(f"H={h}: recomputed history features differ from the frame with no exclusions")
+    written["history_identity_check"] = write(pd.DataFrame(ident), out / "ledgers" / "history_identity_check.csv")
+    pools = {(s, h): ax.PoolIndex(prep.frames[h], s, h, history) for s in active for h in horizons}
     contexts, ctx_rows, member_rows, cal_rows, final_cal_rows, spec_rows = {}, [], [], [], [], {}
     for job in jobs.to_dict("records"):
         s, y, h, o = job["data_setting"], job["outer_year"], job["horizon"], job["origin_ord"]
@@ -204,7 +221,7 @@ def main(argv=None):
                 spec_rows[sid] = {**sp.describe(), "n_pool": int(idx.size), "pool_keys_sha256": ax.pool_hash(idx, f) if idx.size else None,
                                   "pool_max_target_ord": int(f["target_ord"].to_numpy()[idx].max()) if idx.size else None,
                                   "pool_max_source_available_ord": int(f["source_available_ord"].to_numpy()[idx].max()) if idx.size else None,
-                                  "pool_n_copies": int(f["is_copy"].to_numpy()[idx].sum()) if idx.size else 0}
+                                  "pool_n_copies": int(f["is_copy"].to_numpy()[idx].sum()) if idx.size else 0, "n_pool_history_overrides": int(pools[(s, h)].exposed(sp).sum())}
     ctx_table = pd.DataFrame(ctx_rows)
     written["contexts"] = write(ctx_table, out / "selection" / "contexts.csv")
     cat = lambda xs: pd.concat(xs, ignore_index=True) if xs else pd.DataFrame()
@@ -219,24 +236,60 @@ def main(argv=None):
     for job_id, ctx in contexts.items():
         if ctx.status != "ok":
             continue
-        need = pd.concat([ctx.members[["row", "spec_id"]], ctx.calibration[["row", "spec_id"]], ctx.final_calibration[["row", "spec_id"]]], ignore_index=True)
+        need = pd.concat([ctx.members[["row", "spec_id", "hx"]], ctx.calibration[["row", "spec_id", "hx"]], ctx.final_calibration[["row", "spec_id", "hx"]]], ignore_index=True)
         for sid, g in need.groupby("spec_id"):
+            pairs = set(zip(g["row"].astype(int), g["hx"].astype(str)))
             for b in [c["id"] for c in bundles["candidates"]]:
                 for hl in ax.V4_HALF_LIVES:
                     for form in ax.FORMULATIONS:
                         key = ax.v4_unit_key(sid, form, b, hl)
                         req = requests.setdefault(key, {"spec": ctx.specs[sid], "rows": set()})
-                        req["rows"].update(int(r) for r in g["row"])
+                        req["rows"].update(pairs)
     tasks = []
     store = ax.V4UnitStore()
+    override_rows, fit_ovr_cache, recorded_pred = [], {}, set()
+
+    def overrides(h, rows, hxs, scope, role):
+        """Recomputed inputs for (row, history-exclusion) pairs, recorded for the replay."""
+        Xo, bo, oko, so = history.row_inputs(h, rows, hxs)
+        f = prep.frames[h]
+        b0 = f["hist_q3_obs1"].to_numpy(dtype=float)[rows]
+        for k, r in enumerate(rows):
+            override_rows.append({"scope": scope, "role": role, "horizon": h, "area_id": int(f["area_id"].iat[r]), "target_ord": int(f["target_ord"].iat[r]), "hx": ax.hx_label(hxs[k]),
+                                  "frame_hist_q3_obs1": b0[k], "context_hist_q3_obs1": bo[k], "context_obs1_source_ord": int(so[k]), "context_base_ok": bool(oko[k])})
+        return {"pos": None, "X": Xo, "b": bo, "ok": oko}
+
     for key, req in requests.items():
         sp = req["spec"]
-        fit_idx = pools[(sp.setting, sp.horizon)].rows(sp)
-        pred_idx = np.array(sorted(req["rows"]), dtype=np.int64)
-        t = {"key": key, "horizon": sp.horizon, "formulation": key[1], "bundle": key[2], "half_life": key[3], "fit_idx": fit_idx, "pred_idx": pred_idx, "weight_origin": sp.available_by}
+        h = sp.horizon
+        fit_idx = pools[(sp.setting, h)].rows(sp)
+        pairs = sorted(req["rows"])
+        pred_idx = np.array([r for r, _ in pairs], dtype=np.int64)
+        hxs = [ax.hx_parse(x) for _, x in pairs]
+        codes = np.array([history.code(hx) for hx in hxs], dtype=np.int64)
+        t = {"key": key, "horizon": h, "formulation": key[1], "bundle": key[2], "half_life": key[3], "fit_idx": fit_idx, "pred_idx": pred_idx, "pred_key": pred_idx * ax.HX_SCALE + codes,
+             "weight_origin": sp.available_by}
         if fit_idx.size == 0:
-            store.add({"key": key, "status": "unsupported", "pred_idx": pred_idx, "raw_q3": np.full(pred_idx.size, np.nan), "n_fit": 0, "n_fit_used": 0, "fit_max_target_ord": None, "model_kind": None, "sum_weight": 0.0, "min_weight": np.nan})
+            store.add({"key": key, "status": "unsupported", "pred_key": t["pred_key"], "raw_q3": np.full(pred_idx.size, np.nan), "n_fit": 0, "n_fit_used": 0, "fit_max_target_ord": None, "model_kind": None,
+                       "sum_weight": 0.0, "min_weight": np.nan, "n_fit_history_overrides": 0})
             continue
+        exposed = np.flatnonzero(pools[(sp.setting, h)].exposed(sp))
+        if exposed.size:
+            if sp.id not in fit_ovr_cache:
+                o = overrides(h, fit_idx[exposed], [sp.excluded] * exposed.size, f"spec:{sp.id}", "fit")
+                o["pos"] = exposed
+                fit_ovr_cache[sp.id] = o
+            t["fit_ovr"] = fit_ovr_cache[sp.id]
+        need = np.flatnonzero(codes > 0)
+        if need.size:
+            pkey = (sp.id, tuple(t["pred_key"][need]))
+            if pkey not in recorded_pred:
+                recorded_pred.add(pkey)
+                o = overrides(h, pred_idx[need], [hxs[k] for k in need], f"spec:{sp.id}", "oof_prediction")
+            else:
+                o = dict(zip(("X", "b", "ok"), history.row_inputs(h, pred_idx[need], [hxs[k] for k in need])[:3]))
+            o["pos"] = need
+            t["pred_ovr"] = o
         if int(prep.frames[sp.horizon]["target_ord"].to_numpy()[fit_idx].max()) > sp.label_cutoff or int(prep.frames[sp.horizon]["source_available_ord"].to_numpy()[fit_idx].max()) > sp.available_by:
             raise V4Error("a unit pool violates its own cutoff")
         tasks.append(t)
@@ -248,6 +301,7 @@ def main(argv=None):
         written["unit_inventory"] = write(inv.groupby(["setting", "horizon", "formulation"]).agg(units=("n_pool", "size"), empty_pools=("n_pool", lambda x: int((x == 0).sum())), mean_pool=("n_pool", "mean"),
                                                                                                max_pool=("n_pool", "max"), pred_rows=("n_pred", "sum")).reset_index(), out / "selection" / "unit_inventory.csv")
     if args.prepare_only:
+        written["history_overrides"] = write(pd.DataFrame(override_rows, columns=OVERRIDE_COLUMNS).drop_duplicates(), out / "selection" / "history_overrides.csv.gz")
         manifest.update(mode="prepare_only", written=written, elapsed_seconds=time.time() - t0, n_oof_units=len(requests), n_oof_fits=len(tasks))
         (out / "manifest.json").write_text(json.dumps(manifest, indent=1, default=str))
         log("prepare-only done (inputs, cohorts, contexts and fit inventory frozen; no model fitted)")
@@ -256,12 +310,16 @@ def main(argv=None):
     for res in run_pool(ax.v4_unit_task, tasks, args.workers, "OOF units"):
         store.add(res)
     unit_rows, oof_parts = [], []
+    code_map = history.codes()
     for key, u in store.units.items():
         sp = requests[key]["spec"]
         f = prep.frames[sp.horizon]
         unit_rows.append({"unit_id": ax.v4_unit_id(key), "spec_id": key[0], "formulation": key[1], "bundle": key[2], "half_life": key[3], "setting": sp.setting, "horizon": sp.horizon,
-                          "weight_origin_ord": sp.available_by, "status": u["status"], **{k: u[k] for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight")}, "n_pred": int(u["rows"].size)})
-        oof_parts.append(pd.DataFrame({"unit_id": ax.v4_unit_id(key), "area_id": f["area_id"].to_numpy()[u["rows"]], "target_ord": f["target_ord"].to_numpy()[u["rows"]], "raw_q3": u["raw"]}))
+                          "weight_origin_ord": sp.available_by, "status": u["status"], **{k: u[k] for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight", "n_fit_history_overrides")},
+                          "n_pred": int(u["keys"].size)})
+        rows_u, codes_u = u["keys"] // ax.HX_SCALE, u["keys"] % ax.HX_SCALE
+        oof_parts.append(pd.DataFrame({"unit_id": ax.v4_unit_id(key), "area_id": f["area_id"].to_numpy()[rows_u], "target_ord": f["target_ord"].to_numpy()[rows_u],
+                                       "hx": [ax.hx_label(code_map[c]) for c in codes_u], "raw_q3": u["raw"]}))
     written["oof_units"] = write(pd.DataFrame(unit_rows), out / "selection" / "oof_units.csv.gz")
     written["oof_predictions"] = write(cat(oof_parts), out / "selection" / "oof_predictions.csv.gz")
     del oof_parts
@@ -273,7 +331,7 @@ def main(argv=None):
         sig = ctx.selection_signature
         if ctx.status != "ok" or sig in by_sig:
             continue
-        scores, preds = ax.v4_score_context(store, prep.frames[ctx.horizon], ctx, bundles, cfg)
+        scores, preds = ax.v4_score_context(store, prep.frames[ctx.horizon], ctx, bundles, cfg, history)
         best, tie = qo.select_candidate(scores, tol, True, extra_order=["decay_order"])
         by_sig[sig] = best
         score_tables.append(scores.assign(first_job_id=job_id))
@@ -301,7 +359,7 @@ def main(argv=None):
 
     # ---------------- final mappings and fits ----------------
     cohort_prim = cohort.loc[cohort["status"] == "primary"]
-    ftasks, meta, map_rows = [], {}, []
+    ftasks, meta, map_rows, final_override_features = [], {}, [], []
     for job in jobs.to_dict("records"):
         ctx = contexts[job["job_id"]]
         rec = selected.loc[selected["job_id"] == job["job_id"]].iloc[0]
@@ -320,14 +378,29 @@ def main(argv=None):
         if np.isin(f["source_family"].to_numpy()[fit_idx], list(ctx.test_families)).any():
             raise V4Error(f"{job['job_id']}: a test family entered its outer fitting pool")
         hl = ax.parse_half_life(rec["half_life"])
-        maps = ax.v4_fit_mappings(store, f, ctx.final_calibration, rec["formulation"], rec["bundle"], hl, rec["method"], int(cfg["min_calibration_rounds"]))
+        maps = ax.v4_fit_mappings(store, f, ctx.final_calibration, rec["formulation"], rec["bundle"], hl, rec["method"], int(cfg["min_calibration_rounds"]), history)
+        pred_hx = history.exposing(h, pred_idx, ctx.test_families)
+        extra = {}
+        need = np.array([k for k, hx in enumerate(pred_hx) if hx], dtype=np.int64)
+        if need.size:
+            o = overrides(h, pred_idx[need], [pred_hx[k] for k in need], f"job:{job['job_id']}", "test_prediction")
+            o["pos"] = need
+            extra["pred_ovr"] = o
+            final_override_features.append(pd.DataFrame(o["X"], columns=prep.schemas[h]).assign(job_id=job["job_id"], horizon=h, area_id=f["area_id"].to_numpy()[pred_idx[need]],
+                                                                                               target_ord=f["target_ord"].to_numpy()[pred_idx[need]], hx=[ax.hx_label(pred_hx[k]) for k in need]))
+        exposed = np.flatnonzero(pools[(job["data_setting"], h)].exposed(ctx.fit_spec))
+        if exposed.size:
+            o = overrides(h, fit_idx[exposed], [ctx.fit_spec.excluded] * exposed.size, f"job:{job['job_id']}", "final_fit")
+            o["pos"] = exposed
+            extra["fit_ovr"] = o
         key = job["job_id"]
         meta[key] = {"job_id": key, "data_setting": job["data_setting"], "outer_year": job["outer_year"], "horizon": h, "origin": sd.ord_label(job["origin_ord"]), "context_id": ctx.context_id,
                      "selection_signature": ctx.selection_signature, "formulation": rec["formulation"], "bundle": rec["bundle"], "half_life": rec["half_life"], "method": rec["method"],
                      "fit_spec_id": ctx.fit_spec.id, "n_fit": int(fit_idx.size), "n_fit_copies": int(f["is_copy"].to_numpy()[fit_idx].sum()),
                      "fit_max_target_ord": int(f["target_ord"].to_numpy()[fit_idx].max()), "fit_max_source_available_ord": int(f["source_available_ord"].to_numpy()[fit_idx].max())}
         map_rows += [{"job_id": key, "prediction_branch": n, **m.describe()} for n, m in maps.items()]
-        ftasks.append({"key": key, "horizon": h, "formulation": rec["formulation"], "bundle": rec["bundle"], "half_life": rec["half_life"], "origin_ord": job["origin_ord"], "fit_idx": fit_idx, "pred_idx": pred_idx, "mappings": maps})
+        ftasks.append({"key": key, "horizon": h, "formulation": rec["formulation"], "bundle": rec["bundle"], "half_life": rec["half_life"], "origin_ord": job["origin_ord"], "fit_idx": fit_idx, "pred_idx": pred_idx,
+                       "mappings": maps, "pred_hx": [ax.hx_label(x) for x in pred_hx], **extra})
     results = run_pool(ax.v4_final_task, ftasks, args.final_workers or args.workers, "final fits")
     preds, fits, status_rows, model_rows = [], [], [], []
     mdir = out / "models"
@@ -354,6 +427,11 @@ def main(argv=None):
     if preds.empty:
         preds = pd.DataFrame(columns=["area_id", "target_ord", "q3_raw", "q3_final", "clipped", "prediction_branch", "job_id", "data_setting", "outer_year", "horizon"])
     written["final_predictions"] = write(preds, out / "predictions" / "final_predictions.csv.gz")
+    ov = pd.DataFrame(override_rows, columns=OVERRIDE_COLUMNS)
+    written["history_overrides"] = write(ov.drop_duplicates(), out / "selection" / "history_overrides.csv.gz")
+    written["final_override_features"] = write(cat(final_override_features) if final_override_features else pd.DataFrame(columns=["job_id", "horizon", "area_id", "target_ord", "hx"]),
+                                               out / "features" / "final_override_features.csv.gz")
+    log(f"history overrides: {len(ov.drop_duplicates())} rows ({ov.groupby('role').size().to_dict() if len(ov) else {}})")
     written["final_status"] = write(pd.DataFrame(status_rows, columns=None if status_rows else status_cols), out / "fits" / "final_status.csv")
     written["fit_ledger"] = write(cat(fits), out / "fits" / "final_fit_ledger.csv.gz")
     written["calibration_mappings"] = write(pd.DataFrame(map_rows), out / "fits" / "calibration_mappings.csv")

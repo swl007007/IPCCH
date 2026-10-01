@@ -186,7 +186,7 @@ def _store_for(ctx, f, residual_ok=True, drop_row=None, residual_unsupported_spe
                     if drop_row is not None and form == "direct" and b == "X1":
                         raw = np.where(rows == drop_row, np.nan, raw)
                     status = "ok" if (form == "direct" or (residual_ok and sid not in residual_unsupported_specs)) else "unsupported"
-                    store.add({"key": ax.v4_unit_key(sid, form, b, hl), "status": status, "pred_idx": rows, "raw_q3": raw, "n_fit": 1, "n_fit_used": 1, "fit_max_target_ord": 0, "model_kind": "x", "sum_weight": 1.0, "min_weight": 1.0})
+                    store.add({"key": ax.v4_unit_key(sid, form, b, hl), "status": status, "pred_key": rows * ax.HX_SCALE, "raw_q3": raw, "n_fit": 1, "n_fit_used": 1, "fit_max_target_ord": 0, "model_kind": "x", "sum_weight": 1.0, "min_weight": 1.0})
     return store
 
 
@@ -322,3 +322,100 @@ def test_scoring_row_without_baseline_does_not_need_its_residual_unit():
     assert (ok["status"] == "ok").all()
     pr = preds[("X1", "24", "residual", "none")]
     assert set(pr.loc[pr["round"] == r0, "prediction_branch"]) == {"fallback_direct"}
+
+
+# ---------------- context-specific history (report isolation through features) ----------------
+
+from ipcch.somalia_oracle import augment as au
+from ipcch.somalia_oracle import history as hist
+from ipcch.somalia_oracle import monthly_features as mf
+
+
+def _history_world():
+    """Area 1: Jan A, Feb B (another report), Mar target; area 2: Jan A only (Mar is a copy of A)."""
+    raw = pd.DataFrame([(1, 2023, 1, 3, .2, .3, .3, .2, 0.), (1, 2023, 2, 2, .4, .3, .2, .1, 0.), (1, 2023, 3, 3, .2, .2, .3, .2, .1),
+                        (2, 2023, 1, 2, .5, .3, .1, .1, 0.), (2, 2022, 7, 2, .5, .3, .2, 0, 0.)],
+                       columns=["area_id", "year", "month", "overall_phase", *[f"phase{i}_percent" for i in range(1, 6)]])
+    raw["estimated_population"] = 1000.0
+    keys = set(zip(raw["area_id"], sd.month_ord(raw["year"], raw["month"])))
+    led = sd.build_label_ledger({"raw": raw}, keys)
+    fam = {M(2023, 1): "anl:A", M(2023, 2): "local:2023-02", M(2023, 3): "local:2023-03", M(2022, 7): "local:2022-07"}
+    led["source_family"] = led["target_ord"].map(fam)
+    led["is_copy"], led["original_month_ord"] = False, led["target_ord"]
+    led["source_available_ord"] = led["target_ord"]
+    copy = led.loc[(led["area_id"] == 2) & (led["target_ord"] == M(2023, 1))].assign(target_ord=M(2023, 3), month=3, is_copy=True, valid_history=False)
+    led = pd.concat([led, copy], ignore_index=True)
+    names = hist.history_feature_names()
+    f = led.loc[led["valid_target"]].copy().reset_index(drop=True)
+    f["origin_ord"] = f["target_ord"]
+    cutoff = f["target_ord"] - 1
+    f["history_cutoff_ord"] = np.where(f["is_copy"], np.minimum(cutoff, f["original_month_ord"] - 1), cutoff)
+    cat = mf.CATEGORY_HISTORY.format(h=0)
+    for c in [*names, cat, "hist_q3_obs1", "history_obs1_source_ord"]:
+        if c not in f:
+            f[c] = np.nan
+    frames, schemas = {0: f}, {0: [*names, cat]}
+    H = ax.V4History(led, frames, schemas)
+    X, b, src, ok = H.features(0, np.arange(len(f)), ())
+    f[[*names, cat]] = X.astype(float)
+    f["hist_q3_obs1"], f["history_obs1_source_ord"] = b, src
+    return led, f, H, schemas
+
+
+def test_history_recomputation_equals_frame_without_exclusions_and_drops_an_excluded_report():
+    led, f, H, schemas = _history_world()
+    rows = np.arange(len(f))
+    X, b, src, ok = H.features(0, rows, ())
+    assert np.array_equal(X, f[schemas[0]].to_numpy(np.float32), equal_nan=True)
+    r_b = int(np.flatnonzero((f["area_id"] == 1) & (f["target_ord"] == M(2023, 2)))[0])  # area 1 Feb (report B) sees Jan A
+    r_c = int(np.flatnonzero((f["area_id"] == 2) & (f["target_ord"] == M(2023, 3)) & f["is_copy"])[0])  # copy of A: never sees A
+    assert H.exposing(0, np.array([r_b, r_c]), ["anl:A"]) == [("anl:A",), ()]
+    X2, b2, src2, ok2 = H.features(0, np.array([r_b]), ["anl:A"])
+    assert src[r_b] == M(2023, 1) and src2[0] != M(2023, 1)  # residual baseline no longer from report A
+    assert not np.array_equal(X2[0], X[r_b], equal_nan=True)
+    cat = schemas[0].index(mf.CATEGORY_HISTORY.format(h=0))
+    assert np.isfinite(X[r_b, cat]) and np.isnan(X2[0, cat])  # categorical T-1 source was report A
+
+
+def test_pool_keeps_a_family_seen_only_through_history_and_marks_exposed_rows():
+    led, f, H, _ = _history_world()
+    p = ax.PoolIndex(f, "augmented", 0, H)
+    # labels <= Feb exclude nothing by label for "anl:X" style families; A has labels (Jan) -> label exclusion
+    sp = p.normalize(M(2023, 2), M(2023, 3), None, ("anl:A",))
+    assert sp.excluded == ("anl:A",)
+    rows = p.rows(sp)
+    assert "anl:A" not in set(f["source_family"].to_numpy()[rows])
+    exposed = p.exposed(sp)
+    feb = f["target_ord"].to_numpy()[rows] == M(2023, 2)
+    assert exposed[feb].all() and not exposed[~feb].any()
+
+
+def test_context_keys_carry_their_history_exclusions():
+    led, f, H, _ = _history_world()
+    f = f.assign(target_year=f["target_ord"] // 12, original_year=f["original_month_ord"] // 12)
+    p = ax.PoolIndex(f, "augmented", 0, H)
+    ctx = ax.v4_plan_context(f, p, "augmented", 2024, 0, M(2024, 1), ["anl:A"], {**CFG, "min_selection_rounds": 1})
+    feb = ctx.members.loc[ctx.members["target_ord"] == M(2023, 2)]
+    assert (feb["hx"] == "anl:A").all()
+    assert set(ctx.members["hx"]) <= {"", "anl:A"}
+
+
+def test_prediction_keys_outside_the_frozen_cohort_are_rejected():
+    f = _panel()
+    c = ax.v4_freeze_cohorts(_ledger(f), {0: f}, ["original"], [2022], [0])
+    p = _preds(c, f, "original", 2022, 0)
+    extra = p.iloc[:1].assign(area_id=999999)
+    with pytest.raises(ax.AugExpError):
+        ax.v4_evaluate(c, pd.concat([p, extra]), {0: f}, ["original"], [2022], [0])
+
+
+def test_partial_original_reports_are_kept_as_originals_with_their_month_family():
+    raw = pd.DataFrame([[1, M(2024, 1), 3.0, .3, .3, .3, .1, np.nan], [1, M(2024, 2), np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]],
+                       columns=["area_id", "target_ord", *au.LABEL_FIELDS])
+    links = pd.DataFrame([{"original_month_ord": M(2024, 1), "original_month": "2024-01", "link_status": "linked", "reason": None, "anl_id": "9", "valid_from_ord": M(2024, 1), "valid_to_ord": M(2024, 2)}])
+    aug, _ = au.augment_labels(raw, links, (2022, 2026))
+    assert aug["label_state"].tolist() == ["partial", "blank"] and not aug["is_copy"].any()  # a partial block is never a copy source
+    out = ax.mark_partial_originals(aug, links)
+    r = out.iloc[0]
+    assert r["label_state"] == "partial_original" and r["source_family"] == "anl:9" and r["original_month_ord"] == M(2024, 1) and r["source_available_ord"] == M(2024, 1)
+    assert out.iloc[1]["label_state"] == "blank"

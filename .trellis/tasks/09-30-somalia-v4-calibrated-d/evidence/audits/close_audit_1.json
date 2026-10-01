@@ -1,0 +1,274 @@
+{
+  "schema_version": "1.0",
+  "task": "somalia-v4-calibrated-d",
+  "mode": "close-audit",
+  "base_sha": "5b053ff0faa8c82684ab9fe01a24ce0fca4f3917",
+  "completion_sha": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+  "audited_sha": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+  "verdict": "findings",
+  "summary": "Full task review found three major defects (two replay/reproducibility gaps and an inherited transitive-history isolation defect) and one minor inherited history-QC defect. Unmodified production replay and focused tests pass; independently checked source values, metric values and current pool/calibration dependencies agree. The scientific augmented H6 incomplete result is correctly preserved under G9 and is not itself a defect.",
+  "coverage": [
+    {
+      "criterion": "AC1 / R1: approved, converged task contract and search budget precede implementation.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/prd.md:3-3",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/grill.md:77-109",
+        "The approved planning documents are present at base 5b053ff0faa8c82684ab9fe01a24ce0fca4f3917 and unchanged at the audited SHA; G1-G9 have no open decision."
+      ]
+    },
+    {
+      "criterion": "AC2 / R2: pinned 2015-2026 source, 14 predictors, actual-date seasonal selection and coverage limits.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/design.md:21-44",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:configs/somalia_v4_calibrated_d.json:4-18",
+        "/tmp/som-v4/close/input-hashes.json (sha256 d1bffe32df52e9da3dae66a8e400002255a31e12a03131e101032457b906db83) verifies all 10 recorded source/bundle inputs including raw, deep, fs0-fs3, lookup, climate and validity.",
+        "Read-only source verification checked all four horizons x 10312 feature rows: zero selected-season/date mismatches, zero mismatches in the 14 seasonal means, no season end later than the origin boundary; current saved rows all have selected seasonal status. Focused boundary tests cover incomplete-season handling."
+      ]
+    },
+    {
+      "criterion": "AC3 / R3,R11: fixed 144 recipes, independent origin-valid selection at every horizon, RMSE-first ties and no outer-score selection.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:640-699",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:819-867",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/q3opt.py:392-409",
+        "Saved inventory: 142 contexts, 62 unique selections x 144 recipes = 8928 scores; 10320 OOF units. All selections are independent of later H0 recipes; required residual support is checked on baseline-bearing rows. Training/history dependency violations are recorded separately under AC5."
+      ]
+    },
+    {
+      "criterion": "AC4 / R4,R7,R8,R12: separate original and augmented label roles, permitted copies and distinct scenario reporting.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:629-637",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:909-942",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/modeling/run_somalia_v4_calibrated_d.py:385-407",
+        "Raw-authority/source verification: 177364 Somalia raw rows; all saved originals and all 4409 copies match raw source values; every copied recipient has a fully blank raw six-field block. No copies enter original role pools/cohorts. 620 pre-2022 copies occur in 2019-2021; no 2025/2026 copied test rows are invented. Separate annual and pooled tables contain no cross-setting comparisons."
+      ]
+    },
+    {
+      "criterion": "AC5 / R5,R7,R8,R11: expanding five-year evaluation, origin/source cutoffs and complete transitive report/history isolation.",
+      "status": "violated",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/design.md:46-64",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/design.md:97-105",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:577-597",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d) confirms actual 331 pool histories and 166967 final-calibration keys; the synthetic history-purge and missing-P5 failures are findings A03/A04. Earliest eligible supervised year is 2017; no invented 2015/2016 outcomes."
+      ]
+    },
+    {
+      "criterion": "AC6 / R6: own-scenario, horizon-separated pooled metrics from equally weighted annual OOS keys.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:981-1027",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/annual_metrics.csv:1-41",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/pooled_metrics.csv:1-9",
+        "All 43864 prediction keys are unique within setting/year/horizon; the full requested metric inventory has 40 annual and 8 pooled slots. Complete pooled metrics are recomputed from their constituent rows, not annual metric averages."
+      ]
+    },
+    {
+      "criterion": "AC7 / R9,R12: retained keyed evidence, independent source/dependency/selection/metric replay and honest G9 failure statuses.",
+      "status": "violated",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/implement.md:43-48",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/run_manifest.json:169-359",
+        "/tmp/som-v4/close/audit-checks.log (sha256 0a9630d9b21f2c778034efe8df8109cae2373a24152fc8e9b0df0898c967914b)",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d)",
+        "All 37 manifest-written artifact hashes match the independent run copy; 21 committed key-ledger/metric copies agree byte-for-byte after decompression. G9 correctly retains 35 complete + 4 empty + 1 incomplete annual slot and 7 complete + 1 incomplete pooled slot; augmented 2023 H6 has 696 unavailable final predictions. The required independent replay is incomplete in scope as detailed in A01/A02."
+      ]
+    },
+    {
+      "criterion": "AC8 / R10: approved base and actual executor lifecycle binding are recorded; lifecycle setup is not treated as model authorization.",
+      "status": "met",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/lifecycle.md:3-31",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/evidence.md:5-5 records the subsequent execution instruction separately.",
+        "/tmp/som-v4/close/lifecycle-readonly.json (sha256 27a67b5dab5f8d185eb9528e171587d7ad79cdf16e7c38c1c282c53801ca7208) read via SQLite mode=ro confirms run 0e231056d9a04cf18d13ebb9495d1920, exact repository spelling, base 5b053ff0faa8c82684ab9fe01a24ce0fca4f3917, active phase, Claude session 7cea05f8-50d5-408d-aada-1948f70c734c and terminal term_65cb900f23bc17. No close/archive/controller transition was performed."
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest -q -rs -p no:cacheprovider --basetemp=/tmp/som-v4/close/pytest-temp-capped tests/unit/test_somalia_v4.py tests/unit/test_somalia_q3opt.py tests/unit/test_somalia_augment.py tests/unit/test_somalia_oracle.py tests/smoke/test_somalia_v4_pipeline.py",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som-v4/close/focused-tests.log (sha256 a21bfbc1ea0a968ca9727f5561a18e9f8c2769f016148baf8112d981d9b7eb9d)",
+        "71 passed, 1 skipped, 2 warnings in 256.97s (0:04:16)"
+      ]
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src OMP_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python scripts/postprocessing/replay_somalia_v4.py --out-dir /tmp/som-v4/close/run-copy",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only. Production artifacts independently copied (594692439 bytes); original artifacts read-only.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som-v4/close/production-replay.log (sha256 57899a821008668490bf7a0babb0d092b4f2035fbbf940599b59b6ae9a04be3f)",
+        "Unmodified data: 95/95 checks, 8928 candidate replays and 43864 saved-model prediction probes over every horizon. This pass does not remove the verifier coverage findings."
+      ]
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python /tmp/som-v4/close/audit_checks.py",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som-v4/close/audit_checks.py (sha256 496acb290819b5b786c5a685d87651ee82767c49e19b08c62af34e96e704e8da)",
+        "/tmp/som-v4/close/audit-checks.log (sha256 0a9630d9b21f2c778034efe8df8109cae2373a24152fc8e9b0df0898c967914b)",
+        "Assertions reproduce the history leakage trigger and replay false acceptance; they are audit diagnostics, not a product-correctness pass."
+      ]
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /home/swl007007/.venvs/ipcch-geo/bin/python scripts/postprocessing/replay_somalia_v4.py --out-dir /tmp/som-v4/close/negative-run",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only. Separate deliberately damaged scratch copy; no original artifact changed.",
+      "status": "existing_evidence",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som-v4/close/negative-replay.log (sha256 7f0c62516190d11745e48a869a91d84d25b24642bb346bb1f0e86b5db6b2956e)",
+        "/tmp/som-v4/close/negative-mutations.json (sha256 5bbf23b425bf97419a680293dc9ae11f5493279ad6e62a02cfb1aa9cf09874d2)",
+        "Adversarial check executed during this audit: the verifier incorrectly returns success (95/95) despite missing 5 annual/1 pooled slots, altered metric fields and all 142 selections marked unsupported. Zero candidates are replayed. This false acceptance is finding A02, not a correctness pass."
+      ]
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -u /tmp/som-v4/close/extra_checks.py",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only.",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "/tmp/som-v4/close/extra_checks.py (sha256 9fc9c0c58c888814cff181ce8f2f5b4bb835a0956c2233960c241c8c723285ea)",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d)",
+        "331 actual pools checked against every earlier excluded history family; 142 final-calibration contexts / 166967 keys independently rebuilt; 371 additional report values agree; missing-P5 history omission reproduced."
+      ]
+    },
+    {
+      "command": "Production training: scripts/modeling/run_somalia_v4_calibrated_d.py --workers 10 --final-workers 4",
+      "revision": "a88a1f583c928064a3b565eb337b5ec7afb038b8",
+      "environment": "Recorded frozen production environment in fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/run_manifest.json:4-16",
+      "status": "existing_evidence",
+      "exit_code": null,
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/run_log.txt:94-115",
+        "Production code identity is a88a1f583c928064a3b565eb337b5ec7afb038b8, not the executor prompt claimed 5fbe597. git diff a88a1f5..fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba -- src scripts configs tests is empty. Production training was not rerun."
+      ]
+    },
+    {
+      "command": "Full repository pytest suite",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "environment": "Independent git clone --no-hardlinks --no-checkout at fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba in /tmp/som-v4/close/audit-clone; /home/swl007007/.venvs/ipcch-geo/bin/python (Python 3.12.3, NumPy 2.4.4, pandas 3.0.3, scikit-learn 1.8.0, XGBoost 3.2.0); PYTHONDONTWRITEBYTECODE=1; scratch caches/output only.",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/evidence/evidence.md:28-28 reports 12 pre-existing unrelated failures; this is an executor-authored summary, not an independently reproduced full-suite result. Focused affected tests and synthetic smoke were run instead."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "somalia-v4-calibrated-d-A01",
+      "severity": "major",
+      "category": "reproducibility",
+      "origin": "task_change",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "file": "scripts/postprocessing/replay_somalia_v4.py",
+      "lines": {
+        "start": 82,
+        "end": 88
+      },
+      "claim": "The replay does not reconstruct source-label eligibility or traverse all history and final-calibration dependencies required by the plan.",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/implement.md:43-48 requires reconstructing labels/rounds/windows and traversing nested model/calibration histories.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/postprocessing/replay_somalia_v4.py:74-89 consumes generated label/provenance ledgers; it never reads raw labels, validity rounds/links or seasonal inputs and never validates the manifest input/config digests.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/postprocessing/replay_somalia_v4.py:135-169 loads final_calibration_keys but checks only selection members, selection calibration and the outer fit spec. Final calibration is subsequently trusted at lines 313-315.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/postprocessing/replay_somalia_v4.py:205-209 treats a finite baseline plus a nonnegative source ordinal as permitted history; no full history-family traversal occurs.",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d) independently rebuilds all 166967 final-calibration keys for 142 contexts and checks every earlier excluded-family history source across 331 pools: zero current mismatches. These checks are absent from the shipped replay."
+      ],
+      "impact": "The 95/95 replay result establishes internal consistency of selected generated artifacts, not the promised independent verification of copy validity, history isolation and every calibration dependency. No corresponding production-data corruption was found by this audit.",
+      "remediation": "Validate source identities and independently derive permitted originals/copies and validity windows; rebuild expected final-calibration membership and verify every history/baseline dependency against inherited family and origin exclusions before accepting saved OOF values."
+    },
+    {
+      "id": "somalia-v4-calibrated-d-A02",
+      "severity": "major",
+      "category": "reproducibility",
+      "origin": "task_change",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "file": "scripts/postprocessing/replay_somalia_v4.py",
+      "lines": {
+        "start": 251,
+        "end": 307
+      },
+      "claim": "Replay can report success after required result slots are removed and selection verification is bypassed; several required metric fields are not compared.",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/postprocessing/replay_somalia_v4.py:251-307 iterates only selected recipes already marked ok and accepts empty mismatch lists; there is no required-context/status reconciliation.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:scripts/postprocessing/replay_somalia_v4.py:370-415 iterates only existing annual/pooled rows, without checking the configured 40/8 inventories. Its metric dictionary omits raw MAE/bias, confusion counts and composition/coverage/branch/clipping diagnostics.",
+        "/tmp/som-v4/close/audit-checks.log (sha256 0a9630d9b21f2c778034efe8df8109cae2373a24152fc8e9b0df0898c967914b) executes the unchanged metric block: clean 40/8 passes; deleting augmented H6 yields 35/7 and still passes; changing raw_mae/raw_bias and several diagnostic counts by +123 also passes.",
+        "/tmp/som-v4/close/negative-replay.log (sha256 7f0c62516190d11745e48a869a91d84d25b24642bb346bb1f0e86b5db6b2956e) full unchanged replay on a separate damaged scratch copy returned exit 0 and 95/95 passed with candidates_replayed=0 and probe_rows=43864. /tmp/som-v4/close/negative-mutations.json (sha256 5bbf23b425bf97419a680293dc9ae11f5493279ad6e62a02cfb1aa9cf09874d2) records 35 annual rows, 7 pooled rows and all 142 recipe statuses changed to unsupported; raw MAE/bias and diagnostic fields were also altered by +123.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/implement.md:47-48 requires every 40/8 slot and independent replay of all raw/final metrics, confusion counts and selection.",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d) independently recomputes 371 omitted report values on the real complete slots with zero mismatches."
+      ],
+      "impact": "An audit consumer can receive a green verifier despite losing the augmented 2023 H6 incomplete slot and its pooled result, skipping candidate selection, or publishing wrong diagnostics. The unmodified production files retain the required slots and the independently checked values agree.",
+      "remediation": "Derive and compare unique expected slot/job/selection inventories from config and frozen cohorts before looping; reconcile recipe statuses with contexts, candidates, fits and predictions; independently compare every required reported metric/count. Add negative checks for missing slots, skipped selections and changed diagnostics."
+    },
+    {
+      "id": "somalia-v4-calibrated-d-A03",
+      "severity": "major",
+      "category": "correctness",
+      "origin": "pre_existing",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "file": "src/ipcch/somalia_oracle/augexp.py",
+      "lines": {
+        "start": 305,
+        "end": 308
+      },
+      "claim": "Report-family exclusions remove fitting labels but leave excluded reports in globally precomputed history features and residual baselines.",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:121-123 builds a single full original-report history index; lines 167-187 exclude only each row own report and then freeze its features.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:577-588 filters row source_family only. fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augexp.py:326-347 fits the unchanged X and subtracts the unchanged baseline.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/design.md:97-105 requires held-out families to be purged from all upstream base fitting/history inputs, with context-aware reuse.",
+        "/tmp/som-v4/close/audit-checks.log (sha256 0a9630d9b21f2c778034efe8df8109cae2373a24152fc8e9b0df0898c967914b) valid synthetic overlap: January report A in areas 1/2, February report B in area 1, March copy of A in area 2. A is excluded from the March OOF fit labels, but retained area-1 February B still has hist_q3_obs1=0.8 from January A (source ordinal 24252). The existing same-area copy guard passes.",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d) finds no such excluded-family history exposure in any of the 331 actual production pools. The globally precomputed-history behavior is inherited from the base implementation."
+      ],
+      "impact": "For permitted overlapping reports with differing area coverage, held-out report outcomes can enter fitting predictors and residual targets through another report row, violating the explicit source-family isolation contract. This audit does not claim that the saved production metrics are contaminated.",
+      "remediation": "Propagate inherited family exclusions into history, categorical-history and baseline construction for every fitting and receiving dependency; include those exclusions in feature/model cache identity. Check the cross-area overlapping-report example, not only fitting-row family membership."
+    },
+    {
+      "id": "somalia-v4-calibrated-d-A04",
+      "severity": "minor",
+      "category": "contract_violation",
+      "origin": "pre_existing",
+      "revision": "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba",
+      "file": "src/ipcch/somalia_oracle/augexp.py",
+      "lines": {
+        "start": 114,
+        "end": 123
+      },
+      "claim": "Preparation discards missing-P5 history-only records before the inherited history QC can admit them.",
+      "evidence": [
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:.trellis/tasks/09-30-somalia-v4-calibrated-d/design.md:42-42 explicitly preserves the flagged missing-P5-to-zero history-only rule.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/augment.py:93-101 marks any incomplete six-field block partial; prepare line 115 retains only original/copy states.",
+        "fef36dd2a0ffa5e2bb07b83776f4aa15f72fc4ba:src/ipcch/somalia_oracle/data.py:179-205 admits complete P1-P4 with missing P5 as flagged history-only input, but these rows never reach it through prepare.",
+        "/tmp/som-v4/close/extra-checks.log (sha256 bbd6a39c7434abe167c3ccf360a5ad3ae50964664c8d6473cb6f124c41dfe66d) reproduces a finite positive-population P1-P4 row with missing P5: direct ledger QC gives valid_history=True/history_p5_filled=True, whereas preparation retains zero rows.",
+        "Read-only raw-panel inspection of all 905 Somalia IDs found zero partial six-field blocks, so this inherited defect did not change the audited run."
+      ],
+      "impact": "A valid historical report is silently omitted from rich-history features when only P5 is missing. The fixed current data has no affected rows.",
+      "remediation": "Keep eligible original history-only records with raw provenance through ledger QC while continuing to reject them as supervised targets or augmentation sources and preserving partial raw blocks unchanged."
+    }
+  ],
+  "evidence_gaps": [],
+  "limitations": [
+    "This is a standalone full-task close-audit at the supplied completion SHA; no controller-close relaxation was inferred. The task remains active and this report does not close it or declare controller acceptance.",
+    "The production training was not rerun. Ignored run artifacts were read and hashed, then copied to scratch for replay. The clone shares no Git metadata or hardlinks with the source repository.",
+    "Original upstream climate generation/provenance limitations and oracle-weather/ideal-label-availability assumptions remain as explicitly inherited in the task; upstream preprocessing was not regenerated. Monthly feature parity is supported by committed parity evidence and source inspection, with independent raw-label and seasonal-value checks.",
+    "The synthetic smoke replaces monthly scope recovery/parity and reduces tree settings for synthetic inputs; real-source checks and the production saved-model replay provide separate evidence.",
+    "The GitNexus IPCCH index was 13 commits behind HEAD; no reindex was performed. Findings and citations use the pinned Git blobs rather than the stale graph.",
+    "The missing-P5 and transitive-history defects are demonstrated on valid synthetic inputs. Current raw data has no missing-P5 history-only candidates and all 331 production pool histories pass the independent exclusion check; no current result contamination is asserted.",
+    "Read-only scouts were used for independent code/data inspection under the user standing delegation instructions; the primary auditor reproduced the reported defects and performed final validation. No executor transcript was used as evidence.",
+    "The reference-history portability test is skipped because its separate reference checkout is absent in the isolated clone (tests/unit/test_somalia_oracle.py:187). The first combined focused-test invocation was intentionally stopped during the slow smoke phase after excessive native threading; the complete command was rerun with OMP/BLAS threads capped at one, retaining the frozen package versions and model settings."
+  ]
+}

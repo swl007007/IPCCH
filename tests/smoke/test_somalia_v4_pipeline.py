@@ -33,7 +33,9 @@ def _inputs(tmp_path):
             for month in range(1, 13):
                 if (year, month) > (2026, 4):
                     continue
-                lab = (year, month) in LABEL_MONTHS
+                # March 2023 reports cover only part of the areas, inside the Jan-Mar 2023 validity window:
+                # the other areas receive copies, and the March originals see the January report in history
+                lab = (year, month) in LABEL_MONTHS or ((year, month) == (2023, 3) and area < 1604)
                 p = rng.dirichlet([2, 2, 1.5, 0.7, 0.2]) if lab else None
                 phase = (3.0 if p[2:].sum() >= 0.2 else 2.0) if lab else np.nan
                 raw_rows.append({"admin_code": area, "ISO3": "SOM" if area != 9 else "KEN", "year": year, "month": month, "overall_phase": phase, **{c: (p[i] if lab else np.nan) for i, c in enumerate(PERCENT_COLUMNS)},
@@ -114,6 +116,11 @@ def test_v4_cli_and_replay_end_to_end_synthetic(tmp_path, monkeypatch):
     assert set(annual["status"]) <= {"complete", "incomplete", "empty_cohort"}
     assert not any(c.startswith("delta") or "bootstrap" in c for c in [*annual.columns, *pooled.columns])
     assert (out / "report" / "summary.md").exists()
+    ovr = pd.read_csv(out / "selection" / "history_overrides.csv.gz")
+    test_ovr = ovr.loc[ovr["role"] == "test_prediction"]
+    assert len(test_ovr) and (test_ovr["context_obs1_source_ord"] != sd.month_ord(2023, 1)).all()  # held-out January report removed
+    exposed = preds.loc[preds["hx"].fillna("") != ""]
+    assert len(exposed) and set(exposed["job_id"]) == {"augmented_y2023_h00_o2023-03"}
     # independent replay of the smoke run must pass every check
     assert replay.main(["--out-dir", str(out), "--config", str(cpath)]) == 0
     checks = pd.read_csv(out / "replay" / "replay_checks.csv")

@@ -89,6 +89,26 @@ def persistence_with_cutoff(originals: pd.DataFrame, area: np.ndarray, origin: n
     return out
 
 
+def mark_partial_originals(augmented: pd.DataFrame, links: pd.DataFrame) -> pd.DataFrame:
+    """Partially populated raw reports with a reported phase stay original reports.
+
+    They are never copy sources or recipients, but the label-ledger QC decides their own
+    target/history validity (e.g. the flagged missing-P5 history-only rule). Their family
+    follows the same month link as complete originals of that month.
+    """
+    out = augmented.copy()
+    partial = out["label_state"].eq("partial") & out["overall_phase"].notna()
+    if partial.any():
+        linked = links.loc[links["link_status"] == "linked"].set_index("original_month_ord")["anl_id"]
+        months = out.loc[partial, "target_ord"].astype(int)
+        out.loc[partial, "label_state"] = "partial_original"
+        out.loc[partial, "is_copy"] = False
+        out.loc[partial, "original_month_ord"] = months.to_numpy()
+        out.loc[partial, "source_available_ord"] = months.to_numpy()
+        out.loc[partial, "source_family"] = [f"anl:{linked[m]}" if m in linked.index else f"local:{sd.ord_label(m)}" for m in months]
+    return out
+
+
 def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=print, hash_inputs: bool = True, deep: Optional[pd.DataFrame] = None,
             first_model_year: Optional[int] = FIRST_MODEL_YEAR, folds: Mapping[int, Sequence[int]] = FOLDS) -> AugPrepared:
     """``first_model_year=None`` keeps every valid label row (v4); ``folds`` drives the v3 cohort/jobs
@@ -112,7 +132,8 @@ def prepare(input_paths: Mapping[str, Path], cfg: Mapping[str, object], log=prin
     log(f"[prepare] augmentation: {n_add} copies; decisions {decisions['decision'].value_counts().to_dict() if len(decisions) else {}}")
 
     # ---- label ledger over originals + copies (raw values; existing QC/normalization) ----
-    rows = augmented.loc[augmented["label_state"].isin(["original", "copy"])].merge(raw[["area_id", "target_ord", "year", "month", "estimated_population"]], on=["area_id", "target_ord"])
+    augmented = mark_partial_originals(augmented, links)
+    rows = augmented.loc[augmented["label_state"].isin(["original", "copy", "partial_original"])].merge(raw[["area_id", "target_ord", "year", "month", "estimated_population"]], on=["area_id", "target_ord"])
     keys = set(zip(rows["area_id"].astype(int), rows["target_ord"].astype(int)))
     ledger = sd.build_label_ledger({"raw": rows[["area_id", "year", "month", *au.LABEL_FIELDS, "estimated_population"]]}, keys)
     meta = rows[["area_id", "target_ord", "is_copy", "original_month_ord", "source_family", "source_available_ord"]]
@@ -525,6 +546,7 @@ def score_view(store, frame, plan, key_prefix, formulation, cfg, bundles) -> Tup
 
 V4_HALF_LIVES: Tuple[Optional[int], ...] = (12, 24, 48, None)
 V4_DECAY_ORDER = {None: 0, 48: 1, 24: 2, 12: 3}  # deterministic tie order: no decay, 48, 24, 12
+HX_SCALE = 4096  # prediction keys pack (frame row, history-exclusion code)
 
 
 def half_life_label(half_life: Optional[float]) -> str:
@@ -533,6 +555,127 @@ def half_life_label(half_life: Optional[float]) -> str:
 
 def parse_half_life(label: str) -> Optional[int]:
     return None if label in ("none", None) else int(label)
+
+
+class V4History:
+    """Context-specific history inputs (design sections 4-5).
+
+    The frames hold features built from every original report except the row's own.
+    When a context excludes further report families, every row that participates in it
+    (fitting row, OOF prediction row, outer test row) and whose history contains an
+    observation of an excluded family gets its rich history, residual baseline
+    (``hist_q3_obs1`` / ``history_obs1_source_ord``) and categorical phase history
+    recomputed from the original reports minus those families. Unexposed rows keep
+    their frame features, which equal the recomputation with nothing excluded.
+    """
+
+    def __init__(self, ledger: pd.DataFrame, frames: Mapping[int, pd.DataFrame], schemas: Mapping[int, List[str]]):
+        orig = ledger.loc[~ledger["is_copy"].astype(bool)]
+        self.orig = orig
+        self.frames, self.schemas = frames, schemas
+        self.names = hist.history_feature_names()
+        obs = orig.loc[orig["valid_history"].astype(bool) | orig["valid_phase"].astype(bool), ["area_id", "target_ord", "source_family", "valid_history", "valid_phase"]]
+        self.rich = {f: dict(zip(g.loc[g["valid_history"].astype(bool), "area_id"].astype(int), g.loc[g["valid_history"].astype(bool), "target_ord"].astype(int)))
+                     for f, g in obs.groupby("source_family")}
+        self.cat = {f: set(zip(g.loc[g["valid_phase"].astype(bool), "area_id"].astype(int), g.loc[g["valid_phase"].astype(bool), "target_ord"].astype(int))) for f, g in obs.groupby("source_family")}
+        self._index: Dict[Tuple[str, ...], Tuple[object, pd.DataFrame]] = {}
+        self._codes: Dict[Tuple[str, ...], int] = {(): 0}
+        self._base: Dict[Tuple[int, int, int], Tuple[float, bool]] = {}
+        self._feat: Dict[Tuple[int, Tuple[str, ...], int], Tuple[np.ndarray, float, bool]] = {}
+
+    def code(self, hx: Tuple[str, ...]) -> int:
+        if hx not in self._codes:
+            self._codes[hx] = len(self._codes)
+            if self._codes[hx] >= HX_SCALE:
+                raise AugExpError("too many distinct history-exclusion sets")
+        return self._codes[hx]
+
+    def codes(self) -> Dict[int, Tuple[str, ...]]:
+        return {c: hx for hx, c in self._codes.items()}
+
+    def exposing(self, h: int, rows: np.ndarray, families: Sequence[str]) -> List[Tuple[str, ...]]:
+        """Per row: the families among ``families`` with an observation visible in its history
+        (same area, rich-history month <= history cutoff, or the categorical source month T-max(1,H)).
+        The row's own family is already absent from its frame history and is never reported."""
+        f = self.frames[h]
+        rows = np.asarray(rows, dtype=np.int64)
+        own = f["source_family"].to_numpy(dtype=object)[rows]
+        area = f["area_id"].to_numpy(dtype=np.int64)[rows]
+        cutoff = f["history_cutoff_ord"].to_numpy(dtype=np.int64)[rows]
+        catm = f["target_ord"].to_numpy(dtype=np.int64)[rows] - max(1, int(h))
+        out: List[List[str]] = [[] for _ in range(rows.size)]
+        for fam in sorted(set(families)):
+            rich, cat = self.rich.get(fam, {}), self.cat.get(fam, set())
+            if not rich and not cat:
+                continue
+            for k in range(rows.size):
+                if own[k] == fam:
+                    continue
+                a = int(area[k])
+                m = rich.get(a)
+                if (m is not None and m <= cutoff[k]) or (h < 12 and (a, int(catm[k])) in cat):
+                    out[k].append(fam)
+        return [tuple(x) for x in out]
+
+    def _excluded_index(self, excluded: Tuple[str, ...]):
+        if excluded not in self._index:
+            o = self.orig.loc[~self.orig["source_family"].isin(list(excluded))]
+            self._index[excluded] = (hist.build_history_index(o.loc[o["valid_history"].astype(bool)]), o)
+        return self._index[excluded]
+
+    def features(self, h: int, rows: np.ndarray, excluded: Sequence[str]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """(X rows float32, baseline q3, baseline source month, baseline ok) with ``excluded`` removed."""
+        excluded = tuple(sorted(set(excluded)))
+        rows = np.asarray(rows, dtype=np.int64)
+        index, kept = self._excluded_index(excluded)
+        f = self.frames[h].iloc[rows].reset_index(drop=True)
+        area = f["area_id"].to_numpy(dtype=np.int64)
+        origin = f["origin_ord"].to_numpy(dtype=np.int64)
+        cutoff = f["history_cutoff_ord"].to_numpy(dtype=np.int64)
+        hb = pd.DataFrame(hist.build_history_block(index, area, origin, cutoff, self.names), columns=self.names)
+        slots = hist.history_slot_sources(index, area, cutoff)
+        X = f[self.schemas[h]].copy()
+        X[self.names] = hb.to_numpy()
+        cat = mf.CATEGORY_HISTORY.format(h=h)
+        if h < 12 and cat in X.columns:
+            X[cat] = category_history(f, kept, h)
+        b = hb["hist_q3_obs1"].to_numpy(dtype=np.float64)
+        src = slots["history_obs1_source_ord"].to_numpy(dtype=np.int64)
+        return X.to_numpy(dtype=np.float32), b, src, np.isfinite(b) & (src >= 0)
+
+    def row_inputs(self, h: int, rows: np.ndarray, hxs: Sequence[Tuple[str, ...]]) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Feature rows, baseline, baseline-ok and baseline source month for (row, history
+        exclusion) pairs; cached."""
+        rows = np.asarray(rows, dtype=np.int64)
+        width = len(self.schemas[h])
+        X = np.empty((rows.size, width), dtype=np.float32)
+        b = np.empty(rows.size)
+        ok = np.empty(rows.size, dtype=bool)
+        src = np.empty(rows.size, dtype=np.int64)
+        todo: Dict[Tuple[str, ...], List[int]] = {}
+        for k, (r, hx) in enumerate(zip(rows, hxs)):
+            key = (int(h), tuple(hx), int(r))
+            if key in self._feat:
+                X[k], b[k], ok[k], src[k] = self._feat[key]
+            else:
+                todo.setdefault(tuple(hx), []).append(k)
+        for hx, ks in todo.items():
+            Xr, br, sr, okr = self.features(h, rows[ks], hx)
+            for j, k in enumerate(ks):
+                X[k], b[k], ok[k], src[k] = Xr[j], br[j], okr[j], sr[j]
+                self._feat[(int(h), hx, int(rows[k]))] = (Xr[j], br[j], okr[j], sr[j])
+        return X, b, ok, src
+
+    def base_ok(self, h: int, rows: np.ndarray, hxs: Sequence[Tuple[str, ...]]) -> np.ndarray:
+        frame = self.frames[h]
+        _, frame_ok = _baseline(frame)
+        rows = np.asarray(rows, dtype=np.int64)
+        out = frame_ok[rows].copy()
+        need = [k for k, hx in enumerate(hxs) if hx]
+        if need:
+            _, _, ok, _ = self.row_inputs(h, rows[need], [hxs[k] for k in need])
+            out[need] = ok
+        return out
 
 
 @dataclass(frozen=True)
@@ -555,10 +698,14 @@ class PoolSpec:
 
 
 class PoolIndex:
-    """Normalizes pool specifications of one (setting, horizon) frame and caches their rows."""
+    """Normalizes pool specifications of one (setting, horizon) frame and caches their rows.
 
-    def __init__(self, frame: pd.DataFrame, setting: str, horizon: int):
-        self.setting, self.horizon = setting, int(horizon)
+    An excluded family is kept in the normalized spec when it has labels in the pool or an
+    observation visible in some pool row's history; such rows are fitted with history
+    recomputed without it (``exposed``)."""
+
+    def __init__(self, frame: pd.DataFrame, setting: str, horizon: int, history: Optional[V4History] = None):
+        self.setting, self.horizon, self.history = setting, int(horizon), history
         self.setting_mask = branch_mask(frame, setting)
         self.target = frame["target_ord"].to_numpy(dtype=np.int64)
         self.avail = frame["source_available_ord"].to_numpy(dtype=np.int64)
@@ -566,6 +713,7 @@ class PoolIndex:
         self.target_year = self.target // 12
         self.original_year = frame["original_month_ord"].to_numpy(dtype=np.int64) // 12
         self._rows: Dict[PoolSpec, np.ndarray] = {}
+        self._exposed: Dict[PoolSpec, np.ndarray] = {}
         self._memo: Dict[Tuple, PoolSpec] = {}
 
     def normalize(self, label_cutoff: int, available_by: int, max_year: Optional[int], excluded: Sequence[str]) -> PoolSpec:
@@ -581,15 +729,30 @@ class PoolIndex:
         if max_year is not None:
             base &= (self.target_year <= max_year) & (self.original_year <= max_year)
         present = set(self.family[base])
-        eff = tuple(sorted(f for f in set(excluded) if f in present))
+        eff = {f for f in set(excluded) if f in present}
+        rest = sorted(set(excluded) - eff)
+        if rest and self.history is not None:
+            cand = np.flatnonzero(base & ~np.isin(self.family, sorted(eff))) if eff else np.flatnonzero(base)
+            for fams in self.history.exposing(self.horizon, cand, rest):
+                eff.update(fams)
+        eff = tuple(sorted(eff))
         spec = PoolSpec(self.setting, self.horizon, int(label_cutoff), int(available_by), None if max_year is None else int(max_year), eff)
         if spec not in self._rows:
             m = base & ~np.isin(self.family, list(eff)) if eff else base
-            self._rows[spec] = np.flatnonzero(m)
+            rows = np.flatnonzero(m)
+            self._rows[spec] = rows
+            exposed = np.zeros(rows.size, dtype=bool)
+            if eff and self.history is not None:
+                exposed = np.array([bool(x) for x in self.history.exposing(self.horizon, rows, eff)], dtype=bool)
+            self._exposed[spec] = exposed
         return spec
 
     def rows(self, spec: PoolSpec) -> np.ndarray:
         return self._rows[spec]
+
+    def exposed(self, spec: PoolSpec) -> np.ndarray:
+        """Boolean per pool row: history contains an excluded family (refit with recomputed history)."""
+        return self._exposed[spec]
 
 
 def v4_row_spec(pools: PoolIndex, v: int, h: int, max_year: int, excluded: Sequence[str]) -> PoolSpec:
@@ -608,16 +771,16 @@ class V4Context:
     reason: Optional[str]
     rounds: List[int]
     scoring: List[int]
-    members: pd.DataFrame  # row, round, target_ord, spec_id (scoring keys, frozen before scores)
-    calibration: pd.DataFrame  # scoring_round, scoring_target_ord, row, round, target_ord, spec_id
-    final_calibration: pd.DataFrame  # row, round, target_ord, spec_id
+    members: pd.DataFrame  # row, round, target_ord, spec_id, hx, base_ok (scoring keys, frozen before scores)
+    calibration: pd.DataFrame  # scoring_round, scoring_target_ord, row, round, target_ord, spec_id, hx, base_ok
+    final_calibration: pd.DataFrame  # row, round, target_ord, spec_id, hx, base_ok
     fit_spec: Optional[PoolSpec]
     specs: Dict[str, PoolSpec]
 
     @property
     def selection_signature(self) -> str:
-        cols_m = self.members[["row", "round", "spec_id"]].to_numpy().tolist()
-        cols_c = self.calibration[["scoring_round", "scoring_target_ord", "row", "round", "spec_id"]].to_numpy().tolist()
+        cols_m = self.members[["row", "round", "spec_id", "hx"]].to_numpy().tolist()
+        cols_c = self.calibration[["scoring_round", "scoring_target_ord", "row", "round", "spec_id", "hx"]].to_numpy().tolist()
         text = json.dumps([self.setting, int(self.horizon), self.status, cols_m, cols_c], default=str)
         return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
@@ -637,8 +800,20 @@ def v4_label_mask(frame: pd.DataFrame, setting: str, year: int, origin: int, tes
     return m
 
 
+def hx_label(hx: Sequence[str]) -> str:
+    return ";".join(hx)
+
+
+def hx_parse(label) -> Tuple[str, ...]:
+    return tuple(x for x in str(label).split(";") if x) if isinstance(label, str) else ()
+
+
 def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: int, h: int, origin: int, test_families: Sequence[str], cfg: Mapping[str, object]) -> V4Context:
-    """Frozen from label/pool support only, before any candidate is scored."""
+    """Frozen from label/pool/history support only, before any candidate is scored.
+
+    Every key row carries ``hx``: the families of its context (outer test families, the
+    scoring family it serves) visible in its own history, which its prediction excludes.
+    """
     test_families = tuple(sorted(set(test_families)))
     max_year = year - 1
     L = v4_label_mask(frame, setting, year, origin, test_families)
@@ -653,6 +828,13 @@ def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: i
         specs[sp.id] = sp
         return sp
 
+    def keyed(idx: Sequence[int], extra: Sequence[str]) -> List[Dict[str, object]]:
+        idx = np.asarray(idx, dtype=np.int64)
+        nominal = sorted(set(test_families) | set(extra))
+        hxs = pools.history.exposing(h, idx, nominal) if (pools.history is not None and nominal) else [()] * idx.size
+        base = pools.history.base_ok(h, idx, hxs) if pools.history is not None else _baseline(frame)[1][idx]
+        return [{"row": int(i), "target_ord": int(target[i]), "spec_id": spec_for(int(i), extra).id, "hx": hx_label(hx), "base_ok": bool(bk)} for i, hx, bk in zip(idx, hxs, base)]
+
     rounds = sorted(int(r) for r in np.unique(rnd[L]))
     eligible = []
     for r in rounds:
@@ -661,20 +843,20 @@ def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: i
             eligible.append(r)
     scoring = eligible[-int(cfg["selection_rounds"]):]
     members, cal_rows = [], []
+    avail = frame["source_available_ord"].to_numpy()
     for r in scoring:
         mem = np.flatnonzero(L & (rnd == r) & valid)
-        for i in mem:
-            members.append({"row": int(i), "round": r, "target_ord": int(target[i]), "spec_id": spec_for(i, ()).id})
+        fam_r = fam[mem[0]]
+        members += [{**k, "round": r} for k in keyed(mem, (fam_r,))]
         for v in sorted(set(int(x) for x in target[mem])):
             chosen = 0
             for c in reversed([c for c in rounds if c < r]):
                 lim = v - h
-                cand = np.flatnonzero(L & (rnd == c) & (target < v) & (target <= lim) & (frame["source_available_ord"].to_numpy() <= lim))
-                keep = [i for i in cand if pools.rows(spec_for(i, (fam[mem[0]],))).size > 0]
+                cand = np.flatnonzero(L & (rnd == c) & (target < v) & (target <= lim) & (avail <= lim))
+                keep = [i for i in cand if pools.rows(spec_for(i, (fam_r,))).size > 0]
                 if not keep:
                     continue
-                for i in keep:
-                    cal_rows.append({"scoring_round": r, "scoring_target_ord": v, "row": int(i), "round": c, "target_ord": int(target[i]), "spec_id": spec_for(i, (fam[mem[0]],)).id})
+                cal_rows += [{**k, "scoring_round": r, "scoring_target_ord": v, "round": c} for k in keyed(keep, (fam_r,))]
                 chosen += 1
                 if chosen >= int(cfg["calibration_rounds"]):
                     break
@@ -684,7 +866,7 @@ def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: i
         keep = [i for i in cand if pools.rows(spec_for(i, ())).size > 0]
         if not keep:
             continue
-        final_rows += [{"row": int(i), "round": c, "target_ord": int(target[i]), "spec_id": spec_for(i, ()).id} for i in keep]
+        final_rows += [{**k, "round": c} for k in keyed(keep, ())]
         chosen += 1
         if chosen >= int(cfg["calibration_rounds"]):
             break
@@ -694,9 +876,10 @@ def v4_plan_context(frame: pd.DataFrame, pools: PoolIndex, setting: str, year: i
     status, reason = ("ok", None) if ok else ("unsupported", f"{len(scoring)} supported selection rounds; {cfg['min_selection_rounds']} required")
     if pools.rows(fit_spec).size == 0:
         status, reason = "unsupported", "empty outer fitting pool"
-    cols_m, cols_c, cols_f = ["row", "round", "target_ord", "spec_id"], ["scoring_round", "scoring_target_ord", "row", "round", "target_ord", "spec_id"], ["row", "round", "target_ord", "spec_id"]
+    cols_m = ["row", "round", "target_ord", "spec_id", "hx", "base_ok"]
+    cols_c = ["scoring_round", "scoring_target_ord", "row", "round", "target_ord", "spec_id", "hx", "base_ok"]
     return V4Context(setting, year, h, origin, test_families, status, reason, rounds, scoring, pd.DataFrame(members, columns=cols_m), pd.DataFrame(cal_rows, columns=cols_c),
-                     pd.DataFrame(final_rows, columns=cols_f), fit_spec, specs)
+                     pd.DataFrame(final_rows, columns=cols_m), fit_spec, specs)
 
 
 def v4_unit_key(spec_id: str, formulation: str, bundle: str, half_life: Optional[float]) -> Tuple[str, str, str, str]:
@@ -707,57 +890,93 @@ def v4_unit_id(key: Tuple[str, str, str, str]) -> str:
     return hashlib.sha256("|".join(key).encode("utf-8")).hexdigest()[:16]
 
 
+def _v4_matrix(h: int, idx: np.ndarray, ovr: Optional[Mapping[str, np.ndarray]]):
+    """Feature rows, residual baseline and baseline-ok for ``idx`` with context overrides."""
+    frame = _STATE["frames"][h]
+    X = _STATE["X"][h][idx].copy()
+    b_all, ok_all = _baseline(frame)
+    b, ok = b_all[idx].copy(), ok_all[idx].copy()
+    if ovr is not None and len(ovr["pos"]):
+        X[ovr["pos"]] = ovr["X"]
+        b[ovr["pos"]] = ovr["b"]
+        ok[ovr["pos"]] = ovr["ok"]
+    return X, b, ok
+
+
+def v4_fit_predict(h: int, formulation: str, bundle: str, fit_idx: np.ndarray, fit_ovr, pred_idx: np.ndarray, pred_ovr, weight_origin: int, half_life, keep_model: bool = False):
+    """One q3 fit (direct, or residual on baseline-supported rows) and its predictions; the
+    residual prediction exists exactly on prediction rows with a baseline."""
+    frame = _STATE["frames"][h]
+    q3 = frame["q3"].to_numpy(dtype=np.float64)
+    months = frame["target_ord"].to_numpy(dtype=np.int64)
+    Xf, bf, okf = _v4_matrix(h, fit_idx, fit_ovr)
+    sel = np.flatnonzero(okf) if formulation == "residual" else np.arange(fit_idx.size)
+    y = q3[fit_idx[sel]] - bf[sel] if formulation == "residual" else q3[fit_idx]
+    target = "delta" if formulation == "residual" else "q3"
+    w = md.decay_weights(months[fit_idx[sel]], weight_origin, half_life) if sel.size else np.array([])
+    info = {"n_fit": int(fit_idx.size), "n_fit_used": int(sel.size), "fit_max_target_ord": int(months[fit_idx[sel]].max()) if sel.size else None,
+            "sum_weight": float(w.sum()), "min_weight": float(w.min()) if w.size else np.nan, "n_fit_history_overrides": int(len(fit_ovr["pos"])) if fit_ovr else 0}
+    Xp, bp, okp = _v4_matrix(h, pred_idx, pred_ovr)
+    if sel.size == 0:
+        return None, np.full(pred_idx.size, np.nan), {**info, "status": "unsupported"}, okp
+    model = md.fit_regressor(Xf[sel], y, w, _params(bundle, target), target)
+    raw = model.predict(Xp)
+    if formulation == "residual":
+        raw = np.where(okp, bp + raw, np.nan)
+    return (model if keep_model else None), raw, {**info, "status": "ok", "model_kind": model.kind}, okp
+
+
 def v4_unit_task(t: Mapping[str, object]) -> Dict[str, object]:
     """One OOF fit (worker)."""
-    fit_idx, pred_idx = np.asarray(t["fit_idx"]), np.asarray(t["pred_idx"])
-    hl = parse_half_life(t["half_life"])
-    _, raw, info = fit_predict_q3(t["horizon"], t["formulation"], t["bundle"], fit_idx, pred_idx, t["weight_origin"], half_life=hl)
-    frame = _STATE["frames"][t["horizon"]]
-    months = frame["target_ord"].to_numpy(dtype=np.int64)
-    used = fit_idx
-    if t["formulation"] == "residual":
-        _, ok = _baseline(frame)
-        used = fit_idx[ok[fit_idx]]
-    w = md.decay_weights(months[used], t["weight_origin"], hl) if used.size else np.array([])
-    return {"key": t["key"], "status": info["status"], "pred_idx": pred_idx, "raw_q3": np.asarray(raw, dtype=np.float64), "n_fit": info["n_fit"], "n_fit_used": info["n_fit_used"],
-            "fit_max_target_ord": info["fit_max_target_ord"], "model_kind": info.get("model_kind"), "sum_weight": float(w.sum()), "min_weight": float(w.min()) if w.size else np.nan}
+    _, raw, info, _ = v4_fit_predict(t["horizon"], t["formulation"], t["bundle"], np.asarray(t["fit_idx"]), t.get("fit_ovr"), np.asarray(t["pred_idx"]), t.get("pred_ovr"),
+                                     t["weight_origin"], parse_half_life(t["half_life"]))
+    return {"key": t["key"], "status": info["status"], "pred_key": np.asarray(t["pred_key"]), "raw_q3": np.asarray(raw, dtype=np.float64),
+            **{k: info.get(k) for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight", "n_fit_history_overrides")}}
 
 
 class V4UnitStore:
+    """OOF predictions per unit, keyed by ``row * HX_SCALE + history-exclusion code``."""
+
     def __init__(self):
         self.units: Dict[Tuple[str, str, str, str], Dict[str, object]] = {}
 
     def add(self, res: Mapping[str, object]) -> None:
-        order = np.argsort(res["pred_idx"], kind="mergesort")
-        self.units[tuple(res["key"])] = {"status": res["status"], "rows": np.asarray(res["pred_idx"])[order], "raw": np.asarray(res["raw_q3"], dtype=np.float64)[order],
-                                          **{k: res[k] for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight")}}
+        order = np.argsort(res["pred_key"], kind="mergesort")
+        self.units[tuple(res["key"])] = {"status": res["status"], "keys": np.asarray(res["pred_key"], dtype=np.int64)[order], "raw": np.asarray(res["raw_q3"], dtype=np.float64)[order],
+                                          **{k: res.get(k) for k in ("n_fit", "n_fit_used", "fit_max_target_ord", "model_kind", "sum_weight", "min_weight", "n_fit_history_overrides")}}
 
     def ok(self, key) -> bool:
         return key in self.units and self.units[key]["status"] == "ok"
 
-    def raw(self, key, rows: np.ndarray) -> np.ndarray:
-        """Raw q3 for ``rows``; NaN where the unit is unsupported or a row was not requested."""
-        rows = np.asarray(rows, dtype=np.int64)
-        out = np.full(rows.size, np.nan)
+    def raw(self, key, pred_keys: np.ndarray) -> np.ndarray:
+        """Raw q3 for packed prediction keys; NaN where the unit is unsupported or a key was not requested."""
+        pred_keys = np.asarray(pred_keys, dtype=np.int64)
+        out = np.full(pred_keys.size, np.nan)
         u = self.units.get(key)
-        if u is None or u["status"] != "ok" or rows.size == 0:
+        if u is None or u["status"] != "ok" or pred_keys.size == 0:
             return out
-        pos = np.searchsorted(u["rows"], rows)
-        hit = (pos < u["rows"].size) & (u["rows"][np.minimum(pos, u["rows"].size - 1)] == rows)
+        pos = np.searchsorted(u["keys"], pred_keys)
+        hit = (pos < u["keys"].size) & (u["keys"][np.minimum(pos, u["keys"].size - 1)] == pred_keys)
         out[hit] = u["raw"][pos[hit]]
         return out
 
 
-def v4_candidate_raw(store: V4UnitStore, rows: np.ndarray, spec_ids: np.ndarray, formulation: str, bundle: str, half_life, has_base: np.ndarray) -> Tuple[np.ndarray, np.ndarray, bool]:
+def v4_pred_keys(tab: pd.DataFrame, history: Optional[V4History]) -> np.ndarray:
+    codes = [history.code(hx_parse(x)) if history is not None else 0 for x in tab["hx"]] if "hx" in tab else [0] * len(tab)
+    return tab["row"].to_numpy(dtype=np.int64) * HX_SCALE + np.asarray(codes, dtype=np.int64)
+
+
+def v4_candidate_raw(store: V4UnitStore, pred_keys: np.ndarray, spec_ids: np.ndarray, formulation: str, bundle: str, half_life, has_base: np.ndarray) -> Tuple[np.ndarray, np.ndarray, bool]:
     """Raw q3, prediction branch and whether every *required* unit was fitted.
 
     A residual model is required exactly on rows with a permitted history baseline
-    (``has_base``); rows without one use the same-bundle/decay direct model
-    (``fallback_direct``). A baseline row whose residual unit could not be fitted makes
-    the candidate unsupported -- it is never relabelled as missing history.
+    (``has_base``, after the row's context exclusions); rows without one use the
+    same-bundle/decay direct model (``fallback_direct``). A baseline row whose residual
+    unit could not be fitted makes the candidate unsupported -- it is never relabelled
+    as missing history.
     """
-    raw = np.full(rows.size, np.nan)
-    lab = np.full(rows.size, "direct", dtype=object)
+    raw = np.full(pred_keys.size, np.nan)
+    lab = np.full(pred_keys.size, "direct", dtype=object)
     if formulation == "residual":
         lab[:] = np.where(has_base, "residual", "fallback_direct")
     supported = True
@@ -767,16 +986,16 @@ def v4_candidate_raw(store: V4UnitStore, rows: np.ndarray, spec_ids: np.ndarray,
         if need_direct.any():
             dkey = v4_unit_key(sid, "direct", bundle, half_life)
             supported &= store.ok(dkey)
-            raw[need_direct] = store.raw(dkey, rows[need_direct])
+            raw[need_direct] = store.raw(dkey, pred_keys[need_direct])
         need_res = sel & (lab == "residual")
         if need_res.any():
             rkey = v4_unit_key(sid, "residual", bundle, half_life)
             supported &= store.ok(rkey)
-            raw[need_res] = store.raw(rkey, rows[need_res])
+            raw[need_res] = store.raw(rkey, pred_keys[need_res])
     return raw, lab, bool(supported)
 
 
-def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, formulation: str, bundle: str, half_life, method: str, min_rounds: int) -> Dict[str, qo.Q3Mapping]:
+def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, formulation: str, bundle: str, half_life, method: str, min_rounds: int, history: Optional[V4History] = None) -> Dict[str, qo.Q3Mapping]:
     """Branch mappings fitted on the calibration keys' own OOF predictions.
 
     direct / fallback_direct: direct predictions of every calibration key; residual:
@@ -785,8 +1004,9 @@ def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, 
     key set never shrinks after a failure); ``none`` needs no calibration.
     """
     q3 = frame["q3"].to_numpy(dtype=np.float64)
-    _, base_ok = _baseline(frame)
     rows = cal["row"].to_numpy(dtype=np.int64)
+    pkeys = v4_pred_keys(cal, history)
+    base_ok = cal["base_ok"].to_numpy(dtype=bool) if "base_ok" in cal else _baseline(frame)[1][rows]
     rounds = cal["round"].to_numpy(dtype=np.int64)
     sids = cal["spec_id"].to_numpy(dtype=object)
     names = ("direct",) if formulation == "direct" else ("residual", "fallback_direct")
@@ -796,7 +1016,7 @@ def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, 
             out[name] = qo.fit_mapping("none", np.array([]), np.array([]), np.array([]), min_rounds)
             continue
         form = "residual" if name == "residual" else "direct"
-        keep = base_ok[rows] if name == "residual" else np.ones(rows.size, dtype=bool)
+        keep = base_ok if name == "residual" else np.ones(rows.size, dtype=bool)
         raw = np.full(rows.size, np.nan)
         failed = []
         for sid in np.unique(sids[keep]) if keep.any() else []:
@@ -805,7 +1025,7 @@ def v4_fit_mappings(store: V4UnitStore, frame: pd.DataFrame, cal: pd.DataFrame, 
             if not store.ok(key):
                 failed.append(sid)
                 continue
-            raw[sel] = store.raw(key, rows[sel])
+            raw[sel] = store.raw(key, pkeys[sel])
         if failed or not np.isfinite(raw[keep]).all():
             mapping = qo.Q3Mapping(method, "unsupported", f"{form} OOF unit unsupported for {len(failed)} calibration pool spec(s)" if failed else "missing calibration OOF prediction",
                                    months=tuple(sorted({int(r) for r in rounds[keep]})), n_rows=int(keep.sum()))
@@ -827,13 +1047,12 @@ def v4_candidates(bundles: Mapping[str, object]) -> List[Dict[str, object]]:
     return out
 
 
-def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bundles: Mapping[str, object], cfg: Mapping[str, object]) -> Tuple[pd.DataFrame, Dict[Tuple, pd.DataFrame]]:
+def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bundles: Mapping[str, object], cfg: Mapping[str, object], history: Optional[V4History] = None) -> Tuple[pd.DataFrame, Dict[Tuple, pd.DataFrame]]:
     """Every declared recipe on the frozen scoring keys; returns scores and per-candidate predictions."""
     from sklearn.metrics import roc_auc_score
 
     q3 = frame["q3"].to_numpy(dtype=np.float64)
     crisis = frame["actual_crisis"].to_numpy(dtype=np.float64)
-    _, base_ok = _baseline(frame)
     min_rounds = int(cfg["min_calibration_rounds"])
     groups = [(r, v, g) for (r, v), g in ctx.members.groupby(["round", "target_ord"], sort=True)]
     cal_by = {k: g for k, g in ctx.calibration.groupby(["scoring_round", "scoring_target_ord"], sort=True)}
@@ -844,18 +1063,18 @@ def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bu
         finals, truths, crs, parts, reason = [], [], [], [], None
         for r, v, g in groups:
             idx = g["row"].to_numpy(dtype=np.int64)
-            raw, lab, supported = v4_candidate_raw(store, idx, g["spec_id"].to_numpy(dtype=object), form, b, hl, base_ok[idx])
+            raw, lab, supported = v4_candidate_raw(store, v4_pred_keys(g, history), g["spec_id"].to_numpy(dtype=object), form, b, hl, g["base_ok"].to_numpy(dtype=bool))
             if not supported or not np.isfinite(raw).all():
                 reason = f"base OOF fit unsupported at scoring month {sd.ord_label(v)} (round {sd.ord_label(r)})"
                 break
-            maps = v4_fit_mappings(store, frame, cal_by.get((r, v), empty_cal), form, b, hl, method, min_rounds)
+            maps = v4_fit_mappings(store, frame, cal_by.get((r, v), empty_cal), form, b, hl, method, min_rounds, history)
             mapped, why = qo.apply_branches(raw, lab, maps)
             if mapped is None:
                 reason = f"{why} at scoring month {sd.ord_label(v)} (round {sd.ord_label(r)})"
                 break
             fin, clipped = qo.bound_share(mapped)
             finals.append(fin), truths.append(q3[idx]), crs.append(crisis[idx])
-            parts.append(pd.DataFrame({"row": idx, "round": r, "target_ord": v, "raw_q3": raw, "final_q3": fin, "clipped": clipped, "prediction_branch": lab}))
+            parts.append(pd.DataFrame({"row": idx, "hx": g["hx"].to_numpy(), "round": r, "target_ord": v, "raw_q3": raw, "final_q3": fin, "clipped": clipped, "prediction_branch": lab}))
         base = {"context_id": ctx.context_id, "selection_signature": ctx.selection_signature, **cand}
         if reason:
             rows_out.append({**base, "status": "unsupported", "reason": reason, "n": 0, "rmse": np.nan, "auc": np.nan})
@@ -868,33 +1087,38 @@ def v4_score_context(store: V4UnitStore, frame: pd.DataFrame, ctx: V4Context, bu
 
 
 def v4_final_task(t: Mapping[str, object]) -> Dict[str, object]:
-    """Fit the selected recipe on the outer pool and predict the job's frozen test rows (worker)."""
+    """Fit the selected recipe on the outer pool and predict the job's frozen test rows (worker).
+
+    ``fit_ovr`` / ``pred_ovr`` carry recomputed history for rows exposed to the job's test
+    families; every q2/q3/q4/q5 model uses the same context-specific feature rows."""
     h, formulation, bundle = t["horizon"], t["formulation"], t["bundle"]
     hl = parse_half_life(t["half_life"])
     frame = _STATE["frames"][h]
-    X = _STATE["X"][h]
     fit_idx, pred_idx = np.asarray(t["fit_idx"]), np.asarray(t["pred_idx"])
     months = frame["target_ord"].to_numpy(dtype=np.int64)
+    Xf, _, _ = _v4_matrix(h, fit_idx, t.get("fit_ovr"))
+    Xp, _, _ = _v4_matrix(h, pred_idx, t.get("pred_ovr"))
     w = md.decay_weights(months[fit_idx], t["origin_ord"], hl)
     models, others = {}, {}
     for target in ("q2", "q4", "q5"):
-        models[target] = md.fit_regressor(X[fit_idx], frame[target].to_numpy(dtype=float)[fit_idx], w, _params(bundle, target), target)
-        others[target] = models[target].predict(X[pred_idx])
-    dm, raw, _ = fit_predict_q3(h, "direct", bundle, fit_idx, pred_idx, t["origin_ord"], keep_model=True, half_life=hl)
+        models[target] = md.fit_regressor(Xf, frame[target].to_numpy(dtype=float)[fit_idx], w, _params(bundle, target), target)
+        others[target] = models[target].predict(Xp)
+    dm, raw, _, okp = v4_fit_predict(h, "direct", bundle, fit_idx, t.get("fit_ovr"), pred_idx, t.get("pred_ovr"), t["origin_ord"], hl, keep_model=True)
     models["q3_direct"] = dm
     branch = np.full(pred_idx.size, "direct", dtype=object)
     status, reason = "completed", None
+    base = np.full(pred_idx.size, np.nan)
     if formulation == "residual":
-        _, base_ok = _baseline(frame)
-        need = base_ok[pred_idx]
-        rm, res, _ = fit_predict_q3(h, "residual", bundle, fit_idx, pred_idx, t["origin_ord"], keep_model=True, half_life=hl)
+        rm, res, _, need = v4_fit_predict(h, "residual", bundle, fit_idx, t.get("fit_ovr"), pred_idx, t.get("pred_ovr"), t["origin_ord"], hl, keep_model=True)
         if rm is None and need.any():
             status, reason = "unsupported", "no baseline-supported outer fitting rows for test rows with a baseline"
         models["q3_residual_delta"] = rm
         branch = np.where(need, "residual", "fallback_direct").astype(object)
         raw = np.where(need, res, raw)
-    pred = pd.DataFrame({"row": pred_idx, "area_id": frame["area_id"].to_numpy()[pred_idx], "target_ord": months[pred_idx], "q2_raw": others["q2"], "q3_raw": raw, "q4_raw": others["q4"], "q5_raw": others["q5"],
-                         "prediction_branch": branch, "baseline_q3": np.where(branch == "residual", frame["hist_q3_obs1"].to_numpy()[pred_idx], np.nan)})
+        _, bp, _ = _v4_matrix(h, pred_idx, t.get("pred_ovr"))
+        base = np.where(need, bp, np.nan)
+    pred = pd.DataFrame({"row": pred_idx, "area_id": frame["area_id"].to_numpy()[pred_idx], "target_ord": months[pred_idx], "hx": t.get("pred_hx", [""] * pred_idx.size), "q2_raw": others["q2"], "q3_raw": raw,
+                         "q4_raw": others["q4"], "q5_raw": others["q5"], "prediction_branch": branch, "baseline_q3": base})
     mapped, why = (None, reason) if status != "completed" else qo.apply_branches(raw, branch, t["mappings"])
     if mapped is None:
         pred["q3_final"], pred["clipped"], cal = np.nan, False, ("unavailable", why)
@@ -1002,6 +1226,9 @@ def v4_evaluate(cohort: pd.DataFrame, preds: pd.DataFrame, frames: Mapping[int, 
                 p = preds.loc[(preds["data_setting"] == setting) & (preds["outer_year"] == year) & (preds["horizon"] == h)]
                 if p.duplicated(["area_id", "target_ord"]).any():
                     raise AugExpError(f"duplicate prediction keys in {setting}/{year}/H{h}")
+                extra = p.merge(prim[["area_id", "target_ord"]], on=["area_id", "target_ord"], how="left", indicator=True)["_merge"].eq("left_only")
+                if extra.any():
+                    raise AugExpError(f"{int(extra.sum())} prediction keys outside the frozen {setting}/{year}/H{h} cohort")
                 m = prim.merge(f, on=["area_id", "target_ord"], how="left", validate="one_to_one")
                 m = m.merge(p[["area_id", "target_ord", "q3_raw", "q3_final", "clipped", "prediction_branch", "job_id"]], on=["area_id", "target_ord"], how="left", validate="one_to_one")
                 missing = ~np.isfinite(m["q3_final"].to_numpy(dtype=float))
