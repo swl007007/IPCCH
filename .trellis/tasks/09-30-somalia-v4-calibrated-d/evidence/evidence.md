@@ -95,3 +95,9 @@ Under the user's repair-loop rule (same class reported again in round 2) the exe
 - Copies of one assessment are repeated monthly truth, not independent observations; augmented pooled scores weight long validity windows more.
 - 1,008 of 8,928 context×recipe evaluations are unsupported, all residual learned mappings lacking calibration support; recorded with reasons in `candidate_scores.csv.gz`.
 - Upstream climate QA/provenance gaps listed in research.md are inherited, not repaired.
+
+## Closure (2026-10-01)
+
+`trellis-audit close` from pane `wJ:p1` was refused ("Repository is not registered to this executor session"): after the conversation was resumed, Herdr reports Claude session `1e0a5209-65ee-4cb5-ab9b-e8b00bc45f0f` on terminal `term_65cc540c2e07c1`, while run `0e231056d9a04cf18d13ebb9495d1920` is owned by session `7cea05f8-50d5-408d-aada-1948f70c734c` / `term_65cb900f23bc17`; an active run cannot change owner. The failed attempt changed nothing (run still active; the temporary local `.git/info/exclude` entry for the unrelated untracked wrapup script was restored).
+
+User decision (2026-10-01, answering the close-path question): **"Native archive + waiver"** — record this authorization, archive the task with native `task.py archive`, and mark run `0e231056` closed with `waived: true` in the controller DB after a backup (same procedure as `somalia-auc-r2-optimization`, run `b909fb2c`). No controller close-audit job is enqueued. The audit record for this task is the two rounds of manual Codex gpt-6-astra xhigh spot and close audits in `audits/` (round 2: findings, non-result-changing, accepted as audit debt by the user's "Close now" decision). No audit pass is claimed.
