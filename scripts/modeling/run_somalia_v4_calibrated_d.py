@@ -45,6 +45,7 @@ def parse_args(argv=None):
     p.add_argument("--out-dir", type=Path, default=DEFAULT_OUT)
     p.add_argument("--report-dir", type=Path, default=None, help="default: reports/somalia_oracle/v4_calibrated_d for the default out-dir, else <out-dir>/report")
     p.add_argument("--workers", type=int, default=1)
+    p.add_argument("--final-workers", type=int, default=None, help="workers for the final q2/q3/q4/q5 fits (deep trees on the largest pools; default: --workers)")
     p.add_argument("--prepare-only", action="store_true")
     p.add_argument("--skip-input-hash", action="store_true")
     p.add_argument("--pilot", action="append", default=[], help="restrict jobs to setting:year:horizon (repeatable); full recipe inventory per job")
@@ -173,7 +174,7 @@ def main(argv=None):
                 "git_dirty": subprocess.run(["git", "status", "--porcelain"], cwd=paths.PROJECT_ROOT, capture_output=True, text=True).stdout.splitlines(),
                 "runtime": runtime, "inputs": {n: {"path": str(p), "sha256": hashes.get(n)} for n, p in {**inputs, "deep": Path(cfg["inputs"]["deep"])}.items()},
                 "validity_snapshot": {"path": cfg["validity_snapshot"], "sha256": cfg["validity_snapshot_sha256"]}, "config_sha256": sd.sha256_file(args.config),
-                "bundle_config": {"path": str(bundle_path), "sha256": cfg["bundle_config_sha256"]}, "pilot": args.pilot, "workers": args.workers,
+                "bundle_config": {"path": str(bundle_path), "sha256": cfg["bundle_config_sha256"]}, "pilot": args.pilot, "workers": args.workers, "final_workers": args.final_workers or args.workers,
                 "earliest_supervised_year": int(ledger.loc[ledger["valid_target"], "target_ord"].min() // 12), "n_copies": n_copies,
                 "copies_by_year": ledger.loc[ledger["is_copy"]].groupby(ledger["target_ord"] // 12).size().to_dict(), "notes": prep.notes}
     active = list(settings)
@@ -327,7 +328,7 @@ def main(argv=None):
                      "fit_max_target_ord": int(f["target_ord"].to_numpy()[fit_idx].max()), "fit_max_source_available_ord": int(f["source_available_ord"].to_numpy()[fit_idx].max())}
         map_rows += [{"job_id": key, "prediction_branch": n, **m.describe()} for n, m in maps.items()]
         ftasks.append({"key": key, "horizon": h, "formulation": rec["formulation"], "bundle": rec["bundle"], "half_life": rec["half_life"], "origin_ord": job["origin_ord"], "fit_idx": fit_idx, "pred_idx": pred_idx, "mappings": maps})
-    results = run_pool(ax.v4_final_task, ftasks, args.workers, "final fits")
+    results = run_pool(ax.v4_final_task, ftasks, args.final_workers or args.workers, "final fits")
     preds, fits, status_rows, model_rows = [], [], [], []
     mdir = out / "models"
     mdir.mkdir(parents=True, exist_ok=True)
