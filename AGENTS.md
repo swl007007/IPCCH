@@ -1,80 +1,94 @@
 <claude-mem-context>
 # Memory Context
 
-# [IPCCH] recent context, 2026-09-07 6:25pm EDT
+# [IPCCH] recent context, 2026-10-06 1:27pm EDT
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 50 obs (20,638t read) | 434,347t work | 95% savings
+Stats: 50 obs (27,718t read) | 444,689t work | 94% savings
 
-### May 28, 2026
-190 9:53p 🔵 Root Cause of OOM: load_comprehensive_source Uses Plain pd.read_csv with No dtype Optimization
-192 " 🔵 launch_nowcasting.py Model Architecture: Cumulative XGBoost with Time-Decay Weighting
-195 " 🔵 IPCCH Launch Config Constants and CSV Column Structure Confirmed
-196 " 🔴 OOM Fix: Two-Pass Row-Filter CSV Load in load_comprehensive_source
-194 9:54p 🔵 Feature Pipeline Makes Multiple Full DataFrame Copies, Compounding OOM Risk
-197 9:55p 🔵 pytest Fails to Import ipcch Module Without src/ on PYTHONPATH
-199 9:56p 🔵 IPCCH pytest requires PYTHONPATH=src to resolve ipcch module
-200 " 🔵 launch_nowcasting validate-only run: feature schema mismatch between train and April 2026 test set
-201 9:58p 🟣 Launch Nowcasting 2026-04 Pipeline Executed End-to-End
-198 " 🔴 All 16 Unit Tests Pass After OOM Fix — PYTHONPATH=src Required
-202 10:13p 🟣 April 2026 IPC-CH Nowcasting Run Completed Successfully
-203 10:20p 🔵 April 2026 IPC-CH Nowcast Prediction Distribution: Phase 3 Dominates at 81%
-204 " ✅ Project Memory File Created for Launch Nowcasting 2026-04 Runbook
-205 10:21p ✅ MEMORY.md Updated with Launch Nowcasting 2026-04 Pointer
-206 10:23p 🔵 Comparison and Map Inputs Both Available for April 2026 Actuals
-207 " 🔵 launch_comparison.py: Coverage-Aware April-Only Comparison Module Architecture
-208 10:24p 🔵 launch_visualizations.py: Two-Panel Spatial Join Design with Hard-Fail on Duplicate Keys
-209 10:25p 🔵 Shapefile Has No area_id Column — Spatial Join Will Fail Without Remapping
-210 " 🔵 build_map() Delegates Boundary Loading to arm Module — admin_code Remapping May Happen There
-211 10:26p 🔵 admin_code → area_id Remapping Handled Automatically by load_spatial_boundaries() via AREA_ID_ALIASES
-212 " 🔵 April 2026 Actual Coverage: 2,774 of 6,188 Areas Labeled (44.8%) — All IDs Match Perfectly
-213 " 🟣 Mode 3 Comparison and Map Run Launched as Background Process
-214 " 🟣 Mode 3 Report and Map Completed Successfully — Comparison and Choropleth Outputs Written
-215 " 🟣 Full Mode 3 Output Set Confirmed: Comparison CSVs, Confusion Matrix, and Crisis Map PNG Written
-216 10:27p 🔵 April 2026 Nowcast Comparison Metrics: High Phase 3+ Recall (94%) but Zero Phase 4 Detection
-217 10:30p 🔵 contextily Zoom Level 21 Warning When Mapping Labeled-Only Actual Subset
-218 10:43p 🟣 Final Two-Panel Crisis Map PNG Confirmed — 1.17 MB, Correct Partial Coverage Reflected
-219 10:44p ✅ Project Memory Runbook Updated with Complete Mode 3 Comparison and Map Gotchas
-220 10:48p 🔵 alert_risk_maps.py Basemap Pattern: EPSG:3857 Reproject + CartoDB.Positron at alpha=0.4
-221 " 🔵 alert_risk_maps.py Uses Africa-Constrained Extent Calculation to Prevent Basemap Over-Zoom
-222 10:49p 🔵 launch_visualizations.py _panel() Missing EPSG:3857 Reprojection and Africa Extent Filter vs Reference
-224 " 🔴 Basemap Fix Verified: zoom-level-21 Warning Eliminated After EPSG:3857 Reproject
-223 " 🔴 launch_visualizations.py _panel() Fixed: EPSG:3857 Reproject + Africa Extent Filter Added
-225 10:52p 🟣 Crisis Map PNG Now Includes Basemap Tiles — File Size Increased from 1.17MB to 1.89MB
-226 10:53p 🔵 Prediction Output CSV Schema: Dual Prediction Columns (worse + cumulative) Plus Full Metadata
-227 " 🔵 reconstruct_phase_from_cumulative: Last-Phase-Wins Threshold Algorithm — Phase 4 Requires phase4_worse_pred ≥ 0.2
-228 10:54p 🔵 Threshold Sweep Diagnostic: Phase 4 Recall Reaches 38% at th=0.10 but Overall Accuracy Drops to 39%
-S39 Threshold sweep in the upward direction (0.22/0.25/0.30+) to reduce Phase 3 over-prediction in April 2026 nowcast (May 28, 10:55 PM)
-229 11:01p 🔵 High-Threshold Sweep: th=0.25 Maximizes Macro-F1 (0.244); th=0.30 Maximizes Accuracy (0.573)
-230 " 🔵 Per-Phase Thresholds Outperform Global — 0.20/0.30/0.10/0.08 Achieves Best Macro-F1 (0.284) with Phase 4+ Recall 38%
-231 11:03p ✅ Project Memory Updated with Full Threshold Diagnostic Summary and Per-Phase Recommendation
-S41 Stage and commit all changes and merge into main branch (May 28, 11:03 PM)
-232 " 🟣 Alternative th=0.25 Prediction Set and Full Mode 3 Report Generated in Separate Output Directory
-233 11:05p 🟣 th=0.25 Alternative Product Fully Generated: 17-File Output Set with Map PNG and Comparison CSVs
-S40 Re-generate the crisis map and comparison outputs at th=0.25 to show the improved phase distribution compared to canonical th=0.20 (May 28, 11:05 PM)
-S43 Session start — user greeted with "hello" (May 28, 11:05 PM)
-234 11:09p 🔵 Feature Branch 004 Git Status: 13 New Source Files + 3 Modified Files to Commit; Results Directories Gitignored
-235 " 🔵 AGENTS.md Is a Claude-Mem Context File — Should Likely Be Excluded from Commit
-236 11:10p 🔵 AGENTS.md Is Untracked Claude-Mem File Not Covered by .gitignore — Must Be Excluded from Commit
-S44 Session start — user said "hello" (May 28, 11:22 PM)
-S42 Session start — user greeted with "hello" (May 28, 11:22 PM)
-S45 Session start - user said "hello" (May 28, 11:28 PM)
-S46 Run full April 2026 forecast-weather launch pipelines for 3m, 6m, and 12m scopes after validating the historical-weather fallback (May 28, 11:49 PM)
-### Jun 2, 2026
-237 5:07p 🔵 IPCCH completed raw data file location identified
-S47 Validate and run full April 2026 forecast-weather launch pipelines for scopes 3m, 6m, and 12m after implementing the historical-weather fallback (Jun 2, 5:39 PM)
-### Sep 5, 2026
-S50 User asked whether Fable 5 (claude-fable-5-1) is visible in the Claude Code endpoint and whether it has been published/released (Sep 5, 2:25 AM)
-278 2:25a 🔵 Claude Code CLI Version Confirmed on WSL Environment
-279 " 🔵 Claude Code CLI --model Flag Accepts 'fable' as a Valid Alias
-280 2:26a 🔵 claude-fable-5-1 Model ID Silently Falls Back to claude-opus-5
-### Sep 7, 2026
-281 6:22p 🔵 IPC vs CH Country Coverage Analysis in Acute Food Crisis Dataset
+### Oct 5, 2026
+S518 Recolor non-crisis areas in Somalia April 2026 alert map PNG from gray (#d9d8d4) to green, overwriting original file in place (Oct 5, 6:24 PM)
+S522 Trellis task: global-climate-2015-features — fork IPCCH pipeline with new climate CSVs, feature engineering, rerun 0m/3m/6m/12m global metrics (11 total runs: baseline×4, masked×4, unmasked×3) (Oct 5, 6:36 PM)
+3062 7:27p ⚖️ New Trellis Task Planned: IPCCH Pipeline Fork with Updated Climate Features
+3063 7:29p 🔵 climate_2015_2026_MODELING_READY.csv: Audit Findings and Conditional Usability
+3064 " 🔵 climate_monthly_2015_2026_MODELING_READY.csv: Schema Confirmed
+3065 " 🔵 IPCCH Repository State: Experiments, Specs, and Trellis Status
+3066 7:30p 🔵 Existing Global Model Feature Schema: GLDAS/FLDAS Variables vs New CHIRPS/ERA5 Climate CSVs
+3067 7:31p 🔵 Climate CSV Coverage Check: Full admin overlap, monthly data through August 2026
+3068 " 🔵 Trellis task.py create Requires --description Flag
+3069 " 🟣 Trellis Task Created: Global Climate 2015-2026 Feature Rerun (0m/3m/6m/12m)
+3071 " 🔵 Upstream Deep Feature Engineering Code Located at build_deep_ipcch_features.py
+3070 7:32p 🔵 Pipeline Dataset Resolution and Feature Column Selection Logic
+3072 7:38p 🔵 build_deep_ipcch_features.py: Full Feature Engineering Architecture
+3073 7:39p 🔵 build_multiscope_ipcch_features.py: Scope Anchor Lags and Nigeria Precedent Pattern
+3074 " 🔵 Exact Feature Counts and Naming Patterns Per Scope in Existing Model-Ready CSVs
+3075 7:40p 🔵 Stress Signal Thresholds and Rolling Feature Implementation Details
+3076 " 🔵 New Climate Variable Distributions: Stress Threshold Calibration Data
+3077 7:44p 🔵 Pipeline Core Code Unchanged Since Baseline Global Runs (2026-05-31)
+3080 " 🔵 Deep Feature Family Formulas: All Use t-12 Anchor with group-by-area_id Operations
+3081 7:51p 🔵 build_multiscope_ipcch_features.py Architecture: Takes Pre-Engineered Deep Features, Applies Time Shift Per Scope
+3082 " 🔵 Interaction Pairs and Spatial Spillover Are Hardcoded to Old GLDAS Column Names
+3083 7:52p 🔵 Machine Resources and Interim Panel Confirmation
+3084 " 🟣 Trellis PRD Written: Climate 2015 Feature Rerun Spec with Full Design Decisions
+3085 7:53p 🔵 Panel Preparation: admin_code→area_id Rename and Static Context Columns
+3089 " 🔵 Quality guidelines: forbidden patterns, 12 pre-existing test failures, safe_divide behavior
+3090 " 🔵 forecasting_ready.csv header: exact column positions and old interaction names confirmed
+3091 7:56p 🔴 src/ipcch/climate2015_features.py written: complete feature engineering module
+3092 7:57p 🔴 Three patches applied to climate2015_features.py; import smoke test passed
+3094 7:58p 🔴 check_climate2015_fork_fidelity.py written: fidelity gate script comparing recomputed vs saved FLDAS families
+3095 " 🔴 Fidelity check ran in 35s: scope-block NaN-tail mismatch expected, but neighbour mean shows genuine value discrepancy up to 0.139
+3096 " 🔴 Fidelity block summary: asof12 block has only 2 mismatches; neighbour mean is the only real discrepancy; all 39 s0 mismatches are the expected NaN-tail
+3097 8:01p 🔴 Scope-block NaN artifact quantified: baseline scope files have 0% NaN in training rows but 60%/46%/2% NaN in 2025 for s0/s3/s6; new direct-anchor fills these
+3099 8:02p 🔴 tests/unit/test_climate2015_features.py written: 8 unit tests covering anchor safety, naming, stress thresholds, spell helpers, same-month history, season completion, old-column detector, and ragged grid
+3104 8:08p 🔴 run_climate2015_global_suite.py written — 11-run orchestration script for implement.md step 8
+3109 8:09p 🟣 climate2015_v1 pipeline fork: all scripts written, builds and runs in progress
+3115 " 🔵 Implementation status checkpoint: all scripts written, compute in progress — ~2-3 hours remain
+3116 " 🔵 Build progress at 750s: fs0/fs1/fs2-masked done; baseline_rerun_0m training at 2690% CPU, 342 min CPU time
+3108 " 🔴 compare_climate2015_global_metrics.py written — implement.md step 9 complete
+3118 8:13p 🔵 Build stalled at fs2/masked (750s) — fs2/unmasked and fs3 still pending after repeated status checks
+3110 8:14p 🔵 Full build progress: fs0 complete (52521 rows, 847 cols), baseline_rerun/0m started; memory at 10/15GB
+3119 8:20p 🔵 Full dataset build timing: each scope variant takes ~180s for masked + ~95s for unmasked on full 52K-row panel
+3120 8:26p 🔵 Full dataset build complete: exit 0 at 1059s — 7 files written, 4065MB total, all column counts correct
+3121 " 🟣 Trellis check agent launched (a0c2501d85a969df7) to review code against prd/design specs
+S525 Status check (现在怎么样了) on deep_feature_weight_decay_forecasting climate2015 experiment comparing 2015–2026 climate features vs FLDAS baseline (Oct 5, 8:41 PM)
+3177 9:48p 🔵 Climate2015 Deep Feature Experiment Suite Progress Check
+3178 " 🔵 Masked vs Baseline Model Interim Metrics: Climate2015 Deep Feature Experiment
+S523 Status check on climate2015 deep feature weight decay forecasting experiment — masked vs baseline model comparison (Oct 5, 9:48 PM)
+S526 Status check (现在怎么样了) — full run completion and diagnostic investigation of 0m/2025 R² regression (Oct 5, 9:50 PM)
+S528 Climate2015 global model experiment — full completion summary presented to user; session wrapping up pending merge and Trellis close (Oct 5, 10:16 PM)
+3193 10:17p 🟣 Climate2015 experiment report and evidence.md finalized
+3194 " 🔵 Baseline drift in 3m/6m scopes traced to pre-rebuild fs1/fs2 inputs
+3195 " ✅ Climate2015 lessons added to quality-guidelines.md and all files staged for commit
+3197 " 🔵 Staged climate2015 changes confirmed low-risk by gitnexus (all new files, no symbol modifications)
+3198 " 🟣 Climate2015 feature swap committed to IPCCH repo at 585640b
+S529 User approved submission — complete Trellis task, push branch, merge to main (Oct 5, 10:17 PM)
+S530 User approved final submission: complete Trellis task, push branch, merge to main — session in wrap-up phase (Oct 5, 10:18 PM)
+S527 Status check on climate2015 global model experiment — full completion, results, diagnosis, and commit (Oct 5, 10:18 PM)
+3202 10:26p ✅ Trellis task 10-05-global-climate-2015-features archived and session journal recorded
+3203 " 🟣 Climate2015 feature branch pushed to GitHub and fast-forward merged into main
+S531 完成 Trellis 任务、push 分支、合并到 main — climate2015 feature swap 全流程完成 (Oct 5, 10:26 PM)
+**Investigated**: Trellis task state (in_progress → archived); remote/branch relationships confirmed (main ancestor of feature branch, main in sync with origin/main before merge)
 
-Access 434k tokens of past work via get_observations([IDs]) or mem-search skill.
+**Learned**: - fast-forward merge was possible because main was a direct ancestor of feat/global-climate2015-features (no divergence)
+    - results/ and reports/ are gitignored — comparison report and metrics CSV exist locally only, not in the remote repo
+    - Trellis archive and session journal each auto-commit, adding 2 extra commits on top of the feature commit
+
+**Completed**: - Trellis task 10-05-global-climate-2015-features archived to .trellis/tasks/archive/2026-10/ (commit 3040185)
+    - Session journal recorded (commit df8acaf) with full experiment summary tied to commit 585640b
+    - feat/global-climate2015-features pushed to origin with tracking set up
+    - main fast-forwarded from 871112a to df8acaf (4 commits added) and pushed to origin/main
+    - GitHub remote (https://github.com/swl007007/IPCCH.git) is fully up to date; working directory clean
+    - Full climate2015 Trellis lifecycle closed: implement → evidence → archive → journal → push → merge
+
+**Next Steps**: - Optionally delete feat/global-climate2015-features branch locally and on remote (no outstanding work)
+    - Run `node .gitnexus/run.cjs analyze` to refresh GitNexus index (stale after commits)
+    - Remaining open Trellis task: 00-bootstrap-guidelines (planning stage, unrelated to this work)
+
+
+Access 445k tokens of past work via get_observations([IDs]) or mem-search skill.
 </claude-mem-context>
 
 # Project Guidance Addendum
