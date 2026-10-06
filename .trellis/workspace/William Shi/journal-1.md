@@ -78,3 +78,46 @@ Forked the upstream deep-feature climate recipe onto the 14 ensemble-mean variab
 ### Status
 
 [OK] **Completed**
+
+
+## Session 3: Origin-safe global climate + safe IPC history + national IDP benchmark
+<!-- trellis-session: v=2 fp=9cfdee282c474cc7 -->
+
+**Date**: 2026-10-06
+**Task**: Origin-safe global climate + safe IPC history + national IDP benchmark
+**Branch**: `feat/global-origin-safe-climate-idp`
+
+### Summary
+
+Repaired forecast-origin leakage in global IPCCH (safe latest-three history <= min(O,T-1), national DTM IDP <= O, unmasked climate2015, frozen 28,205-key cohort), annual origin-safe fits for H=0/3/6/12 x 3 arms; verified; close audit round 1 major findings A01-A04 fixed without rerun.
+
+### Main Changes
+
+- New --protocol origin-safe in the global CLI (one fit per test year, labels <= Jan(Y)-max(H,1)); global annual protocol blocked
+- Input builder with recipe-verified inherited features, source-support perturbation and saved-dataset timing audit (0 leaks, 9 cutoffs x 4 horizons)
+- Monthly refits dropped after re-grill (10-50 eval rows per month); monthly outputs deleted
+- Results: safe history improves exact/phase3+ accuracy and R2 at every horizon; national IDP shows no consistent gain (single seed)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `c57ab03` | feat(global): origin-safe monthly protocol with safe IPC history and national IDP |
+| `7cffb5a` | fix(metrics): keep the pooled label in compute_metrics; strengthen verifier |
+| `98fc6cd` | refactor(global): annual origin-safe blocks instead of monthly refits |
+| `5d76abd` | docs(task): origin-safe climate/IDP evidence and verified results |
+| `302728d` | fix(global): address close-audit findings A01-A04 for origin-safe runs |
+| `6cec4d3` | chore(task): archive 10-06-global-origin-safe-climate-idp |
+
+### Testing
+
+- [OK] 45 selected tests pass in ~/.venvs/ipcch-geo; independent verifier passed (288 artifacts, 96 model reloads, sklearn replay)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- Controller gate from close audit round 1 remains open (no re-audit by user decision)
+- Optional: refresh GitNexus index
