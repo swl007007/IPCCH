@@ -56,3 +56,25 @@ Verified 76 Somalia unit tests and v4 smoke/replay; 96-row reporting output repr
 ### Status
 
 [OK] **Completed**
+
+
+## Session 2: Global model rerun with 2015-2026 climate features
+<!-- trellis-session: v=2 fp=9c2bf0b46fe5c13b -->
+
+**Date**: 2026-10-05
+**Task**: Global model rerun with 2015-2026 climate features
+**Branch**: `feat/global-climate2015-features`
+
+### Summary
+
+Forked the upstream deep-feature climate recipe onto the 14 ensemble-mean variables of the 2015-2026 climate release plus last-two completed growing seasons, replacing FLDAS/MODIS climate features; fidelity gate 78/80 asof12 columns; 11 global runs (baseline rerun, masked, unmasked) for 0m/3m/6m/12m, test years 2022-2025. Masked mean deltas: sensitivity 3+ +0.05/+0.03/+0.01/+0.03, F2 +0.04/+0.02/+0.01/+0.02, gains concentrated in 2022; 0m 2025 R2 falls 0.351->0.183 (Yemen, East/Southern Africa). Found upstream scope-block NaN gap (59.7%/46.1% of 2025 rows at 0m/3m) and stale May 3m/6m baseline (539 vs 540 features).
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `585640b` | feat(features): global model rerun with 2015-2026 climate features |
+
+### Status
+
+[OK] **Completed**

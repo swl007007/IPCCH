@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 1
-- **Last Active**: 2026-10-01
+- **Total Sessions**: 2
+- **Last Active**: 2026-10-05
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~58 | Active |
+| `journal-1.md` | ~80 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 2 | 2026-10-05 | Global model rerun with 2015-2026 climate features | `585640b` | `feat/global-climate2015-features` |
 | 1 | 2026-10-01 | Wrap Somalia experiment branch and verify main integration | `2f31c17` | `feat/somalia-oracle-experiment` |
 <!-- @@@/auto:session-history -->
 
