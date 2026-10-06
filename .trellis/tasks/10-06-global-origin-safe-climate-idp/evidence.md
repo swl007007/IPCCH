@@ -7,8 +7,8 @@ under `1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/` (h
 
 - Audit run `3a9127b8b73e42318fc83ffd5e141cda`, base_sha `9e66cc5`, executor Claude session
   `cb41f664-60a8-49e5-9221-ab4b33b84dee` / terminal `term_65d3065df8dc98`, started 2026-10-06 14:49 EDT.
-- Code commits: `c57ab03` (implementation), `7cffb5a` (pooled-metrics fix + verifier), followed by the
-  evidence commit. The pre-existing user change to `AGENTS.md` was never staged.
+- Code commits: `c57ab03` (implementation), `7cffb5a` (pooled-metrics fix + verifier), `98fc6cd` (annual
+  blocks after the re-grill + timing audit), followed by the evidence commit. The pre-existing user change to `AGENTS.md` was never staged.
 
 ## Inputs and provenance (AC1, AC2, AC3)
 
@@ -79,11 +79,11 @@ build ran on the uncommitted working tree; the recorded code sha256 values equal
   (unrounded, `%.17g`, with each row's own origin and the fit cutoff), fit keys with age/weight, four `.ubj`
   model bundles and a record with fingerprint, cutoff, fit maximum, minimum age, key hashes, timings and sha256.
 - Tests (frozen interpreter `~/.venvs/ipcch-geo`, Python 3.12.3, XGBoost 3.2.0, NumPy 2.4.4, pandas 3.0.3,
-  scikit-learn 1.8.0): `tests/unit/test_origin_safe.py` 13 passed; `tests/smoke/test_origin_safe_cli.py`
-  6 passed (global annual rejection; partial run + resume; reintroduced lag1 rejected before fit; ledger
-  source after origin rejected before fit; changed dataset hash rejected; full 48-month plan assembles yearly +
-  pooled metrics); `test_climate2015_features.py`, `test_forecasting_weight_decay_country.py`,
-  `test_weight_decay_shap_cli.py` pass. The full repository suite was not run (known unrelated failures;
+  scikit-learn 1.8.0), final run on `98fc6cd`: 42 passed — `tests/unit/test_origin_safe.py` (13),
+  `tests/smoke/test_origin_safe_cli.py` (6: global annual rejection; one annual block with the year's strictest
+  cutoff + resume; reintroduced lag1 rejected before fit; ledger source after origin rejected before fit;
+  changed dataset hash rejected; full plan assembles yearly + pooled metrics), `test_climate2015_features.py`,
+  `test_forecasting_weight_decay_country.py`, `test_weight_decay_shap_cli.py`. The full repository suite was not run (known unrelated failures;
   not run concurrently with heavy fits).
 
 ## Review findings and repairs
@@ -110,10 +110,69 @@ evaluation rows (3 of 48 months < 50, 12 < 100, median 250). Decisions: annual b
 year + pooled, delete the monthly outputs (deleted), reuse the inputs unchanged. Monthly results are not
 reported anywhere.
 
+## Re-check of feature timing after the re-grill (user request: H12 etc. must not leak)
+
+`scripts/postprocessing/audit_origin_safe_feature_timing.py` (2026-10-06, 1,530 s): for 9 cutoffs
+(2018-12, 2020-06, 2021-12, 2022-12, 2023-06, 2023-12, 2024-06, 2024-12, 2025-06) × 4 horizons, every
+observation after the cutoff was perturbed — interim monthly sources, climate grid, seasons ending after the
+cutoff, IPC labels (history source) and DTM reports — and all features were recomputed with the builder code.
+Compared with the SAVED datasets on rows whose cutoff (O, or min(O, T−1) for history) is <= c:
+**0 changed values** in all 144 horizon × cutoff × block cells (H12: 250 inherited, 341 climate, 5 history,
+2 IDP features; up to 52,521 eligible rows). The 56 other features per horizon are 29 static snapshots, lat/lon,
+12 month and 13 year dummies (none unexplained). Output: `results/experiments/origin_safe_climate_idp_v1/
+timing_audit/`. A label-copy tripwire (`timing_audit/label_tripwire.csv`) found no near-copy of the target:
+history features correlate 0.64–0.70 with the reported phase (persistence), all others |r| <= 0.30.
+
 ## Runs (R3, R5, R10, AC4)
 
-PENDING — to be filled from `results/experiments/origin_safe_climate_idp_v1/` after the suite finishes.
+`run_origin_safe_climate_idp_suite.py --n-jobs 16` on `98fc6cd`, 2026-10-06 17:55–19:00 EDT: 12/12 runs
+COMPLETE (ledger `results/experiments/origin_safe_climate_idp_v1/logs/suite_ledger.jsonl`), 3,879 s total,
+240–365 s per run, 45–103 s per annual 4-target batch, peak RSS 5.4 GB, 16 XGBoost threads, sequential.
+48 batches, 192 cumulative-regressor fits; artifacts 769 MB under `results/experiments/origin_safe_climate_idp_v1/runs/`.
 
 ## Verification and results (AC4, AC5)
 
-PENDING.
+`scripts/postprocessing/verify_origin_safe_climate_idp.py` (separate code path) — **passed**, no problems:
+12/12 runs, 48 batches, 288 artifacts re-hashed, 96 model bundles reloaded and reproducing saved predictions
+(2 blocks per run), 1,280,655 fit-key rows checked against `Jan(Y) − max(H,1)`, ages and weights; fit keys
+identical across arms for every horizon × year; each run covers the 28,205 frozen keys exactly once with
+truth equal to the reported phase and normalized targets; classes re-derived from unrounded scores; history and
+IDP replayed from raw sources on all 210,084 rows; scikit-learn replay equals run metrics (max |diff| 2.2e-16,
+identical undefined patterns; no metric was undefined). Outputs in `.../verification/`; report
+`reports/origin_safe_climate_idp_v1/report.md`.
+
+Pooled 2022–2025 (28,205 keys):
+
+| H | arm | accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 0 | no history | 0.599 | 0.692 | 0.888 | 0.840 | 0.421 | 0.100 | 0.411 |
+| 0 | safe history | 0.640 | 0.741 | 0.870 | 0.841 | 0.493 | 0.091 | 0.372 |
+| 0 | + IDP | 0.643 | 0.741 | 0.877 | 0.846 | 0.495 | 0.091 | 0.367 |
+| 3 | no history | 0.589 | 0.676 | 0.897 | 0.842 | 0.408 | 0.102 | 0.425 |
+| 3 | safe history | 0.647 | 0.751 | 0.861 | 0.836 | 0.495 | 0.090 | 0.363 |
+| 3 | + IDP | 0.635 | 0.740 | 0.851 | 0.827 | 0.490 | 0.091 | 0.376 |
+| 6 | no history | 0.595 | 0.695 | 0.854 | 0.817 | 0.377 | 0.104 | 0.418 |
+| 6 | safe history | 0.619 | 0.705 | 0.887 | 0.844 | 0.443 | 0.097 | 0.393 |
+| 6 | + IDP | 0.631 | 0.722 | 0.890 | 0.851 | 0.449 | 0.096 | 0.379 |
+| 12 | no history | 0.576 | 0.688 | 0.791 | 0.768 | 0.321 | 0.106 | 0.442 |
+| 12 | safe history | 0.596 | 0.697 | 0.823 | 0.794 | 0.382 | 0.100 | 0.418 |
+| 12 | + IDP | 0.600 | 0.695 | 0.868 | 0.827 | 0.361 | 0.103 | 0.411 |
+
+Reading (point estimates, one seed, one fit per block, no intervals):
+- Safe history vs no history: pooled accuracy +0.021 to +0.058, R² +0.061 to +0.087, ordinal MAE −0.024 to
+  −0.062 at every horizon; accuracy and R² are higher in every year × horizon cell (16/16). Recall/F2 change
+  sign by horizon (H0/H3 recall −0.017/−0.036, H6/H12 +0.033/+0.031).
+- National IDP on top of safe history: pooled changes are small and mixed (accuracy −0.012 to +0.012; R²
+  −0.021 to +0.006); H12 recall +0.045 with R² −0.021; year-level signs vary. The data do not show a
+  consistent IDP gain; these differences are within what one seed/one fit can produce, which was not measured.
+- Carrier-tail missingness: inherited `_sH` features are NaN on 98.9 % of tail rows; tail rows are 6,818 /
+  5,264 / 183 of 11,415 2025 evaluation rows at H0/H3/H6 (none at H12), so 2025 differences at short horizons
+  run on largely missing inherited scope features (`verification/missingness_carrier_tail.csv`).
+- Old annual climate2015_v1 results are context only (leaky history, `estimated_population`, unnormalized
+  targets, rounded row-dropping postprocessing, annual target-year fits); differences from them mix all of these
+  corrections and are not attributed to any one of them.
+
+## Acceptance state
+
+AC1–AC5 evidence above. Limits remain as stated: upstream climate standardization unverified, observation
+month as availability proxy, static snapshots, single seed. Audit close pending at time of writing.

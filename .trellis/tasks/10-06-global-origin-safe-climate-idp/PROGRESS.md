@@ -56,5 +56,10 @@ Operational ledger only; not approval or acceptance evidence.
   sources, climate grid/seasons, IPC labels, DTM reports — and compares against the SAVED datasets.
 - CLI switched to `--protocol origin-safe` (annual blocks, `--block-years`); suite/verifier/tests updated;
   19 origin-safe tests pass.
-- [ ] 8. Independent artifact/metric verification.
-- [ ] 9. Guidelines, evidence, commit, audit close.
+- Timing audit (9 cutoffs x 4 horizons, saved datasets): 0 changed eligible values; label-copy tripwire clean.
+  Committed 98fc6cd; annual suite 17:55–19:00, 12/12 COMPLETE (3,879 s, peak RSS 5.4 GB).
+- [x] 8. Verifier passed (12 runs, 48 batches, 288 artifacts re-hashed, 96 bundles reloaded, 1.28 M fit-key
+  rows, independent history/IDP replay on 210 k rows, sklearn replay max |diff| 2.2e-16). Report
+  `reports/origin_safe_climate_idp_v1/report.md`; evidence.md complete. Verifier report writer no longer needs
+  `tabulate` (not installed; environment not changed).
+- [~] 9. Guidelines updated; evidence written; commit + audit close next.

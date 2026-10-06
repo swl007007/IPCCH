@@ -350,6 +350,13 @@ def main() -> int:
     return 0 if not problems and len(predictions) == len(ARMS) * len(HORIZONS) else 1
 
 
+def markdown_table(df: pd.DataFrame) -> list:
+    rows = ["| " + " | ".join(df.columns) + " |", "|" + "---|" * len(df.columns)]
+    for _, r in df.iterrows():
+        rows.append("| " + " | ".join(fmt(v) if isinstance(v, float) else str(v) for v in r) + " |")
+    return rows
+
+
 def fmt(value) -> str:
     return "undefined" if value is None or pd.isna(value) else f"{value:.4f}"
 
@@ -380,7 +387,7 @@ def write_report(replayed: pd.DataFrame, deltas: pd.DataFrame, coverage: pd.Data
                   "| scope | year | metric | baseline_rerun | climate2015_masked | n |", "|---|---|---|---:|---:|---:|"]
         for _, r in old.iterrows():
             lines.append(f"| {r.scope} | {r.test_year} | {r.metric} | {fmt(r.baseline)} | {fmt(r.masked)} | {r.n_samples} |")
-    lines += ["", "## Coverage on the frozen evaluation keys", "", coverage.to_markdown(index=False) if hasattr(coverage, "to_markdown") else coverage.to_string(index=False), "",
+    lines += ["", "## Coverage on the frozen evaluation keys", "", *markdown_table(coverage), "",
               "## Limits", ""] + [f"- {x}" for x in manifest["limits"]] + [
               "- Single seed (42), no confidence intervals: differences are point estimates on one fit per origin.",
               "- Old climate2015_v1 / baseline results used annual target-year fits, legacy history and rounded, row-dropping postprocessing; "
