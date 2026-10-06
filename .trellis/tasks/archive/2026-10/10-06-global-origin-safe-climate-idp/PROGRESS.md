@@ -62,4 +62,18 @@ Operational ledger only; not approval or acceptance evidence.
   rows, independent history/IDP replay on 210 k rows, sklearn replay max |diff| 2.2e-16). Report
   `reports/origin_safe_climate_idp_v1/report.md`; evidence.md complete. Verifier report writer no longer needs
   `tabulate` (not installed; environment not changed).
-- [~] 9. Guidelines updated; evidence written; commit + audit close next.
+- [x] 9. Guidelines updated; evidence committed (5d76abd). Close (2026-10-06 ~19:1x):
+  - 1st `trellis-audit close` (user's AGENTS.md stashed and restored byte-identically, user-approved): snapshot
+    persisted, completion_sha 5d76abd, but native archive refused branch == base_branch == main.
+  - User chose: local branch `feat/global-origin-safe-climate-idp` at 5d76abd (not pushed; main unchanged),
+    `task.py set-branch`. `recover`/`close` then only reconciled (phase closing). Controller source
+    (`finish_close`) requires the wrapper's own step `task.py archive <task> --no-commit` to complete with HEAD
+    unchanged; ran exactly that, HEAD still 5d76abd, then `close` enqueued the audit.
+  - Close-audit job `ae81c0e0a9a141f8cfcf37ad` (attempt 1, status launching at enqueue), audited_sha 5d76abd,
+    snapshot sha256 128c5d4e…; controller running. Queued/launching is NOT passed.
+  - Archive move left uncommitted (wrapper uses --no-commit); no push/merge.
+- Close audit round 1 done 19:17: verdict findings, major, gate open (A01 dry-run fits; A02 gate skips history
+  differences; A03 accuracy is five-class not phase 3+; A04 resume inventory). User: fix + recompute, then merge,
+  no rerun/re-audit. Fixed A01–A04 in one pass with tests (22 origin-safe tests pass), gate re-run on real data,
+  metrics recomputed from saved predictions, verifier passed again. Then archive commit, AGENTS.md chore commit,
+  push feature branch, fast-forward main, push.

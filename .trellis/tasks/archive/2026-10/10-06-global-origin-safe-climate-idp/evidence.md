@@ -141,28 +141,31 @@ IDP replayed from raw sources on all 210,084 rows; scikit-learn replay equals ru
 identical undefined patterns; no metric was undefined). Outputs in `.../verification/`; report
 `reports/origin_safe_climate_idp_v1/report.md`.
 
-Pooled 2022–2025 (28,205 keys):
+Pooled 2022–2025 (28,205 keys). Exact-phase accuracy = five-class; phase 3+ accuracy = phase >= 3 vs <= 2
+(both reported since audit finding A03):
 
-| H | arm | accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| 0 | no history | 0.599 | 0.692 | 0.888 | 0.840 | 0.421 | 0.100 | 0.411 |
-| 0 | safe history | 0.640 | 0.741 | 0.870 | 0.841 | 0.493 | 0.091 | 0.372 |
-| 0 | + IDP | 0.643 | 0.741 | 0.877 | 0.846 | 0.495 | 0.091 | 0.367 |
-| 3 | no history | 0.589 | 0.676 | 0.897 | 0.842 | 0.408 | 0.102 | 0.425 |
-| 3 | safe history | 0.647 | 0.751 | 0.861 | 0.836 | 0.495 | 0.090 | 0.363 |
-| 3 | + IDP | 0.635 | 0.740 | 0.851 | 0.827 | 0.490 | 0.091 | 0.376 |
-| 6 | no history | 0.595 | 0.695 | 0.854 | 0.817 | 0.377 | 0.104 | 0.418 |
-| 6 | safe history | 0.619 | 0.705 | 0.887 | 0.844 | 0.443 | 0.097 | 0.393 |
-| 6 | + IDP | 0.631 | 0.722 | 0.890 | 0.851 | 0.449 | 0.096 | 0.379 |
-| 12 | no history | 0.576 | 0.688 | 0.791 | 0.768 | 0.321 | 0.106 | 0.442 |
-| 12 | safe history | 0.596 | 0.697 | 0.823 | 0.794 | 0.382 | 0.100 | 0.418 |
-| 12 | + IDP | 0.600 | 0.695 | 0.868 | 0.827 | 0.361 | 0.103 | 0.411 |
+| H | arm | exact-phase acc. | phase 3+ acc. | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | no history | 0.599 | 0.752 | 0.692 | 0.888 | 0.840 | 0.421 | 0.100 | 0.411 |
+| 0 | safe history | 0.640 | 0.788 | 0.741 | 0.870 | 0.841 | 0.493 | 0.091 | 0.372 |
+| 0 | + IDP | 0.643 | 0.790 | 0.741 | 0.877 | 0.846 | 0.495 | 0.091 | 0.367 |
+| 3 | no history | 0.589 | 0.740 | 0.676 | 0.897 | 0.842 | 0.408 | 0.102 | 0.425 |
+| 3 | safe history | 0.647 | 0.793 | 0.751 | 0.861 | 0.836 | 0.495 | 0.090 | 0.363 |
+| 3 | + IDP | 0.635 | 0.781 | 0.740 | 0.851 | 0.827 | 0.490 | 0.091 | 0.376 |
+| 6 | no history | 0.595 | 0.746 | 0.695 | 0.854 | 0.817 | 0.377 | 0.104 | 0.418 |
+| 6 | safe history | 0.619 | 0.763 | 0.705 | 0.887 | 0.844 | 0.443 | 0.097 | 0.393 |
+| 6 | + IDP | 0.631 | 0.779 | 0.722 | 0.890 | 0.851 | 0.449 | 0.096 | 0.379 |
+| 12 | no history | 0.576 | 0.723 | 0.688 | 0.791 | 0.768 | 0.321 | 0.106 | 0.442 |
+| 12 | safe history | 0.596 | 0.739 | 0.697 | 0.823 | 0.794 | 0.382 | 0.100 | 0.418 |
+| 12 | + IDP | 0.600 | 0.749 | 0.695 | 0.868 | 0.827 | 0.361 | 0.103 | 0.411 |
 
 Reading (point estimates, one seed, one fit per block, no intervals):
-- Safe history vs no history: pooled accuracy +0.021 to +0.058, R² +0.061 to +0.087, ordinal MAE −0.024 to
-  −0.062 at every horizon; accuracy and R² are higher in every year × horizon cell (16/16). Recall/F2 change
+- Safe history vs no history: pooled exact-phase accuracy +0.021 to +0.058, phase 3+ accuracy +0.016 to
+  +0.053, R² +0.061 to +0.087, ordinal MAE −0.024 to −0.062 at every horizon; exact-phase accuracy and R² are
+  higher in every year × horizon cell (16/16), phase 3+ accuracy in 15/16 (H0 2022: −0.0025). Recall/F2 change
   sign by horizon (H0/H3 recall −0.017/−0.036, H6/H12 +0.033/+0.031).
-- National IDP on top of safe history: pooled changes are small and mixed (accuracy −0.012 to +0.012; R²
+- National IDP on top of safe history: pooled changes are small and mixed (exact-phase accuracy −0.012 to
+  +0.012, phase 3+ accuracy −0.012 to +0.015; R²
   −0.021 to +0.006); H12 recall +0.045 with R² −0.021; year-level signs vary. The data do not show a
   consistent IDP gain; these differences are within what one seed/one fit can produce, which was not measured.
 - Carrier-tail missingness: inherited `_sH` features are NaN on 98.9 % of tail rows; tail rows are 6,818 /
@@ -172,7 +175,30 @@ Reading (point estimates, one seed, one fit per block, no intervals):
   targets, rounded row-dropping postprocessing, annual target-year fits); differences from them mix all of these
   corrections and are not attributed to any one of them.
 
+## Close audit round 1 (job `ae81c0e0a9a141f8cfcf37ad`, audited 5d76abd) and fixes
+
+Verdict `findings`, severity major, gate open. Classified per the user's rule and fixed in one pass after the
+user chose "fix + recompute, then merge" (no rerun, no re-audit; the controller gate stays open):
+
+- **A03 (major, changed a reported result):** `accuracy` was exact five-class accuracy; PRD R10 lists phase 3+
+  accuracy. Now `origin_metrics` and the verifier report `exact_phase_accuracy` and `phase3plus_accuracy`;
+  `scripts/postprocessing/recompute_origin_safe_metrics.py` rebuilt every run's `metrics_overall.csv` from the
+  saved predictions (hash-checked against batch records; previous files kept as `metrics_overall_pre_a03.csv`).
+  No model or prediction changed; the verifier's sklearn replay agrees exactly for both accuracies.
+- **A01 (major, broke required behaviour, no number changed):** `--protocol origin-safe --dry-run` fitted
+  models. It now validates inputs and the prefit gate, prints the block plan and returns before writing.
+- **A02 (major, guard hole, no number changed):** the prefit gate did not check the two history-difference
+  columns. `assert_history_ledger` now requires them to equal history1−history2 / history1−history3 exactly
+  (NaN pattern included). The gate passes on all four real datasets; the builder's reference replay had already
+  checked these columns row by row.
+- **A04 (minor, provenance):** resume accepted a batch record listing fewer than the 6 required artifacts.
+  `verify_batch` and the verifier now require exactly the 6 artifacts; all 48 real batches have them.
+- Tests: unit (difference-column leak and NaN fill rejected; both accuracies incl. a case where every exact
+  phase is wrong and every 3+ class right) and CLI smoke (dry-run writes nothing; resume rejects a record missing
+  a model). Runs remain those fingerprinted with the pre-fix CLI/`origin_safe.py`; the fixes do not touch
+  fitting, cutoffs, weights, predictions or the features used.
+
 ## Acceptance state
 
 AC1–AC5 evidence above. Limits remain as stated: upstream climate standardization unverified, observation
-month as availability proxy, static snapshots, single seed. Audit close pending at time of writing.
+month as availability proxy, static snapshots, single seed. Close audit round 1 returned major findings (gate open); fixed as above without re-audit by user decision.
