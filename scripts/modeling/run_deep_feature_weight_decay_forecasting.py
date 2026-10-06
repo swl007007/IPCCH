@@ -965,6 +965,9 @@ def verify_batch(batch_dir: Path, fingerprint: str) -> Optional[Dict[str, object
     if not record_path.exists():
         return None
     record = json.loads(record_path.read_text(encoding="utf-8"))
+    missing = sorted(osf.REQUIRED_BATCH_ARTIFACTS - set(record.get("artifacts", {})))
+    if missing:
+        raise ValueError(f"{batch_dir} batch record lacks required artifacts {missing}; refusing to resume an incomplete batch")
     if record.get("fingerprint") != fingerprint:
         raise ValueError(f"{batch_dir} was produced with a different fingerprint; refusing to mix runs")
     for name, sha in record["artifacts"].items():
@@ -1051,6 +1054,11 @@ def run_origin_batch(inputs: Mapping[str, object], args: argparse.Namespace, yea
 
 def run_origin_safe(args: argparse.Namespace) -> int:
     inputs = load_origin_inputs(args)
+    plan = block_plan(args)
+    if args.dry_run:
+        print(f"origin-safe dry run {args.arm} H={args.horizon}: inputs and prefit gate passed; {len(inputs['features'])} features; "
+              f"blocks {plan} with fit cutoffs {[_ym(y * 12 - max(args.horizon, 1)) for y in plan]}; no fitting, nothing written", flush=True)
+        return 0
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     run_meta_path = out_dir / "run_metadata.json"
@@ -1058,7 +1066,6 @@ def run_origin_safe(args: argparse.Namespace) -> int:
         previous = json.loads(run_meta_path.read_text(encoding="utf-8"))
         if previous.get("fingerprint") != inputs["fingerprint"]:
             raise ValueError(f"{out_dir} holds a run with a different fingerprint; use a new --out-dir")
-    plan = block_plan(args)
     hyperparams, hyperparams_p3 = load_hyperparameters()
     records = []
     print(f"origin-safe {args.arm} H={args.horizon}: {len(plan)} annual blocks, {len(inputs['features'])} features", flush=True)

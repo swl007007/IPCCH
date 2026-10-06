@@ -35,7 +35,9 @@ RESULTS = paths.RESULTS_DIR / "experiments" / VERSION
 REPORTS = paths.REPORTS_DIR / VERSION
 MANIFEST = paths.SOURCE_DATA_DIR / "assembled_IPCCH" / "model_ready" / VERSION / f"{VERSION}_manifest.json"
 OLD_CONTEXT = paths.RESULTS_DIR / "experiments" / "deep_feature_weight_decay_forecasting" / "climate2015_v1" / "comparison_metrics.csv"
-METRICS = ("accuracy", "precision_phase3plus", "sensitivity_phase3plus", "f2_phase3plus", "r2_phase3plus", "mae_phase3plus", "ordinal_mae")
+METRICS = ("exact_phase_accuracy", "phase3plus_accuracy", "precision_phase3plus", "sensitivity_phase3plus", "f2_phase3plus", "r2_phase3plus",
+           "mae_phase3plus", "ordinal_mae")
+REQUIRED_ARTIFACTS = {"predictions.csv", "fit_keys.csv.gz", *(f"model_{t}.ubj" for t in TARGETS)}
 
 
 def sha(path: Path) -> str:
@@ -62,7 +64,8 @@ def replay(df: pd.DataFrame) -> dict:
     out = {"n_samples": len(df)}
     y, p = df["overall_phase"].to_numpy(dtype=int), df["overall_phase_pred"].to_numpy(dtype=int)
     yb, pb = y >= 3, p >= 3
-    out["accuracy"] = accuracy_score(y, p)
+    out["exact_phase_accuracy"] = accuracy_score(y, p)
+    out["phase3plus_accuracy"] = accuracy_score(yb, pb)
     out["precision_phase3plus"] = precision_score(yb, pb, zero_division=np.nan) if pb.any() else None
     out["sensitivity_phase3plus"] = recall_score(yb, pb, zero_division=np.nan) if yb.any() else None
     defined = out["precision_phase3plus"] is not None and out["sensitivity_phase3plus"] is not None and (yb & pb).any()
@@ -192,6 +195,8 @@ def main() -> int:
                 disk = json.loads((bdir / "batch_record.json").read_text())
                 if disk != json.loads(json.dumps(record)) or disk["fingerprint"] != meta["fingerprint"]:
                     problems.append(f"{arm} h{horizon} {year}: batch record differs from run metadata")
+                if set(disk["artifacts"]) != REQUIRED_ARTIFACTS:
+                    problems.append(f"{bdir}: artifact inventory {sorted(disk['artifacts'])} is not the required set")
                 for name, digest in disk["artifacts"].items():
                     checks["artifacts_rehashed"] += 1
                     if sha(bdir / name) != digest:
@@ -364,18 +369,19 @@ def fmt(value) -> str:
 def write_report(replayed: pd.DataFrame, deltas: pd.DataFrame, coverage: pd.DataFrame, summary: dict, manifest: dict) -> None:
     lines = [f"# {VERSION}: origin-safe global climate, safe IPC history and national IDP", "",
              "Machine-readable sources: `results/experiments/origin_safe_climate_idp_v1/verification/`. "
-             "All metrics are replayed with scikit-learn from saved unrounded predictions.", "",
+             "All metrics are replayed with scikit-learn from saved unrounded predictions. Exact-phase accuracy is the five-class "
+             "accuracy; phase 3+ accuracy compares phase >= 3 with phase <= 2 (audit finding A03).", "",
              f"Verification passed: `{summary['passed']}`; runs {summary['runs_found']}/{summary['expected_runs']}; "
              f"batches {summary['batches']}; artifacts re-hashed {summary['artifacts_rehashed']}; models reloaded {summary['models_reloaded']}.", ""]
     for horizon in HORIZONS:
-        lines += [f"## H = {horizon} months", "", "| arm | year | n | accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |",
-                  "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        lines += [f"## H = {horizon} months", "", "| arm | year | n | exact-phase accuracy | phase 3+ accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |",
+                  "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
         for _, r in replayed[replayed.horizon == horizon].iterrows():
             lines.append(f"| {r.arm} | {r.test_year} | {r.n_samples} | " + " | ".join(fmt(r[m]) for m in METRICS) + " |")
         lines.append("")
     lines += ["## Paired differences (same frozen keys, same per-origin fitting keys)", "",
-              "| comparison | H | year | accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |",
-              "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
+              "| comparison | H | year | exact-phase accuracy | phase 3+ accuracy | precision 3+ | recall 3+ | F2 3+ | R² 3+ | MAE 3+ | ordinal MAE |",
+              "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for _, r in deltas.iterrows():
         lines.append(f"| {r.comparison} | {r.horizon} | {r.test_year} | " + " | ".join(fmt(r[m]) for m in METRICS) + " |")
     if OLD_CONTEXT.exists():

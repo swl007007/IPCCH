@@ -1,4 +1,4 @@
-"""Origin-safe global protocol: safe IPC history, national IDP context, frozen cohorts and monthly refits.
+"""Origin-safe global protocol: safe IPC history, national IDP context, frozen cohorts and annual origin-safe fits.
 
 Contract (task ``10-06-global-origin-safe-climate-idp``; observation month is the availability proxy):
 
@@ -45,6 +45,7 @@ FORBIDDEN_FEATURE_PATTERNS = (
     r"^(area_id|year|month|date|test_year|origin_ord|target_ord)$",
     r"(^|_)source_(ord|month|area)",
 )
+REQUIRED_BATCH_ARTIFACTS = frozenset({"predictions.csv", "fit_keys.csv.gz", *(f"model_{t}.ubj" for t in CUMULATIVE_TARGETS)})
 DEFAULT_HALF_LIFE_MONTHS = 24.0
 DEFAULT_PHASE_THRESHOLD = 0.2
 
@@ -358,6 +359,10 @@ def assert_history_ledger(frame: pd.DataFrame, ledger: pd.DataFrame, horizon: in
             raise ValueError(f"history_{k + 1}: source month after min(O, T-1)")
         if not np.array_equal(ledger[f"history_{k + 1}_value"].to_numpy(dtype=float), value, equal_nan=True):
             raise ValueError(f"history_{k + 1}: dataset value differs from ledger")
+    h1, h2, h3 = (frame[c].to_numpy(dtype=float) for c in HISTORY_VALUES)
+    for column, expected in zip(HISTORY_CHANGES, (h1 - h2, h1 - h3)):
+        if not np.array_equal(frame[column].to_numpy(dtype=float), expected, equal_nan=True):
+            raise ValueError(f"{column} is not the difference of the ledger-validated history values")
 
 
 def assert_idp_ledger(frame: pd.DataFrame, ledger: pd.DataFrame, horizon: int) -> None:
@@ -380,14 +385,22 @@ def assert_idp_ledger(frame: pd.DataFrame, ledger: pd.DataFrame, horizon: int) -
 
 
 def origin_metrics(predictions: pd.DataFrame, scope: str = "overall", test_year=None) -> Dict[str, object]:
-    """Accuracy, phase-3+ precision/recall/F2, phase-3+ R2/MAE and ordinal MAE; undefined values stay None."""
+    """Exact-phase and phase-3+ accuracy, phase-3+ precision/recall/F2, phase-3+ R2/MAE and ordinal MAE.
+
+    ``exact_phase_accuracy`` is the project's canonical five-class accuracy; ``phase3plus_accuracy`` compares
+    phase >= 3 against phase <= 2. Undefined values stay None.
+    """
     from ipcch.forecasting_weight_decay import compute_metrics, metric_value
 
     result = compute_metrics(predictions, test_year if test_year is not None else -1, scope)
+    result["exact_phase_accuracy"] = result.pop("accuracy")
     if len(predictions) == 0:
-        result["mae_phase3plus"] = metric_value(None, "unavailable", "no eligible samples")
-        result["ordinal_mae"] = metric_value(None, "unavailable", "no eligible samples")
+        for metric in ("phase3plus_accuracy", "mae_phase3plus", "ordinal_mae"):
+            result[metric] = metric_value(None, "unavailable", "no eligible samples")
         return result
+    observed3 = predictions["overall_phase"].to_numpy(dtype=float) >= 3
+    predicted3 = predictions["overall_phase_pred"].to_numpy(dtype=float) >= 3
+    result["phase3plus_accuracy"] = metric_value(float(np.mean(observed3 == predicted3)))
     truth = predictions["phase3_worse"].to_numpy(dtype=float)
     pred = predictions["phase3_pred"].to_numpy(dtype=float)
     result["mae_phase3plus"] = metric_value(float(np.mean(np.abs(truth - pred))))
@@ -397,9 +410,13 @@ def origin_metrics(predictions: pd.DataFrame, scope: str = "overall", test_year=
     return result
 
 
+ORIGIN_METRICS = ("exact_phase_accuracy", "phase3plus_accuracy", "precision_phase3plus", "sensitivity_phase3plus",
+                  "f2_phase3plus", "r2_phase3plus", "mae_phase3plus", "ordinal_mae")
+
+
 def flatten_origin_metrics(result: Mapping[str, object]) -> Dict[str, object]:
     row = {"scope": result["scope"], "test_year": result["test_year"], "n_samples": result["n_samples"]}
-    for metric in ("accuracy", "precision_phase3plus", "sensitivity_phase3plus", "f2_phase3plus", "r2_phase3plus", "mae_phase3plus", "ordinal_mae"):
+    for metric in ORIGIN_METRICS:
         value = result[metric]
         row[metric] = value["value"]
         row[f"{metric}_status"] = value["status"]

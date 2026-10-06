@@ -138,3 +138,9 @@ Lessons:
   Depth-11 bundles are ~16 MB per 4-target fit set.
 - Do not edit files hashed into a running suite's fingerprint; put fixes in non-hashed modules or
   accept a rerun.
+- Name accuracies explicitly. "Accuracy" in the canonical regressor metrics is five-class; crisis work often
+  means phase 3+ vs 1–2. Report `exact_phase_accuracy` and `phase3plus_accuracy` side by side; a verifier that
+  reuses the same definition cannot catch a definition error.
+- Prefit gates must check every fitted column derived from a ledger (e.g. history differences), not only the
+  ledgered base values. Resume checks must require the full artifact set, not only what a record lists.
+  `--dry-run` must short-circuit every protocol branch before outputs are created.

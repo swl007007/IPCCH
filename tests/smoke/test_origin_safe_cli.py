@@ -150,3 +150,25 @@ def test_full_plan_assembles_yearly_and_pooled_metrics(tmp_path):
     assert metrics.loc[4, "n_samples"] == 144 and metrics["ordinal_mae"].notna().all()
     yearly = pd.concat([pd.read_csv(out / "predictions" / f"predictions_{y}.csv") for y in osf.TARGET_YEARS])
     assert len(yearly) == 144 and not yearly.duplicated(KEYS).any()
+
+
+def test_dry_run_validates_without_fitting_or_writing(tmp_path):
+    manifest = write_inputs(tmp_path)
+    out = tmp_path / "run"
+    result = run_cli(*origin_args(manifest, out, "--dry-run"))
+    assert result.returncode == 0, result.stderr
+    assert "no fitting, nothing written" in result.stdout and "2021-10" in result.stdout
+    assert not out.exists()
+
+
+def test_resume_rejects_batch_record_missing_a_required_artifact(tmp_path):
+    manifest = write_inputs(tmp_path)
+    out = tmp_path / "run"
+    assert run_cli(*origin_args(manifest, out)).returncode == 0
+    record_path = out / "batches" / "2022" / "batch_record.json"
+    record = json.loads(record_path.read_text())
+    del record["artifacts"]["model_phase2_worse.ubj"]
+    (out / "batches" / "2022" / "model_phase2_worse.ubj").unlink()
+    record_path.write_text(json.dumps(record))
+    again = run_cli(*origin_args(manifest, out))
+    assert again.returncode == 1 and "lacks required artifacts" in again.stderr and "model_phase2_worse.ubj" in again.stderr

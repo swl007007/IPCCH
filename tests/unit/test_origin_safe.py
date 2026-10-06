@@ -90,6 +90,20 @@ def test_reference_check_detects_tampered_ledger_and_gate_rejects_bad_provenance
         osf.assert_history_ledger(data, ledger, 6)
 
 
+def test_gate_rejects_history_difference_not_derived_from_validated_values():
+    frame = rows([(1, 2020, 10), (1, 2021, 1), (2, 2021, 1)])
+    block, ledger = osf.build_safe_history(OBS, frame, 3)
+    data = pd.concat([frame, block], axis=1)
+    leaky = data.copy()
+    leaky.loc[0, "overall_phase_history_change_1_2"] = 5 - leaky.loc[0, "overall_phase_history_1"]  # target-relative (truth 5), != 3 - 2
+    with pytest.raises(ValueError, match="overall_phase_history_change_1_2"):
+        osf.assert_history_ledger(leaky, ledger, 3)
+    filled = data.copy()
+    filled.loc[filled["overall_phase_history_change_1_3"].isna(), "overall_phase_history_change_1_3"] = 0.0
+    with pytest.raises(ValueError, match="overall_phase_history_change_1_3"):
+        osf.assert_history_ledger(filled, ledger, 3)
+
+
 def test_legacy_history_and_target_side_population_are_forbidden():
     assert osf.forbidden_features(["overall_phase_lag1", "overall_phase_prev_observed_asof_s3", "estimated_population",
                                    "phase3_worse", "phase2_percent", "GPP_mean__l12", "overall_phase_history_1"]) == [
@@ -168,6 +182,9 @@ def test_completed_season_boundary_is_month_end_of_origin():
 def test_metrics_report_mae_ordinal_and_undefined_precision():
     preds = pd.DataFrame({"overall_phase": [1, 2, 3], "overall_phase_pred": [1, 1, 1], "phase3_worse": [0.0, 0.1, 0.5], "phase3_pred": [0.1, 0.1, 0.1]})
     m = osf.origin_metrics(preds, "overall", 2022)
+    assert "accuracy" not in m
+    assert m["exact_phase_accuracy"]["value"] == pytest.approx(1 / 3)
+    assert m["phase3plus_accuracy"]["value"] == pytest.approx(2 / 3)  # truth 3+ only on row 3, predicted 3+ on none
     assert m["precision_phase3plus"]["status"] == "unavailable"
     assert m["ordinal_mae"]["value"] == pytest.approx(1.0)
     assert m["mae_phase3plus"]["value"] == pytest.approx((0.1 + 0 + 0.4) / 3)
@@ -177,5 +194,9 @@ def test_pooled_metrics_keep_the_aggregate_label():
     preds = pd.DataFrame({"overall_phase": [1, 3, 3], "overall_phase_pred": [1, 3, 1], "phase3_worse": [0.0, 0.4, 0.5], "phase3_pred": [0.1, 0.3, 0.1]})
     pooled = osf.origin_metrics(preds, "overall", "pooled")
     assert pooled["test_year"] == "pooled" and pooled["sensitivity_phase3plus"]["value"] == pytest.approx(0.5)
+    assert pooled["exact_phase_accuracy"]["value"] == pytest.approx(2 / 3) and pooled["phase3plus_accuracy"]["value"] == pytest.approx(2 / 3)
+    binary_only = preds.assign(overall_phase_pred=[2, 4, 4])  # every exact phase wrong, every 3+ class right
+    both = osf.origin_metrics(binary_only, "overall", "pooled")
+    assert both["exact_phase_accuracy"]["value"] == 0.0 and both["phase3plus_accuracy"]["value"] == 1.0
     assert osf.origin_metrics(preds.iloc[:0], "overall", "pooled")["test_year"] == "pooled"
     assert osf.flatten_origin_metrics(pooled)["test_year"] == "pooled"
