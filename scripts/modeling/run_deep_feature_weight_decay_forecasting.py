@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -13,6 +14,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 
+from ipcch import origin_safe as osf
 from ipcch import paths
 from ipcch.forecasting_shap import (
     DEFAULT_CROSSWALK_KEY,
@@ -65,8 +67,15 @@ from ipcch.forecasting_weight_decay import (
     weight_diagnostics,
     write_json,
 )
+from ipcch.origin_safe import ARMS, HORIZONS
 
 DEFAULT_COUNTRY_AREA_LOOKUP_PATH = paths.SOURCE_DATA_DIR / "assembled_IPCCH" / "country_area_id_lookup.csv"
+GLOBAL_ANNUAL_RETIRED = (
+    "Global annual holdouts are retired: they fit on labels after the forecast origin and accept legacy IPC "
+    "history (overall_phase_lag1 / prev_observed) and target-side estimated_population. Build inputs with "
+    "scripts/preprocessing/build_origin_safe_climate_idp_inputs.py and rerun with --protocol monthly-origin "
+    "--origin-manifest <manifest> --horizon <H> --arm <arm>. Country scopes (--country-iso3) keep the annual protocol."
+)
 
 
 @dataclass(frozen=True)
@@ -119,6 +128,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--raw-shap-max-rows", type=int, default=RAW_SHAP_MAX_ROWS_DEFAULT, help="Maximum raw SHAP rows allowed without --allow-large-raw-shap.")
     parser.add_argument("--allow-large-raw-shap", action="store_true", help="Permit raw row-level SHAP output beyond --raw-shap-max-rows.")
     parser.add_argument("--overwrite", action="store_true", help="Allow replacing existing outputs.")
+    parser.add_argument("--protocol", choices=("annual", "monthly-origin"), default="annual", help="annual: legacy calendar-year holdouts (country scopes only). monthly-origin: origin-safe global refit per target month from a frozen input manifest.")
+    parser.add_argument("--origin-manifest", help="monthly-origin: input manifest written by build_origin_safe_climate_idp_inputs.py.")
+    parser.add_argument("--horizon", type=int, choices=HORIZONS, help="monthly-origin: forecast horizon H in months (origin O = T - H).")
+    parser.add_argument("--arm", choices=sorted(ARMS), help="monthly-origin: feature arm recorded in the manifest.")
+    parser.add_argument("--target-months", nargs="+", help="monthly-origin: subset of YYYY-MM target months (default: every month of the test years).")
+    parser.add_argument("--n-jobs", type=int, default=16, help="monthly-origin: XGBoost threads per fit (recorded in the batch fingerprint).")
     return parser.parse_args()
 
 
@@ -681,6 +696,8 @@ def run(args: argparse.Namespace) -> int:
     validate_half_life(args.half_life_months)
     validate_phase_threshold(args.phase_threshold)
     test_years = validate_test_years(args.test_years)
+    if args.protocol == "monthly-origin":
+        return run_monthly_origin(args)
     validate_sample_type(args.shap_sample)
     if args.raw_shap_max_rows <= 0:
         raise ValueError("--raw-shap-max-rows must be positive")
@@ -690,6 +707,8 @@ def run(args: argparse.Namespace) -> int:
     identifier_source_path = resolve_input_path(args.identifier_source, args.identifier_source_key) if args.add_identifier_features else None
     country_lookup_df = pd.read_csv(country_lookup_path)
     scope_selection = resolve_scope_selection(args, country_lookup_df)
+    if not scope_selection.country_filtered:
+        raise ValueError(GLOBAL_ANNUAL_RETIRED)
     output_plan = resolve_output_plan(args, test_years, scope_selection)
     check_existing_outputs(output_plan, args.overwrite, args.dry_run, args.enable_shap)
     ensure_output_dirs(output_plan, args.enable_shap)
@@ -847,6 +866,238 @@ def run(args: argparse.Namespace) -> int:
         write_json(output_plan.shap_metadata_json, metadata["shap"])
     write_json(output_plan.run_metadata_json, metadata)
     write_report(metrics_overall, metrics_scope, metadata, output_plan)
+    return 0
+
+
+MONTHLY_PRED_COLUMNS = ["area_id", "year", "month", "horizon", "arm", "origin_month", "label_cutoff_month", "overall_phase",
+                        *osf.SHARE_COLUMNS, *osf.CUMULATIVE_TARGETS, *osf.PRED_COLUMNS, "overall_phase_pred"]
+
+
+def _ym(ord_value: int) -> str:
+    return osf.ord_label(ord_value)
+
+
+def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
+    """Frozen inputs plus the mandatory prefit gate; raises before any fit on missing or unsafe provenance."""
+    if args.country_iso3 or args.region_scope == 1 or args.country_name:
+        raise ValueError("--protocol monthly-origin is a global protocol; country scopes keep --protocol annual")
+    if args.enable_shap or args.add_identifier_features or args.dataset or args.dataset_key or args.sample_rows:
+        raise ValueError("--protocol monthly-origin takes its dataset and identifier features from --origin-manifest only")
+    if not args.origin_manifest or args.horizon is None or not args.arm or not args.out_dir:
+        raise ValueError("--protocol monthly-origin requires --origin-manifest, --horizon, --arm and --out-dir")
+    if args.n_jobs <= 0:
+        raise ValueError("--n-jobs must be positive")
+    manifest_path = Path(args.origin_manifest)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("status") != "COMPLETE":
+        raise ValueError(f"origin manifest status is {manifest.get('status')!r}, not COMPLETE")
+    entry = manifest["horizons"].get(str(args.horizon))
+    if entry is None or args.arm not in entry["arms"]:
+        raise ValueError(f"manifest has no horizon {args.horizon} / arm {args.arm}")
+    features = list(entry["arms"][args.arm]["features"])
+    if osf.list_sha256(features) != entry["arms"][args.arm]["feature_sha256"]:
+        raise ValueError("manifest feature list does not match its recorded hash")
+    expected_extra = list(osf.ARMS[args.arm])
+    if [c for c in features if c in osf.HISTORY_FEATURES + osf.IDP_FEATURES] != expected_extra:
+        raise ValueError(f"arm {args.arm} must add exactly {expected_extra}")
+    forbidden = osf.forbidden_features(features)
+    if forbidden:
+        raise ValueError(f"unsafe features in the fitted set: {forbidden}. {GLOBAL_ANNUAL_RETIRED}")
+    for label, item in (("dataset", entry["dataset"]), ("history ledger", entry["history_ledger"]), ("IDP ledger", entry["idp_ledger"]), ("cohort", manifest["cohort"])):
+        if not Path(item["path"]).exists():
+            raise FileNotFoundError(f"{label} missing: {item['path']}")
+        if osf.file_sha256(item["path"]) != item["sha256"]:
+            raise ValueError(f"{label} sha256 differs from the manifest: {item['path']}")
+    data = pd.read_csv(entry["dataset"]["path"], float_precision="round_trip", low_memory=False)
+    missing = [c for c in features if c not in data.columns]
+    if missing:
+        raise ValueError(f"dataset is missing manifest features: {missing[:5]}")
+    if data.duplicated(list(osf.KEYS)).any() or osf.keys_sha256(data) != manifest["cohort"]["label_keys_sha256"]:
+        raise ValueError("dataset keys differ from the frozen label keys")
+    if any(c in features for c in osf.HISTORY_FEATURES):
+        osf.assert_history_ledger(data, pd.read_csv(entry["history_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    if any(c in features for c in osf.IDP_FEATURES):
+        osf.assert_idp_ledger(data, pd.read_csv(entry["idp_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    targets = osf.normalized_cumulative_targets(data)
+    cohort = pd.read_csv(manifest["cohort"]["path"])
+    if not cohort[list(osf.KEYS)].equals(data[list(osf.KEYS)]):
+        raise ValueError("cohort file rows differ from the dataset rows")
+    share_valid = targets["share_valid"].to_numpy()
+    eval_key = cohort["eval_key"].to_numpy(dtype=bool)
+    if not np.array_equal(cohort["share_valid"].to_numpy(dtype=bool), share_valid):
+        raise ValueError("share validity differs from the frozen cohort")
+    if not np.array_equal(eval_key, share_valid & data["year"].isin(osf.TARGET_YEARS).to_numpy()) \
+            or osf.keys_sha256(data.loc[eval_key]) != manifest["cohort"]["eval_keys_sha256"]:
+        raise ValueError("evaluation keys differ from the frozen cohort")
+    hyper_paths = [paths.CONFIG_DIR / "forecasting_hyperparameters.json", paths.CONFIG_DIR / "forecasting_hyperparameters_p3.json"]
+    import xgboost
+
+    fingerprint_payload = {
+        "manifest_sha256": osf.file_sha256(manifest_path), "dataset_sha256": entry["dataset"]["sha256"],
+        "feature_sha256": entry["arms"][args.arm]["feature_sha256"], "horizon": args.horizon, "arm": args.arm,
+        "hyperparameters_sha256": [osf.file_sha256(p) for p in hyper_paths], "seed": args.seed,
+        "half_life_months": args.half_life_months, "phase_threshold": args.phase_threshold, "n_jobs": args.n_jobs,
+        "xgboost": xgboost.__version__,
+        "code_sha256": [osf.file_sha256(Path(__file__)), osf.file_sha256(Path(osf.__file__))],
+    }
+    return {
+        "manifest": manifest, "manifest_path": manifest_path, "entry": entry, "features": features, "data": data,
+        "targets": targets, "share_valid": share_valid, "eval_key": eval_key,
+        "ords": osf.month_ord(data["year"], data["month"]),
+        "fingerprint": hashlib.sha256(json.dumps(fingerprint_payload, sort_keys=True).encode()).hexdigest(),
+        "fingerprint_payload": fingerprint_payload,
+    }
+
+
+def target_month_plan(args: argparse.Namespace) -> List[int]:
+    all_months = [year * 12 + m for year in osf.TARGET_YEARS for m in range(12)]
+    if not args.target_months:
+        return all_months
+    chosen = []
+    for text in args.target_months:
+        year, month = (int(x) for x in text.split("-"))
+        value = year * 12 + month - 1
+        if value not in all_months:
+            raise ValueError(f"target month {text} outside the test years")
+        chosen.append(value)
+    return sorted(set(chosen))
+
+
+def verify_batch(batch_dir: Path, fingerprint: str) -> Optional[Dict[str, object]]:
+    """A batch is complete only if its record matches the run fingerprint and every artifact hash."""
+    record_path = batch_dir / "batch_record.json"
+    if not record_path.exists():
+        return None
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    if record.get("fingerprint") != fingerprint:
+        raise ValueError(f"{batch_dir} was produced with a different fingerprint; refusing to mix runs")
+    for name, sha in record["artifacts"].items():
+        path = batch_dir / name
+        if not path.exists() or osf.file_sha256(path) != sha:
+            raise ValueError(f"{path} is missing or changed since its batch record")
+    return record
+
+
+def run_origin_batch(inputs: Mapping[str, object], args: argparse.Namespace, target_ord: int, hyperparams, hyperparams_p3, batch_dir: Path) -> Dict[str, object]:
+    import resource
+    import time
+
+    t0 = time.time()
+    data, targets, ords = inputs["data"], inputs["targets"], inputs["ords"]
+    features = inputs["features"]
+    horizon = args.horizon
+    origin = target_ord - horizon
+    cutoff = int(osf.label_cutoff(np.asarray([target_ord]), horizon)[0])
+    fit = osf.fit_mask(ords, inputs["share_valid"], target_ord, horizon)
+    if not fit.any() or ords[fit].max() > cutoff or ords[fit].max() > origin:
+        raise ValueError(f"{_ym(target_ord)}: fitting labels violate min(O, T-1)")
+    weights = osf.origin_weights(ords[fit], origin, args.half_life_months)
+    evaluate = inputs["eval_key"] & (ords == target_ord)
+    if not evaluate.any():
+        raise ValueError(f"{_ym(target_ord)}: no frozen evaluation keys")
+    X_fit = data.loc[fit, features]
+    X_eval = data.loc[evaluate, features]
+    batch_dir.mkdir(parents=True, exist_ok=True)
+    artifacts: Dict[str, str] = {}
+    preds = {}
+    params = dict(hyperparams, n_jobs=args.n_jobs)
+    params_p3 = dict(hyperparams_p3, n_jobs=args.n_jobs)
+    fit_seconds = {}
+    for target_column, pred_column in zip(osf.CUMULATIVE_TARGETS, osf.PRED_COLUMNS):
+        y_fit = targets.loc[fit, target_column]
+        if y_fit.isna().any():
+            raise ValueError(f"{_ym(target_ord)}: missing {target_column} on a fitting row")
+        t_fit = time.time()
+        model = fit_model(X_fit, y_fit, pd.Series(weights, index=X_fit.index), target_column, params, params_p3, args.seed)
+        fit_seconds[target_column] = round(time.time() - t_fit, 2)
+        if list(model.get_booster().feature_names) != features:
+            raise ValueError("fitted feature order differs from the manifest")
+        preds[pred_column] = model.predict(X_eval).astype(float)
+        model_name = f"model_{target_column}.ubj"
+        model.save_model(batch_dir / model_name)
+        artifacts[model_name] = osf.file_sha256(batch_dir / model_name)
+    out = data.loc[evaluate, list(osf.KEYS) + ["overall_phase", *osf.SHARE_COLUMNS]].copy()
+    out.insert(3, "horizon", horizon)
+    out.insert(4, "arm", args.arm)
+    out.insert(5, "origin_month", _ym(origin))
+    out.insert(6, "label_cutoff_month", _ym(cutoff))
+    for column in osf.CUMULATIVE_TARGETS:
+        out[column] = targets.loc[evaluate, column].to_numpy()
+    for column, values in preds.items():
+        out[column] = values
+    out["overall_phase_pred"] = osf.classify_cumulative(out, args.phase_threshold)
+    out = out[MONTHLY_PRED_COLUMNS]
+    out.to_csv(batch_dir / "predictions.csv", index=False, float_format="%.17g")
+    artifacts["predictions.csv"] = osf.file_sha256(batch_dir / "predictions.csv")
+    fit_keys = data.loc[fit, list(osf.KEYS)].copy()
+    fit_keys["age_months"] = origin - ords[fit]
+    fit_keys["sample_weight"] = weights
+    fit_keys.to_csv(batch_dir / "fit_keys.csv.gz", index=False, float_format="%.17g")
+    artifacts["fit_keys.csv.gz"] = osf.file_sha256(batch_dir / "fit_keys.csv.gz")
+    record = {
+        "fingerprint": inputs["fingerprint"], "arm": args.arm, "horizon": horizon,
+        "target_month": _ym(target_ord), "origin_month": _ym(origin), "label_cutoff_month": _ym(cutoff),
+        "fit_rows": int(fit.sum()), "fit_max_label_month": _ym(int(ords[fit].max())), "fit_min_age_months": int((origin - ords[fit]).min()),
+        "fit_keys_sha256": osf.keys_sha256(fit_keys), "eval_rows": int(evaluate.sum()), "eval_keys_sha256": osf.keys_sha256(out),
+        "feature_count": len(features), "feature_sha256": osf.list_sha256(features),
+        "fit_seconds": fit_seconds, "batch_seconds": round(time.time() - t0, 2),
+        "peak_rss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1),
+        "artifacts": artifacts,
+    }
+    osf.dump_json(batch_dir / "batch_record.json", record)
+    return record
+
+
+def run_monthly_origin(args: argparse.Namespace) -> int:
+    inputs = load_origin_inputs(args)
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    run_meta_path = out_dir / "run_metadata.json"
+    if run_meta_path.exists():
+        previous = json.loads(run_meta_path.read_text(encoding="utf-8"))
+        if previous.get("fingerprint") != inputs["fingerprint"]:
+            raise ValueError(f"{out_dir} holds a run with a different fingerprint; use a new --out-dir")
+    plan = target_month_plan(args)
+    hyperparams, hyperparams_p3 = load_hyperparameters()
+    records = []
+    print(f"monthly-origin {args.arm} H={args.horizon}: {len(plan)} target months, {len(inputs['features'])} features", flush=True)
+    for target_ord in plan:
+        batch_dir = out_dir / "batches" / _ym(target_ord)
+        record = verify_batch(batch_dir, inputs["fingerprint"])
+        if record is None:
+            record = run_origin_batch(inputs, args, target_ord, hyperparams, hyperparams_p3, batch_dir)
+            print(f"  {_ym(target_ord)}: fit {record['fit_rows']} rows (labels <= {record['label_cutoff_month']}), "
+                  f"eval {record['eval_rows']}, {record['batch_seconds']}s, rss {record['peak_rss_mb']} MB", flush=True)
+        else:
+            print(f"  {_ym(target_ord)}: verified existing batch", flush=True)
+        records.append(record)
+    full_plan = len(plan) == 12 * len(osf.TARGET_YEARS)
+    metadata = {
+        "protocol": "monthly-origin", "status": "COMPLETE" if full_plan else "PARTIAL",
+        "fingerprint": inputs["fingerprint"], "fingerprint_payload": inputs["fingerprint_payload"],
+        "manifest": str(inputs["manifest_path"]), "arm": args.arm, "horizon": args.horizon,
+        "feature_count": len(inputs["features"]), "features": inputs["features"],
+        "split_rule": "refit per target month T: labels <= min(T-H, T-1); evaluate frozen keys of month T",
+        "decay_formulation": "weight = 0.5 ** ((origin - label month) / half_life_months)",
+        "half_life_months": args.half_life_months, "phase_threshold": args.phase_threshold, "seed": args.seed,
+        "n_jobs": args.n_jobs, "batches": records, "run_timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    if full_plan:
+        frames = [pd.read_csv(out_dir / "batches" / r["target_month"] / "predictions.csv", float_precision="round_trip") for r in records]
+        predictions = pd.concat(frames, ignore_index=True)
+        if len(predictions) != int(inputs["eval_key"].sum()) or predictions.duplicated(list(osf.KEYS)).any():
+            raise ValueError("assembled predictions do not cover the frozen evaluation keys exactly once")
+        (out_dir / "predictions").mkdir(exist_ok=True)
+        (out_dir / "metrics").mkdir(exist_ok=True)
+        rows = []
+        for year in osf.TARGET_YEARS:
+            part = predictions[predictions["year"] == year]
+            part.to_csv(out_dir / "predictions" / f"predictions_{year}.csv", index=False, float_format="%.17g")
+            rows.append(osf.flatten_origin_metrics(osf.origin_metrics(part, "overall", year)))
+        rows.append(osf.flatten_origin_metrics(osf.origin_metrics(predictions, "overall", "pooled")))
+        pd.DataFrame(rows).to_csv(out_dir / "metrics" / "metrics_overall.csv", index=False)
+        metadata["prediction_rows"] = len(predictions)
+    osf.dump_json(run_meta_path, metadata)
     return 0
 
 
