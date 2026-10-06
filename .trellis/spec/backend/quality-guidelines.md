@@ -83,3 +83,13 @@ silent sample changes, not crashes. Checks favour explicit contracts over conven
 - Report isolation is transitive: a row's OOF pool must exclude its own source family, the scoring family it calibrates for, and the outer test families. Express each pool as an explicit spec (setting, H, label cutoff, availability cutoff, fold upper year, excluded families), normalize away ineffective constraints so identical pools share one fit, and persist the spec plus a key hash so a replay can rebuild every pool.
 - Setting-specific label roles: filter copies per setting in every role (fit, selection, calibration, outer test). A blanket "exclude copies" filter silently turns the augmented scenario into the original one.
 - An exhaustive per-origin search is large: 142 outer jobs → 62 unique selection contexts → 10,320 OOF XGBoost fits on ~1,000 D features. With 12 workers the 15 GB machine dropped to ~200 MB free during final fits; use ≤10 workers and run a measured pilot before a full run.
+
+## Lessons from the climate2015 feature swap (2026-10-05)
+
+- **Model-ready scope files lose their scope block at the end of the grid.** `assemble_latest_IPCCH/build_multiscope_ipcch_features.py` builds every `_sH` scope-block column (all dynamic sources, not only climate) by shifting the asof12 rows by −(12−H). The source grid ends 2026-04, so these columns are NaN for targets after 2025-04 (0m), 2025-07 (3m) and 2025-10 (6m). That blanks 59.7%, 46.1% and 1.6% of 2025 test rows.
+  - When comparing feature sets, mask new scope-anchored features on exactly the rows where the old ones are NaN, so that only the feature source differs.
+  - Report the unmasked effect as a separate arm.
+- **Old run outputs are not a valid baseline after an input rebuild.** The 2026-05-26 3m/6m outputs used 539 features. The fs1/fs2 files rebuilt on 2026-05-30 have 540, which shifts metrics by up to 0.037. Rerun the baseline with the current code and inputs, and compare run metadata (`loaded_rows`, `feature_count`, feature hash) before trusting an old baseline.
+- **Fork upstream feature recipes with a fidelity gate.** Recompute the old families from the interim panel with the forked code and compare them with the saved values, before swapping inputs (see `scripts/preprocessing/check_climate2015_fork_fidelity.py`).
+- **Tie order in `merge_asof`.** Sort the right side with a stable sort on (key, tie-breaker). Some areas' s1/s2 growing seasons share an end date, and an unstable sort silently picks the wrong "latest" season.
+- **Long background chains on this machine.** A session restart reaps backgrounded shells; the downstream steps of a chain never start. Launch multi-hour suites with `setsid nohup`, keep a run ledger, and make the runner skip completed runs.
