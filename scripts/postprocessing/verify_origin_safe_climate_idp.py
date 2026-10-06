@@ -74,6 +74,36 @@ def replay(df: pd.DataFrame) -> dict:
     return out
 
 
+def independent_history(labels: pd.DataFrame, horizon: int) -> np.ndarray:
+    """Latest three reported phases <= min(O, T-1) via merge_asof + within-area positions (not the builder path)."""
+    obs = labels.loc[labels["overall_phase"].isin([1, 2, 3, 4, 5]), ["area_id", "ord", "overall_phase"]].sort_values(["area_id", "ord"]).reset_index(drop=True)
+    obs["pos"] = obs.groupby("area_id").cumcount()
+    rows = pd.DataFrame({"row": np.arange(len(labels)), "area_id": labels["area_id"].to_numpy(), "cut": labels["ord"].to_numpy() - max(horizon, 1)})
+    hit = pd.merge_asof(rows.sort_values("cut"), obs[["area_id", "ord", "pos"]].sort_values("ord"), left_on="cut", right_on="ord",
+                        by="area_id", direction="backward").sort_values("row")
+    by_pos = obs.set_index(["area_id", "pos"])["overall_phase"]
+    out = np.full((len(labels), 3), np.nan)
+    for k in range(3):
+        pos = hit["pos"].to_numpy() - k
+        ok = ~np.isnan(pos) & (pos >= 0)
+        out[ok, k] = by_pos.reindex(pd.MultiIndex.from_arrays([hit["area_id"].to_numpy()[ok], pos[ok].astype(int)])).to_numpy()
+    return out
+
+
+def independent_idp(labels: pd.DataFrame, horizon: int, idp_raw: pd.DataFrame, iso_by_area: pd.Series) -> np.ndarray:
+    rep = idp_raw.loc[idp_raw["idp_ind"].notna(), ["admin0Pcode", "year", "month", "idp_ind"]].copy()
+    rep["rord"] = rep["year"] * 12 + rep["month"] - 1
+    rows = pd.DataFrame({"row": np.arange(len(labels)), "iso3": iso_by_area.reindex(labels["area_id"]).to_numpy(),
+                         "origin": labels["ord"].to_numpy() - horizon})
+    known = rows["iso3"].notna()
+    hit = pd.merge_asof(rows[known].sort_values("origin"), rep.rename(columns={"admin0Pcode": "iso3"})[["iso3", "rord", "idp_ind"]].sort_values("rord"),
+                        left_on="origin", right_on="rord", by="iso3", direction="backward").sort_values("row")
+    out = np.full((len(labels), 2), np.nan)
+    out[hit["row"].to_numpy(), 0] = hit["idp_ind"].to_numpy()
+    out[hit["row"].to_numpy(), 1] = (hit["origin"] - hit["rord"]).to_numpy()
+    return out
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", default=str(MANIFEST))
@@ -91,6 +121,18 @@ def main() -> int:
     predictions = {}
     replay_rows, saved_rows = [], []
     rng = np.random.default_rng(7)
+    idp_raw = pd.read_csv(manifest["inputs"]["idp_admin0_monthly"]["path"])
+    iso_by_area = pd.read_csv(manifest["inputs"]["country_lookup"]["path"]).set_index("area_id")["iso3"]
+    panel_keys = pd.read_csv(manifest["inputs"]["interim"]["path"], usecols=["admin_code", "year", "month"])
+    last_panel = (panel_keys["year"] * 12 + panel_keys["month"] - 1).groupby(panel_keys["admin_code"]).max()
+    del panel_keys
+    checks_dir = RESULTS / "input_checks"
+    retained_by_h, climate_by_h = {}, {}
+    for horizon in HORIZONS:
+        cls = pd.read_csv(checks_dir / f"feature_classification_h{horizon}.csv")
+        retained_by_h[horizon] = set(cls.loc[cls["decision"] == "retained", "feature"])
+        climate_by_h[horizon] = set(pd.read_csv(checks_dir / f"climate_manifest_h{horizon}.csv")["feature_name"])
+    tail_rows = []
     for horizon in HORIZONS:
         entry = manifest["horizons"][str(horizon)]
         data = pd.read_csv(entry["dataset"]["path"], float_precision="round_trip", low_memory=False)
@@ -106,6 +148,27 @@ def main() -> int:
         elif not data[KEYS + ["overall_phase"]].equals(labels[KEYS + ["overall_phase"]]):
             problems.append(f"h{horizon}: label rows differ across horizons")
         lookup = data.set_index(KEYS)
+        hist = independent_history(labels, horizon)
+        if not np.array_equal(hist, data[[f"overall_phase_history_{k}" for k in (1, 2, 3)]].to_numpy(dtype=float), equal_nan=True):
+            problems.append(f"h{horizon}: dataset history differs from the independent latest-three replay")
+        idp = independent_idp(labels, horizon, idp_raw, iso_by_area)
+        if not np.array_equal(idp, data[["idp_admin0_latest_stock", "idp_admin0_latest_age_months"]].to_numpy(dtype=float), equal_nan=True):
+            problems.append(f"h{horizon}: dataset IDP differs from the independent DTM replay")
+        checks["independent_history_idp_rows"] = checks.get("independent_history_idp_rows", 0) + len(data)
+        tail = labels["ord"].to_numpy() + 12 - horizon > last_panel.reindex(labels["area_id"]).to_numpy()
+        inherited_scope = [c for c in entry["arms"]["climate_no_history"]["features"] if c.endswith(f"_s{horizon}") and c in retained_by_h[horizon]] if horizon != 12 else []
+        new_climate = [c for c in entry["arms"]["climate_no_history"]["features"] if c in climate_by_h[horizon]]
+        ev = cohort["eval_key"].to_numpy(dtype=bool)
+        for year in YEARS:
+            m = ev & (labels["year"].to_numpy() == year)
+            row = {"horizon": horizon, "test_year": year, "eval_rows": int(m.sum()), "carrier_tail_rows": int((m & tail).sum())}
+            if inherited_scope:
+                block = data.loc[m, inherited_scope].isna().to_numpy()
+                row["inherited_scope_nan_share"] = float(block.mean())
+                row["inherited_scope_nan_share_tail"] = float(data.loc[m & tail, inherited_scope].isna().to_numpy().mean()) if (m & tail).any() else None
+                row["inherited_scope_nan_share_non_tail"] = float(data.loc[m & ~tail, inherited_scope].isna().to_numpy().mean()) if (m & ~tail).any() else None
+            row["climate2015_nan_share"] = float(data.loc[m, new_climate].isna().to_numpy().mean())
+            tail_rows.append(row)
         for arm in ARMS:
             run = RESULTS / "runs" / arm / f"{horizon}m"
             meta_path = run / "run_metadata.json"
@@ -242,7 +305,39 @@ def main() -> int:
                          "climate_new_nan_share": h["climate_new_nan_share_eval"],
                          "feature_counts": json.dumps({a: v["feature_count"] for a, v in h["arms"].items()})})
     pd.DataFrame(coverage).to_csv(vdir / "coverage.csv", index=False)
-    summary = {"problems": problems, "passed": not problems, **checks, "eval_keys": len(eval_keys),
+    pd.DataFrame(tail_rows).to_csv(vdir / "missingness_carrier_tail.csv", index=False)
+    feature_classes = []
+    for horizon in HORIZONS:
+        for f in manifest["horizons"][str(horizon)]["arms"]["climate_safe_history_idp"]["features"]:
+            if f in retained_by_h[horizon]:
+                kind = "inherited (static snapshot or recipe-verified dynamic)"
+            elif f in climate_by_h[horizon]:
+                kind = "climate2015 (monthly <= O, completed seasons)"
+            elif f.startswith("overall_phase_history"):
+                kind = "safe IPC history (<= min(O, T-1))"
+            elif f.startswith("idp_admin0"):
+                kind = "national DTM IDP (<= O)"
+            elif f in ("lat", "lon"):
+                kind = "identifier: static coordinates"
+            elif f.startswith("month_") or f.startswith("year_"):
+                kind = "identifier: calendar dummy of the target month (known at origin; year dummies act as a trend term)"
+            else:
+                kind = "UNCLASSIFIED"
+                problems.append(f"h{horizon}: feature {f} unclassified")
+            feature_classes.append({"horizon": horizon, "feature": f, "class": kind})
+    pd.DataFrame(feature_classes).to_csv(vdir / "feature_timing_classes.csv", index=False)
+    import platform
+    import subprocess
+
+    import sklearn
+    import xgboost
+
+    runtime = {"python": platform.python_version(), "numpy": np.__version__, "pandas": pd.__version__, "sklearn": sklearn.__version__,
+               "xgboost": xgboost.__version__,
+               "git_head": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=PROJECT_ROOT).stdout.strip(),
+               "code_sha256": {p: sha(PROJECT_ROOT / p) for p in ("scripts/modeling/run_deep_feature_weight_decay_forecasting.py", "src/ipcch/origin_safe.py",
+                                                                  "src/ipcch/forecasting_weight_decay.py", "scripts/postprocessing/verify_origin_safe_climate_idp.py")}}
+    summary = {"problems": problems, "passed": not problems, **checks, "runtime": runtime, "eval_keys": len(eval_keys),
                "runs_found": len(predictions), "expected_runs": len(ARMS) * len(HORIZONS)}
     (vdir / "verification_summary.json").write_text(json.dumps(summary, indent=2))
     write_report(replayed, deltas, pd.DataFrame(coverage), summary, manifest)
@@ -273,6 +368,15 @@ def write_report(replayed: pd.DataFrame, deltas: pd.DataFrame, coverage: pd.Data
               "|---|---:|---|---:|---:|---:|---:|---:|---:|---:|"]
     for _, r in deltas.iterrows():
         lines.append(f"| {r.comparison} | {r.horizon} | {r.test_year} | " + " | ".join(fmt(r[m]) for m in METRICS) + " |")
+    if OLD_CONTEXT.exists():
+        old = pd.read_csv(OLD_CONTEXT)
+        old = old[old["metric"].isin(["accuracy", "precision", "sensitivity", "f2", "r2"])]
+        lines += ["", "## Context only: earlier annual climate2015_v1 runs (not a paired baseline)", "",
+                  "Annual target-year fits with legacy IPC history, `estimated_population`, raw (unnormalized) targets and rounded, "
+                  "row-dropping postprocessing; their `n_samples` are after those drops.", "",
+                  "| scope | year | metric | baseline_rerun | climate2015_masked | n |", "|---|---|---|---:|---:|---:|"]
+        for _, r in old.iterrows():
+            lines.append(f"| {r.scope} | {r.test_year} | {r.metric} | {fmt(r.baseline)} | {fmt(r.masked)} | {r.n_samples} |")
     lines += ["", "## Coverage on the frozen evaluation keys", "", coverage.to_markdown(index=False) if hasattr(coverage, "to_markdown") else coverage.to_string(index=False), "",
               "## Limits", ""] + [f"- {x}" for x in manifest["limits"]] + [
               "- Single seed (42), no confidence intervals: differences are point estimates on one fit per origin.",

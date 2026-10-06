@@ -358,8 +358,13 @@ def metric_value(value: Optional[float], status: str = "ok", reason: Optional[st
     return {"value": None, "status": status, "reason": reason or "unavailable"}
 
 
+def _year_label(test_year: object) -> object:
+    """Calendar years as int; aggregate labels such as ``"pooled"`` are kept as given."""
+    return test_year if isinstance(test_year, str) else int(test_year)
+
+
 def unavailable_metrics(test_year: int, scope: str, reason: str) -> Dict[str, object]:
-    result = {"test_year": int(test_year), "scope": scope, "n_samples": 0, "status": "no eligible samples"}
+    result = {"test_year": _year_label(test_year), "scope": scope, "n_samples": 0, "status": "no eligible samples"}
     for metric in METRIC_NAMES:
         result[metric] = metric_value(None, "unavailable", reason)
     return result
@@ -368,7 +373,7 @@ def unavailable_metrics(test_year: int, scope: str, reason: str) -> Dict[str, ob
 def compute_metrics(predictions: pd.DataFrame, test_year: int, scope: str) -> Dict[str, object]:
     if len(predictions) == 0:
         return unavailable_metrics(test_year, scope, "no eligible samples")
-    result: Dict[str, object] = {"test_year": int(test_year), "scope": scope, "n_samples": int(len(predictions)), "status": "completed"}
+    result: Dict[str, object] = {"test_year": _year_label(test_year), "scope": scope, "n_samples": int(len(predictions)), "status": "completed"}
 
     class_df = predictions.dropna(subset=["overall_phase", "overall_phase_pred"])
     if len(class_df) == 0:

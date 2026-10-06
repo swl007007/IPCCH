@@ -171,3 +171,11 @@ def test_metrics_report_mae_ordinal_and_undefined_precision():
     assert m["precision_phase3plus"]["status"] == "unavailable"
     assert m["ordinal_mae"]["value"] == pytest.approx(1.0)
     assert m["mae_phase3plus"]["value"] == pytest.approx((0.1 + 0 + 0.4) / 3)
+
+
+def test_pooled_metrics_keep_the_aggregate_label():
+    preds = pd.DataFrame({"overall_phase": [1, 3, 3], "overall_phase_pred": [1, 3, 1], "phase3_worse": [0.0, 0.4, 0.5], "phase3_pred": [0.1, 0.3, 0.1]})
+    pooled = osf.origin_metrics(preds, "overall", "pooled")
+    assert pooled["test_year"] == "pooled" and pooled["sensitivity_phase3plus"]["value"] == pytest.approx(0.5)
+    assert osf.origin_metrics(preds.iloc[:0], "overall", "pooled")["test_year"] == "pooled"
+    assert osf.flatten_origin_metrics(pooled)["test_year"] == "pooled"

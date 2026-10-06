@@ -19,9 +19,12 @@ def run_cli(*args):
     return subprocess.run([sys.executable, str(SCRIPT), *args], cwd=REPO_ROOT, text=True, capture_output=True, check=False, env=env)
 
 
-def write_inputs(tmp_path: Path, horizon: int = 3, extra_feature=None, tamper_ledger: bool = False) -> Path:
+def write_inputs(tmp_path: Path, horizon: int = 3, extra_feature=None, tamper_ledger: bool = False, full_years: bool = False) -> Path:
     rng = np.random.default_rng(0)
-    keys = pd.DataFrame([(a, y, m) for a in range(1, 13) for y in (2020, 2021, 2022) for m in range(1, 13) if (y, m) <= (2022, 3)], columns=KEYS)
+    if full_years:
+        keys = pd.DataFrame([(a, y, m) for a in range(1, 4) for y in range(2019, 2026) for m in range(1, 13)], columns=KEYS)
+    else:
+        keys = pd.DataFrame([(a, y, m) for a in range(1, 13) for y in (2020, 2021, 2022) for m in range(1, 13) if (y, m) <= (2022, 3)], columns=KEYS)
     labels = keys.copy()
     labels["overall_phase"] = rng.integers(1, 6, len(labels)).astype(float)
     shares = rng.dirichlet(np.ones(5), len(labels))
@@ -127,3 +130,20 @@ def test_changed_dataset_hash_is_rejected(tmp_path):
     df.to_csv(data_path, index=False)
     result = run_cli(*monthly_args(manifest, tmp_path / "run"))
     assert result.returncode == 1 and "sha256 differs" in result.stderr
+
+
+def test_full_plan_assembles_yearly_and_pooled_metrics(tmp_path):
+    manifest = write_inputs(tmp_path, full_years=True)
+    out = tmp_path / "run"
+    args = [a for a in monthly_args(manifest, out)]
+    cut = args.index("--target-months")
+    args = args[:cut] + args[cut + 3:]  # full 48-month plan
+    result = run_cli(*args)
+    assert result.returncode == 0, result.stderr
+    meta = json.loads((out / "run_metadata.json").read_text())
+    assert meta["status"] == "COMPLETE" and len(meta["batches"]) == 48 and meta["prediction_rows"] == 3 * 48
+    metrics = pd.read_csv(out / "metrics" / "metrics_overall.csv")
+    assert metrics["test_year"].astype(str).tolist() == ["2022", "2023", "2024", "2025", "pooled"]
+    assert metrics.loc[4, "n_samples"] == 144 and metrics["ordinal_mae"].notna().all()
+    yearly = pd.concat([pd.read_csv(out / "predictions" / f"predictions_{y}.csv") for y in osf.TARGET_YEARS])
+    assert len(yearly) == 144 and not yearly.duplicated(KEYS).any()
