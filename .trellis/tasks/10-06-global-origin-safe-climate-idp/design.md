@@ -12,17 +12,17 @@ Use IDP_DTM/output/idp_admin0_monthly.csv via verified country_area_id_lookup.cs
 
 ## Shared logic and global entry
 
-Extract/reuse the small Nigeria latest-three algorithm (not its NGA-specific executor); extend H12 and preserve source area/month. Each training row's features are constructed at its own forecast origin. Each monthly outer fit additionally restricts all fitting labels to <=min(outer_origin,outer_target-1). No selection/tuning uses evaluation labels.
+Extract/reuse the small Nigeria latest-three algorithm (not its NGA-specific executor); extend H12 and preserve source area/month. Each training row's features are constructed at its own forecast origin. Each annual outer fit (test year Y) restricts all fitting labels to <= Jan(Y) − max(H,1), the strictest min(O,T−1) among the year's target months, so every scored month is safe. No selection/tuning uses evaluation labels.
 
-Reuse the existing fixed XGB fitting function/configs and target ordering. Add the minimal monthly-origin protocol to the current global CLI, with mandatory frozen manifest/source-ledger checks; global legacy annual execution or unsafe history inputs must fail with a clear migration message before fitting. Keep country/oracle paths compatible. Add origin weights0.5**(age/24), permitting age0 for H>0. Do not change annual helper semantics for unrelated consumers.
+Reuse the existing fixed XGB fitting function/configs and target ordering. Add the minimal origin-safe annual-block protocol to the current global CLI, with mandatory frozen manifest/source-ledger checks; global legacy annual execution or unsafe history inputs must fail with a clear migration message before fitting. Keep country/oracle paths compatible. Add origin weights0.5**(age/24) with age measured from the block origin Jan(Y) − H, permitting age0 for H>0. Do not change annual helper semantics for unrelated consumers.
 
 Global postprocessing preserves every frozen evaluation row: raw four cumulative regressor predictions, phase classification by highest unrounded score>=0.2 (default phase1), no deletion on zero sums. Truth is reported phase; normalize only derived share targets. Retain existing fitting model behavior; do not add a new calibration or projection layer.
 
 ## Evidence and execution
 
-Versioned external model inputs and repository-local results/reports use a new origin_safe_climate_idp_v1 namespace. Manifest binds complete feature order, source data/QA hashes, git commit, CLI args and numerical environment. Save per-origin actual target fitting keys, model bundles, eval keys and raw predictions; yearly outputs concat only validated monthly batches. Completion requires all expected artifacts and matching fingerprints, not metrics-file existence.
+Versioned external model inputs and repository-local results/reports use a new origin_safe_climate_idp_v1 namespace. Manifest binds complete feature order, source data/QA hashes, git commit, CLI args and numerical environment. Save per-block actual fitting keys, model bundles, eval keys and raw predictions; outputs concat only validated annual batches. Completion requires all expected artifacts and matching fingerprints, not metrics-file existence.
 
-Three arms vary only the five history predictors and then two IDP predictors. Eligible target keys are common across all four horizons; features may remain missing. Per-scope training features and sources are pinned; per-origin fitting keys must be equal across arms for each cumulative target. Metrics replay from saved values must use round-trip float parsing.
+Three arms vary only the five history predictors and then two IDP predictors. Eligible target keys are common across all four horizons; features may remain missing. Per-scope training features and sources are pinned; per-block fitting keys must be equal across arms for each cumulative target. Metrics replay from saved values must use round-trip float parsing.
 
 Sequential batches on15GB machine; measure one real pilot, bound XGB threads, checkpoint each validated batch and resume only exact matching inputs/configs. New outputs allow rollback without deleting prior data. Research pinning does not substitute validation.
 

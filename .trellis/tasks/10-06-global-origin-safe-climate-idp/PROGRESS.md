@@ -43,5 +43,18 @@ Operational ledger only; not approval or acceptance evidence.
   ~15:55; 13 finished batches re-verified by fingerprint and reused. 8 evidence-only findings: handled in the
   verifier (independent history/IDP replay from raw sources on all rows — passes at all horizons —, carrier-tail
   missingness attribution, feature timing classes incl. identifiers, runtime/git identity) and in evidence.
+- Run 1/12 (climate_no_history H0) COMPLETE 2026-10-06 ~16:53 (3,476 s incl. 13 reused batches); metrics
+  assembled with pooled row; n_samples equal the frozen cohort. ~90–115 s per batch; ETA for all 12 runs
+  roughly 2026-10-07 early morning (estimate only). Background waiter on suite exit.
+- 2026-10-06 ~17:15 USER STOP + re-grill: a target month can have 10–50 evaluation rows (3 of 48 months < 50,
+  12 < 100), monthly refits judged not meaningful. All suite processes killed. Decisions (AskUserQuestion):
+  one fit per test year with cutoff Jan(Y) − max(H,1) and weights anchored at Jan(Y) − H; report year +
+  pooled; delete monthly outputs (deleted: runs/ ~964 MB + logs + /tmp pilots); reuse inputs unchanged.
+  prd R3/R5/AC4, design and implement.md amended (change record in prd.md).
+- User asked to re-check that H12 (and other) features cannot leak: `scripts/postprocessing/
+  audit_origin_safe_feature_timing.py` perturbs every source after 9 cutoffs (2018-12 … 2025-06) — interim
+  sources, climate grid/seasons, IPC labels, DTM reports — and compares against the SAVED datasets.
+- CLI switched to `--protocol origin-safe` (annual blocks, `--block-years`); suite/verifier/tests updated;
+  19 origin-safe tests pass.
 - [ ] 8. Independent artifact/metric verification.
 - [ ] 9. Guidelines, evidence, commit, audit close.

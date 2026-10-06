@@ -1,6 +1,6 @@
-"""Run the origin_safe_climate_idp_v1 suite: 3 arms x 4 horizons x 48 monthly refits, one process at a time.
+"""Run the origin_safe_climate_idp_v1 suite: 3 arms x 4 horizons x 4 annual fits, one process at a time.
 
-Each arm/horizon is one ``--protocol monthly-origin`` CLI run; the CLI checkpoints every target month and
+Each arm/horizon is one ``--protocol origin-safe`` CLI run; the CLI checkpoints every annual block and
 resumes only batches whose record matches the run fingerprint and artifact hashes. A run counts as done
 only when its ``run_metadata.json`` says COMPLETE (metrics files alone are not completion).
 """
@@ -46,7 +46,7 @@ def main() -> int:
         for arm in args.arms:
             out = run_dir(arm, horizon)
             meta = out / "run_metadata.json"
-            cmd = [sys.executable, str(CLI), "--protocol", "monthly-origin", "--origin-manifest", args.manifest,
+            cmd = [sys.executable, str(CLI), "--protocol", "origin-safe", "--origin-manifest", args.manifest,
                    "--horizon", str(horizon), "--arm", arm, "--out-dir", str(out), "--n-jobs", str(args.n_jobs), *FIXED]
             t0 = time.time()
             print(f"[run] {arm} H={horizon}", flush=True)

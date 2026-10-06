@@ -183,23 +183,22 @@ def main() -> int:
                 problems.append(f"{arm} h{horizon}: fitted feature order differs from manifest")
             threshold, half_life = meta["phase_threshold"], meta["half_life_months"]
             frames = []
-            reload_targets = set(rng.choice([b["target_month"] for b in meta["batches"]], size=min(args.reload_models_per_run, len(meta["batches"])), replace=False))
-            months = sorted(b["target_month"] for b in meta["batches"])
-            if months != [f"{y}-{m:02d}" for y in YEARS for m in range(1, 13)]:
-                problems.append(f"{arm} h{horizon}: batch months incomplete")
+            reload_targets = set(rng.choice([b["block_year"] for b in meta["batches"]], size=min(args.reload_models_per_run, len(meta["batches"])), replace=False).tolist())
+            if sorted(b["block_year"] for b in meta["batches"]) != list(YEARS):
+                problems.append(f"{arm} h{horizon}: annual blocks incomplete")
             for record in meta["batches"]:
-                bdir = run / "batches" / record["target_month"]
+                year = record["block_year"]
+                bdir = run / "batches" / str(year)
                 disk = json.loads((bdir / "batch_record.json").read_text())
                 if disk != json.loads(json.dumps(record)) or disk["fingerprint"] != meta["fingerprint"]:
-                    problems.append(f"{arm} h{horizon} {record['target_month']}: batch record differs from run metadata")
+                    problems.append(f"{arm} h{horizon} {year}: batch record differs from run metadata")
                 for name, digest in disk["artifacts"].items():
                     checks["artifacts_rehashed"] += 1
                     if sha(bdir / name) != digest:
                         problems.append(f"{bdir / name}: sha256 mismatch")
-                t = ym_ord(record["target_month"])
-                origin, cutoff = t - horizon, t - max(horizon, 1)
-                if ym_ord(record["origin_month"]) != origin or ym_ord(record["label_cutoff_month"]) != cutoff:
-                    problems.append(f"{bdir}: origin/cutoff inconsistent with horizon")
+                origin, cutoff = year * 12 - horizon, year * 12 - max(horizon, 1)
+                if ym_ord(record["fit_origin_month"]) != origin or ym_ord(record["fit_label_cutoff_month"]) != cutoff:
+                    problems.append(f"{bdir}: fit origin/cutoff inconsistent with horizon and block year")
                 fk = pd.read_csv(bdir / "fit_keys.csv.gz", float_precision="round_trip")
                 ford = fk["year"].to_numpy() * 12 + fk["month"].to_numpy() - 1
                 expected_fit = labels.loc[valid & (labels["ord"] <= cutoff).to_numpy(), KEYS].reset_index(drop=True)
@@ -210,11 +209,15 @@ def main() -> int:
                     problems.append(f"{bdir}: fit cutoff/age/weight check failed")
                 checks["fit_rows_checked"] += len(fk)
                 digest = hashlib.sha256(fk[KEYS].to_csv(index=False).encode()).hexdigest()
-                fit_hash.setdefault((horizon, record["target_month"]), set()).add(digest)
+                fit_hash.setdefault((horizon, year), set()).add(digest)
                 pred = pd.read_csv(bdir / "predictions.csv", float_precision="round_trip")
-                expected_eval = eval_keys[(eval_keys["year"] * 12 + eval_keys["month"] - 1) == t].reset_index(drop=True)
+                expected_eval = eval_keys[eval_keys["year"] == year].reset_index(drop=True)
                 if not pred[KEYS].equals(expected_eval):
                     problems.append(f"{bdir}: evaluation keys differ from the frozen cohort")
+                pord = pred["year"].to_numpy() * 12 + pred["month"].to_numpy() - 1
+                if (pord - max(horizon, 1) < cutoff).any() or \
+                        [ym_ord(x) for x in pred["row_origin_month"]] != list(pord - horizon):
+                    problems.append(f"{bdir}: a scored month's own cutoff is earlier than the fit cutoff, or row origins are wrong")
                 truth = lookup.loc[list(pred[KEYS].itertuples(index=False, name=None))]
                 if not np.array_equal(truth["overall_phase"].to_numpy(dtype=float), pred["overall_phase"].to_numpy(dtype=float)):
                     problems.append(f"{bdir}: truth differs from reported phase")
@@ -223,7 +226,7 @@ def main() -> int:
                     problems.append(f"{bdir}: normalized targets differ")
                 if not np.array_equal(classes(pred, threshold), pred["overall_phase_pred"].to_numpy()):
                     problems.append(f"{bdir}: class assignment differs from unrounded >= threshold rule")
-                if record["target_month"] in reload_targets:
+                if year in reload_targets:
                     import xgboost as xgb
 
                     X = truth[features]
