@@ -16,6 +16,7 @@ import pandas as pd
 
 from ipcch import origin_safe as osf
 from ipcch import paths
+from ipcch import weather_oracle as wo
 from ipcch.forecasting_shap import (
     DEFAULT_CROSSWALK_KEY,
     RAW_SHAP_MAX_ROWS_DEFAULT,
@@ -131,7 +132,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol", choices=("annual", "origin-safe"), default="annual", help="annual: legacy calendar-year holdouts (country scopes only). origin-safe: global fit per test year with labels <= Jan(Y) - max(H, 1), from a frozen input manifest.")
     parser.add_argument("--origin-manifest", help="origin-safe: input manifest written by build_origin_safe_climate_idp_inputs.py.")
     parser.add_argument("--horizon", type=int, choices=HORIZONS, help="origin-safe: forecast horizon H in months (row origin O = T - H).")
-    parser.add_argument("--arm", choices=sorted(ARMS), help="origin-safe: feature arm recorded in the manifest.")
+    parser.add_argument("--arm", choices=sorted([*ARMS, *wo.ORACLE_ARMS]), help="origin-safe: feature arm recorded in the manifest (oracle arms only with an origin_safe_weather_oracle_v1 manifest).")
     parser.add_argument("--block-years", type=int, nargs="+", help="origin-safe: subset of test years to fit (default: all test years).")
     parser.add_argument("--n-jobs", type=int, default=16, help="origin-safe: XGBoost threads per fit (recorded in the batch fingerprint).")
     return parser.parse_args()
@@ -891,19 +892,38 @@ def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("status") != "COMPLETE":
         raise ValueError(f"origin manifest status is {manifest.get('status')!r}, not COMPLETE")
+    oracle = manifest.get("version") == wo.ORACLE_VERSION
+    if oracle != (args.arm in wo.ORACLE_ARMS):
+        raise ValueError(f"arm {args.arm} is not allowed with manifest version {manifest.get('version')!r}: "
+                         f"oracle arms {list(wo.ORACLE_ARMS)} require an {wo.ORACLE_VERSION} manifest and it allows no other arm")
+    if oracle and args.horizon not in wo.ORACLE_HORIZONS:
+        raise ValueError(f"{wo.ORACLE_VERSION} fits only H in {wo.ORACLE_HORIZONS}; H={args.horizon} is the shared reference")
+    if oracle and wo.PARENT_VERSION in Path(args.out_dir).resolve().parts:
+        raise ValueError(f"oracle runs must not write into the {wo.PARENT_VERSION} namespace: {args.out_dir}")
     entry = manifest["horizons"].get(str(args.horizon))
     if entry is None or args.arm not in entry["arms"]:
         raise ValueError(f"manifest has no horizon {args.horizon} / arm {args.arm}")
     features = list(entry["arms"][args.arm]["features"])
     if osf.list_sha256(features) != entry["arms"][args.arm]["feature_sha256"]:
         raise ValueError("manifest feature list does not match its recorded hash")
-    expected_extra = list(osf.ARMS[args.arm])
+    expected_extra = list(osf.ARMS[wo.PARENT_ARM if oracle else args.arm])
     if [c for c in features if c in osf.HISTORY_FEATURES + osf.IDP_FEATURES] != expected_extra:
         raise ValueError(f"arm {args.arm} must add exactly {expected_extra}")
+    if oracle:
+        parent_ref = manifest["parent_manifest"]
+        if osf.file_sha256(parent_ref["path"]) != parent_ref["sha256"]:
+            raise ValueError("parent manifest sha256 differs from the oracle manifest")
+        parent_features = json.loads(Path(parent_ref["path"]).read_text(encoding="utf-8"))["horizons"][str(args.horizon)]["arms"][wo.PARENT_ARM]["features"]
+        if osf.list_sha256(parent_features) != entry["parent_feature_sha256"] or features != wo.arm_features(parent_features, args.arm, args.horizon):
+            raise ValueError(f"arm {args.arm} H={args.horizon} must be exactly the parent reference features followed by "
+                             f"{wo.appended_features(args.arm, args.horizon)}")
     forbidden = osf.forbidden_features(features)
     if forbidden:
         raise ValueError(f"unsafe features in the fitted set: {forbidden}. {GLOBAL_ANNUAL_RETIRED}")
-    for label, item in (("dataset", entry["dataset"]), ("history ledger", entry["history_ledger"]), ("IDP ledger", entry["idp_ledger"]), ("cohort", manifest["cohort"])):
+    pinned = [("dataset", entry["dataset"]), ("history ledger", entry["history_ledger"]), ("IDP ledger", entry["idp_ledger"]), ("cohort", manifest["cohort"])]
+    if oracle:
+        pinned.append(("oracle ledger", entry["oracle_ledger"]))
+    for label, item in pinned:
         if not Path(item["path"]).exists():
             raise FileNotFoundError(f"{label} missing: {item['path']}")
         if osf.file_sha256(item["path"]) != item["sha256"]:
@@ -918,6 +938,8 @@ def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
         osf.assert_history_ledger(data, pd.read_csv(entry["history_ledger"]["path"], float_precision="round_trip"), args.horizon)
     if any(c in features for c in osf.IDP_FEATURES):
         osf.assert_idp_ledger(data, pd.read_csv(entry["idp_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    if oracle:
+        wo.assert_oracle_inputs(data, pd.read_csv(entry["oracle_ledger"]["path"], float_precision="round_trip"), args.horizon, args.arm)
     targets = osf.normalized_cumulative_targets(data)
     cohort = pd.read_csv(manifest["cohort"]["path"])
     if not cohort[list(osf.KEYS)].equals(data[list(osf.KEYS)]):
@@ -940,6 +962,9 @@ def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
         "xgboost": xgboost.__version__,
         "code_sha256": [osf.file_sha256(Path(__file__)), osf.file_sha256(Path(osf.__file__))],
     }
+    if oracle:
+        fingerprint_payload["oracle"] = {"version": wo.ORACLE_VERSION, "parent_manifest_sha256": manifest["parent_manifest"]["sha256"],
+                                         "oracle_ledger_sha256": entry["oracle_ledger"]["sha256"], "code_sha256": osf.file_sha256(Path(wo.__file__))}
     return {
         "manifest": manifest, "manifest_path": manifest_path, "entry": entry, "features": features, "data": data,
         "targets": targets, "share_valid": share_valid, "eval_key": eval_key,

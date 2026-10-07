@@ -172,3 +172,95 @@ def test_resume_rejects_batch_record_missing_a_required_artifact(tmp_path):
     record_path.write_text(json.dumps(record))
     again = run_cli(*origin_args(manifest, out))
     assert again.returncode == 1 and "lacks required artifacts" in again.stderr and "model_phase2_worse.ubj" in again.stderr
+
+
+# --------------------------------------------------------------------------- origin_safe_weather_oracle_v1 contract
+
+
+def write_oracle_inputs(tmp_path: Path, tamper_b6: bool = False) -> Path:
+    from ipcch import climate2015_features as cf
+    from ipcch import weather_oracle as wo
+
+    parent_path = write_inputs(tmp_path)
+    parent = json.loads(parent_path.read_text())
+    entry = parent["horizons"]["3"]
+    data = pd.read_csv(entry["dataset"]["path"], float_precision="round_trip")
+    history_ledger = pd.read_csv(entry["history_ledger"]["path"], float_precision="round_trip")
+    rng = np.random.default_rng(1)
+    grid = cf.Grid(np.arange(1, 13), 2019 * 12, 60, {v: rng.normal(size=(12, 60)) for v in wo.ORACLE_VARIABLES})
+    origin = osf.month_ord(data["year"], data["month"]) - 3
+    for v in wo.ORACLE_VARIABLES:  # parent R column: trailing mean of O-2..O
+        data[wo.parent_rolling_column(v, 3)] = np.mean([wo.calendar_lookup(grid, data["area_id"], origin - j)[v] for j in range(3)], axis=0)
+    block, ledger = wo.build_oracle_block(grid, data[KEYS], 3, {v: data[wo.parent_rolling_column(v, 3)].to_numpy() for v in wo.ORACLE_VARIABLES},
+                                          data[wo.HISTORY_GATE].to_numpy(), history_ledger["history_1_source_ord"].to_numpy())
+    appended = pd.concat([data, block], axis=1)
+    if tamper_b6:
+        appended.loc[0, wo.halfmean_name(wo.ORACLE_VARIABLES[0], 3)] += 1.0
+    data_path, ledger_path = tmp_path / "oracle_data.csv", tmp_path / "oracle_ledger.csv"
+    appended.to_csv(data_path, index=False)
+    ledger.to_csv(ledger_path, index=False)
+    parent_features = entry["arms"][wo.PARENT_ARM]["features"]
+    arms = {arm: wo.arm_features(parent_features, arm, 3) for arm in wo.ORACLE_ARMS}
+    manifest = {
+        "version": wo.ORACLE_VERSION, "status": "COMPLETE", "cohort": parent["cohort"],
+        "parent_manifest": {"path": str(parent_path), "sha256": osf.file_sha256(parent_path)},
+        "horizons": {"3": {
+            "dataset": {"path": str(data_path), "sha256": osf.file_sha256(data_path)},
+            "history_ledger": entry["history_ledger"], "idp_ledger": entry["idp_ledger"],
+            "oracle_ledger": {"path": str(ledger_path), "sha256": osf.file_sha256(ledger_path)},
+            "parent_feature_sha256": osf.list_sha256(parent_features),
+            "arms": {arm: {"features": f, "feature_sha256": osf.list_sha256(f)} for arm, f in arms.items()}}},
+    }
+    path = tmp_path / "oracle_manifest.json"
+    path.write_text(json.dumps(manifest))
+    return path
+
+
+def oracle_args(manifest: Path, out: Path, arm: str = "climate_safe_history_idp_oracle_b6", horizon: str = "3", *extra):
+    return ("--protocol", "origin-safe", "--origin-manifest", str(manifest), "--horizon", horizon, "--arm", arm,
+            "--out-dir", str(out), "--block-years", "2022", "--n-jobs", "2", *extra)
+
+
+def test_oracle_dry_run_validates_exact_schema_and_ledger(tmp_path):
+    manifest = write_oracle_inputs(tmp_path)
+    result = run_cli(*oracle_args(manifest, tmp_path / "run", "climate_safe_history_idp_oracle_b6", "3", "--dry-run"))
+    assert result.returncode == 0, result.stderr
+    assert "no fitting, nothing written" in result.stdout and "21 features" in result.stdout  # 9 parent (2 + 5 history + 2 IDP), 6 raw, 6 B6
+    assert not (tmp_path / "run").exists()
+
+
+def test_oracle_version_and_arm_must_match(tmp_path):
+    oracle = write_oracle_inputs(tmp_path)
+    legacy_arm = run_cli(*oracle_args(oracle, tmp_path / "a", "climate_safe_history_idp"))
+    assert legacy_arm.returncode == 1 and "not allowed with manifest version" in legacy_arm.stderr
+    legacy_manifest = tmp_path / "manifest.json"  # the parent written by write_inputs
+    oracle_arm = run_cli(*oracle_args(legacy_manifest, tmp_path / "b", "climate_safe_history_idp_oracle"))
+    assert oracle_arm.returncode == 1 and "not allowed with manifest version" in oracle_arm.stderr
+    h0 = run_cli(*oracle_args(oracle, tmp_path / "c", "climate_safe_history_idp_oracle", "0"))
+    assert h0.returncode == 1 and "shared reference" in h0.stderr
+    old_namespace = run_cli(*oracle_args(oracle, tmp_path / "origin_safe_climate_idp_v1" / "runs" / "x"))
+    assert old_namespace.returncode == 1 and "must not write into" in old_namespace.stderr
+
+
+def test_oracle_b6_column_not_matching_its_dependencies_is_rejected(tmp_path):
+    manifest = write_oracle_inputs(tmp_path, tamper_b6=True)
+    result = run_cli(*oracle_args(manifest, tmp_path / "run"))
+    assert result.returncode == 1 and "declared function of its dependencies" in result.stderr
+    assert not (tmp_path / "run").exists()
+
+
+def test_oracle_tiny_fit_records_oracle_fingerprint_and_exact_feature_order(tmp_path):
+    from ipcch import weather_oracle as wo
+
+    manifest = write_oracle_inputs(tmp_path)
+    out = tmp_path / "run"
+    result = run_cli(*oracle_args(manifest, out, "climate_safe_history_idp_oracle"))
+    assert result.returncode == 0, result.stderr
+    meta = json.loads((out / "run_metadata.json").read_text())
+    assert meta["fingerprint_payload"]["oracle"]["version"] == wo.ORACLE_VERSION
+    assert meta["features"][-6:] == wo.raw_features(3) and len(meta["features"]) == 15
+    import xgboost as xgb
+
+    booster = xgb.Booster()
+    booster.load_model(str(out / "batches" / "2022" / "model_phase3_worse.ubj"))
+    assert list(booster.feature_names) == meta["features"]
