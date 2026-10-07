@@ -1,0 +1,12 @@
+# Round 3: boundary cases and final disagreement check
+
+Accept your strict complete-past rule for the NEW halfmean B, leaving baseline R unchanged. Agree to recommend B6 and offer A4 as the one smaller alternative. No further source reading or code execution. Pressure-test the following, then state any remaining disagreement in a short response (about600 Chinese characters is enough).
+
+1. Dependency-level missingness, not row-level eligibility: (a) C=0, F=NaN => gated feature NaN, NOT0. (b) Past window incomplete but baseline R finite, future complete and latest phase=3 => F finite, B=NaN, gated F finite. (c) History missing, past/future complete => F and B finite, gates NaN. Each variable has its own completeness; missing rain does not suppress temperature features. No row drops or added missingness predictors.
+2. H12 uses past O-5..O and future O+1..O+6. Values O+7..O+12 must have no effect on any new oracle/raw/manual feature for that row. Annual fitting is unchanged.
+3. Latest safe phase may be stale. Call C 'latest reported history was IPC3+', not actual crisis at O or current vulnerability. Keep source month/age as diagnostics, not added model predictors or a new age threshold.
+4. F and B are linear temporal summaries, not mathematical interaction terms. B6 is a manual package with2 conditional interaction columns. arm3-arm2 identifies only the package's total fixed-protocol performance difference. With fixed column sampling, added/redundant columns can affect access to original predictors, so do not infer mechanism from score gains.
+5. Remove unsupported absolutes: completeness rates need not differ when all data are complete; fixed settings do not guarantee a smaller increment; we have not established that the old hyperparameters were tuned on exactly this baseline; gate>=3 is one defensible coupling, not the uniquely honest possible form. Near-zero gain is limited to this package/protocol, not proof of no weather-history interaction.
+6. Signed F can cancel alternating extremes; raw monthly oracle retains them. Therefore no claim B6 exhausts perfect-weather value or forms a theoretical upper bound. The rationale for dropping dryhot is bounded scope and unclear added interpretation, not that compound stress is scientifically irrelevant.
+
+Do these cases expose a substantive flaw in either A4 or B6? If yes, propose the smallest repair. Otherwise close the debate by listing the agreed proposal, contract and any residual scientific limitation. No new package variants.

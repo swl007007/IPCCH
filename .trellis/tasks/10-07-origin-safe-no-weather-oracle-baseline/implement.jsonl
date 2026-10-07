@@ -1,0 +1,8 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Temporal leakage, reproducibility, numerical validation and known unrelated failures"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Reuse existing annual fitter, metrics and verification helpers without copying full pipelines"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Preserve source-to-manifest-to-fitted-schema and saved-prediction contracts"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research.md","reason":"Verified oracle-free reference, source choices and actual Herdr peer discussion"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/integration-surfaces.md","reason":"Frozen runtime, legacy integration boundaries, exact artifact and metric contracts"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/southern-africa-scope.md","reason":"Authoritative region3 mapping, frozen cohort and selected paired bootstrap"}
+{"file":"CONTEXT.md","reason":"Resolved forecast-origin, perfect-weather and local-evaluation terminology"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/final-alignment.md","reason":"Code-grounded boundary cases and selected conditional interval rule with 1000 valid draws required"}

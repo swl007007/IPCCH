@@ -1,0 +1,160 @@
+
+❯ 补充收敛要求：当前已有证据足够，请停止扩展代码/数据搜索，先输出第一轮最多两个小方案。只需具体公式、列数、科学理由和最关键风险；不要追查整条pipeline。后续由我针对具体提案做第二轮反例讨论。
+
+● 无需再搜索，以下是收敛后的两个小方案。记号：m = min(H, 6)，H3 为 3，H6 和 H12 为 6；v ∈ {prcp_anom_month_ensmean, tmean_anom_month_ensmean}；x_v[t] 为气候网格月值；均值为
+  nanmean，最小有效月数 = ceil(n/2)，与 baseline 的 MIN_PERIODS_BY_WINDOW 一致。H0 两方案均为零列。
+
+  方案 1：累积假说，每个非零 horizon 4 列
+
+  ┌──────────────────────────────────────────┬─────────────────────────┬──────────────────────┐
+  │                   列名                   │          公式           │       有效条件       │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}                │ mean(x_v[O+1 .. O+m])   │ ≥ ceil(m/2) 个月有值 │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__bridge{2m}_mean_om{m-1}_o{m} │ mean(x_v[O−m+1 .. O+m]) │ ≥ m 个月有值         │
+  └──────────────────────────────────────────┴─────────────────────────┴──────────────────────┘
+
+  科学理由：食物安全对降水和气温异常的响应是跨起点的季节尺度累积，与 SPI-k 的逻辑同源。bridge 窗口以起点为中心对称，过去一半等于 baseline 已有的 roll{m}_mean_asof{H} 窗口，未来一半等于 F。它在
+  (F, R) 平面给出斜边界，树只能用阶梯逼近，这是手工特征唯一的真实价值。单位保持 mm/month 和 °C，不做归一化。
+
+  最关键风险：bridge 与 F、R 按构造共线。若 Codex 认定冗余，退路是只保留 2 个 F，此时 arm 3 退化为纯聚合检验。另一风险是归因：只要 F 进入 arm 3，arm 3 减 arm 2
+  只能称"手工工程增量"，不能称"交互效应"。
+
+  方案 2：累积 + 复合胁迫，每个非零 horizon 6 列
+
+  方案 1 全部，再加两列：
+
+  ┌─────────────────────────────────────────────────────────────────────────┬────────────────────────────────────────────────────────────────┬──────────────────────────────────────────────┐
+  │                                  列名                                   │                              公式                              │                     说明                     │
+  ├─────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────┤
+  │ oracle_dryhot_compound__wmean_o1_o{m}                                   │ mean_k[ max(−p_k, 0) · max(t_k, 0) ]，k ∈ O+1..O+m             │ 逐月配对后平均；某月任一输入缺失则该月       │
+  │                                                                         │                                                                │ NaN；有效条件同 F                            │
+  ├─────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────┤
+  │ oracle_prcp_anom_month_ensmean__wmean_o1_o{m}__x__gs_last1_prcp_deficit │ max(−F_prcp, 0) · max(−G_prcp, 0)，G 为 baseline 的            │ 连续季节歉收假说；任一 NaN 则 NaN            │
+  │                                                                         │ gs_last1__prcp_anom_gs_ensmean_asof{H}[_s{H}]                  │                                              │
+  └─────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────────────┴──────────────────────────────────────────────┘
+
+  科学理由：干且热的同月配对驱动蒸散胁迫，这个配对信息在窗口均值中不可恢复，从 12 列原始值学它需要 6 个深度 2 的矩形，样本效率低。GS
+  项检验"歉收季接干预报"的复合效应。两项都整流，只在干旱象限非零，避免符号乘积的象限混淆。
+
+  最关键风险：两项按设计偏向干旱，湿涝尾部只由带符号的 F_prcp 保留，须在报告中披露。GS 乘积单位为 mm/month × mm/GS，是显式声明的交互，不是同尺度对比；且 gs_last1 可能在起点前多达 11
+  个月结束，"连续"是宽松的。整流项的 0 表示"观测到无复合胁迫"，NaN 表示"未知"，两者语义必须在台账中区分。
+
+  两方案共同的硬约束：从网格数组计算并用独立回放校验，不从已 gather 的特征列二次推导；台账每行记录 oracle 观测月首末序数和有效月数，并与"假定可得月 = O"分开存放；H12 标注仅覆盖起点后前 6
+  个月；训练行用自身起点，窗口末月 ≤ T_row ≤ 拟合截止。
+
+  明确不入选的：所有 F × IPC 乘积，因为 5 级序数一次分裂即可条件化，乘积反而强加基数间距；端点斜率、F−P、F−R、带符号的 F×R、F×G、F_prcp×F_temp，理由见上一轮表格。
+
+  需用户裁决的：方案 1 还是 2；是否加第四臂"raw + 2 个 F"做干净归因，成本约三跑；是否接受整流项的干旱偏向。我的推荐是方案 1 加第四臂。
+
+❯ 第二轮：请读取 .trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/claude_feature_round2.prompt.md
+  。请针对缺失窗口、GS解释、IPC门控以及4/6列替代方案进行实质反驳或修正；不要再扩展代码检索。只在pane回复，保持planning。
+
+● Bash(cat ".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/claude_feature_round2.prompt.md")
+  ⎿  # Round 2: substantive challenge and narrower alternatives
+
+     Please use already-read evidence; no further repository search. Read-only planning. Your first round proposed4 columns F_v and pooled bridge_v, or6 with dry-hot and GS-dryness products. I
+     agree to reject the26-column bag, endpoint slopes, signed products, all5 ordinal IPC products, and test-year feature search. I challenge the following before presenting choices:
+
+     1. A pooled bridge with only m valid values may be entirely historical when every future value is missing, yet its name implies an oracle bridge. Even when both halves pass separately,
+     varying valid counts changes relative weights. Prefer reuse of baseline R_v=roll{m}_mean_asofH (existing minimum-count rule) and bridge B_v=(R_v+F_v)/2 with BOTH nonmissing. This fixed
+     weighting is exact on complete data and refuses historical-only fallback. Do you accept? If not, give a concrete counterexample and a better bounded contract.
+
+     2. For NEW future summaries require ALL m future source values finite; compound monthly summaries require all paired months. Raw oracle keeps whatever cells exist; aggregated features
+     become NaN on incomplete windows, never drop the row. Historical roll{m} retains its existing baseline min-periods/missingness. We are assessing perfectly known weather values when
+     observed, not pretending a2/6-month average is a6-month forecast. Record coverage; do not add missingness feature search. Is strict completeness defensible as the default?
+
+     3. max(-F_prcp,0)*max(-G_prcp,0) mixes exposure magnitude with GS duration and can make stale GS episodes look current. The label 'consecutive-season crop failure' is unsupported: weather
+     anomalies are not yield and oracle months need not lie in the next GS. I favor deferring this manual GS term; retain all existing GS baseline inputs. If retained, its claim must be
+     strictly 'negative precipitation anomaly in latest completed season and future window', with units/support limitations, no crop-failure inference.
+
+     4. You said F*I(history_1>=3) has 'no accuracy contribution, only SHAP readability'. Neither is established: transformed features can change finite-tree regularization and SHAP
+     allocation. Remove that claim. A threshold gate avoids cardinal1-5 weighting and tests forecast effects conditional on previously reported crisis. Preserve NaN if either factor is
+     unavailable, even if the other would be0; do not map missing history to noncrisis.
+
+     5. User approved historical climate + safe IPC as the interaction DOMAIN, not necessarily every family/column. However omitting explicit IPC coupling should be a visible proposal
+     trade-off, not silently called fulfillment of all requested interactions. A candidate narrowing for your criticism:
+        - Option A4: F_prcp,F_temp,B_prcp,B_temp (your bridge with fixed-half weighting). Tests aggregate/burden representation; no extra manual IPC term. GS and all5 IPC inputs retained in
+     baseline.
+        - Option B6: A4 plus F_prcp*C,F_temp*C, C=1[latest safe reported phase>=3], C=NaN if unavailable. Same representation plus explicit crisis-conditioned forecast terms. No ordinal
+     multiplication, no new thresholds, no GS product, no dry-hot product.
+        Is B6 worth offering as the single more expressive alternative, or would you argue for replacing those2 with your compound terms? Make a scientific choice with reasons; do not produce
+     more than two packages. Keep scope concrete and small.
+
+     6. Preserve three arms. No fourth arm needed merely to rename attribution; third-minus-second is 'incremental effect of the manual feature package' (representation/engineering), NOT
+     isolated interaction effect. The TWO proposals are choices before running, not two packages to both score on2022-2025 and pick a winner. Describe all deltas as fixed-protocol
+     retrospective experiment; no causal or guaranteed upper-bound claim.
+
+     Reply with changed judgments, remaining disagreement and at most two final candidates with exact formulas/counts. Do not merely confirm my proposal; pressure-test it and improve it if
+     justified. Limit further analysis to this discussion rather than exploring more code. We will have one final counterexample round if needed.
+
+● 已读完 round2 prompt，证据足够，不再检索。逐条回应，先说改变的判断，再说仍坚持或进一步收紧的地方，最后给两个最终候选。
+
+  改变的判断
+
+  1. bridge 改为固定半权。 接受。你的反例成立：pooled 规则下 m 个有效值可以全部来自过去，列名却宣称是 oracle 桥接，这是实质缺陷，我没有反例可反驳。但我建议比 (R+F)/2 再紧一步：B
+  只在两半都完整时定义，过去半的完整性用网格计数 n_valid_past = m 判断，baseline 的 R 本身不改。这样 B 在任何有定义的行上都恰好等于 2m 个月的 pooled
+  均值，不再是"可能残缺的过去均值与完整未来均值的半平均"，彻底消除权重漂移。若担心覆盖率损失，退回你的版本，但必须披露两半严格度不对称。另需钉死一条合同：两半长度必须相等，否则 (R+F)/2
+  不再等于 pooled 均值。
+
+  2. 新未来汇总要求全部 m 个值有限。 接受为默认。理由与你一致：我们评估的是"观测到的天气被完美预知"，不是把 2/6 个月均值冒充 6 个月预报。原始 oracle
+  列保留部分信息，所以树不丢失任何东西。补充一条：严格完整使 H3 与 H6/H12 的 NaN 率必然不同，跨 horizon 比较手工包增量时受覆盖率混淆，报告中不得把三个 horizon
+  的增量当同一覆盖率下的可比数字。覆盖率表为必交付物，按 horizon × 年份分别给评估键和拟合行的完整窗口占比，只报告不设阈值，不丢行。
+
+  3. GS 乘积推迟。 接受，且我认为应当撤回而非仅重新标注。你指出的 GS 时长混入幅度是我低估的点：GS 异常是窗口内求和，长季地区 |G|
+  系统性偏大，乘积把这一点直接乘进了暴露幅度。而乘积相对于树已能做的轴对齐分裂，唯一新增的恰是这个被污染的幅度效应。所以增量中最不可信的部分正是它唯一的贡献。撤回。所有 baseline GS
+  输入原样保留。
+
+  4. 撤回"无精度贡献"的说法。 你是对的。在 colsample 0.5/0.7、200 棵、深度 9/11 的有限集成下，预构造的门控特征改变候选分裂集合，可能改变拟合和 SHAP
+  分配。"树能表示"不等于"树在同一正则化下会找到"。改为：预期增量在原理上小，但并未建立为零，实验本身就是检验。NaN 规则接受：任一因子不可得则 NaN，不把缺失史映射为非危机。我补一条显式语义：C
+  观测为 0 时 F×C = 0，这是"观测到非危机"，不是未知，与 NaN 区分。
+
+  6. 三臂保留，不加第四臂。 接受。arm3 减 arm2 =
+  手工特征包的增量效应，属表示/工程层面，不是孤立交互效应。两个候选是运行前的选择，不是两个都跑再挑。所有差值为固定协议的回溯实验。我再补两条不得宣称的上界理由：只有两个变量；固定超参是在
+  baseline 特征族上调出的，对新列没有调过，这本身就偏向小增量。
+
+  对第 5 点的科学选择
+
+  B6 值得作为唯一的更强候选，我放弃用复合项替换那两列。理由与你给的不同，需要记录：干热复合项的两个输入都是 oracle 月份，它完全不触及历史数据，严格说属于 oracle 自身的表示，不是用户问的"oracle
+  × 历史"耦合。此外用户选定的 oracle 变量是 mm 单位的 prcp_anom 而非 prcp_z，max(−p,0) 的量级被多雨地区和雨季月份主导，干旱区的彻底失败只产生很小的乘积值，这使复合项的可比性比 F
+  本身差得多。所以它被撤回的原因是"答非所问且尺度被变量选择削弱"，不是"象限混淆"。
+
+  B6 的门控项是批准域内唯一不做基数加权、不引新阈值、不混单位的 IPC 耦合形式，且与 A4 嵌套，两个候选之间恰好只差一个有名字的假说。两点收紧：门只用 history_1，不用"三个中任一 ≥
+  3"，因为后者引入不规则间隔的陈旧状态；history_1 的来源月可能远早于 O，台账已有该字段，报告须披露"危机状态是截止前最近一次报告，不是起点时刻的状态"。
+
+  最终两个候选
+
+  记号：m = min(H, 6)；v ∈ {prcp_anom_month_ensmean, tmean_anom_month_ensmean}；x_v[t] 为网格月值；R_v 为 baseline 的 {v}__roll{m}_mean_asof{H} 列，H3/H6 带 _s{H} 后缀，H12 为 asof12
+  无后缀。H0 零列。
+
+  A4，每个非零 horizon 4 列
+
+  ┌──────────────────────────────────────┬─────────────────────┬───────────────────────────────────────────────────────────────┐
+  │                 列名                 │        公式         │                           定义条件                            │
+  ├──────────────────────────────────────┼─────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}            │ mean(x_v[O+1..O+m]) │ m 个未来值全部有限，否则 NaN                                  │
+  ├──────────────────────────────────────┼─────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ oracle_{v}__halfmean_roll{m}_o1_o{m} │ (R_v + F_v) / 2     │ F_v 有定义、R_v 非 NaN、且网格计数 n_valid_past = m；否则 NaN │
+  └──────────────────────────────────────┴─────────────────────┴───────────────────────────────────────────────────────────────┘
+
+  假说：跨起点的季节尺度累积。
+
+  B6，A4 加 2 列
+
+  ┌────────────────────────────────────────────────────┬─────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────┐
+  │                        列名                        │                    公式                     │                                 定义条件                                  │
+  ├────────────────────────────────────────────────────┼─────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}__x__crisis_history_1_ge3 │ F_v × C，C = 1[overall_phase_history_1 ≥ 3] │ history_1 为 NaN 则 C 为 NaN；F_v 或 C 为 NaN 则 NaN；C 观测为 0 则值为 0 │
+  └────────────────────────────────────────────────────┴─────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────┘
+
+  附加假说：预报效应以截止前最近报告的危机状态为条件。
+
+  我的推荐是 B6，因为它是用户所问的 IPC 耦合在批准域内唯一诚实的呈现方式，边际成本是两列定义明确的特征；A4 是把 IPC
+  条件化完全交给树的简约备选。两者的最关键风险相同：固定超参与严格完整规则都偏向小增量，若增量接近零，结论是"该表示在此协议下无额外价值"，不是"交互不存在"。
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  [P2] Origin-safe baseline without six weather-oracle predictors (planning) [session-fallback:codex_01a11263-d47a-7621-b394-df0aa6ceec66]                                       159866 tokens
+  Fable 5.1 (200K) · ctx 74% · main · 18m · William Shi · 2 task(s)                                                                                                           89% context used
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents

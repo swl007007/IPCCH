@@ -1,0 +1,260 @@
+     ]
+     ===== inputs.climate_monthly / climate_seasonal
+     climate_monthly {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_monthly_2015_2026_MODELING_READY.csv",
+      "sha256": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89"
+     }
+     climate_seasonal {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_2015_2026_MODELING_READY.csv",
+      "sha256": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e"
+     }
+  ⎿  (file diff unavailable for this command)
+
+● Bash(cd "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH"; sed -n '140,230p'
+      scripts/preprocessing/build_origin_safe_climate_idp_inputs.py)
+  ⎿      expected, _ = recipes.expected(keys, None if horizon == 12 else horizon, df)
+         origin = osf.month_ord(keys["year"], keys["month"]) - horizon
+         early, later = origin <= cutoff, origin > cutoff
+         rows = []
+         for name, base in baseline.items():
+             new = expected[name]
+             same = (base == new) | (np.isnan(base) & np.isnan(new))
+             rows.append({"feature": name, "cutoff": osf.ord_label(cutoff), "rows_origin_le_cutoff": int(early.sum()),
+                          "changed_rows_origin_le_cutoff": int((~same & early).sum()),
+                          "changed_rows_origin_gt_cutoff": int((~same & later).sum())})
+         return pd.DataFrame(rows)
+
+
+     def support_check_climate(grid, seasons, keys, scope_anchor, neighbors, valid, context, baseline: pd.DataFrame,
+                               horizon: int, cutoff: int, rng) -> pd.DataFrame:
+         """Perturb monthly values after ``cutoff`` and seasonal values of seasons ending after the origin month."""
+         values = {}
+         for v, arr in grid.values.items():
+             arr = arr.copy()
+             late_col = np.arange(grid.n_months) + grid.first_ord > cutoff
+             arr[:, late_col] = arr[:, late_col] + rng.normal(100.0, 10.0, arr[:, late_col].shape)
+             values[v] = arr
+         pgrid = cf.Grid(grid.area_ids, grid.first_ord, grid.n_months, values)
+         pseasons = seasons.copy()
+         end = pd.to_datetime(pseasons["gs_end_date_exclusive"])
+         first_day_after = pd.Timestamp(year=(cutoff + 1) // 12, month=(cutoff + 1) % 12 + 1, day=1)
+         late_season = (end > first_day_after).to_numpy()
+         for v in cf.SEASONAL_VARIABLES:
+             pseasons.loc[late_season, v] = pseasons.loc[late_season, v] + 100.0
+         feats, _ = cf.build_scope_features(pgrid, pseasons, keys, scope_anchor, neighbors, valid, context)
+         origin = osf.month_ord(keys["year"], keys["month"]) - horizon
+         early, later = origin <= cutoff, origin > cutoff
+         rows = []
+         for name in baseline.columns:
+             base, new = baseline[name].to_numpy(dtype=float), feats[name].to_numpy(dtype=float)
+             same = (base == new) | (np.isnan(base) & np.isnan(new))
+             rows.append({"feature": name, "cutoff": osf.ord_label(cutoff), "rows_origin_le_cutoff": int(early.sum()),
+                          "changed_rows_origin_le_cutoff": int((~same & early).sum()),
+                          "changed_rows_origin_gt_cutoff": int((~same & later).sum())})
+         return pd.DataFrame(rows)
+
+
+     def main() -> int:
+         args = parse_args()
+         t0 = time.time()
+         out_dir, check_dir = Path(args.out_dir), Path(args.check_dir)
+         manifest_path = out_dir / f"{VERSION}_manifest.json"
+         if manifest_path.exists() and not args.overwrite:
+             raise SystemExit(f"{manifest_path} exists (use --overwrite)")
+         out_dir.mkdir(parents=True, exist_ok=True)
+         check_dir.mkdir(parents=True, exist_ok=True)
+         for name, path in INPUTS.items():
+             if not Path(path).exists():
+                 raise FileNotFoundError(f"{name}: {path}")
+         manifest = {
+             "version": VERSION, "status": "BUILDING",
+             "created_utc": pd.Timestamp.now(tz="UTC").isoformat(),
+             "git_head": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=PROJECT_ROOT).stdout.strip(),
+             "git_status_porcelain": subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=PROJECT_ROOT).stdout,
+             "runtime": {"python": sys.version, "platform": platform.platform(), "numpy": np.__version__, "pandas": pd.__version__},
+             "code_sha256": {str(p.relative_to(PROJECT_ROOT)): osf.file_sha256(p) for p in (
+                 Path(__file__), PROJECT_ROOT / "src/ipcch/origin_safe.py", PROJECT_ROOT / "src/ipcch/retained_feature_recipes.py",
+                 PROJECT_ROOT / "src/ipcch/climate2015_features.py")},
+             "inputs": {}, "timing_contract": {
+                 "availability_proxy": "observation/reporting month; no publication-vintage certification",
+                 "origin": "month-end O = T - H",
+                 "ipc_history_and_fit_labels": "month <= min(O, T-1)",
+                 "monthly_dynamic_and_idp": "month <= O",
+                 "growing_season": "gs_end_date_exclusive <= first day of month O+1",
+             },
+             "limits": [
+                 "Supplied climate climatology/standardization fitted samples are not documented; no full-chain or real-time validity claim.",
+                 "Static geospatial/context snapshots and revised observations are fixed retrospective context, not historical vintages.",
+                 "National DTM IDP stock is an IDP-only country-level context; old reports are stale; no subnational allocation or refugee coverage.",
+                 "Inherited non-climate predictors keep their saved values and missingness (including carrier-row tail NaN).",
+             ],
+             "horizons": {},
+         }
+         for name, path in INPUTS.items():
+             manifest["inputs"][name] = {"path": str(path), "sha256": osf.file_sha256(path)}
+         log(t0, "input hashes done")
+
+         # ---------------------------------------------------------------- labels, cohort, history source
+         panel = load_interim(INPUTS["interim"])
+         if panel.duplicated(KEYS).any():
+             raise ValueError("interim panel has duplicate keys")
+         labels = panel.loc[pd.to_numeric(panel["overall_phase"], errors="coerce").isin(osf.VALID_PHASES), KEYS + LABEL_COLUMNS]
+         labels = labels.sort_values(KEYS, kind="mergesort").reset_index(drop=True)
+         if len(labels) != EXPECTED_LABEL_KEYS:
+             raise ValueError(f"expected {EXPECTED_LABEL_KEYS} reported-phase keys, found {len(labels)}")
+         observations = osf.valid_phase_observations(labels)
+
+● Trellis SessionStart ✓（已在首句确认）
+
+  我已完整读取 round1 prompt、prd.md、research.md、climate2015_features.py、origin_safe.py，并核对了 manifest 中四个 horizon 的实际列名、XGBoost 超参（max_depth 11 / 9，200 棵树，colsample 0.5
+  / 0.7）和气候网格跨度（2015-01 到 2026-08，所有评估行的 oracle 窗口都在网格内）。以下是独立方案与批评，只做规划，不涉及实施。
+
+  一、核心判断：树已经廉价学到什么，学不到什么
+
+  这是收窄搜索空间的唯一可靠依据，比"26 太多"更根本。
+
+  - 树能廉价表达的：单月阈值；跨月可加效应（boosting 对可加函数拟合很好，所以 6 列原始值的"平均水平"大部分已被 arm 2 捕捉）；轴对齐的合取，比如"某月干 且 某月热"；对 5 级序数 IPC
+    史的条件化，一次分裂即可精确做到。
+  - 树不廉价的：对线性组合取阈值，即特征空间中的斜边界，树只能用阶梯逼近；两个连续量的乘积幅度效应；以及聚合后丢失的逐月配对信息。
+
+  由此推论：所有 F × IPC 乘积、所有"符号型"乘积、所有端点斜率，都不是树的短板，手工加入收益接近零，但会污染归因。真正值得手工构造的只有三类：窗口聚合、跨起点累积、逐月复合胁迫。
+
+  二、两个候选包，精确公式
+
+  记号：m = min(H, 6)，H3 为 3，H6 和 H12 为 6。v ∈ {prcp_anom_month_ensmean, tmean_anom_month_ensmean}，x_v[t] 为气候网格上的月值。所有均值用 nanmean，最小有效月数沿用 baseline 的
+  MIN_PERIODS_BY_WINDOW 规则，即 ceil(n/2)。
+
+  包 1：累积假说，每个非零 horizon 4 列
+
+  ┌──────────────────────────────────────────┬─────────────────────────┬──────────────────────┐
+  │                   列名                   │          公式           │       有效条件       │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}                │ mean(x_v[O+1 .. O+m])   │ ≥ ceil(m/2) 个月有值 │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__bridge{2m}_mean_om{m-1}_o{m} │ mean(x_v[O−m+1 .. O+m]) │ ≥ m 个月有值         │
+  └──────────────────────────────────────────┴─────────────────────────┴──────────────────────┘
+
+  假说：食物安全对降水和气温异常的响应是跨起点的季节尺度累积，与 SPI-k 的逻辑一致。bridge 窗口以起点为中心对称，过去一半恰好等于 baseline 已有的 roll{m}_mean_asof{H} 窗口，未来一半等于 F。它在
+  (F, R) 平面上给出斜边界，这是树学不到的方向。单位保持 mm/month 和 °C，无归一化。
+
+  包 2：累积 + 复合胁迫，每个非零 horizon 6 列
+
+  包 1 全部，再加：
+
+  ┌─────────────────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────┐
+  │                                  列名                                   │                            公式                             │                      说明                       │
+  ├─────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
+  │ oracle_dryhot_compound__wmean_o1_o{m}                                   │ mean_k[ max(−p_k, 0) · max(t_k, 0) ]，k ∈ O+1..O+m          │ 逐月配对后再平均；某月任一输入缺失则该月为      │
+  │                                                                         │                                                             │ NaN；有效条件同 F                               │
+  ├─────────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
+  │ oracle_prcp_anom_month_ensmean__wmean_o1_o{m}__x__gs_last1_prcp_deficit │ max(−F_prcp, 0) · max(−G_prcp, 0)，G 取 baseline 的         │ 连续季节歉收假说；任一为 NaN 则 NaN             │
+  │                                                                         │ gs_last1__prcp_anom_gs_ensmean_asof{H}[_s{H}]               │                                                 │
+  └─────────────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────┘
+
+  两项都做了整流，只在"干且热"和"干接干"象限非零，直接回应 Codex 对符号乘积混淆象限的批评。代价是它们按设计偏向干旱，湿涝尾部由带符号的 F_prcp 保留。GS
+  项是显式声明的交互，不是同尺度相减，单位为 mm/month × mm/GS，须在元数据中如此标注。
+
+  两个包在 H0 均为零列，H12 均明确标注"仅覆盖起点后前 6 个月"。
+
+  三、对 prompt 五个问题的回答与 26 列处置
+
+  1. 假说区分与 arm 2 已表达的内容。 包 1 只检验"累积"，包 2 额外检验"复合胁迫"。arm 2 已表达逐月阈值和可加效应，所以我预期两个包的增量都小。这个实验的主要科学结论来自 arm 2 减 arm
+  1，即完美天气预见的价值，手工包是次要的有界检验，报告时应如此定位。
+
+  2. 独立 oracle 汇总值得加吗，归因怎么标。 值得加 F，因为 6 列原始值上的斜阈值树只能阶梯逼近。但只要 F 进入 arm 3，arm 3 减 arm 2
+  就不能叫"交互效应"，只能叫"手工工程增量"。想干净归因只有一条路：增加第四臂"raw + F 两列"。按上次约 350 秒一跑估算，三个 horizon 共约 18 分钟，成本很低，但这是用户决策，我不假设已批准。
+
+  3. 月度 vs GS，IPC 耦合。 跨起点累积只用月度变量，因为 bridge 均值与 F 同为月异常的均值，单位一致。GS 只以整流乘积形式进入包 2。IPC 耦合我不建议：h1 只有 5
+  个取值，树一次分裂就能精确条件化，乘积反而把 1 到 5 的序数间距当成乘法权重。少于 5 个史项的问题因此不存在，baseline 的 5 列原样保留。若用户坚持要可解释的显式项，唯一站得住的形式是 F_v ×
+  1[overall_phase_history_1 ≥ 3] 两列，但它对精度没有贡献，仅为 SHAP 可读性。
+
+  4. 缺失、窗口可比性、零值、时间边界。 源缺失保持 NaN，不做任何填补。整流项的 0 表示"观测到无复合胁迫"，NaN 表示"未知"，两者语义不同，树能区分。m 在 H3 与 H6/H12 不同，列名显式写出窗口，不跨
+  horizon 比较。训练行使用各自起点，窗口月份 ≤ T_row ≤ 拟合截止，自动满足年块边界。台账每行记录 oracle 实际观测月的首末序数和每变量有效月数，并断言窗口末月 ≤ O+m，同时单独保留"假定可得月 =
+  O"字段。bridge 和 F 必须从网格数组计算，再用与现有 reference_*_check 同型的独立回放校验，而不是从已 gather 的特征列二次推导。
+
+  5. 26 列处置。
+
+  ┌──────────────────────────┬───────────────────────────────┬────────────────────────────────────────────┐
+  │         原 26 项         │             处置              │                    理由                    │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 2 个 F                   │ 保留                          │ 聚合，斜阈值                               │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 4 个端点斜率 D，2 个 D−S │ 拒绝                          │ 3 或 6 点端点差噪声大，原始列已暴露端点    │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 2 个 F−P                 │ 拒绝                          │ 单月 P 噪声大，被 bridge 覆盖              │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 2 个 F−R                 │ 拒绝                          │ 反转假说是轴对齐象限，树已能学             │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 2 个 F×R 带符号          │ 替换为 bridge                 │ 象限混淆；真实假说是累积，不是乘积         │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 2 个 F×G 带符号          │ prcp 改为整流乘积，tmean 拒绝 │ 象限混淆，混合单位；热季接热预报无既定依据 │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ F_prcp × F_temp 带符号   │ 拒绝                          │ 象限混淆                                   │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 整流复合均值             │ 保留于包 2                    │ 逐月配对信息聚合后不可恢复                 │
+  ├──────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+  │ 10 个 F × IPC            │ 拒绝                          │ 序数非基数，树一次分裂即可条件化           │
+  └──────────────────────────┴───────────────────────────────┴────────────────────────────────────────────┘
+
+  需用户选择的：包 1 还是包 2；是否加第四臂做干净归因；是否要那两列仅供解释的 IPC 门控项；是否接受整流项按设计偏向干旱象限。属技术判断的：ceil(n/2) 最小有效月规则、bridge 对称窗口而非固定 3
+  个月、命名、台账字段、NaN 与 0 语义、回放校验。
+
+  一个我主动放弃的想法：用生长季日历判断预报窗口是否落在下一季内，这是最重要的物理调节因子，但季节表是逐年记录，下一季日期属未来输入，不符合合同，故不提。
+
+  我预判 Codex 会提的两个反例并先回应：bridge 与 F、R 共线，是的，这正是它的作用，若认为冗余，退路是"包 0 只含 2 个 F"，此时 arm 3
+  就纯粹是聚合检验；整流项偏干旱，是的，按设计如此，已在上面披露。
+
+❯ 补充收敛要求：当前已有证据足够，请停止扩展代码/数据搜索，先输出第一轮最多两个小方案。只需具体公式、列数、科学理由和最关键风险；不要追查整条pipeline。后续由我针对具体提案做第二轮反例讨论。
+
+● 无需再搜索，以下是收敛后的两个小方案。记号：m = min(H, 6)，H3 为 3，H6 和 H12 为 6；v ∈ {prcp_anom_month_ensmean, tmean_anom_month_ensmean}；x_v[t] 为气候网格月值；均值为
+  nanmean，最小有效月数 = ceil(n/2)，与 baseline 的 MIN_PERIODS_BY_WINDOW 一致。H0 两方案均为零列。
+
+  方案 1：累积假说，每个非零 horizon 4 列
+
+  ┌──────────────────────────────────────────┬─────────────────────────┬──────────────────────┐
+  │                   列名                   │          公式           │       有效条件       │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}                │ mean(x_v[O+1 .. O+m])   │ ≥ ceil(m/2) 个月有值 │
+  ├──────────────────────────────────────────┼─────────────────────────┼──────────────────────┤
+  │ oracle_{v}__bridge{2m}_mean_om{m-1}_o{m} │ mean(x_v[O−m+1 .. O+m]) │ ≥ m 个月有值         │
+  └──────────────────────────────────────────┴─────────────────────────┴──────────────────────┘
+
+  科学理由：食物安全对降水和气温异常的响应是跨起点的季节尺度累积，与 SPI-k 的逻辑同源。bridge 窗口以起点为中心对称，过去一半等于 baseline 已有的 roll{m}_mean_asof{H} 窗口，未来一半等于 F。它在
+  (F, R) 平面给出斜边界，树只能用阶梯逼近，这是手工特征唯一的真实价值。单位保持 mm/month 和 °C，不做归一化。
+
+  最关键风险：bridge 与 F、R 按构造共线。若 Codex 认定冗余，退路是只保留 2 个 F，此时 arm 3 退化为纯聚合检验。另一风险是归因：只要 F 进入 arm 3，arm 3 减 arm 2
+  只能称"手工工程增量"，不能称"交互效应"。
+
+  方案 2：累积 + 复合胁迫，每个非零 horizon 6 列
+
+  方案 1 全部，再加两列：
+
+  ┌─────────────────────────────────────────────────────────────────────────┬────────────────────────────────────────────────────────────────┬──────────────────────────────────────────────┐
+  │                                  列名                                   │                              公式                              │                     说明                     │
+  ├─────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────┤
+  │ oracle_dryhot_compound__wmean_o1_o{m}                                   │ mean_k[ max(−p_k, 0) · max(t_k, 0) ]，k ∈ O+1..O+m             │ 逐月配对后平均；某月任一输入缺失则该月       │
+  │                                                                         │                                                                │ NaN；有效条件同 F                            │
+  ├─────────────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────┼──────────────────────────────────────────────┤
+  │ oracle_prcp_anom_month_ensmean__wmean_o1_o{m}__x__gs_last1_prcp_deficit │ max(−F_prcp, 0) · max(−G_prcp, 0)，G 为 baseline 的            │ 连续季节歉收假说；任一 NaN 则 NaN            │
+  │                                                                         │ gs_last1__prcp_anom_gs_ensmean_asof{H}[_s{H}]                  │                                              │
+  └─────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────────────┴──────────────────────────────────────────────┘
+
+  科学理由：干且热的同月配对驱动蒸散胁迫，这个配对信息在窗口均值中不可恢复，从 12 列原始值学它需要 6 个深度 2 的矩形，样本效率低。GS
+  项检验"歉收季接干预报"的复合效应。两项都整流，只在干旱象限非零，避免符号乘积的象限混淆。
+
+  最关键风险：两项按设计偏向干旱，湿涝尾部只由带符号的 F_prcp 保留，须在报告中披露。GS 乘积单位为 mm/month × mm/GS，是显式声明的交互，不是同尺度对比；且 gs_last1 可能在起点前多达 11
+  个月结束，"连续"是宽松的。整流项的 0 表示"观测到无复合胁迫"，NaN 表示"未知"，两者语义必须在台账中区分。
+
+  两方案共同的硬约束：从网格数组计算并用独立回放校验，不从已 gather 的特征列二次推导；台账每行记录 oracle 观测月首末序数和有效月数，并与"假定可得月 = O"分开存放；H12 标注仅覆盖起点后前 6
+  个月；训练行用自身起点，窗口末月 ≤ T_row ≤ 拟合截止。
+
+  明确不入选的：所有 F × IPC 乘积，因为 5 级序数一次分裂即可条件化，乘积反而强加基数间距；端点斜率、F−P、F−R、带符号的 F×R、F×G、F_prcp×F_temp，理由见上一轮表格。
+
+  需用户裁决的：方案 1 还是 2；是否加第四臂"raw + 2 个 F"做干净归因，成本约三跑；是否接受整流项的干旱偏向。我的推荐是方案 1 加第四臂。
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  [P2] Origin-safe baseline without six weather-oracle predictors (planning) [session-fallback:codex_01a11263-d47a-7621-b394-df0aa6ceec66]                                       146514 tokens
+  Fable 5.1 (200K) · ctx 72% · main · 14m · William Shi · 2 task(s)
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents

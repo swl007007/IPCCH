@@ -1,0 +1,8 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Check temporal safety, numerical reproducibility and honest evidence status"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check reuse of existing fitting, metrics and serialization conventions"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"Check inherited matrix parity, exact fitted schemas, lineage and output boundaries"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research.md","reason":"Verify baseline-first comparison and weather-only counterfactual availability"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/integration-surfaces.md","reason":"Check original fingerprints, all-year replays, unchanged annual fitting and metric definitions"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/southern-africa-scope.md","reason":"Check region3 membership and paired country-stratified whole-area bootstrap without refitting"}
+{"file":"CONTEXT.md","reason":"Check reporting terms distinguish realized weather, assumed availability and regional scoring"}
+{"file":".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/final-alignment.md","reason":"Check all G1/B and G2/A decisions, paired validity masks and 999/1000 boundary without refits"}

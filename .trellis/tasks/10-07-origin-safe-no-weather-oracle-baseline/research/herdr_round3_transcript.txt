@@ -1,0 +1,75 @@
+  ├──────────────────────────────────────┼─────────────────────┼───────────────────────────────────────────────────────────────┤
+  │ oracle_{v}__halfmean_roll{m}_o1_o{m} │ (R_v + F_v) / 2     │ F_v 有定义、R_v 非 NaN、且网格计数 n_valid_past = m；否则 NaN │
+  └──────────────────────────────────────┴─────────────────────┴───────────────────────────────────────────────────────────────┘
+
+  假说：跨起点的季节尺度累积。
+
+  B6，A4 加 2 列
+
+  ┌────────────────────────────────────────────────────┬─────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────┐
+  │                        列名                        │                    公式                     │                                 定义条件                                  │
+  ├────────────────────────────────────────────────────┼─────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────┤
+  │ oracle_{v}__wmean_o1_o{m}__x__crisis_history_1_ge3 │ F_v × C，C = 1[overall_phase_history_1 ≥ 3] │ history_1 为 NaN 则 C 为 NaN；F_v 或 C 为 NaN 则 NaN；C 观测为 0 则值为 0 │
+  └────────────────────────────────────────────────────┴─────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────┘
+
+  附加假说：预报效应以截止前最近报告的危机状态为条件。
+
+  我的推荐是 B6，因为它是用户所问的 IPC 耦合在批准域内唯一诚实的呈现方式，边际成本是两列定义明确的特征；A4 是把 IPC
+  条件化完全交给树的简约备选。两者的最关键风险相同：固定超参与严格完整规则都偏向小增量，若增量接近零，结论是"该表示在此协议下无额外价值"，不是"交互不存在"。
+
+❯ 最后一轮边界压力测试：请读 .trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/claude_feature_round3.prompt.md
+  。只检查具体反例及残余分歧，约600中文字足够；不要再查代码或加方案。仍只做规划。
+
+● Bash(cat ".trellis/tasks/10-07-origin-safe-no-weather-oracle-baseline/research/claude_feature_round3.prompt.md")
+  ⎿  # Round 3: boundary cases and final disagreement check
+
+     Accept your strict complete-past rule for the NEW halfmean B, leaving baseline R unchanged. Agree to recommend B6 and offer A4 as the one smaller alternative. No further source reading or
+     code execution. Pressure-test the following, then state any remaining disagreement in a short response (about600 Chinese characters is enough).
+
+     1. Dependency-level missingness, not row-level eligibility: (a) C=0, F=NaN => gated feature NaN, NOT0. (b) Past window incomplete but baseline R finite, future complete and latest phase=3
+     => F finite, B=NaN, gated F finite. (c) History missing, past/future complete => F and B finite, gates NaN. Each variable has its own completeness; missing rain does not suppress
+     temperature features. No row drops or added missingness predictors.
+     2. H12 uses past O-5..O and future O+1..O+6. Values O+7..O+12 must have no effect on any new oracle/raw/manual feature for that row. Annual fitting is unchanged.
+     3. Latest safe phase may be stale. Call C 'latest reported history was IPC3+', not actual crisis at O or current vulnerability. Keep source month/age as diagnostics, not added model
+     predictors or a new age threshold.
+     4. F and B are linear temporal summaries, not mathematical interaction terms. B6 is a manual package with2 conditional interaction columns. arm3-arm2 identifies only the package's total
+     fixed-protocol performance difference. With fixed column sampling, added/redundant columns can affect access to original predictors, so do not infer mechanism from score gains.
+     5. Remove unsupported absolutes: completeness rates need not differ when all data are complete; fixed settings do not guarantee a smaller increment; we have not established that the old
+     hyperparameters were tuned on exactly this baseline; gate>=3 is one defensible coupling, not the uniquely honest possible form. Near-zero gain is limited to this package/protocol, not
+     proof of no weather-history interaction.
+     6. Signed F can cancel alternating extremes; raw monthly oracle retains them. Therefore no claim B6 exhausts perfect-weather value or forms a theoretical upper bound. The rationale for
+     dropping dryhot is bounded scope and unclear added interpretation, not that compound stress is scientifically irrelevant.
+
+     Do these cases expose a substantive flaw in either A4 or B6? If yes, propose the smallest repair. Otherwise close the debate by listing the agreed proposal, contract and any residual
+     scientific limitation. No new package variants.
+
+● 已读 round3，无需再查任何东西。六项边界逐条核对后，A4 与 B6 均未暴露实质缺陷，只需一处措辞修复。
+
+  1. 依赖级缺失。 三个用例与合同一致，接受。唯一修复：我上一轮写的"C 观测为 0 则值为 0"不完整，应改为"F 有限且 C = 0 → 0；F 为 NaN → NaN，无论 C 为何"。另一个非缺陷但需记录的重叠：F 恰为 0 且
+  C = 1 时与 C = 0 同值，浮点数据中测度为零，且 baseline 保留 history_1 可区分。各变量独立完整性，降水缺失不压制气温特征，不丢行，不加缺失指示列。
+
+  2. H12 窗口。 过去 O−5..O 恰为 roll6_mean_asof12 的窗口，未来 O+1..O+6，所有新列与原始 oracle 列均不触及 O+7..O+12。合同应附扰动检验：对 O+7..O+12 加噪，断言新列逐行不变；对 ≤ O
+  的月份加噪，断言 F 不变。年块拟合不变。
+
+  3. C 的命名。 接受"最近一次报告为 IPC3+"，不称起点时危机或当前脆弱性。来源月与年龄只入台账与诊断，不入模型，不设年龄阈值。
+
+  4. 术语。 接受：F 与 B 是线性时间汇总，A4 不含任何交互列；B6 含两列条件交互。arm3 − arm2 只识别该包在固定协议下的总体表现差，列采样下新增列会改变原有预测列的被选概率，故不得由得分推断机制。
+
+  5. 撤回绝对化表述。 覆盖率"可能"随 horizon 不同，仅在存在缺失时；固定设置"可能限制"而非"保证"小增量；旧超参是否针对此 baseline 调出未经证实，撤回；门控 ≥ 3
+  是域内一种避免基数加权与新阈值的可辩护形式，不是唯一诚实形式；近零增量只限于此包与协议。
+
+  6. 上界。 接受：带符号的 F 会抵消交替极值，原始月列保留它们，B6 不穷尽完美天气价值，不构成理论上界。干热项的撤回理由是范围有界与新增解释不清，不是复合胁迫无关。
+
+  残余分歧：无。
+
+  议定方案与合同： 三臂不变；arm3 推荐 B6，A4 为唯一更小备选。F_v 要求 m 个未来值全部有限；B_v = (R_v + F_v)/2，另要求网格计数 n_valid_past = m，R 本身不改；门控 = F_v × 1[history_1 ≥
+  3]，依赖级 NaN 传播。台账记录每行 oracle 观测首末月、各变量过去/未来有效计数、history_1 来源月；交付 horizon × 年份覆盖率表，只报告不设阈值。
+
+  残余科学限制： 完美可得为反事实假设；仅两个变量，H12 只覆盖前 6 个月；mm 单位降水异常未标准化，阈值随区域而异；均值抵消交替极值；C 可能陈旧；B 覆盖率低于 F；任何增量均不作机制或上界解释。
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  [P2] Origin-safe baseline without six weather-oracle predictors (planning) [session-fallback:codex_01a11263-d47a-7621-b394-df0aa6ceec66]                                       164489 tokens
+  Fable 5.1 (200K) · ctx 81% · main · 20m · William Shi · 2 task(s)                                                                                                           91% context used
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents
