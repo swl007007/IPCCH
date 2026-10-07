@@ -325,6 +325,28 @@ def coverage_rows(data: pd.DataFrame, horizon: int, cohort: pd.DataFrame, fit_ke
     return rows
 
 
+def ledger_diagnostics(manifest: dict, horizon: int, cohort: pd.DataFrame, problems: list) -> list:
+    """Realized observation-month span, assumed availability and history_1 staleness per evaluation year (diagnostic only)."""
+    item = manifest["horizons"][str(horizon)]["oracle_ledger"]
+    if legacy.sha(Path(item["path"])) != item["sha256"]:
+        problems.append(f"h{horizon}: oracle ledger sha256 differs from its manifest")
+    ledger = pd.read_csv(item["path"], float_precision="round_trip")
+    if not ledger[KEYS].equals(cohort[KEYS]):
+        problems.append(f"h{horizon}: oracle ledger rows differ from the cohort")
+    rows = []
+    for year in YEARS:
+        part = ledger[cohort["eval_key"].to_numpy(dtype=bool) & (ledger["year"].to_numpy() == year)]
+        stale = part["history_1_staleness_months"]
+        rows.append({"horizon": horizon, "test_year": year, "eval_rows": len(part),
+                     "assumed_available_months": f"{osf.ord_label(part['assumed_forecast_available_ord'].min())}..{osf.ord_label(part['assumed_forecast_available_ord'].max())}",
+                     "realized_obs_months": f"{osf.ord_label(part['future_obs_first_ord'].min())}..{osf.ord_label(part['future_obs_last_ord'].max())}",
+                     **{f"{v}__rows_full_future": int((part[f"{v}__future_finite_months"] == wo.window(horizon)).sum()) for v in wo.ORACLE_VARIABLES},
+                     **{f"{v}__rows_full_past": int((part[f"{v}__past_finite_months"] == wo.window(horizon)).sum()) for v in wo.ORACLE_VARIABLES},
+                     "history_1_missing": int(stale.isna().sum()), "history_1_staleness_median": stale.median(),
+                     "history_1_staleness_p75": stale.quantile(0.75), "history_1_staleness_max": stale.max()})
+    return rows
+
+
 # --------------------------------------------------------------------------- comparison and report
 
 
@@ -392,7 +414,8 @@ def write_report(replayed: pd.DataFrame, deltas: pd.DataFrame, coverage: pd.Data
               "Summed over the declared columns of each kind and over the four years; fitting rows are counted once per annual batch "
               "(the same row recurs in later batches), so fitting totals are not unique observations. Per-feature, per-year rows are in "
               "`verification/oracle_coverage.csv`; the per-row availability ledger records observation months, assumed availability, "
-              "finite-month counts and history_1 source month/staleness.", "",
+              "finite-month counts and history_1 source month/staleness, summarized per evaluation year in "
+              "`verification/oracle_ledger_diagnostics.csv`.", "",
               "| H | rows | kind | row-feature cells | nonmissing | rate |", "|---:|---|---|---:|---:|---:|"]
     for _, r in pooled.iterrows():
         lines.append(f"| {r.horizon} | {r.rows_role} | {r.kind} | {r.rows} | {r.nonmissing} | {fmt(r.nonmissing_rate)} |")
@@ -439,7 +462,7 @@ def main() -> int:
         source = pd.read_csv(src["path"], usecols=["admin_code", "year", "month", *wo.ORACLE_VARIABLES]).rename(columns={"admin_code": "area_id"})
     out_dir = RESULTS / ("reference_preflight" if args.stage == "reference" else "verification")
     out_dir.mkdir(parents=True, exist_ok=True)
-    inventory, replay_rows, fit_digests, coverage, predictions, reference_identity = [], [], {}, [], {}, {}
+    inventory, replay_rows, fit_digests, coverage, predictions, reference_identity, ledger_rows = [], [], {}, [], {}, {}, []
     for horizon in osf.HORIZONS:
         entry = parent["horizons"][str(horizon)]
         if legacy.sha(Path(entry["dataset"]["path"])) != entry["dataset"]["sha256"]:
@@ -459,6 +482,7 @@ def main() -> int:
         print(f"reference h{horizon}: verified ({len(problems)} problems so far)", flush=True)
         if args.stage == "all" and horizon in wo.ORACLE_HORIZONS:
             appended = check_appended_inputs(manifest, parent, horizon, data, source, problems, checks)
+            ledger_rows += ledger_diagnostics(manifest, horizon, cohort, problems)
             del data
             appended_labels = load_labels(appended, cohort)
             for arm in wo.ORACLE_ARMS:
@@ -503,6 +527,7 @@ def main() -> int:
         deltas.to_csv(out_dir / "paired_deltas.csv", index=False)
         coverage = pd.DataFrame(coverage)
         coverage.to_csv(out_dir / "oracle_coverage.csv", index=False)
+        pd.DataFrame(ledger_rows).to_csv(out_dir / "oracle_ledger_diagnostics.csv", index=False)
         comparison = replayed[replayed.horizon == 0].assign(order=0)
         comparison = pd.concat([comparison] + [replayed[(replayed.horizon == h) & (replayed.arm == a)].assign(order=i + 1)
                                                for h in wo.ORACLE_HORIZONS for i, a in enumerate(ARM_ORDER)], ignore_index=True)

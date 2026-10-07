@@ -144,3 +144,46 @@ Lessons:
 - Prefit gates must check every fitted column derived from a ledger (e.g. history differences), not only the
   ledgered base values. Resume checks must require the full artifact set, not only what a record lists.
   `--dry-run` must short-circuit every protocol branch before outputs are created.
+
+## Perfect-weather oracle on the origin-safe reference (2026-10-07, `origin_safe_weather_oracle_v1`)
+
+The only declared exception to the origin-safe timing rules. Implemented in `src/ipcch/weather_oracle.py`.
+
+- Scope: shared monthly `prcp_anom_month_ensmean` and `tmean_anom_month_ensmean` at `O+1 .. O+min(H, 6)` and the
+  fixed B6 terms derived from them (F future mean, B = (R + F) / 2, Q = F × 1[safe history_1 ≥ 3]). Realized values
+  are a counterfactual perfect forecast assumed available at `O`; the ledger keeps actual observation months and the
+  assumed availability month as separate fields. IPC history, IDP, growing season and fitting labels keep their cutoffs.
+- Look up source values by calendar month (`Grid.index_of`), never by row offset; months outside the grid are NaN.
+- Dependency-specific missingness: F needs all future months; B additionally the saved parent R and every past month
+  (stricter than R's own `min_periods`); Q needs F and history_1. A missing F stays NaN under a zero gate.
+- The CLI admits oracle arms only with a manifest whose `version` is `origin_safe_weather_oracle_v1` (and admits no
+  legacy arm with it), only at H3/H6/H12, only with features exactly equal to the parent reference list followed by the
+  declared columns, and refuses output directories inside `origin_safe_climate_idp_v1`. F/B/Q are replayed from the
+  dataset's raw columns, saved R, history_1 and the oracle ledger before fitting. Legacy manifests take the old path.
+- Append-only inputs: re-read the written CSV with round-trip parsing and require `DataFrame.equals` on every parent
+  column (values, NaN masks, order, keys, labels). A feature-list hash is not matrix parity.
+- Reuse the reference by explicit path after an all-four-year replay (models, fit keys/weights, targets, metrics);
+  never point the modified runner at old output directories (its code fingerprint changed on purpose).
+
+## Regional evaluation of saved global predictions (2026-10-07)
+
+Implemented in `src/ipcch/regional_bootstrap.py` and `scripts/postprocessing/evaluate_region3_saved_predictions.py`.
+
+- Membership is the `area_id` join to `data/reference/area_id_country_region_mapping.csv` (e.g. `region == 3`); never a
+  SADC/UN M49/country whitelist. The country lookup supplies bootstrap strata only. Missing membership or a missing
+  country for a selected area is an error, not a silent drop. The regional step must not import fitting code.
+- Pair runs on an explicit sorted `(area_id, year, month)` index and require equal keys and truths across runs; saved key
+  hashes are order-sensitive.
+- Country-stratified whole-area paired bootstrap: per period one `PCG64(42)` generator, countries sorted, one
+  `(n_draws, N_c)` index block per country; all rows of an area carry its multiplicity; one bundle shared by every arm,
+  horizon, metric and contrast. Metrics use integer row weights, equal to explicit row duplication through
+  `osf.origin_metrics` (check both, including undefined cases). R² constancy is tested exactly over positive-weight rows.
+- Paired-difference intervals are conditional: percentiles over jointly defined draws, reported only with ≥ 1,000 of
+  2,000 valid draws; keep every original draw and the per-contrast joint mask, report invalid counts/fractions, never
+  substitute zero or draw replacements. This deliberately differs from the Somalia helpers (any-undefined suppression,
+  F2 = 0 conventions).
+
+Lessons:
+
+- A stale GitNexus index can miss new symbols (`impact` returns "not found"); `node .gitnexus/run.cjs analyze` also
+  rewrites the stats line in `CLAUDE.md`/`AGENTS.md` — keep those out of task commits.
