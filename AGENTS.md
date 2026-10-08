@@ -1,94 +1,9 @@
 <claude-mem-context>
 # Memory Context
 
-# [IPCCH] recent context, 2026-10-06 1:27pm EDT
+# [ipcch] recent context, 2026-10-07 2:51pm EDT
 
-Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
-Format: ID TIME TYPE TITLE
-Fetch details: get_observations([IDs]) | Search: mem-search skill
-
-Stats: 50 obs (27,718t read) | 444,689t work | 94% savings
-
-### Oct 5, 2026
-S518 Recolor non-crisis areas in Somalia April 2026 alert map PNG from gray (#d9d8d4) to green, overwriting original file in place (Oct 5, 6:24 PM)
-S522 Trellis task: global-climate-2015-features — fork IPCCH pipeline with new climate CSVs, feature engineering, rerun 0m/3m/6m/12m global metrics (11 total runs: baseline×4, masked×4, unmasked×3) (Oct 5, 6:36 PM)
-3062 7:27p ⚖️ New Trellis Task Planned: IPCCH Pipeline Fork with Updated Climate Features
-3063 7:29p 🔵 climate_2015_2026_MODELING_READY.csv: Audit Findings and Conditional Usability
-3064 " 🔵 climate_monthly_2015_2026_MODELING_READY.csv: Schema Confirmed
-3065 " 🔵 IPCCH Repository State: Experiments, Specs, and Trellis Status
-3066 7:30p 🔵 Existing Global Model Feature Schema: GLDAS/FLDAS Variables vs New CHIRPS/ERA5 Climate CSVs
-3067 7:31p 🔵 Climate CSV Coverage Check: Full admin overlap, monthly data through August 2026
-3068 " 🔵 Trellis task.py create Requires --description Flag
-3069 " 🟣 Trellis Task Created: Global Climate 2015-2026 Feature Rerun (0m/3m/6m/12m)
-3071 " 🔵 Upstream Deep Feature Engineering Code Located at build_deep_ipcch_features.py
-3070 7:32p 🔵 Pipeline Dataset Resolution and Feature Column Selection Logic
-3072 7:38p 🔵 build_deep_ipcch_features.py: Full Feature Engineering Architecture
-3073 7:39p 🔵 build_multiscope_ipcch_features.py: Scope Anchor Lags and Nigeria Precedent Pattern
-3074 " 🔵 Exact Feature Counts and Naming Patterns Per Scope in Existing Model-Ready CSVs
-3075 7:40p 🔵 Stress Signal Thresholds and Rolling Feature Implementation Details
-3076 " 🔵 New Climate Variable Distributions: Stress Threshold Calibration Data
-3077 7:44p 🔵 Pipeline Core Code Unchanged Since Baseline Global Runs (2026-05-31)
-3080 " 🔵 Deep Feature Family Formulas: All Use t-12 Anchor with group-by-area_id Operations
-3081 7:51p 🔵 build_multiscope_ipcch_features.py Architecture: Takes Pre-Engineered Deep Features, Applies Time Shift Per Scope
-3082 " 🔵 Interaction Pairs and Spatial Spillover Are Hardcoded to Old GLDAS Column Names
-3083 7:52p 🔵 Machine Resources and Interim Panel Confirmation
-3084 " 🟣 Trellis PRD Written: Climate 2015 Feature Rerun Spec with Full Design Decisions
-3085 7:53p 🔵 Panel Preparation: admin_code→area_id Rename and Static Context Columns
-3089 " 🔵 Quality guidelines: forbidden patterns, 12 pre-existing test failures, safe_divide behavior
-3090 " 🔵 forecasting_ready.csv header: exact column positions and old interaction names confirmed
-3091 7:56p 🔴 src/ipcch/climate2015_features.py written: complete feature engineering module
-3092 7:57p 🔴 Three patches applied to climate2015_features.py; import smoke test passed
-3094 7:58p 🔴 check_climate2015_fork_fidelity.py written: fidelity gate script comparing recomputed vs saved FLDAS families
-3095 " 🔴 Fidelity check ran in 35s: scope-block NaN-tail mismatch expected, but neighbour mean shows genuine value discrepancy up to 0.139
-3096 " 🔴 Fidelity block summary: asof12 block has only 2 mismatches; neighbour mean is the only real discrepancy; all 39 s0 mismatches are the expected NaN-tail
-3097 8:01p 🔴 Scope-block NaN artifact quantified: baseline scope files have 0% NaN in training rows but 60%/46%/2% NaN in 2025 for s0/s3/s6; new direct-anchor fills these
-3099 8:02p 🔴 tests/unit/test_climate2015_features.py written: 8 unit tests covering anchor safety, naming, stress thresholds, spell helpers, same-month history, season completion, old-column detector, and ragged grid
-3104 8:08p 🔴 run_climate2015_global_suite.py written — 11-run orchestration script for implement.md step 8
-3109 8:09p 🟣 climate2015_v1 pipeline fork: all scripts written, builds and runs in progress
-3115 " 🔵 Implementation status checkpoint: all scripts written, compute in progress — ~2-3 hours remain
-3116 " 🔵 Build progress at 750s: fs0/fs1/fs2-masked done; baseline_rerun_0m training at 2690% CPU, 342 min CPU time
-3108 " 🔴 compare_climate2015_global_metrics.py written — implement.md step 9 complete
-3118 8:13p 🔵 Build stalled at fs2/masked (750s) — fs2/unmasked and fs3 still pending after repeated status checks
-3110 8:14p 🔵 Full build progress: fs0 complete (52521 rows, 847 cols), baseline_rerun/0m started; memory at 10/15GB
-3119 8:20p 🔵 Full dataset build timing: each scope variant takes ~180s for masked + ~95s for unmasked on full 52K-row panel
-3120 8:26p 🔵 Full dataset build complete: exit 0 at 1059s — 7 files written, 4065MB total, all column counts correct
-3121 " 🟣 Trellis check agent launched (a0c2501d85a969df7) to review code against prd/design specs
-S525 Status check (现在怎么样了) on deep_feature_weight_decay_forecasting climate2015 experiment comparing 2015–2026 climate features vs FLDAS baseline (Oct 5, 8:41 PM)
-3177 9:48p 🔵 Climate2015 Deep Feature Experiment Suite Progress Check
-3178 " 🔵 Masked vs Baseline Model Interim Metrics: Climate2015 Deep Feature Experiment
-S523 Status check on climate2015 deep feature weight decay forecasting experiment — masked vs baseline model comparison (Oct 5, 9:48 PM)
-S526 Status check (现在怎么样了) — full run completion and diagnostic investigation of 0m/2025 R² regression (Oct 5, 9:50 PM)
-S528 Climate2015 global model experiment — full completion summary presented to user; session wrapping up pending merge and Trellis close (Oct 5, 10:16 PM)
-3193 10:17p 🟣 Climate2015 experiment report and evidence.md finalized
-3194 " 🔵 Baseline drift in 3m/6m scopes traced to pre-rebuild fs1/fs2 inputs
-3195 " ✅ Climate2015 lessons added to quality-guidelines.md and all files staged for commit
-3197 " 🔵 Staged climate2015 changes confirmed low-risk by gitnexus (all new files, no symbol modifications)
-3198 " 🟣 Climate2015 feature swap committed to IPCCH repo at 585640b
-S529 User approved submission — complete Trellis task, push branch, merge to main (Oct 5, 10:17 PM)
-S530 User approved final submission: complete Trellis task, push branch, merge to main — session in wrap-up phase (Oct 5, 10:18 PM)
-S527 Status check on climate2015 global model experiment — full completion, results, diagnosis, and commit (Oct 5, 10:18 PM)
-3202 10:26p ✅ Trellis task 10-05-global-climate-2015-features archived and session journal recorded
-3203 " 🟣 Climate2015 feature branch pushed to GitHub and fast-forward merged into main
-S531 完成 Trellis 任务、push 分支、合并到 main — climate2015 feature swap 全流程完成 (Oct 5, 10:26 PM)
-**Investigated**: Trellis task state (in_progress → archived); remote/branch relationships confirmed (main ancestor of feature branch, main in sync with origin/main before merge)
-
-**Learned**: - fast-forward merge was possible because main was a direct ancestor of feat/global-climate2015-features (no divergence)
-    - results/ and reports/ are gitignored — comparison report and metrics CSV exist locally only, not in the remote repo
-    - Trellis archive and session journal each auto-commit, adding 2 extra commits on top of the feature commit
-
-**Completed**: - Trellis task 10-05-global-climate-2015-features archived to .trellis/tasks/archive/2026-10/ (commit 3040185)
-    - Session journal recorded (commit df8acaf) with full experiment summary tied to commit 585640b
-    - feat/global-climate2015-features pushed to origin with tracking set up
-    - main fast-forwarded from 871112a to df8acaf (4 commits added) and pushed to origin/main
-    - GitHub remote (https://github.com/swl007007/IPCCH.git) is fully up to date; working directory clean
-    - Full climate2015 Trellis lifecycle closed: implement → evidence → archive → journal → push → merge
-
-**Next Steps**: - Optionally delete feat/global-climate2015-features branch locally and on remote (no outstanding work)
-    - Run `node .gitnexus/run.cjs analyze` to refresh GitNexus index (stale after commits)
-    - Remaining open Trellis task: 00-bootstrap-guidelines (planning stage, unrelated to this work)
-
-
-Access 445k tokens of past work via get_observations([IDs]) or mem-search skill.
+No previous sessions found.
 </claude-mem-context>
 
 # Project Guidance Addendum
@@ -108,7 +23,7 @@ Current feature baselines to preserve: Spec002 alert-risk maps are single-scope 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **IPCCH** (3579 symbols, 5533 relationships, 163 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **IPCCH** (4349 symbols, 7100 relationships, 198 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
