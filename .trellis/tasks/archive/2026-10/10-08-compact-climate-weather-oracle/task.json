@@ -3,7 +3,7 @@
   "name": "compact-climate-weather-oracle",
   "title": "Simplify climate features and rerun raw weather-oracle comparison",
   "description": "Grill source-grounded feature semantics to convergence, freeze a spec, then run Claude Opus 5.5 1M as supervised executor; compare compact features with and without raw weather oracle, excluding B6 and bootstrap; no additional Trellis audit registration.",
-  "status": "in_progress",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -11,7 +11,7 @@
   "creator": "William Shi",
   "assignee": "William Shi",
   "createdAt": "2026-10-08",
-  "completedAt": null,
+  "completedAt": "2026-10-08",
   "branch": "task/compact-climate-weather-oracle",
   "base_branch": "main",
   "worktree_path": null,
@@ -29,7 +29,7 @@
     ".trellis/tasks/10-08-compact-climate-weather-oracle/expected_run_index.csv",
     ".trellis/tasks/10-08-compact-climate-weather-oracle/expected_feature_contract_metadata.json"
   ],
-  "notes": "User approved execution: 可以执行. Seven compact runs COMPLETE,28 batches/112 models; final verifier exit0, prediction replay diff0,2800 metric cells replayed,740622 fitting rows checked,372800 sampled recipe cells with0 mismatches,740 legacy files unchanged. Supervisor final artifact/codebook/region/delta checks passed. Codebook308 literal union rows with296/302/308 actual per-run inputs. Rollback appendix and execution evidence complete. No extra audit enrollment/bootstrap/B6; ordinary archive pending.",
+  "notes": "User approved execution: 可以执行. Seven compact runs COMPLETE,28 batches/112 models; final verifier exit0, prediction replay diff0,2800 metric cells replayed,740622 fitting rows checked,372800 sampled recipe cells with0 mismatches,740 legacy files unchanged. Supervisor final artifact/codebook/region/delta checks passed. Codebook308 literal union rows with296/302/308 actual per-run inputs. Rollback appendix and execution evidence complete. No extra audit enrollment/bootstrap/B6; ordinary archive complete.",
   "meta": {
     "final_acceptance": {
       "evidence": "evidence.md",

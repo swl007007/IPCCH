@@ -1,6 +1,6 @@
 # Global origin-safe climate and IDP benchmark
 
-Current active task (2026-10-08): `.trellis/tasks/10-08-compact-climate-weather-oracle`; the earlier entry below is preserved as historical context.
+Completed task: `.trellis/tasks/archive/2026-10/10-08-compact-climate-weather-oracle`; the earlier entry below is preserved as historical context. Experiments completed2026-10-09 UTC (2026-10-08 America/New_York).
 
 ## 2026-10-08: compact features and raw oracle execution
 
@@ -20,7 +20,7 @@ Current active task (2026-10-08): `.trellis/tasks/10-08-compact-climate-weather-
 - Final `--stage all` verifier exit0:7/7 runs,28 batches,112 models reloaded, prediction replay difference0,740622 fitting rows checked,2800 independently replayed metric cells,372800 sampled input recipe cells with0 mismatches,740/740 legacy files unchanged. Actual codebook308 union rows is `fitted_verified_all_batches`, with exact296/302/308 run membership/order.
 - Supervisor acceptance passed (`research/supervisor-final-acceptance.json`):203 inventory artifacts freshly rehashed; independent scouts checked all112 fitted orders and identical28205 prediction keys/truths. Global280/regional2520 metrics and global120/regional1080 deltas verified, including region8's empty2022 and three-row2023 groups. Report/codebook hashes pinned in acceptance; no fingerprinted code changed during fitting.
 - Pooled oracle-minus-baseline F2: H3 -0.0018403613, H6 +0.0143561468, H12 +0.0188020704. Effects differ by metric/year/region; point estimates only, no significance claim. Rollback appendix records stable build2 manifest/contracts and validated legacy/compact selections.
-- Next: commit task execution evidence with Windows Git, then ordinary Trellis archive/journal; no audit lifecycle wrappers, push or additional experiments.
+- Execution evidence commit: `10dfc23` (`docs: record compact oracle experiment acceptance`). Current task archived via the ordinary lifecycle only; no other task was archived. Archive/journal bookkeeping commits follow the work commits. No audit lifecycle wrappers, push or additional experiments. No required scientific work remains.
 
 Task: `.trellis/tasks/10-06-global-origin-safe-climate-idp`.
 Operational ledger only; approved requirements live in prd.md/design.md/implement.md.

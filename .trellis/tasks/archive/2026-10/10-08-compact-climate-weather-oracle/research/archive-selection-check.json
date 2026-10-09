@@ -1,0 +1,20 @@
+{
+  "timestamp_utc": "2026-10-09T03:02:24.297443+00:00",
+  "passed": true,
+  "task_status": "completed",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_climate_weather_oracle_suite.py --runs compact_baseline/0m --dry-run",
+  "exit_code": 0,
+  "status": "DRY_RUN_OK",
+  "feature_count": 296,
+  "block_years": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "seconds": 18.2,
+  "stdout_summary": "inputs and prefit gate passed; no fitting, nothing written",
+  "approved_frozen_files_after_archive": "all approval-bound files except appended rollback.md rehashed unchanged",
+  "final_artifact_hashes_rechecked": 11,
+  "archive_path": ".trellis/tasks/archive/2026-10/10-08-compact-climate-weather-oracle"
+}
