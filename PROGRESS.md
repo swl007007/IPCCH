@@ -1,3 +1,21 @@
+# Compact CDS launch — active execution
+
+Task: `.trellis/tasks/10-08-compact-cds-launch`. Authoritative scope: approved `prd.md`, `design.md`, `implement.md` and expected contracts; this ledger is operational state only.
+
+## 2026-10-09 supervisor/executor goal
+
+- User approved the latest formal plan and requested continuous execution under the active goal, stopping only for a critical error.
+- Current branch remains `task/compact-climate-weather-oracle`; use Windows Git.
+- Verified executor: Herdr `compact-cds-executor`, pane `w11:p4`, terminal `term_65d5d6047bdfb4`, Claude session `579e6ba5-f2a2-483c-b465-4b2e3cca1ed3`. Current UI displays Opus5.5 (1M context). Supervisor is Codex pane `w11:p1`. Binding evidence: task `research/executor-binding.json`.
+- No additional audit enrollment/start/close. Existing controller has no active run; prior registration is not this executor binding.
+- Run contract: baseline H0/H6/H12 and weather H6/H12;20 regressors;296/308 exact schemas. Three targets share April population; area/country/region/global outputs and predicted maps/differences.
+- Context CSV truncation was resolved by curated complete-contract reading instructions; CSV itself remains unchanged.
+- Wave0 approval/binding: **component-complete**. Wave1 source/runtime/weather: **pending**. Wave2 compact matrices: **pending**. Wave3 five fits/replay: **pending**. Wave4 population/maps/final acceptance: **pending**.
+- Source/schema planning checks passed; no weather retrieve, feature build, new model fit or map has run yet.
+- Next: commit approved planning/binding artifacts, have this executor start the task normally, perform source/request/runtime preflight and proceed through staged checkpoints. Supervisor verifies actual files/diff and live process/job handles; a timeout does not prove work stopped.
+
+---
+
 # Global origin-safe climate and IDP benchmark
 
 Completed task: `.trellis/tasks/archive/2026-10/10-08-compact-climate-weather-oracle`; the earlier entry below is preserved as historical context. Experiments completed2026-10-09 UTC (2026-10-08 America/New_York).

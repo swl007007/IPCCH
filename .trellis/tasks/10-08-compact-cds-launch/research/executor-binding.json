@@ -1,0 +1,26 @@
+{
+  "status": "verified_bound",
+  "verified_utc": "2026-10-09T04:52:13.686980+00:00",
+  "agent_name": "compact-cds-executor",
+  "pane_id": "w11:p4",
+  "terminal_id": "term_65d5d6047bdfb4",
+  "agent_session": {
+    "agent": "claude",
+    "kind": "id",
+    "source": "herdr:claude",
+    "value": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3"
+  },
+  "cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+  "model_context_evidence": "Current Herdr recent-unwrapped pane read shows Opus5.5 (1M context).",
+  "model": "claude-opus-5-5",
+  "context_window_tokens": 1000000,
+  "supervisor_pane": "w11:p1",
+  "approval_basis": "User explicitly approved execution by requesting Herdr Opus5.5/1M executor binding and continuous goal supervision until the approved spec is complete.",
+  "audit_policy": "No additional audit registration/start/close; supervisor-executor mode as explicitly approved.",
+  "spec_sha256": {
+    "prd.md": "2fb72c7ab2b42da79283efad21ad0df6934dd0916ad0489875936993bf3e0a08",
+    "design.md": "fcb8f1f26f9b066ee742243d69fdcbb4dfe8b6eb9a0dc49be8b6f1165831e526",
+    "implement.md": "24d3ebcf5aac4aae44fc08523963c5c0a9c4a9d3d6670e8da43dc75b110d54f0"
+  },
+  "contract_sha256": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82"
+}

@@ -1,0 +1,79 @@
+{
+  "status": "planning_checks_passed",
+  "scope": "Planning artifacts, expected allowlist projections, hashes, context paths and current Git/task state only; not numerical/source-build/model acceptance.",
+  "created_utc": "2026-10-09T04:46:28.556605+00:00",
+  "task_status": "planning",
+  "execution_status": "Not Executed",
+  "implementation_authorized": false,
+  "final_user_review": "pending",
+  "git_head": "d4481610037e94e52527d3ec6bd436cb4d2fe7c0",
+  "git_branch": "task/compact-climate-weather-oracle",
+  "n_union_features": 308,
+  "n_unique_runs": 5,
+  "n_expected_models": 20,
+  "run_checks": {
+    "compact_baseline/0m": {
+      "n_features": 296,
+      "exact_parent_order": true,
+      "schema_hash_verified": true
+    },
+    "compact_baseline/6m": {
+      "n_features": 296,
+      "exact_parent_order": true,
+      "schema_hash_verified": true
+    },
+    "compact_baseline/12m": {
+      "n_features": 296,
+      "exact_parent_order": true,
+      "schema_hash_verified": true
+    },
+    "compact_cds_weather/6m": {
+      "n_features": 308,
+      "exact_parent_order": true,
+      "schema_hash_verified": true
+    },
+    "compact_cds_weather/12m": {
+      "n_features": 308,
+      "exact_parent_order": true,
+      "schema_hash_verified": true
+    }
+  },
+  "checks": {
+    "spec_requirements_R1_R15_and_acceptance_A1_A9_present": true,
+    "all_user_choices_resolved": true,
+    "unique_literals_and_contiguous_projected_positions": true,
+    "exact_current_manifest_order_and_schema_hashes": true,
+    "common_baseline_prefix": true,
+    "weather_training_and_inference_provenance_separated": true,
+    "spec_contract_run_index_hashes_match": true,
+    "curated_context_and_related_paths_exist": true,
+    "same_origin_population_cutoff_and_targets": true,
+    "no_H3_or_weather_H0_run": true,
+    "runtime_stage_boundary_explicit": true,
+    "new_entrypoints_not_yet_implemented": true,
+    "only_this_task_untracked_git_changes": true
+  },
+  "artifact_sha256": {
+    "check.jsonl": "0a1a3098c657cd8271634d02a774fcd2578e5a960d6ec952ec53d8a0b4d61da9",
+    "design.md": "f6918652e0b3ea7b73148b2a2da7cb650daa3d4fc6c5c8aaebf7c7032a7a7402",
+    "discussion-notes.md": "85f7db17a1fe7b0d161d1a7aeeb9ec8516ccb63cc8cd010b46fa1bbf1ab3fe36",
+    "expected_feature_contract.csv": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82",
+    "expected_feature_contract_metadata.json": "3717c5d1cb2b071cb6499df54ae7a8704b452c5c97b0a25dd1fc0526db32a237",
+    "expected_run_index.csv": "25fff00d23b6a2df22f81900832f8b884909eb172d4bd07832544591cf87b616",
+    "implement.jsonl": "0a1a3098c657cd8271634d02a774fcd2578e5a960d6ec952ec53d8a0b4d61da9",
+    "implement.md": "9e1f1f299edad9f1a7803a6dc630e70a6717359e4d411949f11bbb17f78c847e",
+    "prd.md": "f45d17ef669c168d7dac4e8025919298204d007fa293cf427f492e2d0d237ab5",
+    "research/launch-input-findings.md": "fdf0b21fb96c4dcdbf8b4fc9652cdbcfa55188c05ce709640a89657630f2dbe3",
+    "task.json": "73419012eca057c771f78dbc9aac6eacd1704bc4e2945ccbb847f2a7c5cd67f1"
+  },
+  "not_executed": [
+    "CDS retrieval or actual GRIB decoding/overlap",
+    "feature matrix assembly or numerical feature checks",
+    "model fitting/prediction/replay",
+    "production population/map generation or acceptance tests",
+    "Herdr implementation dispatch",
+    "audit registration/start",
+    "Git commit or branch switching"
+  ],
+  "inherited_source_evidence": "Large population/static source findings came from earlier planning probes; consumed bytes must be rechecked at execution preflight."
+}

@@ -1,0 +1,8 @@
+{"file": ".trellis/spec/backend/index.md", "reason": "Backend modeling conventions, temporal leakage, frozen numerical environment and focused validation requirements."}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Backend modeling conventions, temporal leakage, frozen numerical environment and focused validation requirements."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/prd.md", "reason": "Scope planning contract and source evidence; expected membership/order is not fitted validation."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/design.md", "reason": "Scope planning contract and source evidence; expected membership/order is not fitted validation."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/implement.md", "reason": "Scope planning contract and source evidence; expected membership/order is not fitted validation."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/research/contract-reading.md", "reason": "Mandatory complete on-disk CSV/metadata parsing; context snippets cannot define feature order or membership."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/expected_run_index.csv", "reason": "Scope planning contract and source evidence; expected membership/order is not fitted validation."}
+{"file": ".trellis/tasks/10-08-compact-cds-launch/research/launch-input-findings.md", "reason": "Scope planning contract and source evidence; expected membership/order is not fitted validation."}
