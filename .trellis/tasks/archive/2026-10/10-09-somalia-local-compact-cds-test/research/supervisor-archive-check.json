@@ -1,0 +1,27 @@
+{
+  "checked_utc": "2026-10-09T19:07:25.802196+00:00",
+  "archive_command_exit": 1,
+  "archive_recovery": "Native move completed all files, completed status and session-pointer clearing; empty-source rmdir failed on DrvFS. Independently verified archived bytes and removed only the confirmed empty source directory. No retry of archive, audit, fitting or hooks; no after_archive hooks configured.",
+  "tracked_archive_files_verified_against_acceptance_commit": 68,
+  "archived_status": "completed",
+  "source_task_absent": true,
+  "current_task_output": "Current task: (none)\nSource: none\n",
+  "manifest_bound_spec_copies": {
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1_somalia_local/inputs/compact_climate_weather_oracle_v1_somalia_local_manifest.json": {
+      "prd.md": "edb0caffee5a6dd101529d8b88437a207c67003ed51ece805a68c45ef3a9c4f4",
+      "design.md": "89ef778dc5dde873847bf6461316cca0fb103018882999bbc7df746db08f5f65",
+      "implement.md": "990fce07687b746891c78bd46e7ba611f0b16427727fe1d8f14546f4c4e8e525",
+      "expected_runs.csv": "bfa6f72d407889ca71d5c6bf7133896c2a3e52be83449bf15f7f742878cc7323",
+      "approval.md": "cb07afd45e3268d559067a4b656996dc6850ab814be493c3fc071ebd4d410a22"
+    },
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/nowcasting_2026_04_compact_cds_v1_somalia_local_manifest.json": {
+      "prd.md": "edb0caffee5a6dd101529d8b88437a207c67003ed51ece805a68c45ef3a9c4f4",
+      "design.md": "89ef778dc5dde873847bf6461316cca0fb103018882999bbc7df746db08f5f65",
+      "implement.md": "990fce07687b746891c78bd46e7ba611f0b16427727fe1d8f14546f4c4e8e525",
+      "expected_runs.csv": "bfa6f72d407889ca71d5c6bf7133896c2a3e52be83449bf15f7f742878cc7323",
+      "approval.md": "cb07afd45e3268d559067a4b656996dc6850ab814be493c3fc071ebd4d410a22"
+    }
+  },
+  "full_postarchive_verifier_rerun": false,
+  "archive_safe_validation": "actual production spec-copy fallback checked for both manifests; focused archive test already passed"
+}
