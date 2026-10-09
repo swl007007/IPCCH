@@ -1,0 +1,2 @@
+88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56  scripts/modeling/run_somalia_local_compact_test.py
+3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27  tests/unit/test_somalia_local_compact_test.py

@@ -1,3 +1,25 @@
+# Somalia local compact historical experiment and CDS launch — in progress
+
+Task: `.trellis/tasks/10-09-somalia-local-compact-cds-test`. Approved requirements: `prd.md`, `design.md`, `implement.md`; this ledger records operations, not approval authority.
+
+## 2026-10-09 approval and Herdr handoff
+
+- User approved final spec and directed Herdr Claude Opus 5.5 with1M context execution, Codex supervision, and no Trellis audit. Approval is recorded in task `approval.md`; use ordinary task lifecycle and independent supervisor acceptance.
+- Approved planning commit: `3ccf92a`; current branch `task/compact-climate-weather-oracle`. Ordinary task start changed planning to in_progress; no audit wrapper/controller mutation.
+- Verified executor: Herdr `somalia-local-executor`, pane `w11:p4`, terminal `term_65d6ae54981a13`, Claude session `579e6ba5-f2a2-483c-b465-4b2e3cca1ed3`; live UI Opus5.5(1M context), same filesystem/cwd, idle before dispatch. Evidence: task `research/executor-binding.json` and `executor-runtime-ui.txt`.
+- Scope: historical seven runs/28 batches/112 regressors atH0/3/6/12, launch five runs/20 regressors atH0/6/12, all Somalia-only fits; absolute levels/performance and paired differences. Historical905-area union/4933 evaluation keys; launch904 covered areas/5835 fitting observations.
+- Wave0 approval/activation/binding: complete. Herdr prompt delivered and actual same-session working state observed (`research/dispatch-confirmation.json`); initial45s wait timed out on completion, so no resubmission. Wave1 implementation/tests/preflight: accepted by supervisor. Wave2 historical H0/2022 pilot: pending implementation commit. Remaining fits and Wave3 reports/maps/132-model acceptance: pending.
+- Main session owns commits and final acceptance. Executor first publishes code/test/preflight checkpoint before production fitting; then supervisor approves the measured pilot/full fixed plan through Herdr.
+
+## 2026-10-09 wave 1 supervisor acceptance
+
+- Two new implementation files; frozen helpers/configs unchanged. Nine initial checkpoint findings were corrected, including incomplete resume, archival, exact replay classes, report/map/snapshot completeness and target/undefined evidence. Current script SHA256 `88aee59b…`; test SHA256 `3c149547…`.
+- Independent focused suite: **32 passed in68.47s**, exit0; both code hashes unchanged during the run (`research/supervisor-focused-tests.json`). Real read-only preflight: exit0 after6:47.85, peak RSS0.79GB; all four local roots stayed absent (`research/preflight-checkpoint.json`).
+- Supervisor independently reconstructed full SOM cohort/cutoff counts and launch keys/April weights/population, checked the approved spec bytes against3ccf92a and current frozen code/config hashes (`research/supervisor-preflight-check.json`). Historical4933 evaluation keys, launch5835 fit rows/904 covered areas, fixed effective population18672002.05 all agree.
+- Implementation/preflight accepted (`research/supervisor-implementation-acceptance.json`). Codex owns the stable code commit; only the measured historical H0/2022 pilot is released after that commit. No other production fitting, audit or final acceptance yet. Windows-Git shim restored for executor commands; native-Git CRLF status noise is excluded.
+
+---
+
 # Compact CDS launch — completed
 
 Completed task: `.trellis/tasks/archive/2026-10/10-08-compact-cds-launch`. Authoritative scope: approved `prd.md`, `design.md`, `implement.md` and expected contracts; this ledger is operational state only.

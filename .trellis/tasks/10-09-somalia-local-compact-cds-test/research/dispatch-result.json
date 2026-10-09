@@ -1,0 +1,8 @@
+{
+  "submitted_utc": "2026-10-09T17:34:12.191403+00:00",
+  "target": "somalia-local-executor",
+  "prompt_file": "research/executor-prompt.txt",
+  "command_exit": 1,
+  "stdout": "",
+  "stderr": "{\"error\":{\"code\":\"timeout\",\"message\":\"timed out waiting for agent status\"},\"id\":\"cli:agent:prompt\"}\n"
+}

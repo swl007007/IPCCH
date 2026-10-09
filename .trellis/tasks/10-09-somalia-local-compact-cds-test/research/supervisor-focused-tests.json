@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "-m",
+    "pytest",
+    "tests/unit/test_somalia_local_compact_test.py",
+    "tests/unit/test_compact_launch.py",
+    "-q",
+    "-p",
+    "no:cacheprovider"
+  ],
+  "cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+  "exit_code": 0,
+  "elapsed_seconds": 70.30042886734009,
+  "before_sha256": {
+    "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "after_sha256": {
+    "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "code_stable": true,
+  "log": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/.trellis/tasks/10-09-somalia-local-compact-cds-test/research/supervisor-focused-tests.log",
+  "log_sha256": "0631371b778e21873ca525bab24ea3a71e937670498b4f130fdf926b545e1158",
+  "production_fitting": false,
+  "acceptance_scope": "focused synthetic and frozen launch helper tests only"
+}

@@ -1,0 +1,191 @@
+{
+  "passed": true,
+  "scope": "independent checkpoint hashes, approved-spec bytes, complete keyed cohorts, cutoff counts, April weights, population and no local roots",
+  "production_fitting": false,
+  "code_sha256": {
+    "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "frozen_code_configs_checked": 19,
+  "members": 905,
+  "historical_eval_rows": 4933,
+  "annual_rows": {
+    "2022": 1129,
+    "2023": 1217,
+    "2024": 711,
+    "2025": 1876
+  },
+  "historical_fit_counts": {
+    "compact_baseline/0m/2022": {
+      "rows": 901,
+      "areas": 139,
+      "cutoff_ordinal": 24263
+    },
+    "compact_baseline/0m/2023": {
+      "rows": 2030,
+      "areas": 649,
+      "cutoff_ordinal": 24275
+    },
+    "compact_baseline/0m/2024": {
+      "rows": 3247,
+      "areas": 869,
+      "cutoff_ordinal": 24287
+    },
+    "compact_baseline/0m/2025": {
+      "rows": 3958,
+      "areas": 891,
+      "cutoff_ordinal": 24299
+    },
+    "compact_baseline/3m/2022": {
+      "rows": 901,
+      "areas": 139,
+      "cutoff_ordinal": 24261
+    },
+    "compact_baseline/3m/2023": {
+      "rows": 2030,
+      "areas": 649,
+      "cutoff_ordinal": 24273
+    },
+    "compact_baseline/3m/2024": {
+      "rows": 3247,
+      "areas": 869,
+      "cutoff_ordinal": 24285
+    },
+    "compact_baseline/3m/2025": {
+      "rows": 3958,
+      "areas": 891,
+      "cutoff_ordinal": 24297
+    },
+    "compact_baseline/6m/2022": {
+      "rows": 901,
+      "areas": 139,
+      "cutoff_ordinal": 24258
+    },
+    "compact_baseline/6m/2023": {
+      "rows": 1504,
+      "areas": 624,
+      "cutoff_ordinal": 24270
+    },
+    "compact_baseline/6m/2024": {
+      "rows": 2899,
+      "areas": 842,
+      "cutoff_ordinal": 24282
+    },
+    "compact_baseline/6m/2025": {
+      "rows": 3958,
+      "areas": 891,
+      "cutoff_ordinal": 24294
+    },
+    "compact_baseline/12m/2022": {
+      "rows": 858,
+      "areas": 96,
+      "cutoff_ordinal": 24252
+    },
+    "compact_baseline/12m/2023": {
+      "rows": 944,
+      "areas": 139,
+      "cutoff_ordinal": 24264
+    },
+    "compact_baseline/12m/2024": {
+      "rows": 2554,
+      "areas": 692,
+      "cutoff_ordinal": 24276
+    },
+    "compact_baseline/12m/2025": {
+      "rows": 3603,
+      "areas": 886,
+      "cutoff_ordinal": 24288
+    },
+    "compact_weather_oracle/3m/2022": {
+      "rows": 901,
+      "areas": 139,
+      "cutoff_ordinal": 24261
+    },
+    "compact_weather_oracle/3m/2023": {
+      "rows": 2030,
+      "areas": 649,
+      "cutoff_ordinal": 24273
+    },
+    "compact_weather_oracle/3m/2024": {
+      "rows": 3247,
+      "areas": 869,
+      "cutoff_ordinal": 24285
+    },
+    "compact_weather_oracle/3m/2025": {
+      "rows": 3958,
+      "areas": 891,
+      "cutoff_ordinal": 24297
+    },
+    "compact_weather_oracle/6m/2022": {
+      "rows": 901,
+      "areas": 139,
+      "cutoff_ordinal": 24258
+    },
+    "compact_weather_oracle/6m/2023": {
+      "rows": 1504,
+      "areas": 624,
+      "cutoff_ordinal": 24270
+    },
+    "compact_weather_oracle/6m/2024": {
+      "rows": 2899,
+      "areas": 842,
+      "cutoff_ordinal": 24282
+    },
+    "compact_weather_oracle/6m/2025": {
+      "rows": 3958,
+      "areas": 891,
+      "cutoff_ordinal": 24294
+    },
+    "compact_weather_oracle/12m/2022": {
+      "rows": 858,
+      "areas": 96,
+      "cutoff_ordinal": 24252
+    },
+    "compact_weather_oracle/12m/2023": {
+      "rows": 944,
+      "areas": 139,
+      "cutoff_ordinal": 24264
+    },
+    "compact_weather_oracle/12m/2024": {
+      "rows": 2554,
+      "areas": 692,
+      "cutoff_ordinal": 24276
+    },
+    "compact_weather_oracle/12m/2025": {
+      "rows": 3603,
+      "areas": 886,
+      "cutoff_ordinal": 24288
+    }
+  },
+  "launch": {
+    "compact_baseline/0m": {
+      "fit_rows": 5835,
+      "fit_areas": 905,
+      "inference_areas": 904
+    },
+    "compact_baseline/6m": {
+      "fit_rows": 5835,
+      "fit_areas": 905,
+      "inference_areas": 904
+    },
+    "compact_baseline/12m": {
+      "fit_rows": 5835,
+      "fit_areas": 905,
+      "inference_areas": 904
+    },
+    "compact_cds_weather/6m": {
+      "fit_rows": 5835,
+      "fit_areas": 905,
+      "inference_areas": 904
+    },
+    "compact_cds_weather/12m": {
+      "fit_rows": 5835,
+      "fit_areas": 905,
+      "inference_areas": 904
+    }
+  },
+  "population_raw": 62695007.0,
+  "population_factor": 0.29782279233177217,
+  "population_effective": 18672002.05,
+  "limits": "raw GRIB/provider/vintage verification remains inherited; complete matrices were checked by frozen parent/local preflight gates"
+}

@@ -1,0 +1,33 @@
+{
+  "accepted": true,
+  "acceptance_scope": "implementation, focused synthetic tests and real read-only preflight only",
+  "acceptance_authority": "Codex supervisor",
+  "approved_plan_commit": "3ccf92a17dc94080ee2d2aa54618c2d123923d7a",
+  "implementation_code_sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+  "focused_test_sha256": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27",
+  "executor": {
+    "herdr_agent": "somalia-local-executor",
+    "pane": "w11:p4",
+    "session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+    "observed_model": "Opus 5.5 (1M context)"
+  },
+  "evidence": [
+    "research/implementation-checkpoint.md",
+    "research/preflight-checkpoint.json",
+    "research/supervisor-focused-tests.json",
+    "research/supervisor-preflight-check.json",
+    "research/supervisor-wave1-findings.md"
+  ],
+  "independent_tests": "32 passed; exit0; script/test bytes unchanged before and after",
+  "independent_preflight": "complete SOM cohorts and per-year cutoff counts, all five launch ordered fit sets, April weights, population and approved spec/code hashes passed",
+  "production_fitting_performed": false,
+  "next_release": "after stable implementation commit: measured historical compact_baseline H0/2022 pilot only",
+  "remaining_gate": "independent four-model pilot schema/key/prediction/class/weight check before any remaining production fit",
+  "final_acceptance": false,
+  "trellis_audit": "not started; explicit user override",
+  "limitations": [
+    "earliest Somalia historical fits have901 rows (H0) or858 rows (H12), under inherited fixed global hyperparameters",
+    "prior raw weather/provider/vintage acceptance is inherited and was not rerun",
+    "historical oracle uses realized future weather; future launch levels cannot establish accuracy"
+  ]
+}

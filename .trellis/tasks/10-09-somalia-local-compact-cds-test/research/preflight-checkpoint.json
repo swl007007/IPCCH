@@ -1,0 +1,575 @@
+{
+  "checkpoint": "Somalia local compact/CDS test - Stage 1 implementation and read-only preflight; NO production fitting",
+  "task": ".trellis/tasks/10-09-somalia-local-compact-cds-test",
+  "git_head": "3ccf92a17dc94080ee2d2aa54618c2d123923d7a",
+  "approved_plan_commit": "3ccf92a17dc94080ee2d2aa54618c2d123923d7a",
+  "git_note": "/tmp/ipcch-windows-git-bin shim no longer exists; executor git calls were read-only (rev-parse/status/show) via system git; no add/commit/reset",
+  "executor": {
+    "agent": "claude",
+    "session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+    "task_current_source": "session:claude_579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+    "audit": "none (user override, approval.md/R11)"
+  },
+  "code": {
+    "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "existing_symbols_edited": [],
+  "gitnexus_impact": "not required: no existing symbol edited; frozen primitives called unchanged",
+  "frozen_code_and_config_sha256": {
+    "configs/forecasting_hyperparameters.json": "3742300661466f22eba8198e5d4f9c2a277615ba59562fbf27f251ecc932dd76",
+    "configs/forecasting_hyperparameters_p3.json": "cdc0e55aa15bdda932465088568b9ee717d226208ffb32076f438fb274e6317b",
+    "scripts/modeling/run_compact_cds_launch.py": "c58be4f4336bd3940c4bfe826796f3354a866d119283188a8651fbea08216db4",
+    "scripts/modeling/run_deep_feature_weight_decay_forecasting.py": "67729cf9f55c442ba3e748bfadbd56e9ecfe2692861a5103ac7cb08a003dc184",
+    "scripts/postprocessing/verify_origin_safe_climate_idp.py": "fffa4d143e5393d7e981a164a447b15664a4dc0ad1927d824fc7b21664bc2b63",
+    "scripts/preprocessing/build_compact_cds_launch_inputs.py": "21609b085a29db895e8ec73339fdfd69ecc11a2d3f231f727197f59ba880ad78",
+    "src/ipcch/alert_risk_maps.py": "1dec6b2fa4a0ed5171223e2f0883618306db7dcf43e383891fd0fcc00bb5ba3b",
+    "src/ipcch/cds_launch_weather.py": "be74e2a3f87d124b26c7fd7440dd5c52ad516dc1b8bcd5ff84aaf750cf755e33",
+    "src/ipcch/climate2015_features.py": "e8da9de9224b1f5c42706d50fccd12f2173886079c4c7a711f152f900e9c22d5",
+    "src/ipcch/compact_features.py": "923cae26335f9994043c178a0920a7736e7e80dc9c51a5fffa8d406f07fdf324",
+    "src/ipcch/compact_launch.py": "ed10b701bdfb86624fca4f0975c81e677819db048ed7473d0ade3c4efb4f992d",
+    "src/ipcch/forecasting_weight_decay.py": "1a9f20e2d4b62d532baeb48f3538247dd7719a60cd06f7d75982be2076caaefc",
+    "src/ipcch/launch_nowcasting.py": "4abd29978e5420e335b6331fc22961f924c7c0b395df482f84f89f88747a19c9",
+    "src/ipcch/launch_visualizations.py": "b0595c6916f3484f34f53d7f3885c9d517dd2ce20ea1fd2627036325e3575bc9",
+    "src/ipcch/origin_safe.py": "629936a8de4973399a3dfa798b4a212bb8fefe9838d16a032c072c446101ea03",
+    "src/ipcch/plot_forecast_weather_phase3plus_maps.py": "258a46e46ffb00a91759b81dae4b40cab8894e718d249b00496af1728f91c69c",
+    "src/ipcch/regional_point_metrics.py": "a10a5d847c8e6c5d724ffb0eb32b5ed98ff08a6d531d6574f9159efc913e5da4",
+    "src/ipcch/retained_feature_recipes.py": "cf1557e405d0aef3a62ee9af4286680465e8fae3f7661c959d321870423465ed",
+    "src/ipcch/weather_oracle.py": "65a93d45ec0f738ec9c6e8092e4c355f88149310054e4e1969ae24c2ffc55d81"
+  },
+  "commands": [
+    {
+      "cmd": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_somalia_local_compact_test.py tests/unit/test_compact_launch.py -q",
+      "evidence": "research/supervisor-focused-tests.json/.log (supervisor's independent run at these exact hashes)",
+      "result": "32 passed in 68.47s, exit 0",
+      "supervisor_record": {
+        "command": [
+          "/home/swl007007/.venvs/ipcch-geo/bin/python",
+          "-m",
+          "pytest",
+          "tests/unit/test_somalia_local_compact_test.py",
+          "tests/unit/test_compact_launch.py",
+          "-q",
+          "-p",
+          "no:cacheprovider"
+        ],
+        "cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+        "exit_code": 0,
+        "elapsed_seconds": 70.30042886734009,
+        "before_sha256": {
+          "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+          "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+        },
+        "after_sha256": {
+          "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+          "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+        },
+        "code_stable": true,
+        "log": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/.trellis/tasks/10-09-somalia-local-compact-cds-test/research/supervisor-focused-tests.log",
+        "log_sha256": "0631371b778e21873ca525bab24ea3a71e937670498b4f130fdf926b545e1158",
+        "production_fitting": false,
+        "acceptance_scope": "focused synthetic and frozen launch helper tests only"
+      }
+    },
+    {
+      "cmd": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_somalia_local_compact_test.py -q",
+      "result": "20 passed in 58.55s (executor run at these exact hashes)"
+    },
+    {
+      "cmd": "PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --validate-only",
+      "stdout": "research/preflight_validate_stdout.json",
+      "stdout_sha256": "3deec514b7ec87a88448da77d4227924710bbdfa54271af6e5debc5a044d58fd",
+      "log": "research/preflight_validate.log",
+      "log_sha256": "af4ab54569f63165c078bcd4061fb436de5e9eb5e25dbbb825b94fe0170b8d03",
+      "exit": 0,
+      "wall": "6:47.85",
+      "max_rss_kb": 794028,
+      "code_pins": "research/preflight_code_sha256.txt"
+    }
+  ],
+  "superseded_evidence": [
+    "research/focused_tests.log: 28 passed at an earlier script hash e1d53188 (before the supervisor findings); superseded"
+  ],
+  "preflight": {
+    "mode": "validate-only (nothing written)",
+    "runtime": {
+      "python": "3.12.3",
+      "numpy": "2.4.4",
+      "pandas": "3.0.3",
+      "sklearn": "1.8.0",
+      "xgboost": "3.2.0",
+      "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+      "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+    },
+    "local_code": {
+      "script": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/scripts/modeling/run_somalia_local_compact_test.py",
+      "sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56"
+    },
+    "membership": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/country_area_id_lookup.csv",
+      "sha256": "e2baf6ae9481b42b127db5ce81f3c53ad784bb08ae56dfa56cea74e416b44c90",
+      "column": "iso3",
+      "value": "SOM",
+      "country": "Somalia",
+      "n_areas": 905,
+      "area_ids_sha256": "fc1713826dce604671ad009cc89d19abd048fc75d554d23d43a47aa14f715f92"
+    },
+    "historical": {
+      "local_manifest_sha256_if_written": "573b0d0bb074a2de9251afacf549dfe18a30321af8bce87dfce75ac0644fe228",
+      "cohort": {
+        "label_keys": 52521,
+        "parent_eval_rows": 28205,
+        "parent_share_valid_rows": 52306,
+        "som_label_keys": 6741,
+        "fit_valid_rows": 6739,
+        "fit_valid_keys_sha256": "aa4acb4afa66112cd938eb9b9aa2b48e902b3d492fda5627ed486cb8e13c68c4",
+        "eval_rows": 4933,
+        "eval_keys_sha256": "5f8343c4b4ba92176b1a7fa2797dfb9c29d5805065f200df46c416efcea9f14a",
+        "eval_by_year": {
+          "2022": 1129,
+          "2023": 1217,
+          "2024": 711,
+          "2025": 1876
+        },
+        "eval_areas_by_year": {
+          "2022": 585,
+          "2023": 705,
+          "2024": 372,
+          "2025": 904
+        },
+        "eval_union_areas": 905,
+        "eval_nonmember_rows": 0
+      },
+      "runs": {
+        "compact_baseline/0m": {
+          "features": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "parent_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6",
+          "local_fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+          "years": {
+            "2022": {
+              "fit_rows": 901,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2021-12",
+              "fit_max_label": "2021-07",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 2030,
+              "fit_areas": 649,
+              "fit_label_cutoff": "2022-12",
+              "fit_max_label": "2022-10",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 3247,
+              "fit_areas": 869,
+              "fit_label_cutoff": "2023-12",
+              "fit_max_label": "2023-08",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3958,
+              "fit_areas": 891,
+              "fit_label_cutoff": "2024-12",
+              "fit_max_label": "2024-07",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_baseline/3m": {
+          "features": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "parent_fingerprint": "1b55aff2533411c2f0ddeaef39d0d19b2e4a8028c2bf0bac00921af7d30efdc0",
+          "local_fingerprint": "047bbd929584d238779cb2a00f05983ec2775e31baa3bf6d393ee12a14bfd8be",
+          "years": {
+            "2022": {
+              "fit_rows": 901,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2021-10",
+              "fit_max_label": "2021-07",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 2030,
+              "fit_areas": 649,
+              "fit_label_cutoff": "2022-10",
+              "fit_max_label": "2022-10",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 3247,
+              "fit_areas": 869,
+              "fit_label_cutoff": "2023-10",
+              "fit_max_label": "2023-08",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3958,
+              "fit_areas": 891,
+              "fit_label_cutoff": "2024-10",
+              "fit_max_label": "2024-07",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_baseline/6m": {
+          "features": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "parent_fingerprint": "11395c697f59852a3560b12028a3265a61473a3f993e72ca00d2a9a47194a940",
+          "local_fingerprint": "389617f92273812f51cb72e70ac81eb09dd6e5d8ee229688268f042fc99200b8",
+          "years": {
+            "2022": {
+              "fit_rows": 901,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2021-07",
+              "fit_max_label": "2021-07",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 1504,
+              "fit_areas": 624,
+              "fit_label_cutoff": "2022-07",
+              "fit_max_label": "2022-07",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 2899,
+              "fit_areas": 842,
+              "fit_label_cutoff": "2023-07",
+              "fit_max_label": "2023-03",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3958,
+              "fit_areas": 891,
+              "fit_label_cutoff": "2024-07",
+              "fit_max_label": "2024-07",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_baseline/12m": {
+          "features": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "parent_fingerprint": "09deda912a46e3babe7c65004e53586a78dd1806f682b803de27d88312e994e0",
+          "local_fingerprint": "06f0866079a23548511d9166794675550a1061d9f25f0e6eda1648300de7f65b",
+          "years": {
+            "2022": {
+              "fit_rows": 858,
+              "fit_areas": 96,
+              "fit_label_cutoff": "2021-01",
+              "fit_max_label": "2021-01",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 944,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2022-01",
+              "fit_max_label": "2022-01",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 2554,
+              "fit_areas": 692,
+              "fit_label_cutoff": "2023-01",
+              "fit_max_label": "2023-01",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3603,
+              "fit_areas": 886,
+              "fit_label_cutoff": "2024-01",
+              "fit_max_label": "2024-01",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_weather_oracle/3m": {
+          "features": 302,
+          "feature_sha256": "ce99f6a8af46278f6faf9e60f8a631efae6c5a55e6be025dd0bcfadb1b959e9a",
+          "parent_fingerprint": "12d3257de107a4502717625a84f1233c65d352257e0f7691d05e9fe750ba06be",
+          "local_fingerprint": "fc56b83b307f12020e7efc544f9f03626aca62ca690f02e6f57394c80714f1b6",
+          "years": {
+            "2022": {
+              "fit_rows": 901,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2021-10",
+              "fit_max_label": "2021-07",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 2030,
+              "fit_areas": 649,
+              "fit_label_cutoff": "2022-10",
+              "fit_max_label": "2022-10",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 3247,
+              "fit_areas": 869,
+              "fit_label_cutoff": "2023-10",
+              "fit_max_label": "2023-08",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3958,
+              "fit_areas": 891,
+              "fit_label_cutoff": "2024-10",
+              "fit_max_label": "2024-07",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_weather_oracle/6m": {
+          "features": 308,
+          "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "parent_fingerprint": "daf7e4bcc7a4a5a5f5a543a87a93ed4275d30c9fe329c680a20a7e36e1e4e380",
+          "local_fingerprint": "36d9115b0b648160a0c987a167646451ef13c82e26d43714e956234839ba122b",
+          "years": {
+            "2022": {
+              "fit_rows": 901,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2021-07",
+              "fit_max_label": "2021-07",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 1504,
+              "fit_areas": 624,
+              "fit_label_cutoff": "2022-07",
+              "fit_max_label": "2022-07",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 2899,
+              "fit_areas": 842,
+              "fit_label_cutoff": "2023-07",
+              "fit_max_label": "2023-03",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3958,
+              "fit_areas": 891,
+              "fit_label_cutoff": "2024-07",
+              "fit_max_label": "2024-07",
+              "eval_rows": 1876
+            }
+          }
+        },
+        "compact_weather_oracle/12m": {
+          "features": 308,
+          "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "parent_fingerprint": "eeb4884cbf4cf0cc73d7357c342e5089b9edbc07ade45828e360ea49961e618d",
+          "local_fingerprint": "61239afddada0c89cecf5b94f1fe8cdf42fba51d9f5961a645468b3af6a82dd5",
+          "years": {
+            "2022": {
+              "fit_rows": 858,
+              "fit_areas": 96,
+              "fit_label_cutoff": "2021-01",
+              "fit_max_label": "2021-01",
+              "eval_rows": 1129
+            },
+            "2023": {
+              "fit_rows": 944,
+              "fit_areas": 139,
+              "fit_label_cutoff": "2022-01",
+              "fit_max_label": "2022-01",
+              "eval_rows": 1217
+            },
+            "2024": {
+              "fit_rows": 2554,
+              "fit_areas": 692,
+              "fit_label_cutoff": "2023-01",
+              "fit_max_label": "2023-01",
+              "eval_rows": 711
+            },
+            "2025": {
+              "fit_rows": 3603,
+              "fit_areas": 886,
+              "fit_label_cutoff": "2024-01",
+              "fit_max_label": "2024-01",
+              "eval_rows": 1876
+            }
+          }
+        }
+      },
+      "spec_sha256": {
+        "approved_spec/approval.md": "cb07afd45e3268d559067a4b656996dc6850ab814be493c3fc071ebd4d410a22",
+        "approved_spec/design.md": "89ef778dc5dde873847bf6461316cca0fb103018882999bbc7df746db08f5f65",
+        "approved_spec/expected_runs.csv": "bfa6f72d407889ca71d5c6bf7133896c2a3e52be83449bf15f7f742878cc7323",
+        "approved_spec/implement.md": "990fce07687b746891c78bd46e7ba611f0b16427727fe1d8f14546f4c4e8e525",
+        "approved_spec/prd.md": "edb0caffee5a6dd101529d8b88437a207c67003ed51ece805a68c45ef3a9c4f4"
+      }
+    },
+    "launch": {
+      "local_manifest_sha256_if_written": "f76da0649f74999a06ac02a694dd6a71d1c9e91c230a4f0f4b31a20792f4a15f",
+      "checks": {
+        "inference_areas": 904,
+        "excluded_areas": [
+          3146
+        ],
+        "fit_rows": {
+          "compact_baseline/0m": 5835,
+          "compact_baseline/6m": 5835,
+          "compact_baseline/12m": 5835,
+          "compact_cds_weather/6m": 5835,
+          "compact_cds_weather/12m": 5835
+        },
+        "population_raw": 62695007.0,
+        "cap_factor": 0.29782279233177217,
+        "population_effective": 18672002.05,
+        "reference_population": 19654739.0,
+        "paired_training_identical": true,
+        "weather_prefix_equals_baseline": true
+      },
+      "runs": {
+        "compact_baseline/0m": {
+          "fit_rows": 5835,
+          "fit_areas": 905,
+          "fit_label_months": [
+            "2017-01",
+            "2026-01"
+          ],
+          "fit_keys_sha256": "2a71bb81c6ad862d8cb92d3bae686a2622576d6033819b749413174ab489695f",
+          "inference_keys_sha256": "76e554a777d41d753bc0f4ba1842b3742ff73a5ed33bfca5efb739af7f4e2c83",
+          "feature_count": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "fit_selection_sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+          "inference_sha256": "a175bb4359141c81339006add97ec3bf7798cc01add3d5f38f033ef9a7ae354b"
+        },
+        "compact_baseline/6m": {
+          "fit_rows": 5835,
+          "fit_areas": 905,
+          "fit_label_months": [
+            "2017-01",
+            "2026-01"
+          ],
+          "fit_keys_sha256": "2a71bb81c6ad862d8cb92d3bae686a2622576d6033819b749413174ab489695f",
+          "inference_keys_sha256": "fb0901c3c05bb755028b089af59edf0f5c141bc47dbf1bfc0570db4d474560e2",
+          "feature_count": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "fit_selection_sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+          "inference_sha256": "afbe4dbf9e6543539ec61839b612d6a35c49d5dd23403c3730898661239db107"
+        },
+        "compact_baseline/12m": {
+          "fit_rows": 5835,
+          "fit_areas": 905,
+          "fit_label_months": [
+            "2017-01",
+            "2026-01"
+          ],
+          "fit_keys_sha256": "2a71bb81c6ad862d8cb92d3bae686a2622576d6033819b749413174ab489695f",
+          "inference_keys_sha256": "31833684711fdebcb5280a4991d67575377c1b66d962461220f3710ad6124fc2",
+          "feature_count": 296,
+          "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "fit_selection_sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+          "inference_sha256": "c55a66e2f8389ff6c19fcb7a489d74b8dc2b0b678a5ca887d9e193dd2f0eba4c"
+        },
+        "compact_cds_weather/6m": {
+          "fit_rows": 5835,
+          "fit_areas": 905,
+          "fit_label_months": [
+            "2017-01",
+            "2026-01"
+          ],
+          "fit_keys_sha256": "2a71bb81c6ad862d8cb92d3bae686a2622576d6033819b749413174ab489695f",
+          "inference_keys_sha256": "fb0901c3c05bb755028b089af59edf0f5c141bc47dbf1bfc0570db4d474560e2",
+          "feature_count": 308,
+          "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "fit_selection_sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+          "inference_sha256": "c8b49824a659e06b3fe92327ab1eeaf0fe366640b3a81413c888c5086b90afba"
+        },
+        "compact_cds_weather/12m": {
+          "fit_rows": 5835,
+          "fit_areas": 905,
+          "fit_label_months": [
+            "2017-01",
+            "2026-01"
+          ],
+          "fit_keys_sha256": "2a71bb81c6ad862d8cb92d3bae686a2622576d6033819b749413174ab489695f",
+          "inference_keys_sha256": "31833684711fdebcb5280a4991d67575377c1b66d962461220f3710ad6124fc2",
+          "feature_count": 308,
+          "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "fit_selection_sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+          "inference_sha256": "70f0ac4327192cc2376ef51bd6e1841eb7de2e4a4b5ccbfd82ef990659d34754"
+        }
+      },
+      "parent_manifest": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/compact_cds_launch_v1_manifest.json",
+        "sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe"
+      },
+      "fit_run_fingerprints": "computed by --approve-training after the local manifest is written; each binds the local manifest sha256 reported above (no temporary output in validate-only)"
+    },
+    "frozen_inventory": {
+      "files": 491,
+      "bytes": 2583040544,
+      "digest": "25c451084d015d94cd4a90fff08347e88f898d1fdf8688cc7de7613b03bbef36",
+      "by_role": {
+        "code": 23,
+        "geometry": 5,
+        "membership": 1,
+        "old_reports": 16,
+        "old_results": 392,
+        "parent_inputs": 52,
+        "reference": 2
+      }
+    },
+    "roots_exist": {
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local": false,
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_v1_somalia_local": false,
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local": false,
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local": false
+    }
+  },
+  "approved_values_reproduced": {
+    "members": 905,
+    "hist_eval_rows": 4933,
+    "hist_eval_by_year": {
+      "2022": 1129,
+      "2023": 1217,
+      "2024": 711,
+      "2025": 1876
+    },
+    "hist_eval_areas_by_year": {
+      "2022": 585,
+      "2023": 705,
+      "2024": 372,
+      "2025": 904
+    },
+    "hist_eval_union_areas": 905,
+    "launch_fit_rows_each_run": 5835,
+    "launch_fit_areas": 905,
+    "launch_inference_areas": 904,
+    "launch_excluded": [
+      3146
+    ],
+    "population_raw": 62695007.0,
+    "reference_population": 19654739.0,
+    "cap_factor": 0.29782279233177217,
+    "population_effective": 18672002.05
+  },
+  "spec_bytes_equal_plan_commit": true,
+  "local_roots_created": false,
+  "supervisor_findings_addressed": "research/implementation-checkpoint.md (items 1-9 and the validate-only temporary-file removal)",
+  "unresolved": [
+    "Production fitting closed until supervisor acceptance; the next step would be the measured historical compact_baseline H0/2022 pilot (--approve-training --pilot).",
+    "Small early Somalia fits under fixed global hyperparameters (H0/2022: 901 rows over 139 areas; H12/2022: 858 rows over 96 areas); inherited limit, no tuning.",
+    "Local manifests bind the active task spec bytes and the script sha; any later edit of either before training changes the local identity (intended).",
+    "The frozen inventory reconciles exact membership of the parent result/report roots: a file added there by anyone during the task fails verification (by design).",
+    "Prior raw-GRIB/provider/vintage verification is inherited from the accepted parents; not rerun here.",
+    "Pre-existing unrelated working-tree edits (AGENTS.md, archived contract CSVs, task.json) left untouched."
+  ],
+  "changed_files": [
+    "scripts/modeling/run_somalia_local_compact_test.py (new)",
+    "tests/unit/test_somalia_local_compact_test.py (new)",
+    "research/implementation-status.md",
+    "research/implementation-checkpoint.md",
+    "research/preflight-checkpoint.json",
+    "research/preflight_validate_stdout.json",
+    "research/preflight_validate.log",
+    "research/preflight_code_sha256.txt",
+    "research/focused_tests.log (superseded)",
+    "PROGRESS.md (entry appended)"
+  ]
+}
