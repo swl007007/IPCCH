@@ -121,3 +121,27 @@ Repaired forecast-origin leakage in global IPCCH (safe latest-three history <= m
 
 - Controller gate from close audit round 1 remains open (no re-audit by user decision)
 - Optional: refresh GitNexus index
+
+
+## Session 4: Compact climate and raw oracle experiments completed
+<!-- trellis-session: v=2 fp=032534db22cdc0de -->
+
+**Date**: 2026-10-08
+**Task**: Compact climate and raw oracle experiments completed
+**Branch**: `task/compact-climate-weather-oracle`
+
+### Summary
+
+Completed the approved compact feature suite with verified Claude Opus5.5 1M in Herdr. Seven runs,28 annual batches,112 models; exact model replay,2800 metric cells and372800 sampled input cells verified. Actual296/302/308 input schemas,308-row English codebook,global and all-region annual/pooled metrics and deltas delivered. Supervisor rehashed203 artifacts and confirmed740 legacy files unchanged. Rollback selections and post-archive dry-run passed. No bootstrap,B6,tuning,SHAP,regional fitting,extra audit enrollment or push.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `928d080` | docs: approve compact climate features and oracle comparison |
+| `40060dd` | feat: add frozen compact climate and raw oracle suite |
+| `10dfc23` | docs: record compact oracle experiment acceptance |
+
+### Status
+
+[OK] **Completed**
