@@ -145,3 +145,38 @@ Completed the approved compact feature suite with verified Claude Opus5.5 1M in 
 ### Status
 
 [OK] **Completed**
+
+
+## Session 5: Compact CDS launch accepted
+<!-- trellis-session: v=2 fp=9cf9597527b8686c -->
+
+**Date**: 2026-10-09
+**Task**: Compact CDS launch accepted
+**Branch**: `task/compact-climate-weather-oracle`
+
+### Summary
+
+Completed the approved five-run April2026-origin compact CDS launch:20 model replays,6188 areas, population summaries, seven maps and actual-input codebook; A1-A9 accepted.
+
+### Main Changes
+
+- Saved versioned baseline H0/H6/H12 and oracle-trained/CDS-inferred H6/H12 models; shared H0, exact296/308 columns, fixed April population and old cap.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `58dd9cd` | feat: add compact CDS launch with verified real inputs |
+| `414ae4c` | docs: accept compact CDS launch outputs and provenance |
+
+### Testing
+
+- [OK] 20 boosters independently replayed with max error0;1446597 population cells checked;107 inventory hashes and488 old-artifact hashes verified; all7 maps visually/keyed checked.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- No required scientific work remains. Preserve accepted reference/October endpoint/TP/unseen-year limitations and legacy rollback paths.

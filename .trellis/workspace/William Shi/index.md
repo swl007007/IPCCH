@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 4
-- **Last Active**: 2026-10-08
+- **Total Sessions**: 5
+- **Last Active**: 2026-10-09
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~147 | Active |
+| `journal-1.md` | ~182 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 5 | 2026-10-09 | Compact CDS launch accepted | `58dd9cd`, `414ae4c` | `task/compact-climate-weather-oracle` |
 | 4 | 2026-10-08 | Compact climate and raw oracle experiments completed | `928d080`, `40060dd`, `10dfc23` | `task/compact-climate-weather-oracle` |
 | 3 | 2026-10-06 | Origin-safe global climate + safe IPC history + national IDP benchmark | `c57ab03`, `7cffb5a`, `98fc6cd`, `5d76abd`, `302728d`, `6cec4d3` | `feat/global-origin-safe-climate-idp` |
 | 2 | 2026-10-05 | Global model rerun with 2015-2026 climate features | `585640b` | `feat/global-climate2015-features` |
