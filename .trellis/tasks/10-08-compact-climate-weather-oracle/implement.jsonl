@@ -1,0 +1,10 @@
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "Scientific timing, cohorts, runtime and artifact checks; this task explicitly overrides old carrier masks and bootstrap/audit scope"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Reuse grids, recipes, trainer and metrics"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "Source-to-input-to-fitted-schema-to-report contracts"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/prd.md", "reason": "Approved decisions and pending final review"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/design.md", "reason": "Exact feature formulas, order, experiment and reporting contracts"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/implement.md", "reason": "Execution stages and meaningful checks"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/rollback.md", "reason": "Preserve selectable legacy and frozen compact feature versions"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/research/source-and-region-facts.md", "reason": "RTP definition, seasonal calendar and authoritative region source"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/research/compact-source-missingness.md", "reason": "Evidence for direct-source reconstruction and removed carrier masks"}
+{"file": ".trellis/tasks/10-08-compact-climate-weather-oracle/research/contract-reading.md", "reason": "Read full schema from disk; avoid native context truncation of 98KB metadata"}

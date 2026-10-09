@@ -1,0 +1,22 @@
+{
+  "user_response": "可以执行",
+  "approved_at_utc": "2026-10-09T01:08:37.068266+00:00",
+  "scope": "Execute final reviewed compact-climate-weather-oracle plan including version rollback, seven runs, no B6/bootstrap/additional audit registration",
+  "approved_artifact_sha256": {
+    "prd.md": "f516c30a02954a673c3641c366aa3b425b298bfe8b2479fc81671667d8295aed",
+    "design.md": "680214c8544be77b3f9ed9e27c975e49bed14ef4a1a17781988b025ead42a7f5",
+    "implement.md": "ad2102fd192bf37f7b63af31686c1c781b394ab2a6a5b23eb65ec350c4387258",
+    "rollback.md": "37936290977a11d1865d3e6172247a0e64c677b02cfcbafca0cb66135b1de1c8",
+    "expected_feature_contract.csv": "a2d1960bf75811a391ec4bd0549b4aaddccb1ce57ca9a08f3a3c28d2fb313bc8",
+    "expected_run_index.csv": "fdd65bc2005016f721995c173a28bcea59ec4580b42c70a43bbf7632b3a4097d",
+    "expected_feature_contract_metadata.json": "8f3964364f89b866fc40f31524d38312aaab3202ca02f3886b5b64ade33e1260",
+    "implement.jsonl": "8d798f0d10daf8dfa4c8a37fea2ab45bab29eecb01d10c4cdc74ad9b1576a41b",
+    "check.jsonl": "8d798f0d10daf8dfa4c8a37fea2ab45bab29eecb01d10c4cdc74ad9b1576a41b"
+  },
+  "executor_required": {
+    "provider": "claude",
+    "canonical_model": "claude-opus-5-5",
+    "context_window": 1000000
+  },
+  "extra_audit_enrollment_authorized": false
+}

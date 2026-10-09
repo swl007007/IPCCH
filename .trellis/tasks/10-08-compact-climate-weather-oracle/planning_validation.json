@@ -1,0 +1,30 @@
+{
+  "status": "planning_artifact_checks_passed",
+  "scope": "Expected CSV/schema/hash/context consistency only; no numerical feature matrix or fitting validation",
+  "counts_by_run": {
+    "compact_baseline/0m": 296,
+    "compact_baseline/3m": 296,
+    "compact_baseline/6m": 296,
+    "compact_baseline/12m": 296,
+    "compact_weather_oracle/3m": 302,
+    "compact_weather_oracle/6m": 308,
+    "compact_weather_oracle/12m": 308
+  },
+  "union_rows": 308,
+  "contract_sha256": "a2d1960bf75811a391ec4bd0549b4aaddccb1ce57ca9a08f3a3c28d2fb313bc8",
+  "spec_sha256": {
+    "prd.md": "f516c30a02954a673c3641c366aa3b425b298bfe8b2479fc81671667d8295aed",
+    "design.md": "680214c8544be77b3f9ed9e27c975e49bed14ef4a1a17781988b025ead42a7f5",
+    "implement.md": "ad2102fd192bf37f7b63af31686c1c781b394ab2a6a5b23eb65ec350c4387258",
+    "rollback.md": "37936290977a11d1865d3e6172247a0e64c677b02cfcbafca0cb66135b1de1c8"
+  },
+  "independent_agent_result": "No confirmed cross-artifact differences; unverified range description made neutral and rollback hash added afterwards",
+  "post_adjustment_main_recheck": true,
+  "model_code_edited": false,
+  "input_builder_executed": false,
+  "model_training_executed": false,
+  "claude_executor_dispatched": false,
+  "actual_requested_claude_model_context_verified": false,
+  "audit_enrollment_started": false,
+  "final_user_review_pending": true
+}

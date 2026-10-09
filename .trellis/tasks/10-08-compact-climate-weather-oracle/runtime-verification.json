@@ -1,0 +1,10 @@
+{
+  "probe_session_id": "4abde8d2-2b01-4493-867c-c3e16f4bbcdb",
+  "configured_model": "claude-opus-5-5[1m]",
+  "canonical_model": "claude-opus-5-5",
+  "context_window": 1000000,
+  "provider": "firstParty",
+  "result_subtype": "success",
+  "probe_tools_disabled": true,
+  "executor_session_not_yet_started": true
+}
