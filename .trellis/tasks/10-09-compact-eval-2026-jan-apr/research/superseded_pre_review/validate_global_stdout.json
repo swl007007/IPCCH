@@ -1,0 +1,255 @@
+{
+ "mode": "validate-only (nothing written)",
+ "scope": "global",
+ "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+ "passed": true,
+ "problems": [],
+ "runtime": {
+  "python": "3.12.3",
+  "numpy": "2.4.4",
+  "pandas": "3.0.3",
+  "sklearn": "1.8.0",
+  "xgboost": "3.2.0",
+  "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+  "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+ },
+ "script": {
+  "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/scripts/modeling/run_compact_eval_2026_extension.py",
+  "sha256": "243fe2537f67ff9db1d6fd4102b9c9084bee4962a8fc8fb29c9a5159032979ec"
+ },
+ "extension_manifest_sha256_if_written": "8d3273e66a1d08b390c30d50a8e7d4f8f4965c57ab945be0f769d48424fdd03b",
+ "selection": {
+  "label_keys": 52521,
+  "new_eval_rows": 4327,
+  "new_eval_areas": 3823,
+  "new_eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+  "month_support_rows": {
+   "1": 679,
+   "2": 643,
+   "3": 231,
+   "4": 2774
+  },
+  "month_support_areas": {
+   "1": 679,
+   "2": 643,
+   "3": 231,
+   "4": 2774
+  },
+  "old_eval_rows": 28205,
+  "old_eval_keys_sha256": "f0193c1402d0609556755844b476227b7188f9671323d21317336d7ef58d2e0f",
+  "old_eval_by_year": {
+   "2022": 5599,
+   "2023": 6064,
+   "2024": 5127,
+   "2025": 11415
+  },
+  "fit_valid_rows": 52306,
+  "fit_valid_keys_sha256": "730fc0b8e5383db9fdd5a42b8f6f468322f88e7322932a6d186b5e90f31973a9",
+  "expanded_pooled_rows": 32532,
+  "region_month_rows": {
+   "0": {
+    "1": 0,
+    "2": 0,
+    "3": 81,
+    "4": 397
+   },
+   "1": {
+    "1": 117,
+    "2": 379,
+    "3": 0,
+    "4": 437
+   },
+   "2": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0
+   },
+   "3": {
+    "1": 60,
+    "2": 93,
+    "3": 0,
+    "4": 706
+   },
+   "4": {
+    "1": 501,
+    "2": 17,
+    "3": 0,
+    "4": 329
+   },
+   "5": {
+    "1": 0,
+    "2": 154,
+    "3": 150,
+    "4": 0
+   },
+   "6": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0
+   },
+   "7": {
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 904
+   },
+   "8": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 1
+   }
+  }
+ },
+ "runs": {
+  "compact_baseline/0m": {
+   "fit_rows": 47979,
+   "fit_areas": 6225,
+   "fit_origin_month": "2026-01",
+   "fit_label_cutoff_month": "2025-12",
+   "fit_max_label_month": "2025-12",
+   "fit_keys_sha256": "7fe3413aa2bbd8a81558b5ca39aba8e450a589d3dd53b8f97ed2a5befdc4e8f0",
+   "eval_rows": 4327,
+   "feature_count": 296,
+   "parent_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6",
+   "original_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6",
+   "extension_fingerprint_if_manifest_written": "1a433db0dc0048d4b5f3575499811be9a7de7854e9abe0ace1c66c9a45cfb038",
+   "eval_nan_cells_2026": 160350,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_baseline/3m": {
+   "fit_rows": 47796,
+   "fit_areas": 6225,
+   "fit_origin_month": "2025-10",
+   "fit_label_cutoff_month": "2025-10",
+   "fit_max_label_month": "2025-10",
+   "fit_keys_sha256": "78ba756041105db73e4c13a318dd97b897cbe8596105d573660d555ac6577ae1",
+   "eval_rows": 4327,
+   "feature_count": 296,
+   "parent_fingerprint": "1b55aff2533411c2f0ddeaef39d0d19b2e4a8028c2bf0bac00921af7d30efdc0",
+   "original_fingerprint": "1b55aff2533411c2f0ddeaef39d0d19b2e4a8028c2bf0bac00921af7d30efdc0",
+   "extension_fingerprint_if_manifest_written": "5672557bd9e67309c8414a12ba233812a9e0f231810a46eac0cc986416ff97c8",
+   "eval_nan_cells_2026": 153345,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_baseline/6m": {
+   "fit_rows": 42715,
+   "fit_areas": 6203,
+   "fit_origin_month": "2025-07",
+   "fit_label_cutoff_month": "2025-07",
+   "fit_max_label_month": "2025-07",
+   "fit_keys_sha256": "1f1dd9f30688675f4a43d39a36b7faa9d47382f79432ae0eb0c91bbab39de591",
+   "eval_rows": 4327,
+   "feature_count": 296,
+   "parent_fingerprint": "11395c697f59852a3560b12028a3265a61473a3f993e72ca00d2a9a47194a940",
+   "original_fingerprint": "11395c697f59852a3560b12028a3265a61473a3f993e72ca00d2a9a47194a940",
+   "extension_fingerprint_if_manifest_written": "7c2b666c5d6877f25450fcf8cd0f49015ee6f1914816e8709da69389dcf79f17",
+   "eval_nan_cells_2026": 133343,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_baseline/12m": {
+   "fit_rows": 38536,
+   "fit_areas": 6169,
+   "fit_origin_month": "2025-01",
+   "fit_label_cutoff_month": "2025-01",
+   "fit_max_label_month": "2025-01",
+   "fit_keys_sha256": "6ab64bab3f13c8adf61f8d192cd04abfc1a1d7851401dfbd7bd0f3fd4f0416f4",
+   "eval_rows": 4327,
+   "feature_count": 296,
+   "parent_fingerprint": "09deda912a46e3babe7c65004e53586a78dd1806f682b803de27d88312e994e0",
+   "original_fingerprint": "09deda912a46e3babe7c65004e53586a78dd1806f682b803de27d88312e994e0",
+   "extension_fingerprint_if_manifest_written": "78d3fcdc7cb039768dce24706760bc666e9a5a610b33e2835eb62ebbffa7b6eb",
+   "eval_nan_cells_2026": 111283,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_weather_oracle/3m": {
+   "fit_rows": 47796,
+   "fit_areas": 6225,
+   "fit_origin_month": "2025-10",
+   "fit_label_cutoff_month": "2025-10",
+   "fit_max_label_month": "2025-10",
+   "fit_keys_sha256": "78ba756041105db73e4c13a318dd97b897cbe8596105d573660d555ac6577ae1",
+   "eval_rows": 4327,
+   "feature_count": 302,
+   "parent_fingerprint": "12d3257de107a4502717625a84f1233c65d352257e0f7691d05e9fe750ba06be",
+   "original_fingerprint": "12d3257de107a4502717625a84f1233c65d352257e0f7691d05e9fe750ba06be",
+   "extension_fingerprint_if_manifest_written": "6f6c3e0d12c86ca4cdf057add2cb0504626050907e3886f09a035ef795a2bc2f",
+   "eval_nan_cells_2026": 153375,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_weather_oracle/6m": {
+   "fit_rows": 42715,
+   "fit_areas": 6203,
+   "fit_origin_month": "2025-07",
+   "fit_label_cutoff_month": "2025-07",
+   "fit_max_label_month": "2025-07",
+   "fit_keys_sha256": "1f1dd9f30688675f4a43d39a36b7faa9d47382f79432ae0eb0c91bbab39de591",
+   "eval_rows": 4327,
+   "feature_count": 308,
+   "parent_fingerprint": "daf7e4bcc7a4a5a5f5a543a87a93ed4275d30c9fe329c680a20a7e36e1e4e380",
+   "original_fingerprint": "daf7e4bcc7a4a5a5f5a543a87a93ed4275d30c9fe329c680a20a7e36e1e4e380",
+   "extension_fingerprint_if_manifest_written": "b76fb1c868f5038f12b21689aefb52c35a8cf8f9367380d537cae1d272d3edbd",
+   "eval_nan_cells_2026": 133403,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  },
+  "compact_weather_oracle/12m": {
+   "fit_rows": 38536,
+   "fit_areas": 6169,
+   "fit_origin_month": "2025-01",
+   "fit_label_cutoff_month": "2025-01",
+   "fit_max_label_month": "2025-01",
+   "fit_keys_sha256": "6ab64bab3f13c8adf61f8d192cd04abfc1a1d7851401dfbd7bd0f3fd4f0416f4",
+   "eval_rows": 4327,
+   "feature_count": 308,
+   "parent_fingerprint": "eeb4884cbf4cf0cc73d7357c342e5089b9edbc07ade45828e360ea49961e618d",
+   "original_fingerprint": "eeb4884cbf4cf0cc73d7357c342e5089b9edbc07ade45828e360ea49961e618d",
+   "extension_fingerprint_if_manifest_written": "e329e7bba4a5100f05566281ffd0998281e0d0123cb0d8b456b8eef4f420847f",
+   "eval_nan_cells_2026": 111343,
+   "original_import": {
+    "batches": 4,
+    "schemas_inspected": 16
+   }
+  }
+ },
+ "original_parity_cells": 2800,
+ "protected_inventory": {
+  "files": 859,
+  "bytes": 2739103660,
+  "digest": "c9720c511b2a097f3fea46db1bec543a853d6d0b170600b6d74905f03f78b920",
+  "by_role": {
+   "code": 24,
+   "launch_inputs": 34,
+   "launch_reports": 23,
+   "launch_results": 197,
+   "membership": 1,
+   "old_reports": 8,
+   "old_results": 551,
+   "parent_inputs": 20,
+   "reference": 1
+  }
+ },
+ "roots_exist": {
+  "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1": false,
+  "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1": false
+ }
+}

@@ -1,0 +1,18 @@
+{
+  "task": "compact-eval-2026-jan-apr",
+  "approved_plan_sha": "16d2e92a8948e7f235541a6facb452e375ac4f5d",
+  "trellis_status": "in_progress",
+  "audit_started": false,
+  "executor_name": "somalia-local-executor",
+  "pane_id": "w11:p4",
+  "terminal_id": "term_65d6ae54981a13",
+  "claude_session_id": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+  "visible_model": "Opus 5.5 (1M context)",
+  "identity_evidence": "herdr agent get and visible/detection reads",
+  "observed_utc": "2026-10-09 20:07:23 UTC",
+  "observed_status": "working",
+  "observed_activity": "read approved task handoff and spec; current task visible in executor UI",
+  "prompt_outcome": "submitted; settled-state wait timed out, then actual working activity verified; not resubmitted",
+  "current_authorized_phase": "implementation, focused tests and no-write preflight",
+  "coordinator_barrier": "pause before first heavy fit/code commit so tested implementation can be reviewed and frozen"
+}

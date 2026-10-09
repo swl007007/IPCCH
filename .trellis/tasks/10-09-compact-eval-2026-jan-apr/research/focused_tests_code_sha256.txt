@@ -1,0 +1,2 @@
+cbc1f88b2758cf4c2ec87c83257fc6f7f269d54018bd13f98138389da18db678  scripts/modeling/run_compact_eval_2026_extension.py
+952bd849fee05bf5396df257d0b7beb2b98c15df6cf5f26268248b3648ffbfac  tests/unit/test_compact_eval_2026_extension.py
