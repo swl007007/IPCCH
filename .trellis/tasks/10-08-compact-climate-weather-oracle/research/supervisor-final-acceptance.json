@@ -1,0 +1,50 @@
+{
+  "stage": "final_supervisor_acceptance",
+  "timestamp_utc": "2026-10-09T02:57:28.130886+00:00",
+  "passed": true,
+  "implementation_commit": "40060dd4135cd301347f63ffddaa63384b07264c",
+  "full_verifier": {
+    "runs_verified": 7,
+    "batches": 28,
+    "models_reloaded": 112,
+    "artifacts_rehashed": 168,
+    "fit_rows_checked": 740622,
+    "max_model_replay_abs_diff": 0.0,
+    "independent_feature_cells": 372800,
+    "independent_feature_mismatches": 0,
+    "metric_cells_replayed": 2800,
+    "eval_keys": 28205,
+    "eval_keys_sha256": "f0193c1402d0609556755844b476227b7188f9671323d21317336d7ef58d2e0f",
+    "legacy_no_overwrite": {
+      "files_before": 740,
+      "files_after": 740,
+      "changed_added_removed": 0
+    }
+  },
+  "supervisor_artifacts_rehashed": 203,
+  "codebook_union_rows": 308,
+  "table_rows": {
+    "global_metrics": 280,
+    "regional_metrics": 2520,
+    "global_deltas": 120,
+    "regional_deltas": 1080
+  },
+  "independent_scout_metric_cells_matched": 28,
+  "regional_deltas_checked": 1080,
+  "global_deltas_checked": 120,
+  "region8_empty_and_three_row_groups_preserved": true,
+  "artifact_sha256": {
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/global_metrics.csv": "c3a92268159ee525cf2f518357b22ec76f4bd7eac194ace58e3bc6996d8c0d2a",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/regional_metrics.csv": "af4eae407cb1c81c03c023e002bdaabe2e507a1a3d7aa628a7559faa187a8d10",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/global_deltas.csv": "0a811ac9c8da0180fa9c0908a18b89ea86797e4bc04b9ef369567cf0a7f9c27e",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/regional_deltas.csv": "c39198341e68b0db04c2bf5cb4302ce2091d8daf0f92ca034a051039a363d74e",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/verification_summary.json": "57fbaecf0b270be2cd29175a21058b3ceeee4c42282917e6b2a1139726e04ab0",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/results/experiments/compact_climate_weather_oracle_v1/verification/comparison_metadata.json": "58bfc9b6a9c0a17cf14df1e01c2687c0022a838d85e00b06f98311040fff9a85",
+    "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_model_run_codebook_en.csv": "d3946f2509d9e60d8b6590a75c47c4fdd3da9ffc93d6473694c34d99249060dd",
+    "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_v1/model_run_codebook/model_run_index.csv": "734129be190e3bf7cd982ec4b67966d31fdad8b65a22c3f938caa28bd34e2cec",
+    "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_v1/model_run_codebook/expected_vs_actual_inputs.csv": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/reports/compact_climate_weather_oracle_v1/report.md": "a7317a58777d59cb71d30b50067954675ab569f084d7988f3550f7814ada5e0e"
+  },
+  "limits": "All-stage verifier performed full model replay and sampled independent input replay. Supervisor additionally rehashed concrete inventory and checked codebook, tables, contrasts and separate read-only scout evidence. No additional fits/bootstrap/B6/SHAP/regional training. Focused tests93 passed before fitting; fingerprinted code unchanged."
+}

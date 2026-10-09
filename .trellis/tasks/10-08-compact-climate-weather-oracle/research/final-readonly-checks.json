@@ -1,0 +1,49 @@
+{
+  "stage": "saved_models_and_predictions_before_final_report",
+  "implementation_commit": "40060dd4135cd301347f63ffddaa63384b07264c",
+  "verification_agents": ["final_compact_model_membership", "final_compact_prediction_regions"],
+  "read_only": true,
+  "model_membership": {
+    "passed": true,
+    "complete_runs": 7,
+    "batches": 28,
+    "boosters_reloaded": 112,
+    "model_hashes_checked": 112,
+    "model_order_mismatches": 0,
+    "current_code_hash_comparisons": 91,
+    "distinct_code_files_checked": 8,
+    "contract_file_hash_comparisons": 21,
+    "fingerprints_recomputed": 7,
+    "feature_counts": {"compact_baseline/0m": 296, "compact_baseline/3m": 296, "compact_baseline/6m": 296, "compact_baseline/12m": 296, "compact_weather_oracle/3m": 302, "compact_weather_oracle/6m": 308, "compact_weather_oracle/12m": 308}
+  },
+  "prediction_pairing": {
+    "passed": true,
+    "rows_per_run": 28205,
+    "unique_areas_per_run": 6015,
+    "annual_rows": {"2022": 5599, "2023": 6064, "2024": 5127, "2025": 11415},
+    "truth_columns_matched": 10,
+    "prediction_csvs_rehashed_before_and_after": 28,
+    "unmatched_region_keys": 0,
+    "region_map_sha256": "18ab5099ce2d1154fb5686183ee399124e18427cc1594923f7abe2769da1611d",
+    "region_rows_pooled": {"0": 3243, "1": 3259, "2": 7282, "3": 3234, "4": 4223, "5": 1692, "6": 310, "7": 4933, "8": 29},
+    "positive_phase3plus": 13789,
+    "negative_phase3plus": 14416
+  },
+  "independent_pooled_metric_order": ["exact_phase_accuracy", "phase3plus_accuracy", "f2_phase3plus", "mae_phase3plus"],
+  "independent_pooled_metrics": {
+    "compact_baseline/0m": [0.648502038645630, 0.794646339301542, 0.843321857654746, 0.088659644818793],
+    "compact_baseline/3m": [0.638645630207410, 0.783868108491402, 0.830061220181549, 0.089850429415009],
+    "compact_baseline/6m": [0.630278319446907, 0.778691721326006, 0.838393991428292, 0.095508330085506],
+    "compact_baseline/12m": [0.594149973408970, 0.738840631093778, 0.782912632305893, 0.102273662197138],
+    "compact_weather_oracle/3m": [0.644637475624889, 0.793299060450275, 0.828220858895706, 0.089507520255963],
+    "compact_weather_oracle/6m": [0.625633752880695, 0.776245346569757, 0.852750138197899, 0.095408719365534],
+    "compact_weather_oracle/12m": [0.604254564793476, 0.750221591916327, 0.801714702663262, 0.101091158147428]
+  },
+  "metric_formulas": {
+    "exact_phase_accuracy": "count(overall_phase == overall_phase_pred)/n",
+    "phase3plus_accuracy": "(TP+TN)/n; binary truth and prediction use phase >= 3",
+    "f2_phase3plus": "5*TP/(5*TP+4*FN+FP)",
+    "mae_phase3plus": "fsum(abs(phase3_worse-phase3_pred))/n; normalized saved truth, unclipped prediction"
+  },
+  "limits": "These checks do not certify the pending final metric tables/codebook or numerical source reconstruction. Final all-stage verifier and supervisor artifact checks are separate."
+}
