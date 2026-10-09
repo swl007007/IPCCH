@@ -1,0 +1,112 @@
+{
+  "passed": true,
+  "checks": {
+    "parent_dataset_sha": true,
+    "parent_cohort_sha": true,
+    "features_296_frozen": true,
+    "members_905": true,
+    "dataset_rows_equal_cohort": true,
+    "share_valid_equals_cohort": true,
+    "local_manifest_sha_equals_preflight": true,
+    "run_metadata_partial_pilot": true,
+    "fingerprint_consistent": true,
+    "artifact_set_and_hashes": true,
+    "fit_keys_complete_som_set": true,
+    "fit_age_weight": true,
+    "fit_targets_finite": true,
+    "fit_counts_901_139_max_2021_07": true,
+    "eval_keys_complete_1129": true,
+    "truth_and_targets": true,
+    "boosters_schema_296": true,
+    "raw_replay_within_1e-6": true,
+    "classes_saved_rule": true,
+    "classes_from_reloaded_exact": true,
+    "row_origin_and_cutoff_columns": true,
+    "only_pilot_batch_exists": true,
+    "no_launch_fit": true,
+    "frozen_snapshot_491_matches_preflight": true
+  },
+  "fit": {
+    "rows": 901,
+    "areas": 139,
+    "max_label": "2021-07",
+    "min_label": "2017-01",
+    "keys_sha256": "913c2f3ef7518f0d06caedeb72a9c630ebc9da84abeb821c39ccb96ef2919b88",
+    "record_keys_sha256": "913c2f3ef7518f0d06caedeb72a9c630ebc9da84abeb821c39ccb96ef2919b88",
+    "weight_range": [
+      0.1767766952966369,
+      0.8408964152537145
+    ],
+    "label_cutoff": "2021-12"
+  },
+  "eval": {
+    "rows": 1129,
+    "areas": 585,
+    "keys_sha256": "53a24993cecb8bf805056496eeacbb61739489ddd11bc05c188fc8af1474156a",
+    "class_counts": {
+      "2": 1000,
+      "3": 129
+    },
+    "observed_counts": {
+      "1": 52,
+      "2": 240,
+      "3": 610,
+      "4": 221,
+      "5": 6
+    }
+  },
+  "models": {
+    "phase2_worse": {
+      "sha256": "39f19cbaf0fafae692c395e3bf7c62a674f100830b289ef867d5dfbb7b543d1e",
+      "bytes": 949897,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase3_worse": {
+      "sha256": "d35c3aa6b5d1c08dc8ddffc44a3a84cc4e1208e822801238c1ee029e073e66ce",
+      "bytes": 159239,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase4_worse": {
+      "sha256": "4d6af5c23e250ca948406d27fea70287c1bf8bb49473e65c647e18cc9c22d92d",
+      "bytes": 535022,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase5_worse": {
+      "sha256": "6d4d1f75e80a4379026209ad5972b20dd2561cfa2c5454516f8cfaee52f150ee",
+      "bytes": 164274,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    }
+  },
+  "batch_record": {
+    "fit_rows": 901,
+    "eval_rows": 1129,
+    "fit_seconds": {
+      "phase2_worse": 2.52,
+      "phase3_worse": 0.19,
+      "phase4_worse": 0.98,
+      "phase5_worse": 0.31
+    },
+    "batch_seconds": 4.32,
+    "peak_rss_mb": 744.6,
+    "fit_origin_month": "2022-01",
+    "fit_label_cutoff_month": "2021-12"
+  },
+  "fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+  "parent_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6"
+}

@@ -1,0 +1,599 @@
+{
+  "local_version": "nowcasting_2026_04_compact_cds_v1_somalia_local",
+  "scope": "SOM",
+  "passed": true,
+  "problems": [],
+  "checks": {
+    "models_reloaded": 20,
+    "max_model_replay_abs_diff": 0.0,
+    "launch_fit_rows_checked": 29175,
+    "population_columns_checked": 84,
+    "difference_columns_checked": 147,
+    "map_values_checked": 11752,
+    "population_raw_total": 62695007.0,
+    "population_effective_total": 18672002.05,
+    "cap_factor": 0.29782279233177217,
+    "inference_areas": 904,
+    "map_join_areas": 904
+  },
+  "inventory": [
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/approved_spec/approval.md",
+      "sha256": "cb07afd45e3268d559067a4b656996dc6850ab814be493c3fc071ebd4d410a22",
+      "bytes": 920
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/approved_spec/design.md",
+      "sha256": "89ef778dc5dde873847bf6461316cca0fb103018882999bbc7df746db08f5f65",
+      "bytes": 9066
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/approved_spec/expected_runs.csv",
+      "sha256": "bfa6f72d407889ca71d5c6bf7133896c2a3e52be83449bf15f7f742878cc7323",
+      "bytes": 945
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/approved_spec/implement.md",
+      "sha256": "990fce07687b746891c78bd46e7ba611f0b16427727fe1d8f14546f4c4e8e525",
+      "bytes": 6075
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/approved_spec/prd.md",
+      "sha256": "edb0caffee5a6dd101529d8b88437a207c67003ed51ece805a68c45ef3a9c4f4",
+      "bytes": 7608
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/inference/inference_compact_baseline_h0.csv",
+      "sha256": "a175bb4359141c81339006add97ec3bf7798cc01add3d5f38f033ef9a7ae354b",
+      "bytes": 3436314
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/inference/inference_compact_baseline_h12.csv",
+      "sha256": "c55a66e2f8389ff6c19fcb7a489d74b8dc2b0b678a5ca887d9e193dd2f0eba4c",
+      "bytes": 3437218
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/inference/inference_compact_baseline_h6.csv",
+      "sha256": "afbe4dbf9e6543539ec61839b612d6a35c49d5dd23403c3730898661239db107",
+      "bytes": 3437218
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/inference/inference_compact_cds_weather_h12.csv",
+      "sha256": "70f0ac4327192cc2376ef51bd6e1841eb7de2e4a4b5ccbfd82ef990659d34754",
+      "bytes": 3637227
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/inference/inference_compact_cds_weather_h6.csv",
+      "sha256": "c8b49824a659e06b3fe92327ab1eeaf0fe366640b3a81413c888c5086b90afba",
+      "bytes": 3637227
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/ledgers/country_population_cap_audit_som.csv",
+      "sha256": "2783053193d3a707e720f8d18dd12fe0b0e3a438687621b1e3de881b8ef9a821",
+      "bytes": 543
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/ledgers/parent_country_population_cap_audit.csv",
+      "sha256": "3479f62fad9b090fe81a0d7eee4e23d1504cb0c7517bc0b682a85d9388b6c93b",
+      "bytes": 6817
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/ledgers/population_april_2026_som.csv",
+      "sha256": "a80982cc1adcba67fb3e29e0ce69c62c5b9350d343a72cfc89754977b176bec0",
+      "bytes": 9924
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/ledgers/som_launch_coverage.csv",
+      "sha256": "246089d9745de3e4684be72b2d170c97e6c2657db819f89c21333de81f5b38df",
+      "bytes": 32166
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/nowcasting_2026_04_compact_cds_v1_somalia_local_manifest.json",
+      "sha256": "f76da0649f74999a06ac02a694dd6a71d1c9e91c230a4f0f4b31a20792f4a15f",
+      "bytes": 98451
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/parent_contract/expected_feature_contract.csv",
+      "sha256": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82",
+      "bytes": 869696
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/parent_contract/expected_feature_contract_metadata.json",
+      "sha256": "6295074fa8a94f45e75c695ea3997a8b6927f1b1b00bb8358ab290c4416de410",
+      "bytes": 72099
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/parent_contract/expected_run_index.csv",
+      "sha256": "25fff00d23b6a2df22f81900832f8b884909eb172d4bd07832544591cf87b616",
+      "bytes": 1521
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/som_membership_area_ids.csv",
+      "sha256": "e7301834714a58114f27fe1e2902b87137e700fc15a87877d4174a5308b94ae7",
+      "bytes": 4533
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/training/fit_selection_compact_baseline_h0.csv",
+      "sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+      "bytes": 528972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/training/fit_selection_compact_baseline_h12.csv",
+      "sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+      "bytes": 528972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/training/fit_selection_compact_baseline_h6.csv",
+      "sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+      "bytes": 528972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/training/fit_selection_compact_cds_weather_h12.csv",
+      "sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+      "bytes": 528972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/training/fit_selection_compact_cds_weather_h6.csv",
+      "sha256": "0770909c57e6e70a5a037faeeb9416a76473e8ee42efcc97a30ff86d66396eeb",
+      "bytes": 528972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/area_population_paired_differences.csv",
+      "sha256": "35d1bca77fffda1edcf4b79c63d5610f8f292fd622d75de8dcf0d03b76b985b5",
+      "bytes": 1185024
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/area_population_predictions.csv",
+      "sha256": "10626cf14be8e749e5b2578cef30fc1d1cf54e0b5f8fda00b720955a0ebfbe53",
+      "bytes": 3879011
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/som_population_paired_differences.csv",
+      "sha256": "16ed901ecf0d1f229513eca782e6b032be468d0d5c2b6f32e85350b01419050b",
+      "bytes": 2500
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/som_population_summary.csv",
+      "sha256": "8d306c0affe34aa688b3305ea6ede71b103ec96c580339108a056c690de3ab27",
+      "bytes": 5237
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/preflight/frozen_inventory_before.csv",
+      "sha256": "25c451084d015d94cd4a90fff08347e88f898d1fdf8688cc7de7613b03bbef36",
+      "bytes": 140353
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/report_outputs.json",
+      "sha256": "74274aab98a0bab5c4d230e51242dcf5f411cfc5535abcae1d856fe891e9154e",
+      "bytes": 11677
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/artifact_record.json",
+      "sha256": "2e4a301c272c5601db7ff34b57bc6dcf5f1b281bbaadfb329948687a73fca639",
+      "bytes": 1199
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/feature_schema.json",
+      "sha256": "c583fd35f9e8c5076bc476274ecade40b4417cc814c4bb0ea27c35ad1a692f91",
+      "bytes": 12995
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/fit_keys.csv.gz",
+      "sha256": "d76dd3a0ca890b677c8a6937f597fefddda8198a9d3abc812c380e939a53f7e8",
+      "bytes": 16061
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/fit_targets.csv.gz",
+      "sha256": "c2f098a7ddd37f6ebcac90a989dc2ad18bc977f85674394dc54f9f2ea4be7c7c",
+      "bytes": 30576
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/fit_weights.csv.gz",
+      "sha256": "c35429268df9b386306843877b42db23978c9815ba5ba6606f43cf0d9d1bf00d",
+      "bytes": 18035
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/inference_features.csv.gz",
+      "sha256": "47201c40ec66c5437b723734bff81ea528436415b53433d2b9e4763cdda12374",
+      "bytes": 836105
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/model_phase2_worse.ubj",
+      "sha256": "1b72bcd2c26df0957a13b0724558b7e23f0dd34c1313b7c4d4a8756d626d8192",
+      "bytes": 4090874
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/model_phase3_worse.ubj",
+      "sha256": "4e5be5697a64f6249c78ecf5c88d4f0bcf35727b698afa14d26a6f8ead5616a2",
+      "bytes": 190274
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/model_phase4_worse.ubj",
+      "sha256": "52a7b870797b986d51b1db12ed5a86e92a30b5f11c7f827b00f517b18d457299",
+      "bytes": 3465804
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/model_phase5_worse.ubj",
+      "sha256": "c31a5c8e828384c7a3c76bc50828f1d2252e95df9795c0c73b9451285f3eadc3",
+      "bytes": 621347
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/predictions_raw.csv",
+      "sha256": "38d089714323f168d3c61840883a32eaea11c3410790e9dd4589230c6400a940",
+      "bytes": 122435
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/run_metadata.json",
+      "sha256": "3287b1d59dab7c8e586fbbb975112783fc65929e40990b3152ef0263c06bcfb2",
+      "bytes": 19174
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/artifact_record.json",
+      "sha256": "0022c4eb2b654a88818674854381d18b854bcd9591bc572c90a38c9dd2df74dc",
+      "bytes": 1200
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/feature_schema.json",
+      "sha256": "15ef9f1509e43a1a027860d794b8f37ba0360401c4795573c4adc39ef75a17e0",
+      "bytes": 12996
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/fit_keys.csv.gz",
+      "sha256": "61bb189b1c41d8ff3cdb311a6214be86e10be0bd09c455eb783c9745ee2b6f09",
+      "bytes": 16061
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/fit_targets.csv.gz",
+      "sha256": "fbf1200e3c13c0a37acc3d3e3d90dffb91a8bf570fe634283863582ac1f60c20",
+      "bytes": 30576
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/fit_weights.csv.gz",
+      "sha256": "215b1fc36227f25020982c781d1c0f50d263bf8748e62cb6c46bd0a9b452e99c",
+      "bytes": 18035
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/inference_features.csv.gz",
+      "sha256": "45148ccdb4b0ff65af0ce00c36b926fa4afa21ce52b53b4c92a6cda8e4005e90",
+      "bytes": 836124
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/model_phase2_worse.ubj",
+      "sha256": "b8565cc71fa80c56622efe8ea90e0d5924b560ba0a4f1ad9d127bd8790b14d87",
+      "bytes": 4250869
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/model_phase3_worse.ubj",
+      "sha256": "56f313772ee994f86c8291cf6a4dd91a5b389f24f3aec839444615c6e0475d0c",
+      "bytes": 196654
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/model_phase4_worse.ubj",
+      "sha256": "1f4b5b5f35115f168f759d51a7ec9db5e8e584644fbeba7eb23ab7c75cd423ba",
+      "bytes": 3799070
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/model_phase5_worse.ubj",
+      "sha256": "75756e2d021a952325a3dd3e9d5cb04cd2fc88af2970f3fce819dcc112f44d0f",
+      "bytes": 652864
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/predictions_raw.csv",
+      "sha256": "a7637a4df054a4d18ab962e2acbdf4629c774d262c6fb427fd6e587672e970b9",
+      "bytes": 124104
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/run_metadata.json",
+      "sha256": "12f9f5e3fd71fc35ff1c5928edd183029e43534b7f5a881503fe70a972c4b32b",
+      "bytes": 19176
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/artifact_record.json",
+      "sha256": "35a81f7b4c3af217019108d9e1420fd11c97832248b6816dc00122cc0925b19b",
+      "bytes": 1199
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/feature_schema.json",
+      "sha256": "d0d2e573fa26be70b75a849951443cc881bebd2ad7ac96cb368f01dee7fc8bc8",
+      "bytes": 12995
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/fit_keys.csv.gz",
+      "sha256": "a569061dd8d5cc64994336a92d2e49a2da6b4f9b1225ae203bcb13a084480752",
+      "bytes": 16061
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/fit_targets.csv.gz",
+      "sha256": "7928f5fcbf32521a10e81c7cdbea2db696f5f10cac29502ef7146dbf5a8cd128",
+      "bytes": 30576
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/fit_weights.csv.gz",
+      "sha256": "1db0004a1637ffc49dd502ac44d110791ea7e78ed4565604f293e4dd677486bd",
+      "bytes": 18035
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/inference_features.csv.gz",
+      "sha256": "3518b36c3b0ffc48890368da420f878f2eadd3a7f69085e7a6b0f1f2748e6302",
+      "bytes": 836140
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/model_phase2_worse.ubj",
+      "sha256": "5d8a577d9402f936dd549d6d3df3bd2fa960cf2bee56d7d976b27789d3a7ab49",
+      "bytes": 4194843
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/model_phase3_worse.ubj",
+      "sha256": "5dbba9e19ed97bb1b704d88cb51d5eb425fa5dc64931cb653358efc0f26a65ab",
+      "bytes": 192790
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/model_phase4_worse.ubj",
+      "sha256": "ab26f3b42fe09473a5d2379da530155093f03051a64bca518de51c9d45471049",
+      "bytes": 3662189
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/model_phase5_worse.ubj",
+      "sha256": "541d02cccc6471734604ef53eb91add1ea7391cee0b49bdbc0c6d19e6b59c8da",
+      "bytes": 637791
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/predictions_raw.csv",
+      "sha256": "a6161abe769c3872dd56ba5b0530e71cddf6f48492687e4687a9c5b33f3c0ef4",
+      "bytes": 122508
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/run_metadata.json",
+      "sha256": "0be004e83aa1464d3d2793efd5d908aefbe2f21261dd4d62d67a6262a838fa6f",
+      "bytes": 19174
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/artifact_record.json",
+      "sha256": "5cadac4df1ec6ce80e281ff9a6e37354f90d794817e470571b60588fdc2a87df",
+      "bytes": 1203
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/feature_schema.json",
+      "sha256": "040b218fe1a1f3720d80740a7bb1cdc01aae7ba4ac34387d0ec26281063c5d7e",
+      "bytes": 13497
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/fit_keys.csv.gz",
+      "sha256": "43b793abd3920c3b66e0743728ca951e0828a9c4f303e6996e2af8336b2f05a1",
+      "bytes": 16061
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/fit_targets.csv.gz",
+      "sha256": "2f0d0ab2cd5325505b112232b0591bdb22b2826a62f0ac5f2eb77c05cb1a90a2",
+      "bytes": 30576
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/fit_weights.csv.gz",
+      "sha256": "7cc56c2920ef34cd6ea2dd9c7c4b4289366e92345510b45ae2d1b1203fc4ace0",
+      "bytes": 18035
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/inference_features.csv.gz",
+      "sha256": "60ce2507d012d3fa2f7873dc3d60d09bfb265afa8015c3344b4a6e0afe5bb965",
+      "bytes": 856131
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/model_phase2_worse.ubj",
+      "sha256": "7cbf5051ea12cc5c762c29625b586b16edd7a9932eb9bbd661e1360dfb1cbf17",
+      "bytes": 4096933
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/model_phase3_worse.ubj",
+      "sha256": "3108d98fcb6b6ff7e7874a0663c6eb1e2432e8a2cd4f7a033d89afc761b26059",
+      "bytes": 197083
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/model_phase4_worse.ubj",
+      "sha256": "ee548fce471e69280a0bda56e12dfdef9bd21dc34db1ecd24c56aa14e45e4c8e",
+      "bytes": 3787126
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/model_phase5_worse.ubj",
+      "sha256": "69f0449fcf4663c751a48180c993a550bdda5b4f45f2d540d0de74b661dfaf3a",
+      "bytes": 661869
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/predictions_raw.csv",
+      "sha256": "53f284be02876238332922b28524066959b2c8f0cab21297e14c944d46e634f0",
+      "bytes": 126544
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/run_metadata.json",
+      "sha256": "6e9a6cab499306b9188a2bd4011b2dab14b1952f1e7155afe7e7c38482604924",
+      "bytes": 19681
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/artifact_record.json",
+      "sha256": "fb842f8318e88efab66622f3a08131e413212a1ddeefa71afbb41baa90048a22",
+      "bytes": 1202
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/feature_schema.json",
+      "sha256": "4d14e3053d04587ac4a2e37c8e66414e9f5d92b9e10ec6fcba39c78fa3d970b3",
+      "bytes": 13496
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/fit_keys.csv.gz",
+      "sha256": "cc05a82cd49329672b1fcc68cd9b699e72e61757958752785a982726b00cf741",
+      "bytes": 16061
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/fit_targets.csv.gz",
+      "sha256": "9a4ea314c7aca1b3a612021fc3d5e8843cfb30d5be94a5b42b1baeb9df9b10c0",
+      "bytes": 30576
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/fit_weights.csv.gz",
+      "sha256": "0b7d5c896311ad034956d4291ea8a4fcaeb4c5473f8eb01e2ee0ce93f1a88c33",
+      "bytes": 18035
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/inference_features.csv.gz",
+      "sha256": "7bed30f7e9711ad24654459d8592787352b407f40a1e9ce66047606c366d3a68",
+      "bytes": 856154
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/model_phase2_worse.ubj",
+      "sha256": "e1ed0e8a4ef35b9e61f4157c1ab645cfe2a6ab54dcb86b203bb8dce4cf1960c2",
+      "bytes": 3998417
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/model_phase3_worse.ubj",
+      "sha256": "856c909e17c0dcea559df69b40eda3fa95e48a592c81eded04afcbfbbd7ff16e",
+      "bytes": 194241
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/model_phase4_worse.ubj",
+      "sha256": "00627fa669724e3f75f50c7edfbcf6e60bc8b83c240394df9619045f30e6c995",
+      "bytes": 3506968
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/model_phase5_worse.ubj",
+      "sha256": "76cec8c900ce6f8e910fa8782e452f411fab77600aab47fc3699d2e5e713ad28",
+      "bytes": 641760
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/predictions_raw.csv",
+      "sha256": "f8786248932afd84ad4c60bea94c44c8ba8f4bf525b975eb84b0507f3b84973e",
+      "bytes": 125442
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/run_metadata.json",
+      "sha256": "2241263e6d69a25f52844ce7421337f9028a8c9c52c5dfc9ba1cb85bec62916f",
+      "bytes": 19678
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/scope/run_scope.json",
+      "sha256": "158e2165ac32eaadb4b041cb3c13fee3dad6a14dff729195d5b68682cf4402a0",
+      "bytes": 2350
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/crisis_categorical_compact_baseline_0m_2026-04.csv",
+      "sha256": "3de29e99ac344d011cf9a64b567d4c72bef92896150c7dd0c8d0905df042800c",
+      "bytes": 39969
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/crisis_categorical_compact_baseline_12m_2027-04.csv",
+      "sha256": "01537d9161b0c3c391d1a9fd47dbc28f2f1fb606429592fcce1a6b1d0100bac9",
+      "bytes": 40899
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/crisis_categorical_compact_baseline_6m_2026-10.csv",
+      "sha256": "9e4e369dc3753135e5ac9cac637e6c6c6661a490d178b4d2c209f9e3c9604f75",
+      "bytes": 40086
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/crisis_categorical_compact_cds_weather_12m_2027-04.csv",
+      "sha256": "b87cd0203b269b6da76ebb687ded1a0bc50a67b70279e363d5e32fbd5b367a65",
+      "bytes": 43628
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/crisis_categorical_compact_cds_weather_6m_2026-10.csv",
+      "sha256": "67349a3da6df0db80a7a956e5efb344a14843bd856aff433105423c7ce43aaa1",
+      "bytes": 42780
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/figure_metadata.json",
+      "sha256": "2c7c301048af5afc7f2977298241413e478227513b7332ecd538263d87ca10ed",
+      "bytes": 8995
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/p3plus_share_comparison_2x3.csv",
+      "sha256": "e53101b394b7e86b49796ba6b37416e6a82005a1dc9d614d23ccaf49732a20aa",
+      "bytes": 531365
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/visualizations/p3plus_share_difference_1x2.csv",
+      "sha256": "cdbec421de4ac6cea26e1bdbdbed0716934a8c33a4bf392656747f5c56b44445",
+      "bytes": 139025
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/crisis_categorical_compact_baseline_0m_2026-04.png",
+      "sha256": "5d9c9b6e81a1d11dd4e59b6a305f5f29191246b150c346c624b21c86b8cd6630",
+      "bytes": 386955
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/crisis_categorical_compact_baseline_12m_2027-04.png",
+      "sha256": "94ca3f22a28c699b291b1d7966c3b02f6062457a891aa9f1f9dec065cc5fb047",
+      "bytes": 381196
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/crisis_categorical_compact_baseline_6m_2026-10.png",
+      "sha256": "de6992efbf748df465d81a5279d86366318820826c658fd006991162fa4fba63",
+      "bytes": 382784
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/crisis_categorical_compact_cds_weather_12m_2027-04.png",
+      "sha256": "4407a8a3bf388c4864d94c5f0a592991d7ed47beb3437520362b1d4882c05b7b",
+      "bytes": 382201
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/crisis_categorical_compact_cds_weather_6m_2026-10.png",
+      "sha256": "ea2dd0c685a1d2357fff9a98bf9fc5be38ac2622be3c7896d86150529acd4efa",
+      "bytes": 384420
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/p3plus_share_comparison_2x3.png",
+      "sha256": "947076cf360fc78ec91380a0cf9db908068431775fdcd2b9b2f94fe5ffa02928",
+      "bytes": 496993
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/figures/p3plus_share_difference_1x2.png",
+      "sha256": "6cc9ccb9b8131fd518de8bae221766def5e55e814422372137718eed32b73a74",
+      "bytes": 264250
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/launch_summary.md",
+      "sha256": "f03a23f6c88a4e39f1afa87f6e7874e2578fb191da00a3377e1f56b20904d84b",
+      "bytes": 2542
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/model_run_codebook_en.csv",
+      "sha256": "3381a159a86c2359b2550adbe4eaa603c5b6d75fed1fb14f088f37f552d3e9a4",
+      "bytes": 863714
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/som_population_paired_differences.csv",
+      "sha256": "16ed901ecf0d1f229513eca782e6b032be468d0d5c2b6f32e85350b01419050b",
+      "bytes": 2500
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/population/som_population_summary.csv",
+      "sha256": "8d306c0affe34aa688b3305ea6ede71b103ec96c580339108a056c690de3ab27",
+      "bytes": 5237
+    }
+  ],
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "local_code": {
+    "script": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/scripts/modeling/run_somalia_local_compact_test.py",
+    "sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56"
+  },
+  "frozen": {
+    "frozen_files_checked": 491,
+    "frozen_files_changed": 0,
+    "frozen_files_missing": 0,
+    "frozen_files_added": 0
+  },
+  "frozen_problems": [],
+  "created_utc": "2026-10-09T18:49:34.768957+00:00",
+  "tolerances": {
+    "model_replay": "atol 1e-6, rtol 0; classes of reloaded predictions exact",
+    "metrics/deltas": "atol 1e-12, identical undefined status/reason",
+    "counts/sums": "atol 1e-6, rtol 1e-12",
+    "shares": "atol 1e-12",
+    "csv": "float_precision=round_trip"
+  }
+}

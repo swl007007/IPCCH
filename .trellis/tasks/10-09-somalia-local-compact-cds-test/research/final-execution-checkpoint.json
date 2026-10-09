@@ -1,0 +1,1211 @@
+{
+  "checkpoint": "Somalia local compact/CDS test - full fixed plan executed (training, report, executor verification); awaiting independent Codex final acceptance",
+  "git_head": "e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4",
+  "code": {
+    "script_sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "test_sha256": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "executor": {
+    "session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+    "model": "Claude Opus 5.5 (1M)",
+    "audit": "none (user override)",
+    "commit": "none"
+  },
+  "stages": [
+    {
+      "stage": "train",
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --approve-training",
+      "pid": 788335,
+      "exit_line": "train exit 0",
+      "wall": "10:21.43",
+      "max_rss_kb": 1195580,
+      "exit_status": 0,
+      "stderr_log": "research/train.log",
+      "stderr_sha256": "6269dda2f4baedeeefde2af8667aac7ce3bd807208cb7ef4e30b9ea3aac63a51",
+      "stdout": "research/train_stdout.json",
+      "stdout_sha256": "b47d551333420a046bc246d82c57aabc7f4c03aceb86463c99e678fb882c02a0",
+      "pins_before": "research/train_pins_before.txt",
+      "pins_after": "research/train_pins_after.txt",
+      "pins_unchanged": true
+    },
+    {
+      "stage": "report",
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --report",
+      "pid": 850626,
+      "exit_line": "report exit 0",
+      "wall": "0:42.44",
+      "max_rss_kb": 605780,
+      "exit_status": 0,
+      "stderr_log": "research/report.log",
+      "stderr_sha256": "abb286e328d769c1906bd26378746d96865b0d1a4865e74563b5337893d70bb7",
+      "stdout": "research/report_stdout.json",
+      "stdout_sha256": "8bc2525129ddcdf09b3d6b124d05a2ccc8a5bdb3957747b73157b7551522b3cf",
+      "pins_before": "research/report_pins_before.txt",
+      "pins_after": "research/report_pins_after.txt",
+      "pins_unchanged": true
+    },
+    {
+      "stage": "verify",
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --verify",
+      "pid": 860066,
+      "exit_line": "verify exit 0",
+      "wall": "7:34.52",
+      "max_rss_kb": 948016,
+      "exit_status": 0,
+      "stderr_log": "research/verify.log",
+      "stderr_sha256": "3d2729d0df38a5172177b20fa48665d2b0e206b40735b2cea68c97568ed4334e",
+      "stdout": "research/verify_stdout.json",
+      "stdout_sha256": "f84442b351a1efb9fce24101c38712ec948b4e0b0d91f1a6756cd41ac525045d",
+      "pins_before": "research/verify_pins_before.txt",
+      "pins_after": "research/verify_pins_after.txt",
+      "pins_unchanged": true
+    }
+  ],
+  "verification": {
+    "passed": true,
+    "historical": {
+      "passed": true,
+      "problems": [],
+      "checks": {
+        "batches": 28,
+        "models_reloaded": 112,
+        "artifacts_rehashed": 168,
+        "fit_rows_checked": 64850,
+        "max_model_replay_abs_diff": 0.0,
+        "metric_cells_replayed": 280,
+        "delta_cells_replayed": 160,
+        "undefined_cells": 1,
+        "historical_runs": 7,
+        "eval_keys": 4933,
+        "eval_keys_sha256": "5f8343c4b4ba92176b1a7fa2797dfb9c29d5805065f200df46c416efcea9f14a"
+      }
+    },
+    "launch": {
+      "passed": true,
+      "problems": [],
+      "checks": {
+        "models_reloaded": 20,
+        "max_model_replay_abs_diff": 0.0,
+        "launch_fit_rows_checked": 29175,
+        "population_columns_checked": 84,
+        "difference_columns_checked": 147,
+        "map_values_checked": 11752,
+        "population_raw_total": 62695007.0,
+        "population_effective_total": 18672002.05,
+        "cap_factor": 0.29782279233177217,
+        "inference_areas": 904,
+        "map_join_areas": 904
+      }
+    },
+    "frozen": {
+      "frozen_files_checked": 491,
+      "frozen_files_changed": 0,
+      "frozen_files_missing": 0,
+      "frozen_files_added": 0
+    },
+    "frozen_problems": [],
+    "historical_verification_json": {
+      "path": "results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+      "sha256": "d65d04d316d2ca1adc5106eaf96ae7dde2e36f72869ce3d6d4486adad0ff578a",
+      "inventory_files": 259
+    },
+    "launch_verification_json": {
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/verification.json",
+      "sha256": "c13835e32ff285f88956b0c49649dd7b84db82c6fb1f02776ea9596a1fbaa46a",
+      "inventory_files": 110
+    },
+    "note": "executor verifier success is not final acceptance"
+  },
+  "manifests": {
+    "historical_local": {
+      "path": "results/experiments/compact_climate_weather_oracle_v1_somalia_local/inputs/compact_climate_weather_oracle_v1_somalia_local_manifest.json",
+      "sha256": "573b0d0bb074a2de9251afacf549dfe18a30321af8bce87dfce75ac0644fe228"
+    },
+    "launch_local": {
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/nowcasting_2026_04_compact_cds_v1_somalia_local_manifest.json",
+      "sha256": "f76da0649f74999a06ac02a694dd6a71d1c9e91c230a4f0f4b31a20792f4a15f"
+    },
+    "launch_scope_sidecar": {
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/scope/run_scope.json",
+      "sha256": "158e2165ac32eaadb4b041cb3c13fee3dad6a14dff729195d5b68682cf4402a0"
+    },
+    "frozen_snapshot": {
+      "files": 491,
+      "sha256": "25c451084d015d94cd4a90fff08347e88f898d1fdf8688cc7de7613b03bbef36"
+    }
+  },
+  "stage_inventories": {
+    "historical_results": {
+      "files": 256,
+      "bytes": 143149344
+    },
+    "historical_reports": {
+      "files": 4,
+      "bytes": 631544
+    },
+    "launch_results": {
+      "files": 100,
+      "bytes": 75877142
+    },
+    "launch_reports": {
+      "files": 11,
+      "bytes": 3552792
+    }
+  },
+  "report_records": {
+    "historical_comparison_metadata": {
+      "path": "results/experiments/compact_climate_weather_oracle_v1_somalia_local/report/comparison_metadata.json",
+      "sha256": "451ac23cd462d12a2d6fbab398d10beaf261347d138f9d9a79c014a838767a07"
+    },
+    "launch_report_outputs": {
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/report_outputs.json",
+      "sha256": "74274aab98a0bab5c4d230e51242dcf5f411cfc5535abcae1d856fe891e9154e"
+    },
+    "historical_report_md": "c862bada781d07c7f81bd369625bc25ad054cfaeef8243e9054e0e3c95f80cc3",
+    "launch_summary_md": "f03a23f6c88a4e39f1afa87f6e7874e2578fb191da00a3377e1f56b20904d84b",
+    "historical_codebook": "05e1cf151739111c4300e909fdd42bcf980ef752ec145878f8f0d2234171cc5c",
+    "launch_codebook": "3381a159a86c2359b2550adbe4eaa603c5b6d75fed1fb14f088f37f552d3e9a4",
+    "figures": {
+      "crisis_categorical_compact_baseline_0m_2026-04.png": "5d9c9b6e81a1d11dd4e59b6a305f5f29191246b150c346c624b21c86b8cd6630",
+      "crisis_categorical_compact_baseline_12m_2027-04.png": "94ca3f22a28c699b291b1d7966c3b02f6062457a891aa9f1f9dec065cc5fb047",
+      "crisis_categorical_compact_baseline_6m_2026-10.png": "de6992efbf748df465d81a5279d86366318820826c658fd006991162fa4fba63",
+      "crisis_categorical_compact_cds_weather_12m_2027-04.png": "4407a8a3bf388c4864d94c5f0a592991d7ed47beb3437520362b1d4882c05b7b",
+      "crisis_categorical_compact_cds_weather_6m_2026-10.png": "ea2dd0c685a1d2357fff9a98bf9fc5be38ac2622be3c7896d86150529acd4efa",
+      "p3plus_share_comparison_2x3.png": "947076cf360fc78ec91380a0cf9db908068431775fdcd2b9b2f94fe5ffa02928",
+      "p3plus_share_difference_1x2.png": "6cc9ccb9b8131fd518de8bae221766def5e55e814422372137718eed32b73a74"
+    }
+  },
+  "historical_pooled_metrics": [
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "exact_phase_accuracy",
+      "value": 0.5426718021487938,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "phase3plus_accuracy",
+      "value": 0.6261909588485709,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "precision_phase3plus",
+      "value": 0.6754966887417218,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.7024793388429752,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "f2_phase3plus",
+      "value": 0.6969117245148946,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "r2_phase3plus",
+      "value": -0.0649587055080889,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "mae_phase3plus",
+      "value": 0.1391778425927565,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "metric": "ordinal_mae",
+      "value": 0.5114534765862558,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 3020
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "exact_phase_accuracy",
+      "value": 0.5288870869653354,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "phase3plus_accuracy",
+      "value": 0.5945672004865193,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "precision_phase3plus",
+      "value": 0.6549006168608636,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.6580578512396694,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "f2_phase3plus",
+      "value": 0.6574239713774597,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "r2_phase3plus",
+      "value": -0.0437041866147065,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "mae_phase3plus",
+      "value": 0.1379843096050753,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 3,
+      "metric": "ordinal_mae",
+      "value": 0.5436853841475775,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2918
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "exact_phase_accuracy",
+      "value": 0.5163186701804175,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "phase3plus_accuracy",
+      "value": 0.5826069329008717,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "precision_phase3plus",
+      "value": 0.6581804567577685,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.6053719008264463,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "f2_phase3plus",
+      "value": 0.6152446279834815,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "r2_phase3plus",
+      "value": -0.1988296137027101,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "mae_phase3plus",
+      "value": 0.1462216574547925,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "metric": "ordinal_mae",
+      "value": 0.5560510845327385,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2671
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "exact_phase_accuracy",
+      "value": 0.4143523211027772,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "phase3plus_accuracy",
+      "value": 0.4743563754307723,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "precision_phase3plus",
+      "value": 0.5764127764127764,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.4039256198347107,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "f2_phase3plus",
+      "value": 0.4296388542963884,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "r2_phase3plus",
+      "value": -0.3977023685024703,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "mae_phase3plus",
+      "value": 0.1613250818040145,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "metric": "ordinal_mae",
+      "value": 0.6655179404013783,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2035
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "exact_phase_accuracy",
+      "value": 0.5339549969592539,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "phase3plus_accuracy",
+      "value": 0.601054125278735,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "precision_phase3plus",
+      "value": 0.673461823573017,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.6256887052341596,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "f2_phase3plus",
+      "value": 0.6346933072516417,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "r2_phase3plus",
+      "value": -0.0810586061580027,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "mae_phase3plus",
+      "value": 0.1391296191124939,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 3,
+      "metric": "ordinal_mae",
+      "value": 0.5402392053517129,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2698
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "exact_phase_accuracy",
+      "value": 0.501925805797689,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "phase3plus_accuracy",
+      "value": 0.5672004865193593,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "precision_phase3plus",
+      "value": 0.6403797006206645,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.6039944903581266,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "f2_phase3plus",
+      "value": 0.6109369557645419,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "r2_phase3plus",
+      "value": -0.1819549518364753,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "mae_phase3plus",
+      "value": 0.1461792591807614,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 6,
+      "metric": "ordinal_mae",
+      "value": 0.5724711129130347,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2739
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "exact_phase_accuracy",
+      "value": 0.3967159943239407,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "phase3plus_accuracy",
+      "value": 0.4548956010541253,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "precision_phase3plus",
+      "value": 0.5452250736222128,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "sensitivity_phase3plus",
+      "value": 0.4462809917355372,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "f2_phase3plus",
+      "value": 0.4630886872007432,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "r2_phase3plus",
+      "value": -0.448394245084885,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "mae_phase3plus",
+      "value": 0.1647803129794241,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    },
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "metric": "ordinal_mae",
+      "value": 0.6833569835799717,
+      "status": "ok",
+      "n_rows": 4933,
+      "n_areas": 905,
+      "observed_3plus": 2904,
+      "predicted_3plus": 2377
+    }
+  ],
+  "historical_pooled_deltas": [
+    {
+      "horizon": 0,
+      "metric": "exact_phase_accuracy",
+      "oracle_value": 0.5426718021487938,
+      "baseline_value": 0.5426718021487938,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "f2_phase3plus",
+      "oracle_value": 0.6969117245148946,
+      "baseline_value": 0.6969117245148946,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "mae_phase3plus",
+      "oracle_value": 0.1391778425927565,
+      "baseline_value": 0.1391778425927565,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "ordinal_mae",
+      "oracle_value": 0.5114534765862558,
+      "baseline_value": 0.5114534765862558,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "phase3plus_accuracy",
+      "oracle_value": 0.6261909588485709,
+      "baseline_value": 0.6261909588485709,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "precision_phase3plus",
+      "oracle_value": 0.6754966887417218,
+      "baseline_value": 0.6754966887417218,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "r2_phase3plus",
+      "oracle_value": -0.0649587055080889,
+      "baseline_value": -0.0649587055080889,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 0,
+      "metric": "sensitivity_phase3plus",
+      "oracle_value": 0.7024793388429752,
+      "baseline_value": 0.7024793388429752,
+      "delta": 0.0,
+      "status": "shared_h0_zero",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "exact_phase_accuracy",
+      "oracle_value": 0.5339549969592539,
+      "baseline_value": 0.5288870869653354,
+      "delta": 0.0050679099939184,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "f2_phase3plus",
+      "oracle_value": 0.6346933072516417,
+      "baseline_value": 0.6574239713774597,
+      "delta": -0.022730664125818,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "mae_phase3plus",
+      "oracle_value": 0.1391296191124939,
+      "baseline_value": 0.1379843096050753,
+      "delta": 0.0011453095074186,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "ordinal_mae",
+      "oracle_value": 0.5402392053517129,
+      "baseline_value": 0.5436853841475775,
+      "delta": -0.0034461787958645,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "phase3plus_accuracy",
+      "oracle_value": 0.601054125278735,
+      "baseline_value": 0.5945672004865193,
+      "delta": 0.0064869247922156,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "precision_phase3plus",
+      "oracle_value": 0.673461823573017,
+      "baseline_value": 0.6549006168608636,
+      "delta": 0.0185612067121534,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "r2_phase3plus",
+      "oracle_value": -0.0810586061580027,
+      "baseline_value": -0.0437041866147065,
+      "delta": -0.0373544195432962,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 3,
+      "metric": "sensitivity_phase3plus",
+      "oracle_value": 0.6256887052341596,
+      "baseline_value": 0.6580578512396694,
+      "delta": -0.0323691460055096,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "exact_phase_accuracy",
+      "oracle_value": 0.501925805797689,
+      "baseline_value": 0.5163186701804175,
+      "delta": -0.0143928643827284,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "f2_phase3plus",
+      "oracle_value": 0.6109369557645419,
+      "baseline_value": 0.6152446279834815,
+      "delta": -0.0043076722189395,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "mae_phase3plus",
+      "oracle_value": 0.1461792591807614,
+      "baseline_value": 0.1462216574547925,
+      "delta": -4.239827403113017e-05,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "ordinal_mae",
+      "oracle_value": 0.5724711129130347,
+      "baseline_value": 0.5560510845327385,
+      "delta": 0.0164200283802959,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "phase3plus_accuracy",
+      "oracle_value": 0.5672004865193593,
+      "baseline_value": 0.5826069329008717,
+      "delta": -0.0154064463815123,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "precision_phase3plus",
+      "oracle_value": 0.6403797006206645,
+      "baseline_value": 0.6581804567577685,
+      "delta": -0.017800756137104,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "r2_phase3plus",
+      "oracle_value": -0.1819549518364753,
+      "baseline_value": -0.1988296137027101,
+      "delta": 0.0168746618662347,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 6,
+      "metric": "sensitivity_phase3plus",
+      "oracle_value": 0.6039944903581266,
+      "baseline_value": 0.6053719008264463,
+      "delta": -0.0013774104683196,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "exact_phase_accuracy",
+      "oracle_value": 0.3967159943239407,
+      "baseline_value": 0.4143523211027772,
+      "delta": -0.0176363267788364,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "f2_phase3plus",
+      "oracle_value": 0.4630886872007432,
+      "baseline_value": 0.4296388542963884,
+      "delta": 0.0334498329043547,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "mae_phase3plus",
+      "oracle_value": 0.1647803129794241,
+      "baseline_value": 0.1613250818040145,
+      "delta": 0.0034552311754096,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "ordinal_mae",
+      "oracle_value": 0.6833569835799717,
+      "baseline_value": 0.6655179404013783,
+      "delta": 0.0178390431785931,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "phase3plus_accuracy",
+      "oracle_value": 0.4548956010541253,
+      "baseline_value": 0.4743563754307723,
+      "delta": -0.019460774376647,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "precision_phase3plus",
+      "oracle_value": 0.5452250736222128,
+      "baseline_value": 0.5764127764127764,
+      "delta": -0.0311877027905635,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "r2_phase3plus",
+      "oracle_value": -0.448394245084885,
+      "baseline_value": -0.3977023685024703,
+      "delta": -0.0506918765824146,
+      "status": "ok",
+      "reason": null
+    },
+    {
+      "horizon": 12,
+      "metric": "sensitivity_phase3plus",
+      "oracle_value": 0.4462809917355372,
+      "baseline_value": 0.4039256198347107,
+      "delta": 0.0423553719008264,
+      "status": "ok",
+      "reason": null
+    }
+  ],
+  "historical_undefined": [
+    {
+      "arm": "compact_weather_oracle",
+      "horizon": 12,
+      "period": "2023",
+      "metric": "f2_phase3plus",
+      "status": "unavailable",
+      "reason": "zero f2 denominator"
+    }
+  ],
+  "launch_som_summary": [
+    {
+      "display_arm": "compact_baseline",
+      "horizon": 0,
+      "target_month": "2026-04",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2782543003049251,
+      "count_effective_p3plus": 5195564.865714877,
+      "share_effective_p4plus": 0.0609342394016258,
+      "count_effective_p4plus": 1137764.2430223485,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    },
+    {
+      "display_arm": "compact_baseline",
+      "horizon": 12,
+      "target_month": "2027-04",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2503619801128556,
+      "count_effective_p3plus": 4674759.4059093,
+      "share_effective_p4plus": 0.0761362695219222,
+      "count_effective_p4plus": 1421616.5805926854,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    },
+    {
+      "display_arm": "compact_baseline",
+      "horizon": 6,
+      "target_month": "2026-10",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2720964041370871,
+      "count_effective_p3plus": 5080584.61584532,
+      "share_effective_p4plus": 0.0774645408066137,
+      "count_effective_p4plus": 1446418.0647434003,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    },
+    {
+      "display_arm": "compact_cds_weather",
+      "horizon": 0,
+      "target_month": "2026-04",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2782543003049251,
+      "count_effective_p3plus": 5195564.865714877,
+      "share_effective_p4plus": 0.0609342394016258,
+      "count_effective_p4plus": 1137764.2430223485,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    },
+    {
+      "display_arm": "compact_cds_weather",
+      "horizon": 12,
+      "target_month": "2027-04",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2649261938285516,
+      "count_effective_p3plus": 4946702.434265414,
+      "share_effective_p4plus": 0.0772210042055049,
+      "count_effective_p4plus": 1441870.7488282465,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    },
+    {
+      "display_arm": "compact_cds_weather",
+      "horizon": 6,
+      "target_month": "2026-10",
+      "population_raw": 62695007,
+      "population_effective": 18672002.05,
+      "share_effective_p3plus": 0.2771690595386566,
+      "count_effective_p3plus": 5175301.247902368,
+      "share_effective_p4plus": 0.0729837950018257,
+      "count_effective_p4plus": 1362753.5698908707,
+      "n_areas": 904,
+      "n_capped_areas": 904
+    }
+  ],
+  "launch_cds_minus_baseline": [
+    {
+      "horizon": 0,
+      "target_month": "2026-04",
+      "delta_share_effective_p3plus": 0.0,
+      "delta_count_effective_p3plus": 0.0,
+      "delta_share_effective_p4plus": 0.0,
+      "delta_count_effective_p4plus": 0.0
+    },
+    {
+      "horizon": 12,
+      "target_month": "2027-04",
+      "delta_share_effective_p3plus": 0.0145642137156959,
+      "delta_count_effective_p3plus": 271943.0283561144,
+      "delta_share_effective_p4plus": 0.0010847346835826,
+      "delta_count_effective_p4plus": 20254.16823556088
+    },
+    {
+      "horizon": 6,
+      "target_month": "2026-10",
+      "delta_share_effective_p3plus": 0.0050726554015694,
+      "delta_count_effective_p3plus": 94716.63205704838,
+      "delta_share_effective_p4plus": -0.0044807458047879,
+      "delta_count_effective_p4plus": -83664.4948525296
+    }
+  ],
+  "limitations": [
+    "Single seed and one fit per annual block; differences are point estimates, no bootstrap/intervals.",
+    "Fixed global hyperparameters on small early Somalia fits (2022: 858-901 rows over 96-139 areas); early-year phase 3+ under-prediction (e.g. H0/2022 recall 0.151, H12/2022 recall 0.010) is a reported result, not tuned.",
+    "Historical oracle uses realized weather as a perfect forecast: it is the value of ideal weather information, not CDS skill.",
+    "Launch values are prediction summaries for future targets, not accuracy; inherited CDS weather-stage limits (October (start,end] window, raw signed precipitation endpoints) apply unchanged.",
+    "Area 3146 is outside launch coverage (no April 2026 parent row); its population is not invented. All 904 SOM launch areas are capped by the inherited Somalia factor 0.29782279233177217.",
+    "Observation/report month remains an availability proxy; upstream vintages and climatology lineage are inherited, not re-verified.",
+    "Reporting repair touched 27-80 of 904 areas per view (negative cumulative components); raw predictions/classes unchanged."
+  ]
+}

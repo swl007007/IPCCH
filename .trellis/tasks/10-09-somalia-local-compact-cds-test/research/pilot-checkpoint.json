@@ -1,0 +1,213 @@
+{
+  "checkpoint": "Somalia local historical pilot compact_baseline H0 / 2022 (one batch, four regressors); remaining fixed plan NOT run",
+  "git_head": "e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4",
+  "git": "Windows-Git shim /tmp/ipcch-windows-git-bin (read-only calls)",
+  "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --approve-training --pilot",
+  "pid": 758706,
+  "exit": 0,
+  "status": "PARTIAL (pilot by design)",
+  "wall": "1:14.90",
+  "max_rss_kb": 762436,
+  "batch_timing": {
+    "fit_seconds": {
+      "phase2_worse": 2.52,
+      "phase3_worse": 0.19,
+      "phase4_worse": 0.98,
+      "phase5_worse": 0.31
+    },
+    "batch_seconds": 4.32,
+    "peak_rss_mb": 744.6
+  },
+  "logs": {
+    "stderr": "research/pilot.log",
+    "stderr_sha256": "0acdf99b01ed3bdd643fa4378bcf14f700ebda8d489008bbd096f0f04bf3f7fe",
+    "stdout": "research/pilot_stdout.json",
+    "stdout_sha256": "4ef4a2d12be0244b75dc5b6b4a02cf7dd07bdb6b0bb61a45da6355c292435f25",
+    "pid_file": "research/pilot.pid"
+  },
+  "pins": {
+    "before": "research/pilot_pins_before.txt",
+    "after": "research/pilot_pins_after.txt",
+    "unchanged": true,
+    "script_sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "test_sha256": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python"
+  },
+  "identities": {
+    "local_manifest": {
+      "path": "results/experiments/compact_climate_weather_oracle_v1_somalia_local/inputs/compact_climate_weather_oracle_v1_somalia_local_manifest.json",
+      "sha256": "573b0d0bb074a2de9251afacf549dfe18a30321af8bce87dfce75ac0644fe228",
+      "equals_preflight": true
+    },
+    "local_fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+    "parent_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6",
+    "fingerprint_equals_preflight_prefix": true,
+    "local_inputs": {
+      "approved_spec/approval.md": "cb07afd45e3268d559067a4b656996dc6850ab814be493c3fc071ebd4d410a22",
+      "approved_spec/design.md": "89ef778dc5dde873847bf6461316cca0fb103018882999bbc7df746db08f5f65",
+      "approved_spec/expected_runs.csv": "bfa6f72d407889ca71d5c6bf7133896c2a3e52be83449bf15f7f742878cc7323",
+      "approved_spec/implement.md": "990fce07687b746891c78bd46e7ba611f0b16427727fe1d8f14546f4c4e8e525",
+      "approved_spec/prd.md": "edb0caffee5a6dd101529d8b88437a207c67003ed51ece805a68c45ef3a9c4f4",
+      "parent_contract/expected_feature_contract.csv": "a2d1960bf75811a391ec4bd0549b4aaddccb1ce57ca9a08f3a3c28d2fb313bc8",
+      "parent_contract/expected_feature_contract_metadata.json": "8f3964364f89b866fc40f31524d38312aaab3202ca02f3886b5b64ade33e1260",
+      "parent_contract/expected_run_index.csv": "fdd65bc2005016f721995c173a28bcea59ec4580b42c70a43bbf7632b3a4097d",
+      "som_eval_keys.csv": "42087ab148eaabe3ae850ba1efe943a21d415c50a5a0063364dedbabc982b279",
+      "som_fit_valid_keys.csv": "d40480181c118745800ccc86a8779f186938d1cf3bcc9304e41ec1b8ec6b9ac9",
+      "som_membership_area_ids.csv": "e7301834714a58114f27fe1e2902b87137e700fc15a87877d4174a5308b94ae7"
+    },
+    "frozen_snapshot": {
+      "files": 491,
+      "sha256": "25c451084d015d94cd4a90fff08347e88f898d1fdf8688cc7de7613b03bbef36",
+      "equals_preflight_digest": true,
+      "launch_copy_identical": true
+    }
+  },
+  "fit": {
+    "rows": 901,
+    "areas": 139,
+    "max_label": "2021-07",
+    "min_label": "2017-01",
+    "keys_sha256": "913c2f3ef7518f0d06caedeb72a9c630ebc9da84abeb821c39ccb96ef2919b88",
+    "record_keys_sha256": "913c2f3ef7518f0d06caedeb72a9c630ebc9da84abeb821c39ccb96ef2919b88",
+    "weight_range": [
+      0.1767766952966369,
+      0.8408964152537145
+    ],
+    "label_cutoff": "2021-12",
+    "fit_origin": "2022-01",
+    "expected": "901 rows over 139 areas, labels <= 2021-12 (actual max 2021-07)"
+  },
+  "evaluation": {
+    "rows": 1129,
+    "areas": 585,
+    "keys_sha256": "53a24993cecb8bf805056496eeacbb61739489ddd11bc05c188fc8af1474156a",
+    "class_counts": {
+      "2": 1000,
+      "3": 129
+    },
+    "observed_counts": {
+      "1": 52,
+      "2": 240,
+      "3": 610,
+      "4": 221,
+      "5": 6
+    },
+    "expected": "1129 keys"
+  },
+  "features": {
+    "count": 296,
+    "sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909"
+  },
+  "artifacts": {
+    "model_phase2_worse.ubj": {
+      "sha256": "39f19cbaf0fafae692c395e3bf7c62a674f100830b289ef867d5dfbb7b543d1e"
+    },
+    "model_phase3_worse.ubj": {
+      "sha256": "d35c3aa6b5d1c08dc8ddffc44a3a84cc4e1208e822801238c1ee029e073e66ce"
+    },
+    "model_phase4_worse.ubj": {
+      "sha256": "4d6af5c23e250ca948406d27fea70287c1bf8bb49473e65c647e18cc9c22d92d"
+    },
+    "model_phase5_worse.ubj": {
+      "sha256": "6d4d1f75e80a4379026209ad5972b20dd2561cfa2c5454516f8cfaee52f150ee"
+    },
+    "predictions.csv": {
+      "sha256": "5f22e1edbc360070ad7e98a029c25813845d090598e69c7801cdd19bb4ad2fe8"
+    },
+    "fit_keys.csv.gz": {
+      "sha256": "fc624ac3d344d9077cd8b98e2dc51eebff2fe06bca1536caefc3a71f7fff4816"
+    },
+    "batch_record.json": {
+      "sha256": "4e488c929254df42adc8fe6ee976c5d5b5cc5f3c6c3855e6ecc091df8daa02f0"
+    },
+    "run_metadata.json": {
+      "sha256": "e28c8c594134b6783c5f19689529cb94769b2a7f0b9c78688575b3d7dc55a416"
+    }
+  },
+  "models": {
+    "phase2_worse": {
+      "sha256": "39f19cbaf0fafae692c395e3bf7c62a674f100830b289ef867d5dfbb7b543d1e",
+      "bytes": 949897,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase3_worse": {
+      "sha256": "d35c3aa6b5d1c08dc8ddffc44a3a84cc4e1208e822801238c1ee029e073e66ce",
+      "bytes": 159239,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase4_worse": {
+      "sha256": "4d6af5c23e250ca948406d27fea70287c1bf8bb49473e65c647e18cc9c22d92d",
+      "bytes": 535022,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    },
+    "phase5_worse": {
+      "sha256": "6d4d1f75e80a4379026209ad5972b20dd2561cfa2c5454516f8cfaee52f150ee",
+      "bytes": 164274,
+      "feature_names_equal_manifest": true,
+      "num_features": 296,
+      "boosted_rounds": 200,
+      "max_abs_replay_diff": 0.0,
+      "finite": true
+    }
+  },
+  "independent_check": {
+    "script": "research/pilot_check.py",
+    "script_sha256": "d88b740fed85f02037cc216b01fe7275728958dd7a6798040368176393e53c10",
+    "result": "research/pilot-independent-check.json",
+    "result_sha256": "1d21657f61b3e189e5809a94320e30b7f93d23d66692462407c621c68c68a07c",
+    "passed": true,
+    "checks": {
+      "parent_dataset_sha": true,
+      "parent_cohort_sha": true,
+      "features_296_frozen": true,
+      "members_905": true,
+      "dataset_rows_equal_cohort": true,
+      "share_valid_equals_cohort": true,
+      "local_manifest_sha_equals_preflight": true,
+      "run_metadata_partial_pilot": true,
+      "fingerprint_consistent": true,
+      "artifact_set_and_hashes": true,
+      "fit_keys_complete_som_set": true,
+      "fit_age_weight": true,
+      "fit_targets_finite": true,
+      "fit_counts_901_139_max_2021_07": true,
+      "eval_keys_complete_1129": true,
+      "truth_and_targets": true,
+      "boosters_schema_296": true,
+      "raw_replay_within_1e-6": true,
+      "classes_saved_rule": true,
+      "classes_from_reloaded_exact": true,
+      "row_origin_and_cutoff_columns": true,
+      "only_pilot_batch_exists": true,
+      "no_launch_fit": true,
+      "frozen_snapshot_491_matches_preflight": true
+    }
+  },
+  "observation": "Pilot H0/2022 predicts phase 3+ for 129 of 1129 keys while 837 are observed phase 3+ (classes: 1000 phase 2, 129 phase 3). Reported as a fact; metrics are produced only at the report stage.",
+  "not_run": [
+    "other 27 historical batches",
+    "launch inputs/fits",
+    "report",
+    "full verification"
+  ],
+  "next": "STOP for independent supervisor acceptance of the four pilot models"
+}

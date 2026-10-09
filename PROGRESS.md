@@ -1,6 +1,15 @@
-# Somalia local compact historical experiment and CDS launch — in progress
+# Somalia local compact historical experiment and CDS launch — completed
 
-Task: `.trellis/tasks/10-09-somalia-local-compact-cds-test`. Approved requirements: `prd.md`, `design.md`, `implement.md`; this ledger records operations, not approval authority.
+Task: `somalia-local-compact-cds-test` (ordinary archive: `.trellis/tasks/archive/2026-10/10-09-somalia-local-compact-cds-test`). Approved requirements: `prd.md`, `design.md`, `implement.md`; this ledger records operations, not approval authority. Earlier checkpoints below retain their original scope/status.
+
+## 2026-10-09 supervisor final acceptance
+
+- All A1–A9 independently accepted at19:03:26UTC (`research/supervisor-final-acceptance.json`). Same Herdr Opus5.5(1M) session; implementation `e563b0b`, script `88aee59b…` and test `3c149547…` unchanged. No Trellis audit/start/close or push.
+- Fresh supervisor full verifier exit0 after381.00s:28 historical batches/112 models plus20 launch models, raw replay difference0 and exact classes;280 metric/160 delta cells;904-area geometry/maps/population. Separate read-only scouts independently reconstructed complete cohorts, paired matrices/targets/weights, all metrics/deltas and population arithmetic.
+- Supervisor independently rehashed369 inventoried artifacts and confirmed the complete371-file output set (including two verifier JSONs); all491 frozen files rehashed unchanged. All seven PNGs individually viewed; titles, legends, dates, units and common color scales readable.
+- Executor checkpoint corrected32 empty reason NaNs to standard JSON null; strict parsing and scientific-value preservation independently checked. Durable evidence includes both executor verification copies and the fresh supervisor command/log/hash record.
+- Historical pooled F2 baseline→oracle: H0 shared0.697; H3 0.657→0.635; H6 0.615→0.611; H12 0.430→0.463. Continuous pooled R² is negative in all runs;2022 recall under-prediction persists. One inherited undefined oracleH12/2023 F2 remains explicitly undefined.
+- Launch P3+ shares baseline→CDS: H0 shared27.825%; H6 27.210%→27.717% (+0.507pp,+94,717 effective people); H12 25.036%→26.493% (+1.456pp,+271,943). Fixed effective denominator18,672,002.05;3146 absent from launch. Single-seed point estimates; oracle is realized weather, launch levels cannot establish accuracy; upstream weather/reference/spatial limits remain inherited.
 
 ## 2026-10-09 approval and Herdr handoff
 
@@ -8,7 +17,7 @@ Task: `.trellis/tasks/10-09-somalia-local-compact-cds-test`. Approved requiremen
 - Approved planning commit: `3ccf92a`; current branch `task/compact-climate-weather-oracle`. Ordinary task start changed planning to in_progress; no audit wrapper/controller mutation.
 - Verified executor: Herdr `somalia-local-executor`, pane `w11:p4`, terminal `term_65d6ae54981a13`, Claude session `579e6ba5-f2a2-483c-b465-4b2e3cca1ed3`; live UI Opus5.5(1M context), same filesystem/cwd, idle before dispatch. Evidence: task `research/executor-binding.json` and `executor-runtime-ui.txt`.
 - Scope: historical seven runs/28 batches/112 regressors atH0/3/6/12, launch five runs/20 regressors atH0/6/12, all Somalia-only fits; absolute levels/performance and paired differences. Historical905-area union/4933 evaluation keys; launch904 covered areas/5835 fitting observations.
-- Wave0 approval/activation/binding: complete. Herdr prompt delivered and actual same-session working state observed (`research/dispatch-confirmation.json`); initial45s wait timed out on completion, so no resubmission. Wave1 implementation/tests/preflight: accepted by supervisor. Wave2 historical H0/2022 pilot: pending implementation commit. Remaining fits and Wave3 reports/maps/132-model acceptance: pending.
+- Wave0 approval/activation/binding: complete. Herdr prompt delivered and actual same-session working state observed (`research/dispatch-confirmation.json`); initial45s wait timed out on completion, so no resubmission. Wave1 implementation/tests/preflight and Wave2 pilot accepted; Wave3 full132-model supervisor acceptance complete. Earlier release/checkpoint statements below are historical.
 - Main session owns commits and final acceptance. Executor first publishes code/test/preflight checkpoint before production fitting; then supervisor approves the measured pilot/full fixed plan through Herdr.
 
 ## 2026-10-09 wave 1 supervisor acceptance
@@ -17,6 +26,21 @@ Task: `.trellis/tasks/10-09-somalia-local-compact-cds-test`. Approved requiremen
 - Independent focused suite: **32 passed in68.47s**, exit0; both code hashes unchanged during the run (`research/supervisor-focused-tests.json`). Real read-only preflight: exit0 after6:47.85, peak RSS0.79GB; all four local roots stayed absent (`research/preflight-checkpoint.json`).
 - Supervisor independently reconstructed full SOM cohort/cutoff counts and launch keys/April weights/population, checked the approved spec bytes against3ccf92a and current frozen code/config hashes (`research/supervisor-preflight-check.json`). Historical4933 evaluation keys, launch5835 fit rows/904 covered areas, fixed effective population18672002.05 all agree.
 - Implementation/preflight accepted (`research/supervisor-implementation-acceptance.json`). Codex owns the stable code commit; only the measured historical H0/2022 pilot is released after that commit. No other production fitting, audit or final acceptance yet. Windows-Git shim restored for executor commands; native-Git CRLF status noise is excluded.
+
+## 2026-10-09 historical H0/2022 pilot (executor)
+
+- Stable implementation commit `e563b0b`. Pilot `run_somalia_local_compact_test.py --approve-training --pilot` (frozen interpreter, Windows-Git shim): PID 758706, exit0, wall 1:14.90, max RSS 0.76 GB, batch 4.32 s; status PARTIAL by design. HEAD/script `88aee59b…`/test `3c149547…`/config pins identical before and after.
+- Local manifest SHA256 `573b0d0b…` equals preflight; local fingerprint `d2524106…` (≠ parent). 901 SOM fitting rows over 139 areas (labels 2017-01..2021-07, cutoff 2021-12), 1129 evaluation keys over 585 areas, 296 frozen features; four UBJs reload with exact schema, replay max diff 0.0, classes from reloaded predictions exact. 491-file frozen snapshot written with the preflight digest `25c45108…`.
+- Independent check `research/pilot_check.py` → `research/pilot-independent-check.json` passed (24/24). Checkpoint: `research/pilot-checkpoint.md/.json`. STOPPED: remaining 27 historical batches, launch fits, reports and verification stay closed until supervisor acceptance.
+
+## 2026-10-09 full fixed plan (executor, after supervisor pilot acceptance)
+
+- Stage 1 `--approve-training` (PID 788335): exit0, wall 10:21.43, max RSS 1.20 GB; pilot batch verified (not refit); 7 historical runs COMPLETE (28 batches, 112 UBJs) and 5 launch fit records (20 UBJs, 5,835 SOM rows each); HEAD/code/config/snapshot pins unchanged. Logs `research/train.log`, `train_stdout.json` (frozen fit_run lines precede the JSON).
+- Stage 2 `--report` (PID 850626): exit0, 0:42.44, 0.61 GB; SOM annual/pooled 8-metric tables (280 cells), deltas (160), undefined reasons (1: oracle H12/2023 F2 "zero f2 denominator"), codebooks, report.md; launch area/SOM tables, seven SOM maps (visually inspected), summary.
+- Stage 3 `--verify` (PID 860066; live log in task research): exit0, 7:34.52, 0.95 GB. Historical PASS (28 batches/112 models, replay 0.0, 280 metric + 160 delta cells, 64,850 fit rows); launch PASS (20 models, replay 0.0, population/cap/difference/map checks, 904-area join); frozen 491/491 unchanged, 0 missing/added. Executor verifier pass is not final acceptance.
+- Evidence: `research/final-execution-evidence.md`, `research/final-execution-checkpoint.json`. Key limitation: early-year SOM under-prediction (H0/2022 recall 0.151, H12/2022 0.010) under fixed settings; pooled oracle−baseline differences small and mixed. STOPPED for independent Codex final acceptance.
+
+- Stable implementation commit: `e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4`. Measured H0/2022 pilot exit0 after1:14.90, peak RSS0.76GB; supervisor independently reloaded4 models (296 features/200 rounds each), complete901 fit/1129 eval keys and weights/targets, replay difference0 and classes exact (`research/supervisor-pilot-replay.json`, `supervisor-pilot-acceptance.json`). Remaining27 historical batches, five launch fits, reports/maps and full verifier released sequentially; final acceptance pending.
 
 ---
 

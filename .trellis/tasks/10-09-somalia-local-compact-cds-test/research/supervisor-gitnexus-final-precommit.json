@@ -1,0 +1,12 @@
+{
+  "scope": "staged",
+  "manual_scope": "accepted task evidence, PROGRESS and backend guideline documentation only; index predates Somalia runner, so Windows Git staged-path checks supplement graph results",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"summary\": {\n    \"changed_count\": 3,\n    \"affected_count\": 0,\n    \"changed_files\": 43,\n    \"risk_level\": \"low\"\n  },\n  \"changed_symbols\": [\n    {\n      \"id\": \"Section:PROGRESS.md:L1:Global origin-safe climate and IDP benchmark\",\n      \"name\": \"Global origin-safe climate and IDP benchmark\",\n      \"filePath\": \"PROGRESS.md\",\n      \"change_type\": \"touched\"\n    },\n    {\n      \"id\": \"Section:PROGRESS.md:L5:2026-10-08: compact features and raw oracle execution\",\n      \"name\": \"2026-10-08: compact features and raw oracle execution\",\n      \"filePath\": \"PROGRESS.md\",\n      \"change_type\": \"touched\"\n    },\n    {\n      \"id\": \"Section:PROGRESS.md:L22:2026-10-06: approved planning and executor handoff\",\n      \"name\": \"2026-10-06: approved planning and executor handoff\",\n      \"filePath\": \"PROGRESS.md\",\n      \"change_type\": \"touched\"\n    }\n  ],\n  \"affected_processes\": []\n}\n\n---\n**Next:** Review affected processes. Use context() on high-risk changed symbols. READ gitnexus://repo/IPCCH/process/{name} for full execution traces."
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+ "historical": [
+  {
+   "run_id": "compact_baseline/0m",
+   "status": "PARTIAL",
+   "batches": [
+    2022
+   ]
+  }
+ ],
+ "launch": "not started (pilot)"
+}

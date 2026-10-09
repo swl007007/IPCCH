@@ -1,0 +1,12 @@
+Active task: .trellis/tasks/10-09-somalia-local-compact-cds-test
+
+Stage1 implementation and preflight are accepted by the Codex supervisor. Read research/supervisor-implementation-acceptance.json and supervisor-preflight-check.json. Main independently ran32 focused tests (exit0, exact stable hashes), reconstructed complete keyed cohorts/cutoff counts/launch weights/population and approved-spec bytes, and committed implementation as e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4 on the same branch. No existing frozen helper/config/source changed. No audit and no push. Your same Herdr session/pane/model/context remains the executor.
+
+Authorize NOW only the measured historical compact_baseline H0/2022 pilot:
+PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_somalia_local_compact_test.py --approve-training --pilot
+
+The Windows-Git shim has been restored and tested; use that PATH explicitly for model metadata and all Git reads. Do not use native Git or alter global Git settings. Preserve existing unrelated AGENTS.md and archived superseded PNG edits.
+
+Verify HEAD/script SHA88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56/test SHA3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27 before and after. Do not edit any fingerprinted code or copied approved spec. Logs/stdout remain in task research, outside inventoried results/reports roots. Record exact command, actual PID if backgrounded, exit/status, wall/RSS, local manifest/fingerprint identities, full fitting/evaluation keys, four UBJ artifact identities and reload/schema/raw-prediction/class checks. Expected901 fitting rows over139 areas, labels<=2021-12 (actual max2021-07),1129 evaluation keys;296 inherited features. Historical local manifest should match preflight SHA573b0d0bb074a2de9251afacf549dfe18a30321af8bce87dfce75ac0644fe228. Preserve the491-file before snapshot for later comparison.
+
+Update the Somalia task section at the top of PROGRESS.md (do not append under old completed ledgers). Publish research/pilot-checkpoint.md and pilot-checkpoint.json with precise results, then STOP. No other historical batch, no launch fit, no report/full verification yet. Codex independently accepts all four pilot models before releasing the remaining fixed plan. Never commit, archive, register/start/close an audit, mutate controller gates, or push.

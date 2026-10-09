@@ -1,0 +1,66 @@
+{
+  "command": [
+    "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "scripts/modeling/run_somalia_local_compact_test.py",
+    "--verify"
+  ],
+  "cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+  "exit": 0,
+  "elapsed_seconds": 381.0047936439514,
+  "code_stable": true,
+  "code_sha256": {
+    "scripts/modeling/run_somalia_local_compact_test.py": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+    "tests/unit/test_somalia_local_compact_test.py": "3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27"
+  },
+  "summary": {
+    "passed": true,
+    "historical": {
+      "passed": true,
+      "problems": [],
+      "checks": {
+        "batches": 28,
+        "models_reloaded": 112,
+        "artifacts_rehashed": 168,
+        "fit_rows_checked": 64850,
+        "max_model_replay_abs_diff": 0.0,
+        "metric_cells_replayed": 280,
+        "delta_cells_replayed": 160,
+        "undefined_cells": 1,
+        "historical_runs": 7,
+        "eval_keys": 4933,
+        "eval_keys_sha256": "5f8343c4b4ba92176b1a7fa2797dfb9c29d5805065f200df46c416efcea9f14a"
+      }
+    },
+    "launch": {
+      "passed": true,
+      "problems": [],
+      "checks": {
+        "models_reloaded": 20,
+        "max_model_replay_abs_diff": 0.0,
+        "launch_fit_rows_checked": 29175,
+        "population_columns_checked": 84,
+        "difference_columns_checked": 147,
+        "map_values_checked": 11752,
+        "population_raw_total": 62695007.0,
+        "population_effective_total": 18672002.05,
+        "cap_factor": 0.29782279233177217,
+        "inference_areas": 904,
+        "map_join_areas": 904
+      }
+    },
+    "frozen": {
+      "frozen_files_checked": 491,
+      "frozen_files_changed": 0,
+      "frozen_files_missing": 0,
+      "frozen_files_added": 0
+    },
+    "frozen_problems": []
+  },
+  "stdout_sha256": "f84442b351a1efb9fce24101c38712ec948b4e0b0d91f1a6756cd41ac525045d",
+  "log_sha256": "0052135e1ba487e94a02ffbcd5f0a8e850f824e2215293f7fc6ee299bafcfb65",
+  "verification_records": {
+    "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+    "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/verification.json": "beb7a4236b46f81630e98945f63ff276957537abe2c134d9256a75bea2960be1"
+  },
+  "scope": "fresh independent supervisor execution of all132-model, metric, population, map and frozen-parent verification; no fitting"
+}

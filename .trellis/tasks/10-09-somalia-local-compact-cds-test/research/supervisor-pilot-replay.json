@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "scope": "independent four-model H0/2022 pilot replay and complete fit/eval key/weight/target/schema checks",
+  "manifest_sha256": "573b0d0bb074a2de9251afacf549dfe18a30321af8bce87dfce75ac0644fe228",
+  "fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+  "fit_rows": 901,
+  "fit_areas": 139,
+  "eval_rows": 1129,
+  "classes_exact": true,
+  "models": [
+    {
+      "target": "phase2_worse",
+      "model_sha256": "39f19cbaf0fafae692c395e3bf7c62a674f100830b289ef867d5dfbb7b543d1e",
+      "features": 296,
+      "rounds": 200,
+      "max_abs_diff": 0.0
+    },
+    {
+      "target": "phase3_worse",
+      "model_sha256": "d35c3aa6b5d1c08dc8ddffc44a3a84cc4e1208e822801238c1ee029e073e66ce",
+      "features": 296,
+      "rounds": 200,
+      "max_abs_diff": 0.0
+    },
+    {
+      "target": "phase4_worse",
+      "model_sha256": "4d6af5c23e250ca948406d27fea70287c1bf8bb49473e65c647e18cc9c22d92d",
+      "features": 296,
+      "rounds": 200,
+      "max_abs_diff": 0.0
+    },
+    {
+      "target": "phase5_worse",
+      "model_sha256": "6d4d1f75e80a4379026209ad5972b20dd2561cfa2c5454516f8cfaee52f150ee",
+      "features": 296,
+      "rounds": 200,
+      "max_abs_diff": 0.0
+    }
+  ],
+  "elapsed_seconds": 8.159003496170044,
+  "script_sha256": "88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56",
+  "full_task_acceptance": false
+}

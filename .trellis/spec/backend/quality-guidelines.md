@@ -310,3 +310,57 @@ Inspect title bounds visually: accepted figure/codebook documentation correction
 Wrong: label a GRIB by `validityDate` or filename, round before classification, or equate a file-list hash to numeric/map fidelity.
 Correct: use the statistical/verifying month, threshold raw scores, reload models and compare saved keyed values independently.
 Keep approved contracts in the external versioned input root; archived task paths in evidence are provenance, not runtime inputs.
+
+## Somalia local compact experiment and launch (2026-10-09)
+
+### Scope and trigger
+
+`run_somalia_local_compact_test.py` refits the frozen compact experiments on exact canonical `iso3 == "SOM"`
+membership. Historical oracle and future CDS launch remain separate estimands. Global helpers and artifacts stay frozen.
+
+### Signatures
+
+- `--validate-only`: full parent gates and complete local selections, without output writes.
+- `--approve-training [--pilot]`: sequential local fitting; the pilot is historical H0/2022 and remains PARTIAL.
+- `--report`: saved-artifact tables/codebooks/seven SOM maps; never fits.
+- `--verify`: complete saved-model replay, independent metrics/population/maps, frozen-source and inventory checks; never fits.
+
+### Contracts
+
+- Historical: seven runs/28 batches/112 models, H0/3/6/12, 4,933 fixed evaluation keys over905 member areas.
+  Launch: five unique sets/20 models, H0/6/12, 5,835 fit rows and904 inference areas;3146 remains eligible historically.
+- Filter fitting and evaluation/inference separately, then require COMPLETE ordered eligible sets for every cutoff.
+  Local fingerprints bind membership, selected keys, local code, parent manifests and approved-spec copies.
+- Baseline296; historical H3 oracle302, H6/H12 oracle308; CDS308. Keep fitted order, missingness, targets and weights.
+- Historical binary P3+ uses reported/reconstructed overall phase>=3; continuous metrics use normalized phase3_worse
+  versus raw phase3_pred. Pooled metrics use pooled rows. Retain the inherited precision/recall F2 denominator convention.
+- April population is fixed across all launch targets/arms. Classes use raw scores; share/count maps use reporting repair.
+- Runtime spec reads use manifest-bound input copies after task archival. Logs stay outside inventoried result/report roots.
+
+### Validation and error matrix
+
+| Condition | Required outcome |
+|---|---|
+| Nonempty batch directory without its completion record | Reject; preserve partial diagnostics rather than overwrite/refit |
+| Missing/extra eligible keys, shifted target/weight keys or changed source/runtime/code | Reject acceptance/resume |
+| Reloaded score within tolerance but across0.2 class threshold | Fail exact class replay |
+| Empty/incomplete snapshot, figure metadata or mandatory inventory | Fail; compare complete required/current path sets |
+| Undefined metric or paired delta | Preserve canonical mask/reason and both paired values; never fill with0 |
+| Expected-input codebook wording survives actual-fit verification | Remove only obsolete expectation claims; keep source limitations |
+
+### Good, base and bad cases
+
+Good: 905-member historical fitting with904 covered launch areas and an explicit3146 exclusion reason.
+Base: one shared H0 fit in each stage with zero paired differences. Bad: country-filter saved global predictions and call them local fits.
+
+### Tests required
+
+`test_somalia_local_compact_test.py` and `test_compact_launch.py` check mixed-country selection, complete keys/cutoffs/weights,
+no-write preflight, incomplete resume, archive-safe contracts, exact reload classes, undefined reasons and full metadata sets.
+Final acceptance reloads112+20 models, checks all annual/pooled metrics/deltas, population arithmetic and seven904-area maps.
+
+### Wrong versus correct
+
+Wrong: only compare feature-list hashes or accept a raw-score tolerance without checking reloaded classes.
+Correct: compare complete paired matrices/keys/targets/weights and require both numeric replay and exact thresholded classes.
+Fixed global hyperparameters on small early SOM fitting sets can under-predict; report that result without unapproved tuning.

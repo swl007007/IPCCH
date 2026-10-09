@@ -1,0 +1,14 @@
+Active task: .trellis/tasks/10-09-somalia-local-compact-cds-test
+
+Codex independently accepted your measured H0/2022 pilot. Read research/supervisor-pilot-acceptance.json and supervisor-pilot-replay.json: all4 UBJs loaded, literal296-feature schema/200 rounds, full901 fit/1129 eval keys, targets/January weights, artifact/local manifest/code/fingerprint identities and exact replay classes passed; raw prediction replay difference0. Main reviewed pilot-checkpoint.md/json. This releases the remainder of the already-approved fixed plan; no new science or tuning.
+
+Same executor/session/model/context, same branch and frozen implementation commit e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4. Fixed script SHA88aee59be33033dd85f180bd9cc4e5f317bc9c033b1a32a972fe0acf82ea8c56/test SHA3c149547623e8cee33365e4575e23ac3fc4d5b8b098cf1f6c30fab6638a5ae27. No existing-code or copied-spec edits during execution. Use PATH=/tmp/ipcch-windows-git-bin:$PATH and PYTHONPATH=src with the frozen model interpreter. Logs/stdout/PIDs/pins go to task research outside result/report inventories. Preserve the491-file snapshot and original outputs.
+
+Execute sequentially:
+1. --approve-training (resume the accepted pilot without refitting; complete28 historical batches/112 models and5 unique launch sets/20 models; allSOM fits).
+2. --report (annual/pooled8 metrics and deltas; launch area/SOM phase1-5/P3+/P4+ shares/counts/caps/deltas; sevenSOM maps; actualEnglishcodebooks).
+3. --verify (complete132-model reload/replay, key/target/weight/schema/paired checks, independent metrics/undefined/deltas/population/maps/complete inventories/frozen491-file comparison).
+
+Use /usr/bin/time -v and record the true process exit, wall/RSS and code/HEAD pins for each command. Do not overlap training with heavy tests/verification. No extra arm/horizon/bootstrap/SHAP/provider downloads, no imputation/calibration/tuning. Poor performance is a reportable result, never a reason to change settings; explicitly preserve the small early Som fit and pilot underprediction limit.
+
+If an execution/report/verification gate fails, preserve diagnostics and return to the supervisor before any fingerprinted-code change, source repair or rebuild. Do not overwrite stale/incomplete outputs or silently relax tolerances. No audit register/start/close, no controller mutation, no commit/archive/push. Update only the Somalia section near the top of PROGRESS.md as stages complete. Publish research/final-execution-evidence.md and machine-readable research/final-execution-checkpoint.json with exact commands/exits, all stage inventories/manifests/hashes, verification outcome, run/report summary tables and remaining limitations. STOP for independent Codex final acceptance; executor verifier success is not final acceptance.

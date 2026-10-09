@@ -1,0 +1,16 @@
+{
+  "accepted": true,
+  "authority": "Codex supervisor",
+  "scope": "historical H0/2022 pilot only",
+  "implementation_commit": "e563b0bd2ac7fba1094c0e30f7f5d889a1c99fa4",
+  "independent_replay": "research/supervisor-pilot-replay.json",
+  "models_reloaded": 4,
+  "max_abs_diff": 0,
+  "classes_exact": true,
+  "fit_rows": 901,
+  "eval_rows": 1129,
+  "next_release": "remaining fixed27 historical batches, five launch fits, reports/maps and full verifier; sequential, immutablecode",
+  "full_task_acceptance": false,
+  "trellis_audit": "not started; user override",
+  "limits": "small early local fit sample; observed pilot P3+ underprediction is retained and must be reported"
+}

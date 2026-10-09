@@ -1,0 +1,101 @@
+[2026-10-09T18:38:06Z] compact_baseline/0m: fitted 5835 rows in 23.74 s, peak RSS 1060.0 MB
+[2026-10-09T18:38:34Z] compact_baseline/6m: fitted 5835 rows in 27.89 s, peak RSS 1087.9 MB
+[2026-10-09T18:38:59Z] compact_baseline/12m: fitted 5835 rows in 24.22 s, peak RSS 1131.7 MB
+[2026-10-09T18:39:24Z] compact_cds_weather/6m: fitted 5835 rows in 24.82 s, peak RSS 1156.2 MB
+[2026-10-09T18:39:50Z] compact_cds_weather/12m: fitted 5835 rows in 26.17 s, peak RSS 1167.6 MB
+{
+ "historical": [
+  {
+   "run_id": "compact_baseline/0m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_baseline/3m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_baseline/6m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_baseline/12m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_weather_oracle/3m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_weather_oracle/6m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  {
+   "run_id": "compact_weather_oracle/12m",
+   "status": "COMPLETE",
+   "batches": [
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  }
+ ],
+ "launch": [
+  {
+   "run_id": "compact_baseline/0m",
+   "fingerprint": "3a5337b1cf0c37729a23eda7165f722c17df61ef0e4d00c6b781c534c57d2150"
+  },
+  {
+   "run_id": "compact_baseline/6m",
+   "fingerprint": "ab23a68ed0cd2ffeedf3b3aac6d25ceec6bbdd373c48630834a5fb3c928e680f"
+  },
+  {
+   "run_id": "compact_baseline/12m",
+   "fingerprint": "253d7458d55538a88d0a1d92258d9b442af5b2f2c42b16bf1393e7ae3912bc5b"
+  },
+  {
+   "run_id": "compact_cds_weather/6m",
+   "fingerprint": "1a2f793d4dda56b1c727c219691a7ae981b2906d89941b7ab3a81eae230191f6"
+  },
+  {
+   "run_id": "compact_cds_weather/12m",
+   "fingerprint": "cd2db7ed3456b04e41a6ff4e26547298400da71deca8677fdfe02bed00702a76"
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "historical": {
+  "metrics": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/report/som_metrics_long.csv",
+   "sha256": "f5d9da2233edb4f34918514d2e906531964e3efebc3231e64ac85b24f3744c18",
+   "rows": 280,
+   "columns": 17
+  },
+  "deltas": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/report/som_oracle_minus_baseline_deltas.csv",
+   "sha256": "4f2ba8b66b50e738920da69979d55e1d9b61c4a8f104015095c3df82d4d31215",
+   "rows": 160,
+   "columns": 16
+  },
+  "undefined": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/report/som_undefined_reasons.csv",
+   "sha256": "0f5b3a18fca1da4f15307995c35d723c4d5ea009b1194a96f68d27620c010778",
+   "rows": 1,
+   "columns": 6
+  }
+ },
+ "launch_figures": [
+  "crisis_categorical_compact_baseline_0m_2026-04",
+  "crisis_categorical_compact_baseline_12m_2027-04",
+  "crisis_categorical_compact_baseline_6m_2026-10",
+  "crisis_categorical_compact_cds_weather_12m_2027-04",
+  "crisis_categorical_compact_cds_weather_6m_2026-10",
+  "p3plus_share_comparison_2x3",
+  "p3plus_share_difference_1x2"
+ ]
+}

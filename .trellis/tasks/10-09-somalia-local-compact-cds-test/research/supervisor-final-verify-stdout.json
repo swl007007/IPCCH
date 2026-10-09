@@ -1,0 +1,44 @@
+{
+ "passed": true,
+ "historical": {
+  "passed": true,
+  "problems": [],
+  "checks": {
+   "batches": 28,
+   "models_reloaded": 112,
+   "artifacts_rehashed": 168,
+   "fit_rows_checked": 64850,
+   "max_model_replay_abs_diff": 0.0,
+   "metric_cells_replayed": 280,
+   "delta_cells_replayed": 160,
+   "undefined_cells": 1,
+   "historical_runs": 7,
+   "eval_keys": 4933,
+   "eval_keys_sha256": "5f8343c4b4ba92176b1a7fa2797dfb9c29d5805065f200df46c416efcea9f14a"
+  }
+ },
+ "launch": {
+  "passed": true,
+  "problems": [],
+  "checks": {
+   "models_reloaded": 20,
+   "max_model_replay_abs_diff": 0.0,
+   "launch_fit_rows_checked": 29175,
+   "population_columns_checked": 84,
+   "difference_columns_checked": 147,
+   "map_values_checked": 11752,
+   "population_raw_total": 62695007.0,
+   "population_effective_total": 18672002.05,
+   "cap_factor": 0.29782279233177217,
+   "inference_areas": 904,
+   "map_join_areas": 904
+  }
+ },
+ "frozen": {
+  "frozen_files_checked": 491,
+  "frozen_files_changed": 0,
+  "frozen_files_missing": 0,
+  "frozen_files_added": 0
+ },
+ "frozen_problems": []
+}
