@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
+- **Total Sessions**: 6
 - **Last Active**: 2026-10-09
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~182 | Active |
+| `journal-1.md` | ~217 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-10-09 | Somalia local compact historical and CDS launch accepted | `e563b0b`, `3aff3c6` | `task/compact-climate-weather-oracle` |
 | 5 | 2026-10-09 | Compact CDS launch accepted | `58dd9cd`, `414ae4c` | `task/compact-climate-weather-oracle` |
 | 4 | 2026-10-08 | Compact climate and raw oracle experiments completed | `928d080`, `40060dd`, `10dfc23` | `task/compact-climate-weather-oracle` |
 | 3 | 2026-10-06 | Origin-safe global climate + safe IPC history + national IDP benchmark | `c57ab03`, `7cffb5a`, `98fc6cd`, `5d76abd`, `302728d`, `6cec4d3` | `feat/global-origin-safe-climate-idp` |

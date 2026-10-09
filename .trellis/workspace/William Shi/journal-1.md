@@ -180,3 +180,38 @@ Completed the approved five-run April2026-origin compact CDS launch:20 model rep
 ### Next Steps
 
 - No required scientific work remains. Preserve accepted reference/October endpoint/TP/unseen-year limitations and legacy rollback paths.
+
+
+## Session 6: Somalia local compact historical and CDS launch accepted
+<!-- trellis-session: v=2 fp=9255dd9c6c835c19 -->
+
+**Date**: 2026-10-09
+**Task**: Somalia local compact historical and CDS launch accepted
+**Branch**: `task/compact-climate-weather-oracle`
+
+### Summary
+
+Herdr Opus5.5 1M executor; Codex accepted A1-A9. Fresh132-model replay difference0;280 metrics/160 deltas;369 artifacts and491 frozen files rehashed;seven SOM maps viewed. Ordinary archive with verified empty-directory DrvFS recovery;no Trellis audit or push. Early2022 under-prediction and mixed oracle changes;future launch levels are not accuracy.
+
+### Main Changes
+
+- Somalia-only historical7 runs/28 batches/112 models;launch5 sets/20 models;absolute metrics/levels and paired differences
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e563b0b` | feat: run compact experiments with Somalia-local fits |
+| `3aff3c6` | docs: accept Somalia local compact and CDS experiment results |
+
+### Testing
+
+- [OK] 32 focused tests passed with frozen code;full supervisor verifier exit0 in381s
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- No pending work in approved scope;reports and supervisor acceptance are under recorded local roots and archived task research
