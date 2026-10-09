@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "method": "math.fsum and scalar clipped-component construction; no production reporting imports",
+  "checked_utc": "2026-10-09T07:09:57.948937+00:00",
+  "manifest_sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+  "population_ledger_sha256": "0c195fab6572914d1b50c039296489d19ea05a7c98076468d78d7d27dd59672c",
+  "checked_cells": 1446597,
+  "max_abs_differences": {
+    "people": 7.450580596923828e-09,
+    "share": 1.1102230246251565e-16
+  },
+  "checks": {
+    "all_four_levels_all_phases_raw_and_effective_counts_shares_differences": true,
+    "fixed_population_common_cap_and_full_coverage": true,
+    "report_population_copies_byte_equal": true
+  },
+  "capped_countries": 19,
+  "capped_areas": 4004,
+  "population_raw_total": 2106501620.657281,
+  "population_effective_total": 1429568874.4239516,
+  "zero_population_areas": 6
+}

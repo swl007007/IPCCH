@@ -1,0 +1,196 @@
+{
+  "mode": "independent replay (read-only)",
+  "checked_utc": "2026-10-09T07:08:11.996981+00:00",
+  "passed": true,
+  "checks": {
+    "artifact_hashes_match": true,
+    "artifact_set_complete": true,
+    "metadata_complete": true,
+    "hyperparameters_are_config_plus_njobs16": true,
+    "schema_equals_manifest_features": true,
+    "fit_keys_equal_selection": true,
+    "fit_targets_equal_selection": true,
+    "fit_label_months_before_2026_04": true,
+    "fit_weights_equal_selection": true,
+    "fit_weights_match_independent_rule_1e-12": true,
+    "raw_matrix_columns_keys_plus_contract": true,
+    "raw_matrix_equals_manifest_inference": true,
+    "prediction_keys_equal_inference": true,
+    "booster_feature_order_all": true,
+    "raw_predictions_within_1e-6": true,
+    "predictions_finite": true,
+    "classes_exact_saved_vs_independent_rederivation": true,
+    "classes_exact_saved_vs_reload": true,
+    "run_columns": true
+  },
+  "run_id": "compact_cds_weather/6m",
+  "run_dir": "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m",
+  "manifest_sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+  "artifacts": {
+    "feature_schema.json": "4d14e3053d04587ac4a2e37c8e66414e9f5d92b9e10ec6fcba39c78fa3d970b3",
+    "fit_keys.csv.gz": "b3a84cdbab6431d03a1e78a292847d1cf55a06918b794751fedafe851fc8e0e1",
+    "fit_targets.csv.gz": "90d3e6e80c39d9ac03c93cd181b4310322ab154a43741a1afe40a7dc7df881d8",
+    "fit_weights.csv.gz": "f2d55ec827d37ca73d2d650b72bc49ee46eeab752cb0185c3d52c3684a657a94",
+    "inference_features.csv.gz": "2ceeaf9b6a51fd16b96faa6bd4d5c0e7688d62e5e0fdfb17d5bab9a10c593b3f",
+    "predictions_raw.csv": "44295a9a22d8454df357aa37a7a59961d483d94fd01c46c47b2a6babc177f0ad",
+    "model_phase2_worse.ubj": "226872e96387aee2b17826d45ca9b37b37c7c83d18ad34dc254f182fb95ce51f",
+    "model_phase3_worse.ubj": "3c878312a19d9048795131f734e96304030f3f77122bf1a2a1ae6550eb7550d0",
+    "model_phase4_worse.ubj": "b31229e4090449ea1fee34fe76a67a8c3d1658b34e02efb7ba3f467824dfdd6c",
+    "model_phase5_worse.ubj": "42440f6232a73d77259f7ffbd36a02d268d0b6de5478e636c5645a8293de2a57",
+    "run_metadata.json": "67c5e29a6d261694259b504384bbccf52d2e13520736d3c5bf8dc89107730ed4"
+  },
+  "fingerprint": "df90f77125a4a1050a910176e53806adcf03a4e35dfa5df41d62e31ad33edfb7",
+  "git_head": "58dd9cd3e830de7ee049b6de3238831fe6c016ca",
+  "git_status_porcelain": "M PROGRESS.md\n?? .trellis/tasks/10-08-compact-cds-launch/research/pilot-check.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/pilot_replay_check.py\n?? .trellis/tasks/10-08-compact-cds-launch/research/supervisor-pilot-acceptance.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/supervisor-pilot-replay.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/supervisor_population_verify.py",
+  "fit_seconds": {
+    "phase2_worse": 17.26,
+    "phase3_worse": 2.21,
+    "phase4_worse": 13.33,
+    "phase5_worse": 4.0
+  },
+  "run_seconds": 46.48,
+  "peak_rss_mb_self": 2038.4,
+  "hyperparameters": {
+    "set": "canonical",
+    "hyperparameters": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/configs/forecasting_hyperparameters.json",
+    "hyperparameters_p3": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/configs/forecasting_hyperparameters_p3.json"
+  },
+  "hyperparameters_effective": {
+    "phase2/4/5": {
+      "max_depth": 11,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "subsample": 1,
+      "colsample_bytree": 0.5,
+      "gamma": 0,
+      "min_child_weight": 0,
+      "scale_pos_weight": 1,
+      "n_jobs": 16
+    },
+    "phase3": {
+      "max_depth": 9,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "subsample": 0.5,
+      "colsample_bytree": 0.7,
+      "gamma": 0.1,
+      "min_child_weight": 0,
+      "scale_pos_weight": 1,
+      "n_jobs": 16
+    }
+  },
+  "contract_columns": [
+    "position",
+    "predictor",
+    "group",
+    "description",
+    "unit",
+    "source",
+    "time_relative_to_origin",
+    "formula",
+    "missing_semantics",
+    "input_type",
+    "compact_baseline_0m",
+    "compact_baseline_0m_expanded_count",
+    "compact_baseline_6m",
+    "compact_baseline_6m_expanded_count",
+    "compact_baseline_12m",
+    "compact_baseline_12m_expanded_count",
+    "compact_cds_weather_6m",
+    "compact_cds_weather_6m_expanded_count",
+    "compact_cds_weather_12m",
+    "compact_cds_weather_12m_expanded_count",
+    "expected_model_columns",
+    "expected_model_positions",
+    "horizons_months",
+    "family",
+    "source_variable",
+    "base_source_definition",
+    "definition_evidence",
+    "limitations",
+    "contract_status",
+    "training_source",
+    "inference_source",
+    "training_formula",
+    "inference_formula",
+    "training_missing_semantics",
+    "inference_missing_semantics",
+    "training_reference_period",
+    "inference_reference_period",
+    "training_spatial_definition",
+    "inference_spatial_definition"
+  ],
+  "weights_max_abs_vs_independent_rule": 0.0,
+  "fit_rows": 49532,
+  "fit_label_ord_range": [
+    24168,
+    24314
+  ],
+  "weight_range": [
+    0.014328188175072988,
+    0.9715319411536059
+  ],
+  "boosters": {
+    "phase2_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 308,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase3_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 308,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase4_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 308,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase5_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 308,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    }
+  },
+  "class_counts": {
+    "2": 2429,
+    "3": 3746,
+    "4": 13
+  },
+  "raw_prediction_summary": {
+    "phase2_pred": {
+      "min": 0.2551501393318176,
+      "mean": 0.6083963898521666,
+      "max": 0.9027757048606873
+    },
+    "phase3_pred": {
+      "min": 0.0778176337480545,
+      "mean": 0.25760392838295576,
+      "max": 0.7259130477905273
+    },
+    "phase4_pred": {
+      "min": -0.002611360279843211,
+      "mean": 0.0543472608321399,
+      "max": 0.22423309087753296
+    },
+    "phase5_pred": {
+      "min": -0.0006841085269115865,
+      "mean": 0.002615502380662051,
+      "max": 0.04167397692799568
+    }
+  },
+  "cumulative_monotone_rows_violating": 41,
+  "elapsed_s": 1.8
+}

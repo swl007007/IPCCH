@@ -1,0 +1,53 @@
+{
+  "status": "ACCEPTED",
+  "checked_utc": "2026-10-09T07:20:35.004634+00:00",
+  "artifact_inventory_freshly_rehashed": 107,
+  "inventory_exact_file_set": true,
+  "inventory_path_alias_filesystem_identity_verified": true,
+  "old_artifacts_checked": 488,
+  "old_artifacts_changed": 0,
+  "verification_sha256": "924f3bd7091b2bf9cd3bfc06cb77b23aabeb6340c96e474e26ec65b812e0716e",
+  "launch_summary_sha256": "33aa73ccf5b53f7196562d0072a1229035f3782e6d45429e791cecf21ba4a03c",
+  "report_outputs_sha256": "8a0563f6f28ca481dac49c50c094bcff3ecaabd47589e46e7c15b91741fc0473",
+  "codebook_sha256": "e563cbf06095a13f57bc9975902a43f28199b5fdadb319b74b51a9a8b4946297",
+  "codebook_rows": 308,
+  "model_replay_evidence_sha256": "feccf8db38f7b8851ffacb02b2cc8572ab72915ebc0003af6df63aaf85f12bc8",
+  "population_evidence_sha256": "bffb7fea5725bc0367e7f7839b4aee1341ada278e51de6c60b13e5e3902660d2",
+  "map_codebook_evidence_sha256": "f007e91ea2722027d3d0b4a20217a169bfe7d3af4a63bec2c970c0a2acdcf37e",
+  "figures_human_inspected": [
+    "crisis_categorical_compact_baseline_0m_2026-04.png",
+    "crisis_categorical_compact_baseline_12m_2027-04.png",
+    "crisis_categorical_compact_baseline_6m_2026-10.png",
+    "crisis_categorical_compact_cds_weather_12m_2027-04.png",
+    "crisis_categorical_compact_cds_weather_6m_2026-10.png",
+    "p3plus_share_comparison_2x3.png",
+    "p3plus_share_difference_1x2.png"
+  ],
+  "root_replay_max_abs_diff": 0,
+  "root_population_checked_cells": 1446597,
+  "accepted_requirements": {
+    "A1": "passed",
+    "A2": "passed",
+    "A3": "passed",
+    "A4": "passed",
+    "A5": "passed",
+    "A6": "passed",
+    "A7": "passed",
+    "A8": "passed",
+    "A9": "passed"
+  },
+  "weather_and_input_evidence": [
+    "supervisor-input-acceptance.json",
+    "supervisor-implementation-acceptance.json",
+    "supervisor-october-reduction-check.json",
+    "supervisor-temperature-convention-decision.md",
+    "supervisor-precipitation-gate-decision.md"
+  ],
+  "limitations": [
+    "Observed training reference declared1991-2020 differs from CDS model1993-2016 and point sampling; accepted approximation.",
+    "October temperature endpoint convention empirically verified on supplied September products; primary docs do not explicitly define inclusivity.",
+    "Small raw TP endpoint decreases beyond final packing bounds remain unexplained; signed totals preserved and original overlap bound passed.",
+    "2027 existing year indicators all0; static/population vintages unverified, fixed April population, no forecast accuracy/interval claim."
+  ],
+  "lifecycle": "science complete; evidence commit/archive/journal pending; no additional audit lifecycle"
+}

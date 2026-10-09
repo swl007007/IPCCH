@@ -1,0 +1,586 @@
+{
+  "version": "compact_cds_launch_v1",
+  "passed": true,
+  "problems": [],
+  "checks": {
+    "models_reloaded": 20,
+    "max_replay_abs_diff": 0.0,
+    "population_columns_checked": 714,
+    "difference_columns_checked": 315,
+    "capped_countries": 19,
+    "capped_areas": 4004,
+    "population_raw_total": 2106501620.657281,
+    "population_effective_total": 1429568874.4239516,
+    "old_artifacts_checked": 488,
+    "old_artifacts_changed": 0,
+    "inventory_files": 107,
+    "figures": [
+      "crisis_categorical_compact_baseline_0m_2026-04.png",
+      "crisis_categorical_compact_baseline_12m_2027-04.png",
+      "crisis_categorical_compact_baseline_6m_2026-10.png",
+      "crisis_categorical_compact_cds_weather_12m_2027-04.png",
+      "crisis_categorical_compact_cds_weather_6m_2026-10.png",
+      "p3plus_share_comparison_2x3.png",
+      "p3plus_share_difference_1x2.png"
+    ]
+  },
+  "tolerances": {
+    "replay": "finite, atol 1e-6, rtol 0; classification exact",
+    "shares": "atol 1e-12",
+    "counts": "atol 1e-6, rtol 1e-12",
+    "csv": "float_precision=round_trip; only empty fields missing"
+  },
+  "manifest": {
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/compact_cds_launch_v1_manifest.json",
+    "sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe"
+  },
+  "git_head": "58dd9cd3e830de7ee049b6de3238831fe6c016ca",
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "inventory": [
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt1_failed_roundtrip.log",
+      "sha256": "219f5f5ed92295b058ee6fba7046c14895a2edacc786cfa932400b06b3315d37",
+      "bytes": 2988
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt1_partial_outputs_sha256.txt",
+      "sha256": "267dcac48bdf3db72b642aed5c88990e88c87f16d3cca033353c0993fa244102",
+      "bytes": 1220
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt2.pid",
+      "sha256": "444cd1755838bc78fa700d2e21d8b1b8d220ec8dbc05690e0720b20073ce99d4",
+      "bytes": 125
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt2_code_sha256.txt",
+      "sha256": "9109c680a0804d181f8bbd9d0c93c8288945995a3e34dfda166f4a5cf687e215",
+      "bytes": 315
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt2_code_sha256_launch_copy.txt",
+      "sha256": "9109c680a0804d181f8bbd9d0c93c8288945995a3e34dfda166f4a5cf687e215",
+      "bytes": 315
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt2_superseded_stopped.log",
+      "sha256": "e6431f16de966a29dec5bf7817dcb96528be666af8cdd5c58bb9ac284100b2fb",
+      "bytes": 1228
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt3.log",
+      "sha256": "b34ba58151bf76a6460c6d2329c4f46b7f64e6048e47981bbf5fc6adc95dc513",
+      "bytes": 1954
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt3.pid",
+      "sha256": "4be933e94feb92d5aeffb79e68bb57d6ec96a4c0037e886f20b5fee8108419c7",
+      "bytes": 364
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt3_code_sha256.txt",
+      "sha256": "e4ccaacab74f20d8abe7e18fe2982b3447c67b6e66847b64a00a68e1bae215cf",
+      "bytes": 524
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/fits_remaining.log",
+      "sha256": "a14f5288297172f6aba83bce5a512e36ae319a4f508736d6ad83e98e3d16d4f9",
+      "bytes": 1309
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/fits_remaining.pid",
+      "sha256": "e159946919d22c74978fdee9ac473f14075574eb6014bb411c1b064bc2e5e858",
+      "bytes": 114
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/fits_remaining_pins.txt",
+      "sha256": "18c0fbbaa5edc0149a8a8969a7c36df1b57345372c1f8650db0164f788be6561",
+      "bytes": 1631
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/pilot_h0.log",
+      "sha256": "6b15394b4ccfc4c71981b417741893385e16881c8f818a493dc83646d03070f6",
+      "bytes": 972
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/pilot_h0.pid",
+      "sha256": "3dca446f2391a207cf60ecec53b679520542cc6ac17d4bdfe3009c870801e48a",
+      "bytes": 141
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/pilot_h0_pins.txt",
+      "sha256": "a4a223c4c36498ece32c0ee62187dcf8ce29b47e5266d48856f16376d78a1900",
+      "bytes": 1161
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/report.log",
+      "sha256": "e42480888d9b5e59ad250d977aa00ece52b65bb303cb160f3b6b6bb126cb3d7c",
+      "bytes": 842
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/logs/validate_only_attempt3.log",
+      "sha256": "eceb2625600e8ae996a04a33a3ef8bf431dd93ddf00a83feb3b54a1a266cc3d2",
+      "bytes": 1194
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/area_population_paired_differences.csv",
+      "sha256": "8544b81f68ecc85e74208a2d7ce9be9c8ab2d4c0f524d5f93dad5c4685d02054",
+      "bytes": 7486218
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/area_population_predictions.csv",
+      "sha256": "4aa08482e28a4b2f2d25e3a6345517700fd1586082107df413c2726ebd4310cc",
+      "bytes": 24699447
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/country_population_cap_audit.csv",
+      "sha256": "3479f62fad9b090fe81a0d7eee4e23d1504cb0c7517bc0b682a85d9388b6c93b",
+      "bytes": 6817
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/country_population_paired_differences.csv",
+      "sha256": "c1e910d8471541e9e459672c04222bb8c30c139800cc86999e131d13a1d39d1b",
+      "bytes": 83013
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/country_population_summary.csv",
+      "sha256": "d78bf47a045c95a91685a58cbcd70648372ed7ed40f1b14ac4b52c3cc57f5a54",
+      "bytes": 218612
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/global_population_paired_differences.csv",
+      "sha256": "47df0c13b83e66ec6e4b3bf3e25e06b0fd559f147632d9421b0084007e30309a",
+      "bytes": 2497
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/global_population_summary.csv",
+      "sha256": "66e02b6d928021af8a3fea7e3321981becd04b291a6952c3c79ac0a26596d133",
+      "bytes": 5154
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/region_population_paired_differences.csv",
+      "sha256": "5df60950eea14dc893f4e393c79ad11a1ab5e50990f9d87ea7bf6c5adfe49b9e",
+      "bytes": 14737
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/population/regional_population_summary.csv",
+      "sha256": "88732148ff95a3a19d4bbd0e6a9e42002602ffdec70f189465397b456b37038c",
+      "bytes": 37741
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/preflight/old_artifact_inventory_before.csv",
+      "sha256": "38034e0b2f9a6ff2b21670b75bb406545b36b18efe47159b94275b41997f585d",
+      "bytes": 132228
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/report_outputs.json",
+      "sha256": "577977e61cd57079e5ec61fb22fc12bac70823cc3d4876d3148e4b64a325c656",
+      "bytes": 10846
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/artifact_record.json",
+      "sha256": "c4313d23a752972ef99f132fa798ab63e73cb911878f7e6e5c497b0c5c0ac7d9",
+      "bytes": 1199
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/feature_schema.json",
+      "sha256": "c583fd35f9e8c5076bc476274ecade40b4417cc814c4bb0ea27c35ad1a692f91",
+      "bytes": 12995
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/fit_keys.csv.gz",
+      "sha256": "0b409f719785333dca4f0537961de220b5aefb2ff748e20f34eb6628b8e740f8",
+      "bytes": 139020
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/fit_targets.csv.gz",
+      "sha256": "674d84a9969188259bca50dcd9947d0de80949600298e761cbffbacca3b32dde",
+      "bytes": 482129
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/fit_weights.csv.gz",
+      "sha256": "756db99c8004337fe2fad08f0e1bfc1bb4b2f0f00e906785b31ed42d346c9944",
+      "bytes": 151461
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/inference_features.csv.gz",
+      "sha256": "e773aba35bcb4e6905bc32738d737f122a09085f590fa97f8810f404a7eb63e9",
+      "bytes": 7820922
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/model_phase2_worse.ubj",
+      "sha256": "b9436dddd07ebbba3be094d671bbb291002c6db9d78a7019c30774dff99b1b6b",
+      "bytes": 9412413
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/model_phase3_worse.ubj",
+      "sha256": "9293ac3e9936827c66908f7f2ba3af72f30e36e0aa4a869c500226d95549b0e2",
+      "bytes": 302916
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/model_phase4_worse.ubj",
+      "sha256": "54cb909806af44b2878ee3b49640a717be234ec0f169b4af3580933acfdeb50c",
+      "bytes": 6860857
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/model_phase5_worse.ubj",
+      "sha256": "8f6c343013ab2626914ffa3a2002b49bf51150ee9aec9790b19c6375dc1dfc49",
+      "bytes": 1095933
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/predictions_raw.csv",
+      "sha256": "e07b733c99daa0a37f0fbb843a4a09f83bb3a8606a80daa5046aa11d024b0277",
+      "bytes": 835584
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/run_metadata.json",
+      "sha256": "e5b269f4e75ed4d2dd20a0ed4731a1c51a4f6ec9b5f5a99ffc86eb745f339a01",
+      "bytes": 17518
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/artifact_record.json",
+      "sha256": "387f506df76e4d4e9ba1590923e027debf944d0ef9506d7212ae9b46b4003349",
+      "bytes": 1200
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/feature_schema.json",
+      "sha256": "15ef9f1509e43a1a027860d794b8f37ba0360401c4795573c4adc39ef75a17e0",
+      "bytes": 12996
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/fit_keys.csv.gz",
+      "sha256": "ac50325fd8a8f5215c3f77c11f6090c924ef3e5cd923727844f2a40d853b1480",
+      "bytes": 139020
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/fit_targets.csv.gz",
+      "sha256": "068bc1cc0a6b44616a8cbe521693147eb4bf99bbe6b963bcab04263422b4276e",
+      "bytes": 482129
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/fit_weights.csv.gz",
+      "sha256": "8e9b4b63347494d6b73a35920e6684444c530f993c7c1d95c1684da4e6d337f1",
+      "bytes": 151461
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/inference_features.csv.gz",
+      "sha256": "5416b5900094cae3ee410723370a03cefd8c757e9f8fadac95e52e99d2559a8f",
+      "bytes": 7821050
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/model_phase2_worse.ubj",
+      "sha256": "d63c62204b59663b37e66dbe9b5714925c47b5619d1da4bc8ee341e75f43bd40",
+      "bytes": 9531471
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/model_phase3_worse.ubj",
+      "sha256": "1ea917da4f056b8592805b5709576857cf6d2276f5824d3677b193637d49e93f",
+      "bytes": 311002
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/model_phase4_worse.ubj",
+      "sha256": "3bd33099fe1cc44474f05eb9659e96d51a4424c78dafea01b1d0468977d459ea",
+      "bytes": 7336802
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/model_phase5_worse.ubj",
+      "sha256": "de2d504dc080658c91a6656d32f37e32c08af6bd12caff0b84d41e9866448aa7",
+      "bytes": 1196433
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/predictions_raw.csv",
+      "sha256": "54f281e75476c53a18010368ee452e344a9ccb4ad4d63d325bd1e7d7f2f3c0ae",
+      "bytes": 846328
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/run_metadata.json",
+      "sha256": "e671f3c5e5d6072d08d33fe28ced4f67451552b1eb345179d5f3c1b4fc95b7bc",
+      "bytes": 17844
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/artifact_record.json",
+      "sha256": "efe003e435154f321b654be60e1c39c7fe4f2e424f6b5aa55e0f84970d7bb738",
+      "bytes": 1199
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/feature_schema.json",
+      "sha256": "d0d2e573fa26be70b75a849951443cc881bebd2ad7ac96cb368f01dee7fc8bc8",
+      "bytes": 12995
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/fit_keys.csv.gz",
+      "sha256": "e2830ba07eca5fc4f67e0949c591501652368f36b8269423ba81906c59611697",
+      "bytes": 139020
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/fit_targets.csv.gz",
+      "sha256": "3bd9bb53ab91519eba295aaff30eb5812713226b9e542cb32167f72c8b5c6191",
+      "bytes": 482129
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/fit_weights.csv.gz",
+      "sha256": "2e14e8a5e6842f2912e8a1095258a6303127c8ef0af89aae53bbf875c1044818",
+      "bytes": 151461
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/inference_features.csv.gz",
+      "sha256": "76cdd394447a350489ffacdced1ccdd52c6d3d876ad47391f50be36a9115d20e",
+      "bytes": 7821164
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/model_phase2_worse.ubj",
+      "sha256": "72263d099aeb6b945e066e672a897356020aca130cc2933efad5d2c8815d1f40",
+      "bytes": 9544131
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/model_phase3_worse.ubj",
+      "sha256": "3ea30a85a60a0e237efd74ae592d2e2781c2f91c3306c4eb386d08b1ce72b2a1",
+      "bytes": 309923
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/model_phase4_worse.ubj",
+      "sha256": "77494a278e5878d4b0a7bcceef9d76f0a6c728a8543baf1417dc78eea4541aad",
+      "bytes": 6563488
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/model_phase5_worse.ubj",
+      "sha256": "2e7990ae187143a7f685f4255b7a275bf7d0f1119990397b8fbd756cde92b5e2",
+      "bytes": 1103065
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/predictions_raw.csv",
+      "sha256": "1eb3e6dbf7c960913da4ef4c0a61d8dee3965e81824390b8301fb431efd38c0b",
+      "bytes": 845522
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/run_metadata.json",
+      "sha256": "bd1c85baf460cb199eb0980adb0dc05eacce294c16584bebdeb8b64e5256f3c7",
+      "bytes": 17756
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/artifact_record.json",
+      "sha256": "52a23de6f22f8a2b3dafca304cee5e64dacf2d12b5ddaba2fffaabfa2507ecff",
+      "bytes": 1203
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/feature_schema.json",
+      "sha256": "040b218fe1a1f3720d80740a7bb1cdc01aae7ba4ac34387d0ec26281063c5d7e",
+      "bytes": 13497
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/fit_keys.csv.gz",
+      "sha256": "b2da13162bc7b07149f1448d08eddeec850c1ea8f89765d8b135b4143cfcd6c6",
+      "bytes": 139020
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/fit_targets.csv.gz",
+      "sha256": "5f80984098a499b3f90db43337365cb601cc5bcf8113df8c8f3251be12306f3c",
+      "bytes": 482129
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/fit_weights.csv.gz",
+      "sha256": "1bb6a6d6702c5817b7c3a8a7eb2e53758aa670ca7cdc564acc618e70f835da71",
+      "bytes": 151461
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/inference_features.csv.gz",
+      "sha256": "3071421f2136188dfffbd6685df35d09ac60dc1b9d445c50d8a4a79024909c05",
+      "bytes": 8166341
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/model_phase2_worse.ubj",
+      "sha256": "aa562daeb67450e9e6f2007bef9e6defd394a46229e8b4eeb02986310ab65565",
+      "bytes": 9379298
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/model_phase3_worse.ubj",
+      "sha256": "01d0d3c7429b64ff03f7c3f6225f07c57189468170ef6dc611599f1d89b20f12",
+      "bytes": 314899
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/model_phase4_worse.ubj",
+      "sha256": "21c0a2ca07b8c457190aea45ecbc12584ef790cf740eef8611d26e8ef677413c",
+      "bytes": 7434003
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/model_phase5_worse.ubj",
+      "sha256": "30c2091256ea6a9b033e2dd4f96a3d6e91b3c0992264b1864b3a6aca573da005",
+      "bytes": 1271257
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/predictions_raw.csv",
+      "sha256": "8c536fda355c8cb21a718b9d0ae3fbe3851eadc35e849f7d05db9301e6e6eaae",
+      "bytes": 862626
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/run_metadata.json",
+      "sha256": "164725fd061adf941d30d120c92a19c29f48f104ccbbc4c8c4ff07f3fab5e18e",
+      "bytes": 18348
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/artifact_record.json",
+      "sha256": "c6e4afa290c8880bb04be5362865c478240d1e7444d793252928a1f9335833c0",
+      "bytes": 1202
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/feature_schema.json",
+      "sha256": "4d14e3053d04587ac4a2e37c8e66414e9f5d92b9e10ec6fcba39c78fa3d970b3",
+      "bytes": 13496
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/fit_keys.csv.gz",
+      "sha256": "b3a84cdbab6431d03a1e78a292847d1cf55a06918b794751fedafe851fc8e0e1",
+      "bytes": 139020
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/fit_targets.csv.gz",
+      "sha256": "90d3e6e80c39d9ac03c93cd181b4310322ab154a43741a1afe40a7dc7df881d8",
+      "bytes": 482129
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/fit_weights.csv.gz",
+      "sha256": "f2d55ec827d37ca73d2d650b72bc49ee46eeab752cb0185c3d52c3684a657a94",
+      "bytes": 151461
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/inference_features.csv.gz",
+      "sha256": "2ceeaf9b6a51fd16b96faa6bd4d5c0e7688d62e5e0fdfb17d5bab9a10c593b3f",
+      "bytes": 8166442
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/model_phase2_worse.ubj",
+      "sha256": "226872e96387aee2b17826d45ca9b37b37c7c83d18ad34dc254f182fb95ce51f",
+      "bytes": 9300088
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/model_phase3_worse.ubj",
+      "sha256": "3c878312a19d9048795131f734e96304030f3f77122bf1a2a1ae6550eb7550d0",
+      "bytes": 307908
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/model_phase4_worse.ubj",
+      "sha256": "b31229e4090449ea1fee34fe76a67a8c3d1658b34e02efb7ba3f467824dfdd6c",
+      "bytes": 6656944
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/model_phase5_worse.ubj",
+      "sha256": "42440f6232a73d77259f7ffbd36a02d268d0b6de5478e636c5645a8293de2a57",
+      "bytes": 1178440
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/predictions_raw.csv",
+      "sha256": "44295a9a22d8454df357aa37a7a59961d483d94fd01c46c47b2a6babc177f0ad",
+      "bytes": 862864
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/run_metadata.json",
+      "sha256": "67c5e29a6d261694259b504384bbccf52d2e13520736d3c5bf8dc89107730ed4",
+      "bytes": 18344
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/crisis_categorical_compact_baseline_0m_2026-04.csv",
+      "sha256": "996ebd22401822e2903d5b6eb94713d639e709fd578c2c285da78c39faed19b6",
+      "bytes": 250830
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/crisis_categorical_compact_baseline_12m_2027-04.csv",
+      "sha256": "fa728f20b3249f82120306094c2974b9b724b896c3833abbf19cabefdea945de",
+      "bytes": 256733
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/crisis_categorical_compact_baseline_6m_2026-10.csv",
+      "sha256": "17f61685bb0b81c1e541dc2e61077facea46cdb2b539bd755966de948d8fa8c9",
+      "bytes": 251546
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/crisis_categorical_compact_cds_weather_12m_2027-04.csv",
+      "sha256": "379bf2578616c7183abd288704de0294d15d26ffc47fef796470ef83aea6caed",
+      "bytes": 275135
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/crisis_categorical_compact_cds_weather_6m_2026-10.csv",
+      "sha256": "a1b4dcd830647cc0595039600f09c0398f9bdcc8edf9aaebdf362155af30918c",
+      "bytes": 270095
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/figure_metadata.json",
+      "sha256": "6b9881829e31d0eafe8b6a06e2d90008c0e3c4e498579c7eeeaae5c61482fcaa",
+      "bytes": 6676
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/p3plus_share_comparison_2x3.csv",
+      "sha256": "565d0fcd128a8305e81a703640fccd8de4db15a9af87fbbc849626718cbb671a",
+      "bytes": 3497984
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/visualizations/p3plus_share_difference_1x2.csv",
+      "sha256": "4ec806601ad46e86a3708efee1faa5c89e32498d96d6112211aeb6a79773a30d",
+      "bytes": 905887
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/crisis_categorical_compact_baseline_0m_2026-04.png",
+      "sha256": "9f5191194d703f10c2a4afd8041848b91ae7eb9d5e0bb4c85a8de6eaf1b4b474",
+      "bytes": 913730
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/crisis_categorical_compact_baseline_12m_2027-04.png",
+      "sha256": "f0d273d9d7a13abd0e6a3b5006bfdd694a88ddc9abc5615b6998d7aa67971623",
+      "bytes": 907484
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/crisis_categorical_compact_baseline_6m_2026-10.png",
+      "sha256": "7eac1313bc3859ef1b6b80891faa52a26a511ed2b507f428c0405646c70ef209",
+      "bytes": 917776
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/crisis_categorical_compact_cds_weather_12m_2027-04.png",
+      "sha256": "75050978b0094fa2a76b005c03add4ed868cdfffbf08a0484b0193587dcfa09f",
+      "bytes": 912138
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/crisis_categorical_compact_cds_weather_6m_2026-10.png",
+      "sha256": "1536a5b0b3cb65aa1dddef8486d2a57b5c9276a56750d5c1544577e4af15a781",
+      "bytes": 916815
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/p3plus_share_comparison_2x3.png",
+      "sha256": "c75bf4fe8c67413613192ef9fc68a4694cd86281ed10f9361160d0f6f367bbb7",
+      "bytes": 766180
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/figures/p3plus_share_difference_1x2.png",
+      "sha256": "f9b105bfe5af047034b5b227a1fe9c535b3c3031251762c9aa617ddf83cb346e",
+      "bytes": 349589
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/model_run_codebook_en.csv",
+      "sha256": "50f353ee77349ea0e19c69cb5da68cb5043385b43c773e3780170c285e12053d",
+      "bytes": 536890
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/population/country_population_summary.csv",
+      "sha256": "d78bf47a045c95a91685a58cbcd70648372ed7ed40f1b14ac4b52c3cc57f5a54",
+      "bytes": 218612
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/population/global_population_summary.csv",
+      "sha256": "66e02b6d928021af8a3fea7e3321981becd04b291a6952c3c79ac0a26596d133",
+      "bytes": 5154
+    },
+    {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/population/regional_population_summary.csv",
+      "sha256": "88732148ff95a3a19d4bbd0e6a9e42002602ffdec70f189465397b456b37038c",
+      "bytes": 37741
+    }
+  ],
+  "created_utc": "2026-10-09T07:12:21.897415+00:00",
+  "terminology": "prediction summaries; no scoring, bootstrap or SHAP"
+}

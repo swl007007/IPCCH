@@ -1,0 +1,21 @@
+{
+  "status": "ACCEPTED",
+  "scope": "shared H0 pilot only",
+  "checked_utc": "2026-10-09T07:03:31.119919+00:00",
+  "supervisor": "Codex w11:p1",
+  "executor_session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+  "run_id": "compact_baseline/0m",
+  "replay_evidence": ".trellis/tasks/10-08-compact-cds-launch/research/supervisor-pilot-replay.json",
+  "replay_sha256": "11703525a2a6dfb998ead212a4777b5f8c3b7bab8ea3598f266b41a9aee4b8b7",
+  "manifest_sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+  "fit_rows": 49532,
+  "inference_rows": 6188,
+  "feature_count": 296,
+  "booster_order_equals_expected_contract": true,
+  "fingerprint_rehashed": true,
+  "fit_code_and_configs_unchanged": true,
+  "implementation_commit": "58dd9cd3e830de7ee049b6de3238831fe6c016ca",
+  "raw_predictions_replay_max_abs": 0.0,
+  "remaining_four_fits_authorized": true,
+  "final_acceptance": "pending"
+}

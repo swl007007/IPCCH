@@ -1,0 +1,118 @@
+{
+  "script": ".trellis/tasks/10-08-compact-cds-launch/research/output_documentation_corrections.py",
+  "script_sha256": "f8365314ae12d813921f43cdf6c5e68326e46a57d9d9f49f59a1c9fb74e2f752",
+  "started_utc": "2026-10-09T07:14:17Z",
+  "scope": "documentation/figure-text only; models, predictions, records, fitted code and configs unchanged",
+  "codebook": {
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04_compact_cds_v1/model_run_codebook_en.csv",
+    "sha256_before": "50f353ee77349ea0e19c69cb5da68cb5043385b43c773e3780170c285e12053d",
+    "sha256_after": "e563cbf06095a13f57bc9975902a43f28199b5fdadb319b74b51a9a8b4946297",
+    "rows": 308,
+    "columns_before": 30,
+    "columns_after": 39,
+    "fields_copied_from_contract": [
+      "training_source",
+      "inference_source",
+      "training_formula",
+      "inference_formula",
+      "training_missing_semantics",
+      "inference_missing_semantics",
+      "training_reference_period",
+      "inference_reference_period",
+      "training_spatial_definition",
+      "inference_spatial_definition"
+    ],
+    "contract_sha256": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82",
+    "limitations_sentences_removed": [
+      " This is an expected input, not a fitted result.",
+      "Expected inputs only; no fit verified. "
+    ],
+    "weather_rows_outcome_appended": 12,
+    "unchanged_columns_asserted": [
+      "position",
+      "predictor",
+      "group",
+      "description",
+      "unit",
+      "source",
+      "time_relative_to_origin",
+      "formula",
+      "missing_semantics",
+      "input_type",
+      "compact_baseline_0m",
+      "compact_baseline_0m_expanded_count",
+      "compact_baseline_6m",
+      "compact_baseline_6m_expanded_count",
+      "compact_baseline_12m",
+      "compact_baseline_12m_expanded_count",
+      "compact_cds_weather_6m",
+      "compact_cds_weather_6m_expanded_count",
+      "compact_cds_weather_12m",
+      "compact_cds_weather_12m_expanded_count",
+      "actual_model_columns",
+      "actual_model_positions",
+      "expected_matches_actual",
+      "family",
+      "source_variable",
+      "base_source_definition",
+      "definition_evidence",
+      "fit_status"
+    ]
+  },
+  "categorical_figures": {
+    "crisis_categorical_compact_baseline_0m_2026-04": {
+      "figure_sha256_before": "9f5191194d703f10c2a4afd8041848b91ae7eb9d5e0bb4c85a8de6eaf1b4b474",
+      "figure_sha256_after": "42ff016becbf7cd74a3fc8c86dc40be6a36a5de8801ce73b3eeaff42580aa6b3",
+      "superseded_copy": ".trellis/tasks/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_baseline_0m_2026-04.png",
+      "panel_title": "Predicted crisis (phase >= 3), target 2026-04, n=6188 areas",
+      "suptitle": "IPCCH compact launch, origin 2026-04: compact_baseline H0 (shared H0 fit)\nPredicted-only view; actual-outcome panels are excluded by design for this launch.",
+      "text_inside_canvas": true,
+      "record_sha256_unchanged": "996ebd22401822e2903d5b6eb94713d639e709fd578c2c285da78c39faed19b6",
+      "classes_equal_predictions_raw": true
+    },
+    "crisis_categorical_compact_baseline_6m_2026-10": {
+      "figure_sha256_before": "7eac1313bc3859ef1b6b80891faa52a26a511ed2b507f428c0405646c70ef209",
+      "figure_sha256_after": "28d2ac72ad3f7acc235ad03a0ae0e26446aeec3e80ca4e30eb2908a11a69adc1",
+      "superseded_copy": ".trellis/tasks/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_baseline_6m_2026-10.png",
+      "panel_title": "Predicted crisis (phase >= 3), target 2026-10, n=6188 areas",
+      "suptitle": "IPCCH compact launch, origin 2026-04: compact_baseline H6\nPredicted-only view; actual-outcome panels are excluded by design for this launch.",
+      "text_inside_canvas": true,
+      "record_sha256_unchanged": "17f61685bb0b81c1e541dc2e61077facea46cdb2b539bd755966de948d8fa8c9",
+      "classes_equal_predictions_raw": true
+    },
+    "crisis_categorical_compact_baseline_12m_2027-04": {
+      "figure_sha256_before": "f0d273d9d7a13abd0e6a3b5006bfdd694a88ddc9abc5615b6998d7aa67971623",
+      "figure_sha256_after": "1073379b2ef8591c33992abc54c60e9c10c8935d594c5cd1b40f1442aff6a78a",
+      "superseded_copy": ".trellis/tasks/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_baseline_12m_2027-04.png",
+      "panel_title": "Predicted crisis (phase >= 3), target 2027-04, n=6188 areas",
+      "suptitle": "IPCCH compact launch, origin 2026-04: compact_baseline H12\nPredicted-only view; actual-outcome panels are excluded by design for this launch.",
+      "text_inside_canvas": true,
+      "record_sha256_unchanged": "fa728f20b3249f82120306094c2974b9b724b896c3833abbf19cabefdea945de",
+      "classes_equal_predictions_raw": true
+    },
+    "crisis_categorical_compact_cds_weather_6m_2026-10": {
+      "figure_sha256_before": "1536a5b0b3cb65aa1dddef8486d2a57b5c9276a56750d5c1544577e4af15a781",
+      "figure_sha256_after": "48960bb31f25215577c80b6eae57e8110d131c78813f609fb7c5204b6a4b3bdf",
+      "superseded_copy": ".trellis/tasks/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_cds_weather_6m_2026-10.png",
+      "panel_title": "Predicted crisis (phase >= 3), target 2026-10, n=6188 areas",
+      "suptitle": "IPCCH compact launch, origin 2026-04: compact_cds_weather H6\nPredicted-only view; actual-outcome panels are excluded by design for this launch.",
+      "text_inside_canvas": true,
+      "record_sha256_unchanged": "a1b4dcd830647cc0595039600f09c0398f9bdcc8edf9aaebdf362155af30918c",
+      "classes_equal_predictions_raw": true
+    },
+    "crisis_categorical_compact_cds_weather_12m_2027-04": {
+      "figure_sha256_before": "75050978b0094fa2a76b005c03add4ed868cdfffbf08a0484b0193587dcfa09f",
+      "figure_sha256_after": "18c67c271a2c9d9432e27ee7e0cda025705d97cf049cf18f3d810aa83620fcbd",
+      "superseded_copy": ".trellis/tasks/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_cds_weather_12m_2027-04.png",
+      "panel_title": "Predicted crisis (phase >= 3), target 2027-04, n=6188 areas",
+      "suptitle": "IPCCH compact launch, origin 2026-04: compact_cds_weather H12\nPredicted-only view; actual-outcome panels are excluded by design for this launch.",
+      "text_inside_canvas": true,
+      "record_sha256_unchanged": "379bf2578616c7183abd288704de0294d15d26ffc47fef796470ef83aea6caed",
+      "classes_equal_predictions_raw": true
+    }
+  },
+  "report_outputs_sha256_before": "577977e61cd57079e5ec61fb22fc12bac70823cc3d4876d3148e4b64a325c656",
+  "report_outputs_sha256_after": "8a0563f6f28ca481dac49c50c094bcff3ecaabd47589e46e7c15b91741fc0473",
+  "figure_metadata_sha256_after": "6fef9a7fc02f725a47fd2a66f5f99379dc6995cea268c2ca847e436531b534f1",
+  "finished_utc": "2026-10-09T07:14:40Z"
+}

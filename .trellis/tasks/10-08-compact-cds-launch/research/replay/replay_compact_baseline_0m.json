@@ -1,0 +1,197 @@
+{
+  "mode": "independent replay (read-only)",
+  "checked_utc": "2026-10-09T07:08:02.509904+00:00",
+  "passed": true,
+  "checks": {
+    "artifact_hashes_match": true,
+    "artifact_set_complete": true,
+    "metadata_complete": true,
+    "hyperparameters_are_config_plus_njobs16": true,
+    "schema_equals_manifest_features": true,
+    "fit_keys_equal_selection": true,
+    "fit_targets_equal_selection": true,
+    "fit_label_months_before_2026_04": true,
+    "fit_weights_equal_selection": true,
+    "fit_weights_match_independent_rule_1e-12": true,
+    "raw_matrix_columns_keys_plus_contract": true,
+    "raw_matrix_equals_manifest_inference": true,
+    "prediction_keys_equal_inference": true,
+    "booster_feature_order_all": true,
+    "raw_predictions_within_1e-6": true,
+    "predictions_finite": true,
+    "classes_exact_saved_vs_independent_rederivation": true,
+    "classes_exact_saved_vs_reload": true,
+    "run_columns": true
+  },
+  "run_id": "compact_baseline/0m",
+  "run_dir": "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m",
+  "manifest_sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+  "artifacts": {
+    "feature_schema.json": "c583fd35f9e8c5076bc476274ecade40b4417cc814c4bb0ea27c35ad1a692f91",
+    "fit_keys.csv.gz": "0b409f719785333dca4f0537961de220b5aefb2ff748e20f34eb6628b8e740f8",
+    "fit_targets.csv.gz": "674d84a9969188259bca50dcd9947d0de80949600298e761cbffbacca3b32dde",
+    "fit_weights.csv.gz": "756db99c8004337fe2fad08f0e1bfc1bb4b2f0f00e906785b31ed42d346c9944",
+    "inference_features.csv.gz": "e773aba35bcb4e6905bc32738d737f122a09085f590fa97f8810f404a7eb63e9",
+    "predictions_raw.csv": "e07b733c99daa0a37f0fbb843a4a09f83bb3a8606a80daa5046aa11d024b0277",
+    "model_phase2_worse.ubj": "b9436dddd07ebbba3be094d671bbb291002c6db9d78a7019c30774dff99b1b6b",
+    "model_phase3_worse.ubj": "9293ac3e9936827c66908f7f2ba3af72f30e36e0aa4a869c500226d95549b0e2",
+    "model_phase4_worse.ubj": "54cb909806af44b2878ee3b49640a717be234ec0f169b4af3580933acfdeb50c",
+    "model_phase5_worse.ubj": "8f6c343013ab2626914ffa3a2002b49bf51150ee9aec9790b19c6375dc1dfc49",
+    "run_metadata.json": "e5b269f4e75ed4d2dd20a0ed4731a1c51a4f6ec9b5f5a99ffc86eb745f339a01"
+  },
+  "fingerprint": "975b0806aef6d7e28f242c8d8b0da4c12158d3606d6ed474ab8934c92e003c9b",
+  "git_head": "58dd9cd3e830de7ee049b6de3238831fe6c016ca",
+  "git_status_porcelain": "M PROGRESS.md\n?? .trellis/tasks/10-08-compact-cds-launch/research/pilot_replay_check.py",
+  "fit_seconds": {
+    "phase2_worse": 16.91,
+    "phase3_worse": 2.06,
+    "phase4_worse": 12.94,
+    "phase5_worse": 3.55
+  },
+  "run_seconds": 44.93,
+  "peak_rss_mb_self": 1910.8,
+  "hyperparameters": {
+    "set": "canonical",
+    "hyperparameters": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/configs/forecasting_hyperparameters.json",
+    "hyperparameters_p3": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/configs/forecasting_hyperparameters_p3.json"
+  },
+  "hyperparameters_effective": {
+    "phase2/4/5": {
+      "max_depth": 11,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "subsample": 1,
+      "colsample_bytree": 0.5,
+      "gamma": 0,
+      "min_child_weight": 0,
+      "scale_pos_weight": 1,
+      "n_jobs": 16
+    },
+    "phase3": {
+      "max_depth": 9,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "subsample": 0.5,
+      "colsample_bytree": 0.7,
+      "gamma": 0.1,
+      "min_child_weight": 0,
+      "scale_pos_weight": 1,
+      "n_jobs": 16
+    }
+  },
+  "contract_columns": [
+    "position",
+    "predictor",
+    "group",
+    "description",
+    "unit",
+    "source",
+    "time_relative_to_origin",
+    "formula",
+    "missing_semantics",
+    "input_type",
+    "compact_baseline_0m",
+    "compact_baseline_0m_expanded_count",
+    "compact_baseline_6m",
+    "compact_baseline_6m_expanded_count",
+    "compact_baseline_12m",
+    "compact_baseline_12m_expanded_count",
+    "compact_cds_weather_6m",
+    "compact_cds_weather_6m_expanded_count",
+    "compact_cds_weather_12m",
+    "compact_cds_weather_12m_expanded_count",
+    "expected_model_columns",
+    "expected_model_positions",
+    "horizons_months",
+    "family",
+    "source_variable",
+    "base_source_definition",
+    "definition_evidence",
+    "limitations",
+    "contract_status",
+    "training_source",
+    "inference_source",
+    "training_formula",
+    "inference_formula",
+    "training_missing_semantics",
+    "inference_missing_semantics",
+    "training_reference_period",
+    "inference_reference_period",
+    "training_spatial_definition",
+    "inference_spatial_definition"
+  ],
+  "weights_max_abs_vs_independent_rule": 0.0,
+  "fit_rows": 49532,
+  "fit_label_ord_range": [
+    24168,
+    24314
+  ],
+  "weight_range": [
+    0.014328188175072988,
+    0.9715319411536059
+  ],
+  "boosters": {
+    "phase2_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 296,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase3_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 296,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase4_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 296,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    },
+    "phase5_worse": {
+      "feature_names_equal_contract": true,
+      "num_features": 296,
+      "num_boosted_rounds": 200,
+      "max_abs_saved_vs_reload_raw": 0.0,
+      "max_abs_saved_vs_reload_manifest_matrix": 0.0,
+      "finite": true
+    }
+  },
+  "class_counts": {
+    "1": 38,
+    "2": 1690,
+    "3": 4366,
+    "4": 94
+  },
+  "raw_prediction_summary": {
+    "phase2_pred": {
+      "min": 0.1234641820192337,
+      "mean": 0.6109297843391115,
+      "max": 0.9027233719825745
+    },
+    "phase3_pred": {
+      "min": 0.0652974545955658,
+      "mean": 0.2712418646048983,
+      "max": 0.6693199276924133
+    },
+    "phase4_pred": {
+      "min": -0.004367377143353224,
+      "mean": 0.05776400494038029,
+      "max": 0.2896369695663452
+    },
+    "phase5_pred": {
+      "min": -0.001389185432344675,
+      "mean": 0.0030228367545441807,
+      "max": 0.05144815146923065
+    }
+  },
+  "cumulative_monotone_rows_violating": 137,
+  "elapsed_s": 2.0
+}

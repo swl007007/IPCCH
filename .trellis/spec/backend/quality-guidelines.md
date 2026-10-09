@@ -251,3 +251,62 @@ Pandas rolling add/remove statistics can leave a nonzero SD after a window becom
 mean/variance can distort z for prior values30.0 versus29.99999999999999. Compact `trailing`/`same_month_z` use per-window,
 shift-centred calculations, tested against exact Fraction arithmetic. Keep the old helpers unchanged for legacy versions.
 Use unique-group `pivot` for reports: `pivot_table(dropna=False)` on multiple index fields creates nonexistent run groups.
+
+## Compact CDS launch (2026-10-09, `compact_cds_launch_v1`)
+
+### Scope and trigger
+
+April2026-origin launch: April2026/October2026/April2027 population predictions and maps. This version trains the weather
+arm on realized compact oracle anomalies and substitutes same-April-init ECMWF system51 CDS anomalies at inference.
+The five unique sets are baseline H0/H6/H12 (296 columns) and weather H6/H12 (308), four regressors each; H0 is shared.
+
+### Signatures
+
+- `build_compact_cds_launch_inputs.py --weather-only --download-weather`: existing CDS interpreter, weather only.
+- `build_compact_cds_launch_inputs.py --assemble-only --weather-cube <cube>`: frozen model interpreter, no download.
+- `run_compact_cds_launch.py --validate-only`: prefit checks without writes/fitting.
+- `run_compact_cds_launch.py --approve-training [--runs compact_baseline/0m]`: sequential fitting, complete-record resume.
+- `run_compact_cds_launch.py --report` and `--verify`: saved-model population/maps/codebook and independent verification.
+
+### Contracts
+
+- Fit labels strictly before April2026; every inference IPC history uses source reports through March. Ordinary/IDP
+  sources use April origin; completed-season rules stay inherited. Full6188-area cohort ignores target-label eligibility.
+- Calendar is the target, including existing year flags all0 for2027. Fixed April population, common legacy country cap
+  (raw >110% of2025 reference ->95%), raw predictions/classes unchanged; reporting shares only use difference/clip/normalize.
+- CDS official monthly leads2..6 mean May..September. October uses original-frequency forecast and all24 April-init
+  1993..2016 hindcast years;51 forecast members and25 members/year. Temperature uses six-hour valid times in `(start,end]`,
+  empirically verified against supplied September absolute and anomaly products; primary documents do not specify inclusivity.
+- Rainfall uses signed accumulated endpoints `P(end)-P(start)` and preserves small decreases as diagnostics. September
+  packing/reduction bounds are frozen independently of discrepancies. No clipping, member removal or tolerance tuning.
+- Training observed1991..2020 reference and CDS model1993..2016/fixed-point extraction differ by accepted design.
+  Model and weather interpreters are separate (NumPy2.4.4 vs2.4.6). Credentials remain in the existing home config.
+
+### Validation and error matrix
+
+| Condition | Required outcome |
+|---|---|
+| Missing/changed source, contract/config/runtime, incomplete/stale fitting record | Reject rather than substitute/refit silently |
+| Missing weather identity/member/year/grid/month or unexplained September overlap | Preserve diagnostics and reject October acceptance |
+| Invalid population, changed/duplicate keys, missing country/region/geometry join | Reject; retain zero-population areas |
+| Nonfinite prediction, schema/replay difference, inconsistent arithmetic/map record | Fail verification; no acceptance |
+| Open verifier stdout under inventoried results/reports root | Move the live log outside both roots before verification |
+
+### Good, base and bad cases
+
+H0 has one fit and zero paired differences. H12 uses only May..October forecasts from the same April initialization.
+Using the old shifted processed monthly labels, later initialization or the2774 labeled-April subset is invalid.
+
+### Tests required
+
+Assert month/units/support/packing identities; March-only history and future-source invariance; literal `NA` and object-ID
+CSV round trips; exact296/308 feature order and20 finite model replays; independent phase1..5/P3+/P4+ counts/shares at
+area/country/region/global and all paired differences; exactly seven maps and keyed table-value/geometry coverage.
+An actual codebook admits fitted features only and distinguishes training/inference formulas, references and spatial definitions.
+Inspect title bounds visually: accepted figure/codebook documentation corrections are recorded with hashes in the task evidence.
+
+### Wrong versus correct
+
+Wrong: label a GRIB by `validityDate` or filename, round before classification, or equate a file-list hash to numeric/map fidelity.
+Correct: use the statistical/verifying month, threshold raw scores, reload models and compare saved keyed values independently.
+Keep approved contracts in the external versioned input root; archived task paths in evidence are provenance, not runtime inputs.

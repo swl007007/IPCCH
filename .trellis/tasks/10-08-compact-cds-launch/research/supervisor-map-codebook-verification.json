@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "checked_utc": "2026-10-09T07:15:54.439097+00:00",
+  "figures": 7,
+  "mapped_areas_per_panel": 6188,
+  "categorical_values": "exact raw phase >=3; five unique run records",
+  "continuous_values": "repaired shares x100; six cohorts",
+  "difference_values": "(CDS-baseline) repaired shares x100; two cohorts",
+  "geometry_sidecars_rehashed": true,
+  "codebook_union_rows": 308,
+  "codebook_membership_and_order": {
+    "compact_baseline/0m": 296,
+    "compact_baseline/6m": 296,
+    "compact_baseline/12m": 296,
+    "compact_cds_weather/6m": 308,
+    "compact_cds_weather/12m": 308
+  },
+  "codebook_actual_only": true,
+  "codebook_training_inference_fields_match_contract": [
+    "training_source",
+    "inference_source",
+    "training_formula",
+    "inference_formula",
+    "training_missing_semantics",
+    "inference_missing_semantics",
+    "training_reference_period",
+    "inference_reference_period",
+    "training_spatial_definition",
+    "inference_spatial_definition"
+  ],
+  "codebook_sha256": "e563cbf06095a13f57bc9975902a43f28199b5fdadb319b74b51a9a8b4946297",
+  "figure_metadata_sha256": "6fef9a7fc02f725a47fd2a66f5f99379dc6995cea268c2ca847e436531b534f1",
+  "figure_sha256": {
+    "crisis_categorical_compact_baseline_0m_2026-04.png": "42ff016becbf7cd74a3fc8c86dc40be6a36a5de8801ce73b3eeaff42580aa6b3",
+    "crisis_categorical_compact_baseline_12m_2027-04.png": "1073379b2ef8591c33992abc54c60e9c10c8935d594c5cd1b40f1442aff6a78a",
+    "crisis_categorical_compact_baseline_6m_2026-10.png": "28d2ac72ad3f7acc235ad03a0ae0e26446aeec3e80ca4e30eb2908a11a69adc1",
+    "crisis_categorical_compact_cds_weather_12m_2027-04.png": "18c67c271a2c9d9432e27ee7e0cda025705d97cf049cf18f3d810aa83620fcbd",
+    "crisis_categorical_compact_cds_weather_6m_2026-10.png": "48960bb31f25215577c80b6eae57e8110d131c78813f609fb7c5204b6a4b3bdf",
+    "p3plus_share_comparison_2x3.png": "c75bf4fe8c67413613192ef9fc68a4694cd86281ed10f9361160d0f6f367bbb7",
+    "p3plus_share_difference_1x2.png": "f9b105bfe5af047034b5b227a1fe9c535b3c3031251762c9aa617ddf83cb346e"
+  }
+}
