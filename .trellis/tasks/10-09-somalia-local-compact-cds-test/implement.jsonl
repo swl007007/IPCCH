@@ -1,0 +1,6 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Temporal leakage, compact/CDS frozen contracts and keyed evidence"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/prd.md","reason":"Historical and launch requirements and observable acceptance"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/design.md","reason":"SOM masks, parent gates, cohorts, fingerprints and reporting"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/implement.md","reason":"Execution ordering, two-file scope and lifecycle gates"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/research/local-contract-surface.md","reason":"Reusable unchanged fits/replays and frozen global boundaries"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/research/coverage.md","reason":"905 historical versus904 launch coverage and inherited population"}

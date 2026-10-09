@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Independent numerical/keyed evidence and temporal contracts"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/prd.md","reason":"Acceptance for132 models, cohorts, absolute values and deltas"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/design.md","reason":"Independent model/metric/population/map replays and complete identity"}
+{"file":".trellis/tasks/10-09-somalia-local-compact-cds-test/research/coverage.md","reason":"SOM membership, stage coverage and fixed population factor"}

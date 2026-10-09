@@ -1,0 +1,32 @@
+{
+  "id": "somalia-local-compact-cds-test",
+  "name": "somalia-local-compact-cds-test",
+  "title": "Somalia local compact historical experiment and CDS launch",
+  "description": "After grilling and spec approval, rerun the compact historical baseline/oracle experiment and April2026 compact/CDS launch using Somalia-only local fits; report absolute results and paired differences.",
+  "status": "planning",
+  "dev_type": "backend",
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "William Shi",
+  "assignee": "William Shi",
+  "createdAt": "2026-10-09",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "Final spec approved 2026-10-09; execute via Herdr Claude Opus 5.5 1M, Codex supervisor, no Trellis audit. Ordinary lifecycle and independent supervisor acceptance.",
+  "meta": {
+    "approval_date": "2026-10-09",
+    "requested_executor": "Claude Opus 5.5",
+    "requested_context_window": 1000000,
+    "audit_policy": "user explicitly excluded Trellis audit for this task",
+    "acceptance_authority": "Codex supervisor"
+  }
+}

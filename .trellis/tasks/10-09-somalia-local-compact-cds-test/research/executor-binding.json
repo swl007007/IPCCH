@@ -1,0 +1,32 @@
+{
+  "verified_utc": "2026-10-09T17:30:31.293680+00:00",
+  "agent": {
+    "agent": "claude",
+    "agent_session": {
+      "agent": "claude",
+      "kind": "id",
+      "source": "herdr:claude",
+      "value": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3"
+    },
+    "agent_status": "idle",
+    "cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+    "focused": false,
+    "foreground_cwd": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH",
+    "name": "somalia-local-executor",
+    "pane_id": "w11:p4",
+    "revision": 2,
+    "state_change_seq": 6,
+    "tab_id": "w11:t4",
+    "terminal_id": "term_65d6ae54981a13",
+    "terminal_title": "✳ Compact climate weather oracle",
+    "terminal_title_stripped": "Compact climate weather oracle",
+    "workspace_id": "w11"
+  },
+  "runtime_observation": "Opus 5.5 (1M context)",
+  "requested_context_window": 1000000,
+  "runtime_evidence": "research/executor-runtime-ui.txt",
+  "supervisor_pane": "w11:p1",
+  "user_approval": "approval.md",
+  "audit_policy": "no Trellis audit; explicit current user instruction",
+  "execution_status": "not yet dispatched; planning commit and ordinary task activation pending"
+}

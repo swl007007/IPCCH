@@ -1,0 +1,12 @@
+  The full record is in research/final-execution-evidence.md, and PROGRESS.md is updated.
+
+❯ Supervisor final acceptance is complete: research/supervisor-final-acceptance.json ACCEPTED A1-A9,107 artifacts freshly rehashed with exact inventory file set,488 old artifacts unchanged; independent20-model replay,1446597 population cells, all map/geometry/codebook checks passed and all7 PNGs visually inspected. Codex will now handle
+  the evidence/spec-ledger commit and ordinary Trellis archive/journal. Keep all source, model and output artifacts unchanged; no further commands that regenerate reports or fit/retrieve/verify. No audit wrappers or push. You can end at this accepted checkpoint; the same executor binding is retained in evidence.
+
+● Acknowledged. The compact CDS launch is accepted, and I'm stopping here. I won't touch any source, model or output files, and won't run any fit, retrieval, report or verify commands, audit wrappers or pushes. The evidence/spec-ledger commit, archive and journal are left to Codex.
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Opus 5.5 (1M context) · ctx 22% · task/compact-climate-weather-oracle · 0m · William Shi · 1 task(s)                                                                                                                                                                                                                              218265 tokens
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents

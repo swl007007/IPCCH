@@ -1,0 +1,13 @@
+stage,arm,horizon,test_years,origin,target,features,batches,models
+historical,compact_baseline,0,2022|2023|2024|2025,row-specific,row-specific,296,4,16
+historical,compact_baseline,3,2022|2023|2024|2025,row-specific,row-specific,296,4,16
+historical,compact_weather_oracle,3,2022|2023|2024|2025,row-specific,row-specific,302,4,16
+historical,compact_baseline,6,2022|2023|2024|2025,row-specific,row-specific,296,4,16
+historical,compact_weather_oracle,6,2022|2023|2024|2025,row-specific,row-specific,308,4,16
+historical,compact_baseline,12,2022|2023|2024|2025,row-specific,row-specific,296,4,16
+historical,compact_weather_oracle,12,2022|2023|2024|2025,row-specific,row-specific,308,4,16
+launch,compact_baseline,0,,2026-04,2026-04,296,1,4
+launch,compact_baseline,6,,2026-04,2026-10,296,1,4
+launch,compact_cds_weather,6,,2026-04,2026-10,308,1,4
+launch,compact_baseline,12,,2026-04,2027-04,296,1,4
+launch,compact_cds_weather,12,,2026-04,2027-04,308,1,4
