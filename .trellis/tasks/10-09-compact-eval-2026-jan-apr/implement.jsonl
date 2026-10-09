@@ -1,0 +1,7 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"Temporal safety, frozen compact inputs/runtime, honest local fitting, replay and inventories"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/prd.md","reason":"Approved requirements R1-R6 and observable acceptance A1-A8"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/design.md","reason":"Independent entrypoint, post-parent-gate masks, old/new provenance, exact periods and output boundaries"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/implement.md","reason":"Bounded execution sequence, fresh implementation gate and no-audit Herdr executor policy"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/expected_runs.csv","reason":"Fourteen2026batches, cutoffs, fitting/evaluation sets and56newboosters"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/approval.md","reason":"Explicit requirements convergence and subsequent fresh written-plan execution approval; no-audit Herdr policy"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/contracts.md","reason":"Current code/data/report contracts and source/hash evidence without fabricated run validation"}

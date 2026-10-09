@@ -1,0 +1,15 @@
+scope,model_scope,arm,horizon,block_year,fit_origin_month,fit_label_cutoff_month,fit_rows,fit_areas,eval_rows,eval_areas,feature_count,new_boosters
+global,global,compact_baseline,0,2026,2026-01,2025-12,47979,6225,4327,3823,296,4
+global,global,compact_baseline,3,2026,2025-10,2025-10,47796,6225,4327,3823,296,4
+global,global,compact_baseline,6,2026,2025-07,2025-07,42715,6203,4327,3823,296,4
+global,global,compact_baseline,12,2026,2025-01,2025-01,38536,6169,4327,3823,296,4
+global,global,compact_weather_oracle,3,2026,2025-10,2025-10,47796,6225,4327,3823,302,4
+global,global,compact_weather_oracle,6,2026,2025-07,2025-07,42715,6203,4327,3823,308,4
+global,global,compact_weather_oracle,12,2026,2025-01,2025-01,38536,6169,4327,3823,308,4
+SOM,Somalia local,compact_baseline,0,2026,2026-01,2025-12,5834,905,905,904,296,4
+SOM,Somalia local,compact_baseline,3,2026,2025-10,2025-10,5834,905,905,904,296,4
+SOM,Somalia local,compact_baseline,6,2026,2025-07,2025-07,4926,905,905,904,296,4
+SOM,Somalia local,compact_baseline,12,2026,2025-01,2025-01,3958,891,905,904,296,4
+SOM,Somalia local,compact_weather_oracle,3,2026,2025-10,2025-10,5834,905,905,904,302,4
+SOM,Somalia local,compact_weather_oracle,6,2026,2025-07,2025-07,4926,905,905,904,308,4
+SOM,Somalia local,compact_weather_oracle,12,2026,2025-01,2025-01,3958,891,905,904,308,4

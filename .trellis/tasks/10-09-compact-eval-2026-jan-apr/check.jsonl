@@ -1,0 +1,6 @@
+{"file":".trellis/spec/backend/quality-guidelines.md","reason":"No-leakage, replay tolerances, complete artifact inventories and source-preserving failure handling"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/prd.md","reason":"A1-A8 acceptance, scientific boundaries, absolute metrics/deltas and partial2026coverage"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/design.md","reason":"Old/new lineage, fiveannual/twopooledperiods, unchanged parent code and all-regions coverage"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/implement.md","reason":"Focused commands and separate executed-versus-planned validation evidence"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/expected_runs.csv","reason":"Independent counts/cutoffs and exact14batch/56modelnewrun inventory"}
+{"file":".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/contracts.md","reason":"Pinned source facts, canonical undefined support and prior-result verification limitations"}
