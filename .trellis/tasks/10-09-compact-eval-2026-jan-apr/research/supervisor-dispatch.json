@@ -13,6 +13,9 @@
   "observed_status": "working",
   "observed_activity": "read approved task handoff and spec; current task visible in executor UI",
   "prompt_outcome": "submitted; settled-state wait timed out, then actual working activity verified; not resubmitted",
-  "current_authorized_phase": "implementation, focused tests and no-write preflight",
-  "coordinator_barrier": "pause before first heavy fit/code commit so tested implementation can be reviewed and frozen"
+  "current_authorized_phase": "2026 fitting, historical reports, saved-artifact verification and execution evidence",
+  "coordinator_barrier": "source freeze accepted; pause after final execution checkpoint before coordinator acceptance/commit/archive",
+  "implementation_commit": "60578219e89d2f4e8aa17c644703200096a4f22b",
+  "release_prompt_outcome": "submitted; wait timed out after 5 seconds, same verified session working and reading release file; not resubmitted",
+  "release_file": "research/supervisor-fitting-release.md"
 }

@@ -1,0 +1,49 @@
+{
+ "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+ "scope": "SOM",
+ "status": "verification_pending",
+ "outputs": {
+  "som_metrics_long.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/som_metrics_long.csv",
+   "sha256": "2b473ba66e0fe6d03d031c75c553377e9aeaef01549a56990effaf63b25759f7",
+   "rows": 392,
+   "columns": 17
+  },
+  "som_oracle_minus_baseline_deltas.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/som_oracle_minus_baseline_deltas.csv",
+   "sha256": "2f753a5cd45e331e1ab16f23dce4909824a5c8ef00a953f318f14539387f4994",
+   "rows": 224,
+   "columns": 16
+  },
+  "som_undefined_reasons.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/som_undefined_reasons.csv",
+   "sha256": "0f5b3a18fca1da4f15307995c35d723c4d5ea009b1194a96f68d27620c010778",
+   "rows": 1,
+   "columns": 6
+  },
+  "coverage_by_month.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/coverage_by_month.csv",
+   "sha256": "4c2f467b4427f82349f603098e15f17f620783b008126b77b0daf1b4e2b97cfe",
+   "rows": 4,
+   "columns": 7
+  }
+ },
+ "codebook": {
+  "codebook": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_somalia_local_model_run_codebook_en.csv",
+  "sha256": "5c1edd47dec8095d758acaf8c1cae0d32c0c08cac2e4774428476a66320a744e",
+  "rows": 308,
+  "expected_rows": 308,
+  "expected_vs_actual": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/expected_vs_actual_inputs.csv",
+   "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+  },
+  "model_run_index": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/model_run_index.csv",
+   "sha256": "3ff4a3eee6800818b5dac3701bb61b65ccc50b00818e3fea0e94adc1395e98fc"
+  }
+ },
+ "report_md": {
+  "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report.md",
+  "sha256": "90bc34f77b8887be4fe266827ff7bd3046c980fa3f33fe529169843a17cc9fda"
+ }
+}

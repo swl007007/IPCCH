@@ -1,0 +1,85 @@
+{
+  "accepted_utc": "2026-10-09T21:05:01.074807+00:00",
+  "status": "accepted_A1_A8_by_coordinator",
+  "audit_started": false,
+  "approved_plan_sha": "16d2e92a8948e7f235541a6facb452e375ac4f5d",
+  "implementation_sha": "60578219e89d2f4e8aa17c644703200096a4f22b",
+  "executor_session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+  "entrypoint_sha256": "cbc1f88b2758cf4c2ec87c83257fc6f7f269d54018bd13f98138389da18db678",
+  "test_sha256": "952bd849fee05bf5396df257d0b7beb2b98c15df6cf5f26268248b3648ffbfac",
+  "acceptance": {
+    "A1": "accepted",
+    "A2": "accepted",
+    "A3": "accepted",
+    "A4": "accepted",
+    "A5": "accepted",
+    "A6": "accepted",
+    "A7": "accepted",
+    "A8": "accepted"
+  },
+  "scope_checks": {
+    "global": {
+      "new_batches": 7,
+      "new_models_replayed": 28,
+      "max_new_replay_abs_diff": 0.0,
+      "schemas_inspected": 140,
+      "original_batches_checked": 28,
+      "metric_cells_replayed": 3920,
+      "delta_cells_replayed": 1680,
+      "original_parity_cells": 2800,
+      "undefined_cells": 176,
+      "protected_files": 859,
+      "protected_changed": 0,
+      "protected_missing": 0,
+      "protected_added": 0,
+      "verification_path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/verification/verification_summary.json",
+      "verification_sha256": "8dee633fa0dc6db73223ec85993a52ca03206cb8b88fd9063c4d1e14fd678e72",
+      "inventory_sha256": "a5ba615ca986051be274a87a9d0ce9f1f4bc501c6e7a8a489f42ad1536f6db39"
+    },
+    "SOM": {
+      "new_batches": 7,
+      "new_models_replayed": 28,
+      "max_new_replay_abs_diff": 0.0,
+      "schemas_inspected": 140,
+      "original_batches_checked": 28,
+      "metric_cells_replayed": 392,
+      "delta_cells_replayed": 224,
+      "original_parity_cells": 280,
+      "undefined_cells": 1,
+      "protected_files": 859,
+      "protected_changed": 0,
+      "protected_missing": 0,
+      "protected_added": 0,
+      "verification_path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/verification/verification_summary.json",
+      "verification_sha256": "8980fb5979353ae7cbdbe8d4d57bbfa2eb6cd3b79005ae3d445cda468d4f582c",
+      "inventory_sha256": "73eb7ac007bfb40bd588ea18482d042da76b62e21753c8075c301b50cafa1dea"
+    }
+  },
+  "roots": {
+    "global": {
+      "results": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+      "report": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report.md"
+    },
+    "SOM": {
+      "results": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+      "report": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report.md"
+    }
+  },
+  "supplementary_evidence": [
+    "publication-check.md",
+    "result-extraction.md",
+    "supervisor-protected-after.json",
+    "final-execution-evidence.md",
+    "final-execution-checkpoint.json"
+  ],
+  "protected_baseline_files": 961,
+  "all_action_return_codes": 0,
+  "focused_tests_passed": 82,
+  "limits": [
+    "2026 contains January-April only",
+    "SOM has 904/905 rows from April",
+    "single seed and point estimates; no bootstrap",
+    "retrospective source availability proxy; oracle is not CDS skill",
+    "224 reused boosters retain accepted prior numerical replay; 56 new boosters replayed here"
+  ]
+}

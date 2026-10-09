@@ -1,0 +1,21 @@
+{
+ "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+ "scope": "SOM",
+ "passed": true,
+ "problems": [],
+ "checks": {
+  "new_batches": 7,
+  "new_models_replayed": 28,
+  "max_new_replay_abs_diff": 0.0,
+  "schemas_inspected": 140,
+  "original_batches_checked": 28,
+  "metric_cells_replayed": 392,
+  "delta_cells_replayed": 224,
+  "original_parity_cells": 280,
+  "undefined_cells": 1,
+  "protected_files": 859,
+  "protected_changed": 0,
+  "protected_missing": 0,
+  "protected_added": 0
+ }
+}

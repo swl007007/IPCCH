@@ -1,0 +1,1199 @@
+{
+  "checkpoint": "compact 2026 Jan-Apr extension: fitting, reporting and saved-artifact verification complete; awaiting coordinator acceptance",
+  "git_head": "60578219e89d2f4e8aa17c644703200096a4f22b",
+  "approved_plan_commit": "16d2e92a8948e7f235541a6facb452e375ac4f5d",
+  "code": {
+    "entrypoint_sha256": "cbc1f88b2758cf4c2ec87c83257fc6f7f269d54018bd13f98138389da18db678",
+    "test_sha256": "952bd849fee05bf5396df257d0b7beb2b98c15df6cf5f26268248b3648ffbfac"
+  },
+  "executor": {
+    "session": "579e6ba5-f2a2-483c-b465-4b2e3cca1ed3",
+    "audit": "none",
+    "commit": "none"
+  },
+  "chain": {
+    "script": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/chain.sh",
+    "sha256": "a1b2349354e8896d9ec62aba9c297aab7e2fae0c671ac96109bffb3d5e0a471e",
+    "returncodes": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/action_returncodes.txt"
+  },
+  "actions": [
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope global --approve-training",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1616775,
+      "wall": "7:02.93",
+      "max_rss_kb": 2153544,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/approve-training_global_stdout.json",
+      "stdout_sha256": "48110b6dce35e04f5d8fdd012ab5167b58e89d373dad198b1a7c498ba05f8c17",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/approve-training_global.log",
+      "log_sha256": "289651369052e1290fb4d81dee9e61232c54239e8e0d3d87d3dd20e1f1fd1452",
+      "pins_unchanged": true
+    },
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope SOM --approve-training",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1652193,
+      "wall": "4:08.73",
+      "max_rss_kb": 1161720,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/approve-training_SOM_stdout.json",
+      "stdout_sha256": "1abdf72bd83c115af871ad7fd4cef70382406dfde1d268b155b9be6ce1dc7f61",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/approve-training_SOM.log",
+      "log_sha256": "22c97bf83ce49c48eab28f93eb99865b71293ca1131b56726154b0258dfd7b3b",
+      "pins_unchanged": true
+    },
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope global --report",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1675612,
+      "wall": "0:12.39",
+      "max_rss_kb": 334052,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/report_global_stdout.json",
+      "stdout_sha256": "3f5c75b83db78daea43efd6336e98a7b88b2d0971fe157dfdd8ad86fa46153ad",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/report_global.log",
+      "log_sha256": "48c425223ae3f5a0d29b0064d72c64e86d4cae49ff62e52beb24ce177d5e58e0",
+      "pins_unchanged": true
+    },
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope SOM --report",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1676875,
+      "wall": "0:07.16",
+      "max_rss_kb": 303516,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/report_SOM_stdout.json",
+      "stdout_sha256": "d647f137905f4cded0d9f89299423834b13bdfa7ab378d86251b0e94add9941e",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/report_SOM.log",
+      "log_sha256": "f0ecd41b361bb5b444d109b8a5d7da9248ded5ef1191c13a4f04a1b95ca3ac14",
+      "pins_unchanged": true
+    },
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope global --verify",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1677568,
+      "wall": "2:46.35",
+      "max_rss_kb": 1022992,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/verify_global_stdout.json",
+      "stdout_sha256": "95c14f5707f274d853494909fd70c43f6e1a59cd5c5f40e184ec3cc389ff1ba0",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/verify_global.log",
+      "log_sha256": "e8c416ca775d46fafd5d4bbeb2e0cbcb9eee88320e28d3e4fa2d55e09df24526",
+      "pins_unchanged": true
+    },
+    {
+      "command": "PATH=/tmp/ipcch-windows-git-bin:$PATH PYTHONPATH=src /usr/bin/time -v /home/swl007007/.venvs/ipcch-geo/bin/python scripts/modeling/run_compact_eval_2026_extension.py --scope SOM --verify",
+      "action_return_code": 0,
+      "time_wrapper_pid": 1692487,
+      "wall": "2:48.88",
+      "max_rss_kb": 940556,
+      "time_exit_status": 0,
+      "stdout": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/verify_SOM_stdout.json",
+      "stdout_sha256": "903ec2e9c23bbaf6a6c698ea5cfc86aca842f3aeb8d91c802e57246317ef49f0",
+      "stderr_time_log": ".trellis/tasks/10-09-compact-eval-2026-jan-apr/research/execution/verify_SOM.log",
+      "log_sha256": "41e7461d30aa179199d49de5471ff12f6189f45b16e41d9c08af686fa6c72e84",
+      "pins_unchanged": true
+    }
+  ],
+  "scopes": {
+    "global": {
+      "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+      "results_root": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+      "reports_root": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+      "extension_manifest": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/inputs/extension_manifest.json",
+        "sha256": "913fae43952ced0982a77abc6fe97b3a0325ac7bf8bfae8f2c98380fb766ab70"
+      },
+      "verification_summary": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/verification/verification_summary.json",
+        "sha256": "8dee633fa0dc6db73223ec85993a52ca03206cb8b88fd9063c4d1e14fd678e72",
+        "passed": true,
+        "status": "accepted_by_executor_verifier",
+        "problems": [],
+        "checks": {
+          "new_batches": 7,
+          "new_models_replayed": 28,
+          "max_new_replay_abs_diff": 0.0,
+          "schemas_inspected": 140,
+          "original_batches_checked": 28,
+          "metric_cells_replayed": 3920,
+          "delta_cells_replayed": 1680,
+          "original_parity_cells": 2800,
+          "undefined_cells": 176,
+          "protected_files": 859,
+          "protected_changed": 0,
+          "protected_missing": 0,
+          "protected_added": 0
+        },
+        "final_reporting": {
+          "status": "verified",
+          "updated": [
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report.md",
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_model_run_codebook_en.csv",
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/comparison_metadata.json"
+          ],
+          "report_md_sha256": "a88209b3c957f4395749140c54782f51a7b9c955eacef647ed58708b32fa0d71",
+          "codebook_sha256": "0904d7f33b9054ac5095eb0aea1407450c3871087d96bdd360eb66862ccc926d",
+          "comparison_metadata_sha256": "a5d0a2f04e3c81cdba76f106b342fdab32b7a1f1a2dfe54dfeb1f6ce3129f401"
+        }
+      },
+      "artifact_inventory": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/verification/artifact_inventory.csv",
+        "sha256": "a5ba615ca986051be274a87a9d0ce9f1f4bc501c6e7a8a489f42ad1536f6db39",
+        "rows": 86
+      },
+      "comparison_metadata": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/comparison_metadata.json",
+        "sha256": "a5d0a2f04e3c81cdba76f106b342fdab32b7a1f1a2dfe54dfeb1f6ce3129f401",
+        "status": "verified"
+      },
+      "report_outputs": {
+        "all_metrics_long.csv": {
+          "sha256": "187ecac1310374e99c20873cf8caba73ea07b1c267ee7e96bb00f0df724f4866",
+          "rows": 3920
+        },
+        "global_metrics.csv": {
+          "sha256": "bf04f11f5b27bf772b22a5a91d026166193e58f6120d46b7eb609bced7b89035",
+          "rows": 392
+        },
+        "regional_metrics.csv": {
+          "sha256": "8211a32f2c13b0d247d53183eb7f4d896985f873dced7de3ab7b5e331d8b69a3",
+          "rows": 3528
+        },
+        "global_deltas.csv": {
+          "sha256": "cd8e572a0e20ff6f43bea5e52021d422a9b15bc7fcdbfde0e67ed0a289d921d1",
+          "rows": 168
+        },
+        "regional_deltas.csv": {
+          "sha256": "0790b6dac0e3a7db00b51201d3d8d23d9f4cf2adb50d0094945f865010f1b033",
+          "rows": 1512
+        },
+        "undefined_reasons.csv": {
+          "sha256": "f0ede90ea9de6140812727d9dc8042ea5aca29e1e055f5ddc4f96dfc0d0309b1",
+          "rows": 10
+        },
+        "coverage_by_month.csv": {
+          "sha256": "77aa091b44541a33a4605aaf365f963886f955d703b5b28934c760cfd6f5120c",
+          "rows": 4
+        }
+      },
+      "report_md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report.md",
+        "sha256": "a88209b3c957f4395749140c54782f51a7b9c955eacef647ed58708b32fa0d71"
+      },
+      "codebook": {
+        "codebook": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_model_run_codebook_en.csv",
+        "sha256": "0904d7f33b9054ac5095eb0aea1407450c3871087d96bdd360eb66862ccc926d",
+        "rows": 308,
+        "expected_rows": 308,
+        "expected_vs_actual": {
+          "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/expected_vs_actual_inputs.csv",
+          "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+        },
+        "model_run_index": {
+          "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/model_run_index.csv",
+          "sha256": "e65b1e7f652c67350d80d5c5a2c3450f547c32a995ff687d7454b3ea8bac9cfa"
+        }
+      },
+      "selection": {
+        "expanded_pooled_rows": 32532,
+        "fit_valid_keys_sha256": "730fc0b8e5383db9fdd5a42b8f6f468322f88e7322932a6d186b5e90f31973a9",
+        "fit_valid_rows": 52306,
+        "label_keys": 52521,
+        "month_support_areas": {
+          "1": 679,
+          "2": 643,
+          "3": 231,
+          "4": 2774
+        },
+        "month_support_rows": {
+          "1": 679,
+          "2": 643,
+          "3": 231,
+          "4": 2774
+        },
+        "new_eval_areas": 3823,
+        "new_eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+        "new_eval_rows": 4327,
+        "old_eval_by_year": {
+          "2022": 5599,
+          "2023": 6064,
+          "2024": 5127,
+          "2025": 11415
+        },
+        "old_eval_keys_sha256": "f0193c1402d0609556755844b476227b7188f9671323d21317336d7ef58d2e0f",
+        "old_eval_rows": 28205,
+        "region_month_rows": {
+          "0": {
+            "1": 0,
+            "2": 0,
+            "3": 81,
+            "4": 397
+          },
+          "1": {
+            "1": 117,
+            "2": 379,
+            "3": 0,
+            "4": 437
+          },
+          "2": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0
+          },
+          "3": {
+            "1": 60,
+            "2": 93,
+            "3": 0,
+            "4": 706
+          },
+          "4": {
+            "1": 501,
+            "2": 17,
+            "3": 0,
+            "4": 329
+          },
+          "5": {
+            "1": 0,
+            "2": 154,
+            "3": 150,
+            "4": 0
+          },
+          "6": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0
+          },
+          "7": {
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "4": 904
+          },
+          "8": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 1
+          }
+        }
+      },
+      "root_files": 88,
+      "root_bytes": 192893025,
+      "new_batches_on_disk": 7,
+      "new_models_on_disk": 28,
+      "runs": {
+        "compact_baseline/0m": {
+          "run_metadata_sha256": "c185c940fa9043c1a2cbd243cc587d71aa819af3438077ffed37109f9245c49b",
+          "extension_fingerprint": "50f5addf1c9d0bbbc062ea18efa052a3b5991a2494c90ecdfeb2f23da8be06ac",
+          "original_fingerprint": "b9f808eac345f96fdd879869bca6f8a60b50aa78400eef17554e6b2470c70fb6",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 47979,
+            "fit_origin_month": "2026-01",
+            "fit_label_cutoff_month": "2025-12",
+            "fit_max_label_month": "2025-12",
+            "fit_keys_sha256": "7fe3413aa2bbd8a81558b5ca39aba8e450a589d3dd53b8f97ed2a5befdc4e8f0",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 17.68,
+              "phase3_worse": 2.15,
+              "phase4_worse": 13.58,
+              "phase5_worse": 3.54
+            },
+            "batch_seconds": 37.66,
+            "peak_rss_mb": 1896.0
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/0m/predictions/predictions_2022_2026.csv",
+            "sha256": "c9132a555a9c3f0f0f22116e73b43e3a26cd33d7a64be50091f32428afcf61c5",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "305e50e60388f4b151be6f1f9a26cdf1c02258dd4e59f03cc6405289a2996369",
+            "model_phase3_worse.ubj": "63223820a8c4c7605b4c94f6c778d01c665601176fe84f70cb57f47bf9c5d599",
+            "model_phase4_worse.ubj": "bd3beb21cb914c3b1ad94a3d98780c6e7ab0712dd412c9c3829ebd09bf77ce85",
+            "model_phase5_worse.ubj": "20497dcfdf258ee825eab2dc3aca233577f1f3a7e71b1f1bd6543108593afbac",
+            "predictions.csv": "5831c2a412b3be5ae1693e54adf9313438c64e0b4db95f5542743640c048543d",
+            "fit_keys.csv.gz": "daba896760119a0cc37f4ea5c3947893f6c09e30c13463231b6298db9b53e872"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/12m": {
+          "run_metadata_sha256": "96e41c731bc095a2bbb9b81cdd2a4a082281e92babb802ba68a4935f45b90ee8",
+          "extension_fingerprint": "c3319de8d55e14bb4432e733f259df09c46bc2dc7200433ea7e9a8f2111d3e75",
+          "original_fingerprint": "09deda912a46e3babe7c65004e53586a78dd1806f682b803de27d88312e994e0",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 38536,
+            "fit_origin_month": "2025-01",
+            "fit_label_cutoff_month": "2025-01",
+            "fit_max_label_month": "2025-01",
+            "fit_keys_sha256": "6ab64bab3f13c8adf61f8d192cd04abfc1a1d7851401dfbd7bd0f3fd4f0416f4",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 16.37,
+              "phase3_worse": 2.14,
+              "phase4_worse": 12.82,
+              "phase5_worse": 3.41
+            },
+            "batch_seconds": 35.47,
+            "peak_rss_mb": 1993.4
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/12m/predictions/predictions_2022_2026.csv",
+            "sha256": "45a7de672b16bf1fafa853753225a26c0bfa4590621b720d324bf9b55f686813",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "25ce1951d337f00367027246bd947669782d5579dfced1b29d1243ad09b9828c",
+            "model_phase3_worse.ubj": "0ea12a02f6fa1a38492cc36a183c8d7171879a03f54adc74c613e61762c22651",
+            "model_phase4_worse.ubj": "5cf4b96409cc99398bfabbe1d2909b3c66182c6dcdb5336d2b079f79ddb8d1d8",
+            "model_phase5_worse.ubj": "163195f2457e794dbb910058e2447d9f12c7556554277c7d45d1dd8bc526ad70",
+            "predictions.csv": "c1bbc746dfcfa6fec56ee119e81a9e1b13c5a4e495dc38983d2e41b45ced82ff",
+            "fit_keys.csv.gz": "671e1f47c74a699b860180fb880cf8507b985fc9488f7ceef235f1e71d64b13a"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/3m": {
+          "run_metadata_sha256": "f050efcb3f5fe62b83566345eac4b0227d4bd93fc3f8128a14c8f0f6082b6f23",
+          "extension_fingerprint": "4c97fa8061e2e95619c83abd19777e38d5718ef1c57728a844844353951c84d6",
+          "original_fingerprint": "1b55aff2533411c2f0ddeaef39d0d19b2e4a8028c2bf0bac00921af7d30efdc0",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 47796,
+            "fit_origin_month": "2025-10",
+            "fit_label_cutoff_month": "2025-10",
+            "fit_max_label_month": "2025-10",
+            "fit_keys_sha256": "78ba756041105db73e4c13a318dd97b897cbe8596105d573660d555ac6577ae1",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 16.61,
+              "phase3_worse": 2.12,
+              "phase4_worse": 12.76,
+              "phase5_worse": 3.72
+            },
+            "batch_seconds": 35.84,
+            "peak_rss_mb": 1993.4
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/3m/predictions/predictions_2022_2026.csv",
+            "sha256": "9985a7d5e04251d9e1f067b917172291aa4c975f0d6a6c75c2dccbd55a17266d",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "6370a87666a1efff4f7d5df1486625afeebccb414f975da9c4222e09944373f8",
+            "model_phase3_worse.ubj": "ec87f9cd7f6328d8d9a6bb01973eced3880fea204d228e249c52ccaccbd13e4c",
+            "model_phase4_worse.ubj": "d8524b4b0f7976c2bc21ec3d250006462fbd0bd25d569227daf7239b0b4af517",
+            "model_phase5_worse.ubj": "3dd48dfc90ff71b74475c8d76e2ff4ab06b44d86bf0ccaf3d548d8eda2267ac2",
+            "predictions.csv": "42edef186ce39614aab93256c56752d7899066a81970460610d9e4f7f6ab4edc",
+            "fit_keys.csv.gz": "1963a1fa2663ac9464a207c38a3163a3eb9c789b6cbbd47a00f4277be427bc4a"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/6m": {
+          "run_metadata_sha256": "ef1a2df924ad8a5d4dc318e38b3544de77e670a711ad83aea53b2cf34647c9ac",
+          "extension_fingerprint": "150f3cf2e529939bae824f0000bff8150b1d25bbd08f78c78bd1da78c27de1e7",
+          "original_fingerprint": "11395c697f59852a3560b12028a3265a61473a3f993e72ca00d2a9a47194a940",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 42715,
+            "fit_origin_month": "2025-07",
+            "fit_label_cutoff_month": "2025-07",
+            "fit_max_label_month": "2025-07",
+            "fit_keys_sha256": "1f1dd9f30688675f4a43d39a36b7faa9d47382f79432ae0eb0c91bbab39de591",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 16.02,
+              "phase3_worse": 1.93,
+              "phase4_worse": 12.87,
+              "phase5_worse": 3.32
+            },
+            "batch_seconds": 34.74,
+            "peak_rss_mb": 1993.4
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/6m/predictions/predictions_2022_2026.csv",
+            "sha256": "4720dc2fbc4ff91fee8e34367c4de1fd8e68a639191fa37142e33ad3557d4d2e",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "1f05caa78ddb237957b339153636f5035e5c1a1f87ed83f94628aaac90abb84c",
+            "model_phase3_worse.ubj": "0c09c395b1dbdeb535430cb79e62fe3b474115f5adb910f30112b591ba756555",
+            "model_phase4_worse.ubj": "7a914ad0dc4202c4e22dc4c4cf9c9b976e315769545a3bbb73bdcb877da887f2",
+            "model_phase5_worse.ubj": "7a6807c04810c7854dda2e316fde82c1df9190f5503454fc13bf5158c8e2c8f6",
+            "predictions.csv": "12c32fc7aa8117dc87d831831b60d998dbbdfd49e64cafcbfb8cd2f33c51feeb",
+            "fit_keys.csv.gz": "6c04ab6ff773df2224e152cd8d2c39c57ef09e2851b0e47b708e0af91ac6eea1"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/12m": {
+          "run_metadata_sha256": "65e7540fa74c89b4f9e96e23b4114efb7659f0728fca1aaa06f22b6f4fb48420",
+          "extension_fingerprint": "6715052f0bb72d6485eab4de61d751ffae31cc776c0b9a71b3ca73e408553bf2",
+          "original_fingerprint": "eeb4884cbf4cf0cc73d7357c342e5089b9edbc07ade45828e360ea49961e618d",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 38536,
+            "fit_origin_month": "2025-01",
+            "fit_label_cutoff_month": "2025-01",
+            "fit_max_label_month": "2025-01",
+            "fit_keys_sha256": "6ab64bab3f13c8adf61f8d192cd04abfc1a1d7851401dfbd7bd0f3fd4f0416f4",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 17.82,
+              "phase3_worse": 1.91,
+              "phase4_worse": 14.04,
+              "phase5_worse": 3.41
+            },
+            "batch_seconds": 37.8,
+            "peak_rss_mb": 2103.1
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/12m/predictions/predictions_2022_2026.csv",
+            "sha256": "b3f10bb309db01bdd0c92034ea3126c5ec1cee4af80d317d05b1c5cc662263df",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "bbc8d2dd67a4df844c6a6ef0574f95c65ce232a7b153eb27f284d0992d8d3a90",
+            "model_phase3_worse.ubj": "7b59b201ca3ad03f177812c90dd6015ef6693663056f42cd50f1c15bc70897a5",
+            "model_phase4_worse.ubj": "95a982fc30186f6f8d9a43ad188a8ce904f3a2b8dcba3c740f9d6c2d27f0d27c",
+            "model_phase5_worse.ubj": "c34edc73e1a7089bc6b9b830f58b1d64d258cc43d37bb10a859c6825c9bb702c",
+            "predictions.csv": "71f24397760aaf5e43b756f5ec26fecfe2bd29629474f3bfbe6de5388759f2fe",
+            "fit_keys.csv.gz": "ecb67315f815440d57f69c1a40e532d0c27b18c2f11cf2c3d0e4791ff0877ecf"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/3m": {
+          "run_metadata_sha256": "5c55a608548ce359cda95ff081431288a188a3ed81edcd5fba7741b58f1658fd",
+          "extension_fingerprint": "aeb407f7b48e3e7c9e466ebb5bf1c3f43cfef0e3ab5826c290fe73ffaa4b35c5",
+          "original_fingerprint": "12d3257de107a4502717625a84f1233c65d352257e0f7691d05e9fe750ba06be",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 47796,
+            "fit_origin_month": "2025-10",
+            "fit_label_cutoff_month": "2025-10",
+            "fit_max_label_month": "2025-10",
+            "fit_keys_sha256": "78ba756041105db73e4c13a318dd97b897cbe8596105d573660d555ac6577ae1",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 17.41,
+              "phase3_worse": 2.18,
+              "phase4_worse": 13.98,
+              "phase5_worse": 4.22
+            },
+            "batch_seconds": 38.49,
+            "peak_rss_mb": 2049.8
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/3m/predictions/predictions_2022_2026.csv",
+            "sha256": "0c8356ea52b35106dd9bc105420c08f93115e5754e107b009da76bb6fc537656",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "af9603ce15f1d80b02a257fa81b98001b4193601125bbfd02269edbd7b4cd023",
+            "model_phase3_worse.ubj": "e03603fa7cf1609b717d0966d933440a89aeabaad99db43d8041ed6f246e529c",
+            "model_phase4_worse.ubj": "47c20f0c1c6c3cd676f0813c6071414314f62ecb03e68a2a4c4140e0a806afda",
+            "model_phase5_worse.ubj": "379c451c6c312496c66c4f2a7fbb1e06bfbbaa75b956d94cb1494c540e284677",
+            "predictions.csv": "5b8413c18bf20ae0f1d05e25cd35b2b5e5a7dba8eabb4c5d2d77f6fd5ed3168a",
+            "fit_keys.csv.gz": "89fe7782561a70a513edfef15a863146128b579d867b7a82b81f350634e24b15"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/6m": {
+          "run_metadata_sha256": "98bed27f94dd7392c5a33b62ca3da1580a54badfdbead2f95e11d2abd92ffa8a",
+          "extension_fingerprint": "d86a8e9d33b0e65f0ec5bcd9213767b7b16339cf3a8fde466ae69d3a33576e98",
+          "original_fingerprint": "daf7e4bcc7a4a5a5f5a543a87a93ed4275d30c9fe329c680a20a7e36e1e4e380",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 42715,
+            "fit_origin_month": "2025-07",
+            "fit_label_cutoff_month": "2025-07",
+            "fit_max_label_month": "2025-07",
+            "fit_keys_sha256": "1f1dd9f30688675f4a43d39a36b7faa9d47382f79432ae0eb0c91bbab39de591",
+            "eval_rows": 4327,
+            "eval_keys_sha256": "e925e0f4a64a3597f1f44eb10eac49943506165b0caeee7fa67ce4b07cf087d6",
+            "fit_seconds": {
+              "phase2_worse": 16.79,
+              "phase3_worse": 1.95,
+              "phase4_worse": 14.11,
+              "phase5_worse": 3.73
+            },
+            "batch_seconds": 37.21,
+            "peak_rss_mb": 2049.8
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/6m/predictions/predictions_2022_2026.csv",
+            "sha256": "5c7e0ce7b01f69da55456ee2bff2660d99a6d6024fb7e0873084bc9541a46d76",
+            "rows": 32532,
+            "rows_by_year": {
+              "2022": 5599,
+              "2023": 6064,
+              "2024": 5127,
+              "2025": 11415,
+              "2026": 4327
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "d3bf323dd2629981e6881564afa404d15712c735daba57ef5510ab0513eefa14",
+            "model_phase3_worse.ubj": "3884ddb8f04dee1356611e39ded9629144c36e0cbd81a8cf85d6f9480a8cb0a5",
+            "model_phase4_worse.ubj": "9c67b59682365b559acb48941bb2379e2c6d02f544a4d7d8aede2cb1e9244727",
+            "model_phase5_worse.ubj": "70510e74cddc91d0e6486a1425f510210bbe721dc676b40b514b8ff7f939ed65",
+            "predictions.csv": "d67498cca9bfa818c49351daba1469bea12162d77e171cda1e860999b0f748e6",
+            "fit_keys.csv.gz": "333b154c473b74cc7f052911b60dd1ac4fd8ef300148ec3886de40250bbdc8b4"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1/verification/artifact_inventory.csv",
+            "sha256": "0e98fc8734a9678ebc237ee4dc1b23cb7f1b3ecb13dca993d22ea9067908ff96",
+            "entries_checked": 7
+          }
+        }
+      }
+    },
+    "SOM": {
+      "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+      "results_root": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+      "reports_root": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+      "extension_manifest": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/inputs/extension_manifest.json",
+        "sha256": "bce554fbbbac4d43d82a866c430c3fe4192baad59cdb103dc4e86c8c5bfe75ae"
+      },
+      "verification_summary": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/verification/verification_summary.json",
+        "sha256": "8980fb5979353ae7cbdbe8d4d57bbfa2eb6cd3b79005ae3d445cda468d4f582c",
+        "passed": true,
+        "status": "accepted_by_executor_verifier",
+        "problems": [],
+        "checks": {
+          "new_batches": 7,
+          "new_models_replayed": 28,
+          "max_new_replay_abs_diff": 0.0,
+          "schemas_inspected": 140,
+          "original_batches_checked": 28,
+          "metric_cells_replayed": 392,
+          "delta_cells_replayed": 224,
+          "original_parity_cells": 280,
+          "undefined_cells": 1,
+          "protected_files": 859,
+          "protected_changed": 0,
+          "protected_missing": 0,
+          "protected_added": 0
+        },
+        "final_reporting": {
+          "status": "verified",
+          "updated": [
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report.md",
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_somalia_local_model_run_codebook_en.csv",
+            "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/comparison_metadata.json"
+          ],
+          "report_md_sha256": "96ddfbab48e60770094a726fb4ea8b4fa04a33f4949586971bd400b39fa601db",
+          "codebook_sha256": "92369c5990b9d79c5c3cfec07d9688f78a54813a1b423b1f2c17640adaf540ca",
+          "comparison_metadata_sha256": "083598321e374a8ebd0f24c11f0d19ad0c71fbd4fb197a3326e626cc32a92b24"
+        }
+      },
+      "artifact_inventory": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/verification/artifact_inventory.csv",
+        "sha256": "73eb7ac007bfb40bd588ea18482d042da76b62e21753c8075c301b50cafa1dea",
+        "rows": 84
+      },
+      "comparison_metadata": {
+        "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report/comparison_metadata.json",
+        "sha256": "083598321e374a8ebd0f24c11f0d19ad0c71fbd4fb197a3326e626cc32a92b24",
+        "status": "verified"
+      },
+      "report_outputs": {
+        "som_metrics_long.csv": {
+          "sha256": "2b473ba66e0fe6d03d031c75c553377e9aeaef01549a56990effaf63b25759f7",
+          "rows": 392
+        },
+        "som_oracle_minus_baseline_deltas.csv": {
+          "sha256": "2f753a5cd45e331e1ab16f23dce4909824a5c8ef00a953f318f14539387f4994",
+          "rows": 224
+        },
+        "som_undefined_reasons.csv": {
+          "sha256": "0f5b3a18fca1da4f15307995c35d723c4d5ea009b1194a96f68d27620c010778",
+          "rows": 1
+        },
+        "coverage_by_month.csv": {
+          "sha256": "4c2f467b4427f82349f603098e15f17f620783b008126b77b0daf1b4e2b97cfe",
+          "rows": 4
+        }
+      },
+      "report_md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report.md",
+        "sha256": "96ddfbab48e60770094a726fb4ea8b4fa04a33f4949586971bd400b39fa601db"
+      },
+      "codebook": {
+        "codebook": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_somalia_local_model_run_codebook_en.csv",
+        "sha256": "92369c5990b9d79c5c3cfec07d9688f78a54813a1b423b1f2c17640adaf540ca",
+        "rows": 308,
+        "expected_rows": 308,
+        "expected_vs_actual": {
+          "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/expected_vs_actual_inputs.csv",
+          "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+        },
+        "model_run_index": {
+          "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/model_run_index.csv",
+          "sha256": "3ff4a3eee6800818b5dac3701bb61b65ccc50b00818e3fea0e94adc1395e98fc"
+        }
+      },
+      "selection": {
+        "expanded_pooled_rows": 5838,
+        "fit_valid_keys_sha256": "aa4acb4afa66112cd938eb9b9aa2b48e902b3d492fda5627ed486cb8e13c68c4",
+        "fit_valid_rows": 6739,
+        "label_keys": 52521,
+        "month_support_areas": {
+          "1": 1,
+          "2": 0,
+          "3": 0,
+          "4": 904
+        },
+        "month_support_rows": {
+          "1": 1,
+          "2": 0,
+          "3": 0,
+          "4": 904
+        },
+        "new_eval_areas": 904,
+        "new_eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+        "new_eval_rows": 905,
+        "old_eval_by_year": {
+          "2022": 1129,
+          "2023": 1217,
+          "2024": 711,
+          "2025": 1876
+        },
+        "old_eval_keys_sha256": "5f8343c4b4ba92176b1a7fa2797dfb9c29d5805065f200df46c416efcea9f14a",
+        "old_eval_rows": 4933
+      },
+      "root_files": 86,
+      "root_bytes": 69700311,
+      "new_batches_on_disk": 7,
+      "new_models_on_disk": 28,
+      "runs": {
+        "compact_baseline/0m": {
+          "run_metadata_sha256": "2e85413bd3e81ce1756392958b56b164ab7c06d67a72bcbe43fe3cd7497e5a08",
+          "extension_fingerprint": "4d46add6653f189fa3cc5dd91935ddbdb7d21192b257d723e9243e55c55bc079",
+          "original_fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 5834,
+            "fit_origin_month": "2026-01",
+            "fit_label_cutoff_month": "2025-12",
+            "fit_max_label_month": "2025-10",
+            "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 6.68,
+              "phase3_worse": 0.53,
+              "phase4_worse": 5.51,
+              "phase5_worse": 1.34
+            },
+            "batch_seconds": 14.37,
+            "peak_rss_mb": 1082.2
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/0m/predictions/predictions_2022_2026.csv",
+            "sha256": "fce689e5b1239db53681fd513fd9f0c9afe3c74bb6f7b9ce3f41e48d8a535d76",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "d174141cc629746b7250b8fd184d5f7d669807ba89f8b6c9fc0ade176c00d6c5",
+            "model_phase3_worse.ubj": "47d44831ed7486c164cc3c193f219691b3f68a2d32fb2d4d1c761cf7bb75417a",
+            "model_phase4_worse.ubj": "d37063ffbcaf9b897af34dcf6d08049a6658a4961269b0788827231fdea8cdd2",
+            "model_phase5_worse.ubj": "ad750c56d106858624d990e1aa9d5d8620165bfe6f44f452dda399c84f30db56",
+            "predictions.csv": "53f012f935a9e5941b4d9fd1db90c89ef84002cc92916ac1ab01370c22b9b0cc",
+            "fit_keys.csv.gz": "ca32c15501a70306766f91b3805fcf949ae236ce8b52287844a9e087f3c08ec1"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/12m": {
+          "run_metadata_sha256": "0305497f6ee82b7f029bcb546736475dc0108eed30af62743432f6a4b95b2de9",
+          "extension_fingerprint": "882049cbe055a896eddb1a564bf83e5aeb62aae1e99470a991de828f02f4c099",
+          "original_fingerprint": "06f0866079a23548511d9166794675550a1061d9f25f0e6eda1648300de7f65b",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 3958,
+            "fit_origin_month": "2025-01",
+            "fit_label_cutoff_month": "2025-01",
+            "fit_max_label_month": "2024-07",
+            "fit_keys_sha256": "35c813862c72aff1e475d119b6f186027750e8fa019c4b639a395d9977ff0636",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 4.93,
+              "phase3_worse": 0.45,
+              "phase4_worse": 4.34,
+              "phase5_worse": 1.14
+            },
+            "batch_seconds": 11.16,
+            "peak_rss_mb": 1082.2
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/12m/predictions/predictions_2022_2026.csv",
+            "sha256": "b49dd4c47fbdba640cab58df662b4dbd4d82cfbbdf85eee3e4d87d2fc3bd032f",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "4b32e62e2f36feddf975e582700b4bbaf570e6bc10d46fe75405b703b2ba7979",
+            "model_phase3_worse.ubj": "01c0a4e2c4acd88c47f722048dc8d91fbd4f9f66af21773510b3355e593be71e",
+            "model_phase4_worse.ubj": "22c3430bb931a3b43c78c5bb30676c60aacba3c6ede1ac296e9942c6ba6c0726",
+            "model_phase5_worse.ubj": "12975261907f9719bc3e873eb3b5019ccdd57520134dd2b8392585ef1dd88158",
+            "predictions.csv": "f8034502f980ca057aaa45b05bbca1915253ca422bdf93c336f7418b25b14b21",
+            "fit_keys.csv.gz": "23aa2d8c6ee9c2b9c9b73bc4825b7fd0f586dd5c4bba74d35e392a415ce70f3c"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/3m": {
+          "run_metadata_sha256": "ceb941132f2111b60ef119c1e64f83661d72e2520b8d272e4a463500d5fcfc3b",
+          "extension_fingerprint": "118100e3e0e562ac93f64513d6108820ec10577b0ccec322c3ff03460324fd71",
+          "original_fingerprint": "047bbd929584d238779cb2a00f05983ec2775e31baa3bf6d393ee12a14bfd8be",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 5834,
+            "fit_origin_month": "2025-10",
+            "fit_label_cutoff_month": "2025-10",
+            "fit_max_label_month": "2025-10",
+            "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 7.36,
+              "phase3_worse": 0.53,
+              "phase4_worse": 5.62,
+              "phase5_worse": 1.19
+            },
+            "batch_seconds": 15.02,
+            "peak_rss_mb": 1082.2
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/3m/predictions/predictions_2022_2026.csv",
+            "sha256": "07b61a46d86f8e273f8aa0533f686d8459236c5bbeb8d1658f43be5b49e7e00d",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "62d784d8d25a0a6af2fbda3e20dade35b777e309adf7152440f60df68861adb1",
+            "model_phase3_worse.ubj": "d70121dbd172e46948d213d1ef3ab9fe019a66ef333b53728944e0717b91054a",
+            "model_phase4_worse.ubj": "e5973086576820195f246b7e83a7ecd0dacfc8b6e80fd33b43e5d19c1ce521fc",
+            "model_phase5_worse.ubj": "ae7cdc8eb47fa8724477f75349fe5514a79fb51a239f74758aa1c0030ed6c372",
+            "predictions.csv": "6ee325757766b038866f3048d5dd44fb14a0004f5d2d9acafc6629459c26a84c",
+            "fit_keys.csv.gz": "d72ade24e03ad0f1caf32b7ce7ca6d0d70b054d4b2e8bd4d766890cf103b0a72"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_baseline/6m": {
+          "run_metadata_sha256": "e216672b4361eee06ecb5043b4102fc7d418082ebd401e1c8df34c06e403cffe",
+          "extension_fingerprint": "eee4a7004cb472bd7bd040e2edc33dfebeaf8796b6b16fe7c25702aa6ae6b89c",
+          "original_fingerprint": "389617f92273812f51cb72e70ac81eb09dd6e5d8ee229688268f042fc99200b8",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 4926,
+            "fit_origin_month": "2025-07",
+            "fit_label_cutoff_month": "2025-07",
+            "fit_max_label_month": "2025-07",
+            "fit_keys_sha256": "58b9ad192abb3a7f988cacdded800f5be1c7bd1aee2a45d39059af4051fb77de",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 5.75,
+              "phase3_worse": 0.49,
+              "phase4_worse": 4.93,
+              "phase5_worse": 1.16
+            },
+            "batch_seconds": 12.6,
+            "peak_rss_mb": 1082.2
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/6m/predictions/predictions_2022_2026.csv",
+            "sha256": "39010cb344ff4c242f6eb153fc08519ff47115c54c8f80f6147964d82aed5c97",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "a1356aa8bdc7d3a107c9d1dc0773d33b41ef24620a09e2829236e56c1d9da569",
+            "model_phase3_worse.ubj": "fa2c6e6d52887dc2644f98a301750c2b96b308286fb31798432a83cc6776bd4d",
+            "model_phase4_worse.ubj": "b07f3d21453cc6a5634874343e67f9671de2cccf5cf7940fd7caa029ccf6cc6d",
+            "model_phase5_worse.ubj": "71f39248bb6749312d62dc8b0d0d2efbceb9dedc01427a223fb60c9c6ef4f49e",
+            "predictions.csv": "69aa22908c3918b2b07a1b31832c435b076d3f3efba571c66b281b570aca4b74",
+            "fit_keys.csv.gz": "1073f2707475624cbef2c9bcc8263d11e9590975025f8fec77b6976126c5daab"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/12m": {
+          "run_metadata_sha256": "08af7305fdf984c98ad957118b8961e84988d2a3d23bc58ceb9ef3563ca318f3",
+          "extension_fingerprint": "1791aca354ac2cdbbb7c4a47d4b801b53a99b3f8ab39244e16d91eae6853676a",
+          "original_fingerprint": "61239afddada0c89cecf5b94f1fe8cdf42fba51d9f5961a645468b3af6a82dd5",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 3958,
+            "fit_origin_month": "2025-01",
+            "fit_label_cutoff_month": "2025-01",
+            "fit_max_label_month": "2024-07",
+            "fit_keys_sha256": "35c813862c72aff1e475d119b6f186027750e8fa019c4b639a395d9977ff0636",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 7.03,
+              "phase3_worse": 0.88,
+              "phase4_worse": 5.83,
+              "phase5_worse": 1.41
+            },
+            "batch_seconds": 15.52,
+            "peak_rss_mb": 1134.5
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/12m/predictions/predictions_2022_2026.csv",
+            "sha256": "885d4413cb3bc7200dbbbd216795d3a65e6fc68ecc3a250e9e39c2299a0dc9d3",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "15ee45e83c3e220dc2f976b0f19aac25caa42d461d9c83b9fdad7681e2e4cfbe",
+            "model_phase3_worse.ubj": "cae2b04a33d9ec60f88c6400f6ac246bce861dcf28d22fabb78dce61db64a45b",
+            "model_phase4_worse.ubj": "4f3c2ec5ad9ebcc6550cff85992e0b8dd7618c19f2ecff2ba68e492edad92dd5",
+            "model_phase5_worse.ubj": "eeedb0b4424ab74fbc40f7b3081e9054589c5533aa7189a278b342068a4e8d55",
+            "predictions.csv": "3583af951a6ac681dc03a1f4c763c82a823607113bd98b3ce2a11ac19f9cb095",
+            "fit_keys.csv.gz": "64005ad77d146a533575c5fc69bfde288041225eab1b289de4edf9d8ed352313"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/3m": {
+          "run_metadata_sha256": "4f0f9620d0915eb8009ffbf386c9859f327e99477ca28878437bec8e924746ab",
+          "extension_fingerprint": "63fa3031c45a4d52e250510cd7e675d8054f9b506437ae387737046a10133dea",
+          "original_fingerprint": "fc56b83b307f12020e7efc544f9f03626aca62ca690f02e6f57394c80714f1b6",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 5834,
+            "fit_origin_month": "2025-10",
+            "fit_label_cutoff_month": "2025-10",
+            "fit_max_label_month": "2025-10",
+            "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 6.46,
+              "phase3_worse": 0.57,
+              "phase4_worse": 5.46,
+              "phase5_worse": 1.23
+            },
+            "batch_seconds": 14.03,
+            "peak_rss_mb": 1114.0
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/3m/predictions/predictions_2022_2026.csv",
+            "sha256": "4c53ea9ce8ee340d2bb7d00810260cc6e27f222bcecfb6cc8dc25a3c7395cd69",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "794a9cbb325b15f69fb31a24b9f46b3a9c456db8f7dfb503ef60e01dadfe9d19",
+            "model_phase3_worse.ubj": "c88768665390bba72e79dea00713d7c2696a0a15f71b78967548dd1894b76b5d",
+            "model_phase4_worse.ubj": "1d0796582b3ce55c7fac51f87f93f1cffd5f6ca0c968822f4204822edcb2cd75",
+            "model_phase5_worse.ubj": "dda054883f0456ac348fd448fa08aeb847395e55a307a4401eb11efae9f95cb9",
+            "predictions.csv": "a1c1935aef7da3e9facd05d88aeb97ca5fe48dc1d99888e72340c71975abc623",
+            "fit_keys.csv.gz": "6c1bf579fdc7057663e458c2e23ee8b0cd61c583a9fd9f57b0c497d10bf02582"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        },
+        "compact_weather_oracle/6m": {
+          "run_metadata_sha256": "b7f61a126787645bf0bdc3f9e8013ca30171151dc84b0f68c84d3a30b4f29542",
+          "extension_fingerprint": "7d9dc3a0006cb8ff75d50e333a3036600df9fd79ec6ee432e61e7cc7d0c2bc43",
+          "original_fingerprint": "36d9115b0b648160a0c987a167646451ef13c82e26d43714e956234839ba122b",
+          "reused_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "fitted_here_years": [
+            2026
+          ],
+          "new_batch": {
+            "fit_rows": 4926,
+            "fit_origin_month": "2025-07",
+            "fit_label_cutoff_month": "2025-07",
+            "fit_max_label_month": "2025-07",
+            "fit_keys_sha256": "58b9ad192abb3a7f988cacdded800f5be1c7bd1aee2a45d39059af4051fb77de",
+            "eval_rows": 905,
+            "eval_keys_sha256": "e2a14c201ae040d577ff98aab585e581024f40c14951b44845b4e83790e86e1a",
+            "fit_seconds": {
+              "phase2_worse": 6.07,
+              "phase3_worse": 0.5,
+              "phase4_worse": 5.55,
+              "phase5_worse": 1.27
+            },
+            "batch_seconds": 13.65,
+            "peak_rss_mb": 1134.5
+          },
+          "predictions": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/6m/predictions/predictions_2022_2026.csv",
+            "sha256": "3ee2068b1102ccb0e317b8903b70e654a51a0274296c4679728ccc4fd236209f",
+            "rows": 5838,
+            "rows_by_year": {
+              "2022": 1129,
+              "2023": 1217,
+              "2024": 711,
+              "2025": 1876,
+              "2026": 905
+            }
+          },
+          "new_batch_artifacts": {
+            "model_phase2_worse.ubj": "79f2aae8334e8cacdf2887a9754264a2828ddc6c70d9a43f4632b119adf4fcbc",
+            "model_phase3_worse.ubj": "ca90cad8adf065d7bba9227a79808ba3082763b3f21ee0454047ebac0022c22b",
+            "model_phase4_worse.ubj": "a159da9e9ab3bf05b2b55696723469fa858a8c38abc2306bee3aff5cf1574427",
+            "model_phase5_worse.ubj": "52f16bf2ca800c416c6e852f7e85895555ec0919053d794b0fe5d210004312e3",
+            "predictions.csv": "71dad06c2e80307f4c2e900b8c51d03317d49fdac8df557b6c28bffd31f43e81",
+            "fit_keys.csv.gz": "629f9afeeb69a92237a4a7d93501291517f7237abd4fd69eb05be4cee567866e"
+          },
+          "accepted_inventory": {
+            "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_v1_somalia_local/verification/verification.json",
+            "sha256": "01751ac0652cff8fe950fbba1b89f88937d1a61c73d8124702ca8dbb85fdaa31",
+            "entries_checked": 7
+          }
+        }
+      }
+    }
+  }
+}

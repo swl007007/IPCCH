@@ -1,0 +1,97 @@
+{
+ "scope": "SOM",
+ "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+ "runs": [
+  {
+   "run_id": "compact_baseline/0m",
+   "fingerprint": "4d46add6653f189fa3cc5dd91935ddbdb7d21192b257d723e9243e55c55bc079",
+   "original_fingerprint": "d25241063045983210a415d8a09ebb4fdfa5794ed97ea89550e5f718a0edae4e",
+   "fit_rows": 5834,
+   "fit_areas": 905,
+   "fit_origin_month": "2026-01",
+   "fit_label_cutoff_month": "2025-12",
+   "fit_max_label_month": "2025-10",
+   "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+   "eval_rows": 905,
+   "feature_count": 296
+  },
+  {
+   "run_id": "compact_baseline/3m",
+   "fingerprint": "118100e3e0e562ac93f64513d6108820ec10577b0ccec322c3ff03460324fd71",
+   "original_fingerprint": "047bbd929584d238779cb2a00f05983ec2775e31baa3bf6d393ee12a14bfd8be",
+   "fit_rows": 5834,
+   "fit_areas": 905,
+   "fit_origin_month": "2025-10",
+   "fit_label_cutoff_month": "2025-10",
+   "fit_max_label_month": "2025-10",
+   "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+   "eval_rows": 905,
+   "feature_count": 296
+  },
+  {
+   "run_id": "compact_baseline/6m",
+   "fingerprint": "eee4a7004cb472bd7bd040e2edc33dfebeaf8796b6b16fe7c25702aa6ae6b89c",
+   "original_fingerprint": "389617f92273812f51cb72e70ac81eb09dd6e5d8ee229688268f042fc99200b8",
+   "fit_rows": 4926,
+   "fit_areas": 905,
+   "fit_origin_month": "2025-07",
+   "fit_label_cutoff_month": "2025-07",
+   "fit_max_label_month": "2025-07",
+   "fit_keys_sha256": "58b9ad192abb3a7f988cacdded800f5be1c7bd1aee2a45d39059af4051fb77de",
+   "eval_rows": 905,
+   "feature_count": 296
+  },
+  {
+   "run_id": "compact_baseline/12m",
+   "fingerprint": "882049cbe055a896eddb1a564bf83e5aeb62aae1e99470a991de828f02f4c099",
+   "original_fingerprint": "06f0866079a23548511d9166794675550a1061d9f25f0e6eda1648300de7f65b",
+   "fit_rows": 3958,
+   "fit_areas": 891,
+   "fit_origin_month": "2025-01",
+   "fit_label_cutoff_month": "2025-01",
+   "fit_max_label_month": "2024-07",
+   "fit_keys_sha256": "35c813862c72aff1e475d119b6f186027750e8fa019c4b639a395d9977ff0636",
+   "eval_rows": 905,
+   "feature_count": 296
+  },
+  {
+   "run_id": "compact_weather_oracle/3m",
+   "fingerprint": "63fa3031c45a4d52e250510cd7e675d8054f9b506437ae387737046a10133dea",
+   "original_fingerprint": "fc56b83b307f12020e7efc544f9f03626aca62ca690f02e6f57394c80714f1b6",
+   "fit_rows": 5834,
+   "fit_areas": 905,
+   "fit_origin_month": "2025-10",
+   "fit_label_cutoff_month": "2025-10",
+   "fit_max_label_month": "2025-10",
+   "fit_keys_sha256": "f5249dc7322b3de887e6d2e3f11c9f9b0a0c1ad68e627b535e5ee22b2815fa6c",
+   "eval_rows": 905,
+   "feature_count": 302
+  },
+  {
+   "run_id": "compact_weather_oracle/6m",
+   "fingerprint": "7d9dc3a0006cb8ff75d50e333a3036600df9fd79ec6ee432e61e7cc7d0c2bc43",
+   "original_fingerprint": "36d9115b0b648160a0c987a167646451ef13c82e26d43714e956234839ba122b",
+   "fit_rows": 4926,
+   "fit_areas": 905,
+   "fit_origin_month": "2025-07",
+   "fit_label_cutoff_month": "2025-07",
+   "fit_max_label_month": "2025-07",
+   "fit_keys_sha256": "58b9ad192abb3a7f988cacdded800f5be1c7bd1aee2a45d39059af4051fb77de",
+   "eval_rows": 905,
+   "feature_count": 308
+  },
+  {
+   "run_id": "compact_weather_oracle/12m",
+   "fingerprint": "1791aca354ac2cdbbb7c4a47d4b801b53a99b3f8ab39244e16d91eae6853676a",
+   "original_fingerprint": "61239afddada0c89cecf5b94f1fe8cdf42fba51d9f5961a645468b3af6a82dd5",
+   "fit_rows": 3958,
+   "fit_areas": 891,
+   "fit_origin_month": "2025-01",
+   "fit_label_cutoff_month": "2025-01",
+   "fit_max_label_month": "2024-07",
+   "fit_keys_sha256": "35c813862c72aff1e475d119b6f186027750e8fa019c4b639a395d9977ff0636",
+   "eval_rows": 905,
+   "feature_count": 308
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+1616775 approve-training_global
+1652193 approve-training_SOM
+1675612 report_global
+1676875 report_SOM
+1677568 verify_global
+1692487 verify_SOM

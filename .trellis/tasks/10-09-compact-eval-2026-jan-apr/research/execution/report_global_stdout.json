@@ -1,0 +1,67 @@
+{
+ "version": "compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+ "scope": "global",
+ "status": "verification_pending",
+ "outputs": {
+  "all_metrics_long.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/all_metrics_long.csv",
+   "sha256": "187ecac1310374e99c20873cf8caba73ea07b1c267ee7e96bb00f0df724f4866",
+   "rows": 3920,
+   "columns": 18
+  },
+  "global_metrics.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/global_metrics.csv",
+   "sha256": "bf04f11f5b27bf772b22a5a91d026166193e58f6120d46b7eb609bced7b89035",
+   "rows": 392,
+   "columns": 18
+  },
+  "regional_metrics.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/regional_metrics.csv",
+   "sha256": "8211a32f2c13b0d247d53183eb7f4d896985f873dced7de3ab7b5e331d8b69a3",
+   "rows": 3528,
+   "columns": 18
+  },
+  "global_deltas.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/global_deltas.csv",
+   "sha256": "cd8e572a0e20ff6f43bea5e52021d422a9b15bc7fcdbfde0e67ed0a289d921d1",
+   "rows": 168,
+   "columns": 17
+  },
+  "regional_deltas.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/regional_deltas.csv",
+   "sha256": "0790b6dac0e3a7db00b51201d3d8d23d9f4cf2adb50d0094945f865010f1b033",
+   "rows": 1512,
+   "columns": 17
+  },
+  "undefined_reasons.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/undefined_reasons.csv",
+   "sha256": "f0ede90ea9de6140812727d9dc8042ea5aca29e1e055f5ddc4f96dfc0d0309b1",
+   "rows": 10,
+   "columns": 4
+  },
+  "coverage_by_month.csv": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report/coverage_by_month.csv",
+   "sha256": "77aa091b44541a33a4605aaf365f963886f955d703b5b28934c760cfd6f5120c",
+   "rows": 4,
+   "columns": 16
+  }
+ },
+ "codebook": {
+  "codebook": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_model_run_codebook_en.csv",
+  "sha256": "8f6313336cd53b579ad35472c0f87cb1d41851169752f1cb778ceafa4bd8a882",
+  "rows": 308,
+  "expected_rows": 308,
+  "expected_vs_actual": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/expected_vs_actual_inputs.csv",
+   "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+  },
+  "model_run_index": {
+   "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/model_run_index.csv",
+   "sha256": "e65b1e7f652c67350d80d5c5a2c3450f547c32a995ff687d7454b3ea8bac9cfa"
+  }
+ },
+ "report_md": {
+  "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report.md",
+  "sha256": "a347528a42b4871236b12115717d48d6752a7c2be8dfb1895b35349e75a08705"
+ }
+}
