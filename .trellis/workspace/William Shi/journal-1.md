@@ -215,3 +215,27 @@ Herdr Opus5.5 1M executor; Codex accepted A1-A9. Fresh132-model replay differenc
 ### Next Steps
 
 - No pending work in approved scope;reports and supervisor acceptance are under recorded local roots and archived task research
+
+
+## Session 7: Complete global and Somalia compact 2026 Jan-Apr evaluation
+<!-- trellis-session: v=2 fp=2c3e647f5293fa15 -->
+
+**Date**: 2026-10-09
+**Task**: Complete global and Somalia compact 2026 Jan-Apr evaluation
+**Branch**: `task/compact-climate-weather-oracle`
+
+### Summary
+
+Approved spec executed by Herdr Claude Opus 5.5 (1M), supervised by Codex, without Trellis audit. Added 14 batches and 56 boosters for 2026 January-April only; reused accepted 2022-2025 artifacts, retained both pooled periods, updated absolute metrics, paired differences, regions, reports and codebooks. 82 focused tests passed; all model replays exact; A1-A8 accepted; 961 protected files unchanged. Ordinary task archived with durable spec fallback verified. Somalia evaluation has 904 of 905 rows in April.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `16d2e92` | docs: approve compact 2026 Jan-Apr evaluation extension |
+| `6057821` | feat(modeling): extend compact historical evaluation through April 2026 |
+| `affadd8` | test(modeling): record accepted compact 2026 extension evidence |
+
+### Status
+
+[OK] **Completed**
