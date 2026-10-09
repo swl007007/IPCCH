@@ -1,0 +1,433 @@
+{
+  "checks": {
+    "csv_positions_equal_features_by_run": true,
+    "background_counts": [
+      29,
+      27,
+      5,
+      2
+    ],
+    "eval_by_year": {
+      "2022": 5599,
+      "2023": 6064,
+      "2024": 5127,
+      "2025": 11415
+    },
+    "h0_bg_missing_cells": 120057,
+    "h3_static_identifier_vs_h0": {
+      "numeric_equal": true,
+      "na_mask_equal": true,
+      "pandas_equals": true,
+      "dtype_only_columns": {}
+    },
+    "h3_bg_missing_cells": 122213,
+    "h6_static_identifier_vs_h0": {
+      "numeric_equal": true,
+      "na_mask_equal": true,
+      "pandas_equals": true,
+      "dtype_only_columns": {}
+    },
+    "h6_bg_missing_cells": 131570,
+    "h12_static_identifier_vs_h0": {
+      "numeric_equal": true,
+      "na_mask_equal": true,
+      "pandas_equals": false,
+      "dtype_only_columns": {
+        "AEZ_32000": [
+          "float64",
+          "int64"
+        ],
+        "AEZ_34000": [
+          "float64",
+          "int64"
+        ],
+        "AEZ_36000": [
+          "float64",
+          "int64"
+        ],
+        "AEZ_38000": [
+          "float64",
+          "int64"
+        ],
+        "AEZ_7000": [
+          "float64",
+          "int64"
+        ],
+        "elevation": [
+          "float64",
+          "int64"
+        ]
+      }
+    },
+    "h12_bg_missing_cells": 148194,
+    "eval_rows_by_region": {
+      "0": 3243,
+      "1": 3259,
+      "2": 7282,
+      "3": 3234,
+      "4": 4223,
+      "5": 1692,
+      "6": 310,
+      "7": 4933,
+      "8": 29
+    },
+    "eval_rows_by_region_year": {
+      "0": {
+        "2022": 281,
+        "2023": 460,
+        "2024": 511,
+        "2025": 1991
+      },
+      "1": {
+        "2022": 753,
+        "2023": 558,
+        "2024": 497,
+        "2025": 1451
+      },
+      "2": {
+        "2022": 1698,
+        "2023": 1938,
+        "2024": 1697,
+        "2025": 1949
+      },
+      "3": {
+        "2022": 703,
+        "2023": 514,
+        "2024": 594,
+        "2025": 1423
+      },
+      "4": {
+        "2022": 719,
+        "2023": 1004,
+        "2024": 722,
+        "2025": 1778
+      },
+      "5": {
+        "2022": 267,
+        "2023": 273,
+        "2024": 288,
+        "2025": 864
+      },
+      "6": {
+        "2022": 49,
+        "2023": 97,
+        "2024": 98,
+        "2025": 66
+      },
+      "7": {
+        "2022": 1129,
+        "2023": 1217,
+        "2024": 711,
+        "2025": 1876
+      },
+      "8": {
+        "2023": 3,
+        "2024": 9,
+        "2025": 17
+      }
+    },
+    "region_values": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "source_coverage": {
+      "GPP_mean": {
+        "nonmissing": 1063986,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2024-12",
+        "inf": 0
+      },
+      "nightlight_mean": {
+        "nonmissing": 1219841,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "event_count_violence": {
+        "nonmissing": 1143772,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2025-05",
+        "inf": 0
+      },
+      "sum_fatalities_violence": {
+        "nonmissing": 1143772,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2025-05",
+        "inf": 0
+      },
+      "WFP_Price": {
+        "nonmissing": 590225,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "food_price_index_WB": {
+        "nonmissing": 904000,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "nino34_anom": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_staple_food_corn_x1_price": {
+        "nonmissing": 1207414,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_staple_food_hard_wheat_x1_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_staple_food_rough_rice_x1_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_staple_food_soft_wheat_x1_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_staple_food_soybeans_x1_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_NGUSHHUB": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_oilgas_CL1_COMB_Comdty_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_oilgas_NG1_Comdty_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_soybean_oil_futures_last_price": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_soybean_oil_futures_bid": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPURGB": {
+        "nonmissing": 1219868,
+        "rows": 1219868,
+        "first": "2010-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPDANO": {
+        "nonmissing": 1014377,
+        "rows": 1219868,
+        "first": "2012-10",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPPOBA": {
+        "nonmissing": 846248,
+        "rows": 1219868,
+        "first": "2014-01",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPURBS": {
+        "nonmissing": 1001923,
+        "rows": 1219868,
+        "first": "2012-10",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPAMME": {
+        "nonmissing": 1014377,
+        "rows": 1219868,
+        "first": "2012-10",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPAMBS": {
+        "nonmissing": 703651,
+        "rows": 1219868,
+        "first": "2012-10",
+        "last": "2022-02",
+        "inf": 0
+      },
+      "bbg_GCFPURMG": {
+        "nonmissing": 1014377,
+        "rows": 1219868,
+        "first": "2012-10",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_GCFPDAIN": {
+        "nonmissing": 815113,
+        "rows": 1219868,
+        "first": "2015-06",
+        "last": "2026-04",
+        "inf": 0
+      },
+      "bbg_TZTX2_Comdty": {
+        "nonmissing": 0,
+        "rows": 1219868,
+        "first": null,
+        "last": null,
+        "inf": 0
+      },
+      "prcp_anom_month_ensmean": {
+        "nonmissing": 871500,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "prcp_z_month_ensmean": {
+        "nonmissing": 871435,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "rainy_days_month_ensmean": {
+        "nonmissing": 871500,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "cdd_month_ensmean": {
+        "nonmissing": 871500,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "tmean_anom_month_ensmean": {
+        "nonmissing": 869260,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "tmax_anom_month_ensmean": {
+        "nonmissing": 869260,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "hot_days_p95_month_ensmean": {
+        "nonmissing": 869260,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "gdd_month_ensmean": {
+        "nonmissing": 869260,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "edd_month_ensmean": {
+        "nonmissing": 869260,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "sm_z_month_ensmean": {
+        "nonmissing": 868446,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-08",
+        "inf": 0
+      },
+      "spi03_month_ensmean": {
+        "nonmissing": 865275,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-07",
+        "inf": 0
+      },
+      "spei03_month_ensmean": {
+        "nonmissing": 821011,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-07",
+        "inf": 0
+      },
+      "ndvi_anom_month_ensmean": {
+        "nonmissing": 863858,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-07",
+        "inf": 0
+      },
+      "evi_anom_month_ensmean": {
+        "nonmissing": 863858,
+        "rows": 871780,
+        "first": "2015-01",
+        "last": "2026-07",
+        "inf": 0
+      }
+    },
+    "season_pairs": {
+      "pairs": 74724,
+      "s1_longer": 26154,
+      "s2_longer": 48198,
+      "tie": 372,
+      "nonpositive": 0
+    }
+  },
+  "problems": [],
+  "passed": true,
+  "elapsed_s": 102.0
+}

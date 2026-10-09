@@ -187,3 +187,67 @@ Lessons:
 
 - A stale GitNexus index can miss new symbols (`impact` returns "not found"); `node .gitnexus/run.cjs analyze` also
   rewrites the stats line in `CLAUDE.md`/`AGENTS.md` — keep those out of task commits.
+
+## Compact climate and raw oracle version (2026-10-08)
+
+### Scope and trigger
+
+`compact_climate_weather_oracle_v1` is an explicit feature version. Its approved task supersedes the older carrier/saved-NA
+mask rules for this version only. Legacy inputs/results and their selection paths remain intact; returning to a version
+selects its manifest and matching arm/output paths. No global feature default or destructive restore is needed.
+
+### Signatures
+
+- Builder: `scripts/preprocessing/build_compact_climate_weather_oracle_inputs.py --contract-dir <approved-contract-dir>`.
+- Fitter: `run_deep_feature_weight_decay_forecasting.py --protocol origin-safe --origin-manifest <manifest> --arm
+  compact_baseline|compact_weather_oracle --horizon <H> --out-dir <new-version-output>`.
+- Seven-run driver: `scripts/modeling/run_compact_climate_weather_oracle_suite.py [--dry-run] [--runs compact_baseline/0m]
+  [--block-years 2022]`; a one-year pilot is part of the suite and remains PARTIAL until all years exist.
+- Verification/report: `scripts/postprocessing/verify_compact_climate_weather_oracle.py --stage inputs|all --manifest <manifest>`.
+
+### Contracts
+
+- Baseline order is static29, ordinary120, monthly-z56, stress28, two seasons plus latest-major29, calendar27, history5,
+  IDP2:296 inputs at every H. Oracle appends raw prcp/tmean in offset-major order,302 at H3 and308 at H6/H12. H0 is shared.
+- Reconstruct dynamics at each row's `O=T-H`; retain source-native missingness. Monthly z uses strictly earlier-year
+  same-month history first, followed by MA3/6/12. MA minimums2/3/6; SD12 minimum6 and ddof1. No epsilon/clipping of z.
+- Keep original stress hit/missing-comparator rules. Major means uniquely longer fixed calendar duration in the selected
+  latest season's same-area/year s1/s2 pair; ties/unavailable comparisons are NA. The same ledger selects climate and major.
+- Store approved contract bytes in the versioned input directory: a consumed path under an active task directory would
+  break after task archival. Keep original task paths as provenance rather than a runtime dependency.
+- Compact fingerprints bind manifest/dataset/schema/ledgers/parent/source/cohort/contract/build-code/fit-code/config/runtime
+  and seed/half-life/threshold/thread settings. Runtime includes interpreter identity; fit-code includes the metric helper
+  `forecasting_weight_decay.py`. Preserve the legacy fingerprint construction.
+
+### Validation and error matrix
+
+| Condition | Required outcome |
+|---|---|
+| Wrong version/arm/horizon, extra predictors, ledger disagreement | Reject before fitting |
+| Frozen runtime/config or pinned file/helper bytes differ | Reject; do not substitute or silently resume |
+| Compact output targets legacy namespace | Reject |
+| Origin exceeds a source grid's final month | Builder rejects this unsupported cohort; do not silently blank supported windows |
+| Child/suite dry-run | Validate without creating model, log or ledger outputs |
+| Failed/incomplete full replay | Nonzero result and unverified diagnostic codebook; never claim fitted verification |
+| Full verification | Require seven runs,28 batches,112 models, matching fitted order and complete artifact identities |
+
+### Good, base and bad cases
+
+H0 uses current-month dynamic sources while IPC history excludes the target month. H12 uses `O=T-12` once, with no extra
+fixed-history block. Oracle H12 uses only `O+1..O+6`. Oracle H0 and a compact arm with a legacy manifest are invalid.
+All regions0–8, including empty/small groups, are scored from saved global predictions; pooled metrics use pooled rows.
+
+### Tests required
+
+Check calendar gaps/minimum counts, exact constant and near-constant statistics, z-before-MA and future perturbations,
+original stress boundaries, exclusive season ends/ties and the selected-record major dummy, baseline/oracle matrix parity,
+legacy/compact selection and complete resume rejection, no phantom report groups, and independent global/regional metrics.
+Reload all112 boosters and replay every batch (predictions atol1e-6/rtol0; metrics atol1e-12 with identical undefined masks).
+Actual codebook membership comes from checked fitted lists; the approved expected CSV supplies descriptions only.
+
+### Wrong versus correct
+
+Pandas rolling add/remove statistics can leave a nonzero SD after a window becomes exactly constant; naive uncentred
+mean/variance can distort z for prior values30.0 versus29.99999999999999. Compact `trailing`/`same_month_z` use per-window,
+shift-centred calculations, tested against exact Fraction arithmetic. Keep the old helpers unchanged for legacy versions.
+Use unique-group `pivot` for reports: `pivot_table(dropna=False)` on multiple index fields creates nonexistent run groups.

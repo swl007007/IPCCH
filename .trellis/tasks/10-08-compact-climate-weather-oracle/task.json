@@ -3,7 +3,7 @@
   "name": "compact-climate-weather-oracle",
   "title": "Simplify climate features and rerun raw weather-oracle comparison",
   "description": "Grill source-grounded feature semantics to convergence, freeze a spec, then run Claude Opus 5.5 1M as supervised executor; compare compact features with and without raw weather oracle, excluding B6 and bootstrap; no additional Trellis audit registration.",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -12,7 +12,7 @@
   "assignee": "William Shi",
   "createdAt": "2026-10-08",
   "completedAt": null,
-  "branch": null,
+  "branch": "task/compact-climate-weather-oracle",
   "base_branch": "main",
   "worktree_path": null,
   "commit": null,
@@ -29,6 +29,6 @@
     ".trellis/tasks/10-08-compact-climate-weather-oracle/expected_run_index.csv",
     ".trellis/tasks/10-08-compact-climate-weather-oracle/expected_feature_contract_metadata.json"
   ],
-  "notes": "Final planning review approved by user: 可以执行. Frozen spec/contract hashes in execution-approval.json. Verified Opus5.5 1M probe. Start and dispatch pending; no extra audit enrollment.",
+  "notes": "Final planning review approved by user: 可以执行. Frozen spec/contract hashes in execution-approval.json. Implementation and repaired input checkpoint accepted by supervisor:93 tests,372800 independent input cells with0 mismatches,740 legacy files unchanged,7/7 compact dry-runs and actual legacy selection checks passed. Verified Claude Opus5.5 1M executor is paused before real fitting pending implementation commit. No extra audit enrollment.",
   "meta": {}
 }

@@ -1,0 +1,56 @@
+{
+  "stage": "inputs",
+  "problems": [],
+  "batches": 0,
+  "artifacts_rehashed": 0,
+  "models_reloaded": 0,
+  "fit_rows_checked": 0,
+  "max_model_replay_abs_diff": 0.0,
+  "independent_feature_cells": 372800,
+  "independent_feature_mismatches": 0,
+  "legacy_no_overwrite": {
+    "files_before": 740,
+    "files_after": 740,
+    "changed_added_removed": 0
+  },
+  "pinned_identities": {
+    "source interim": "a91719e8e603e11b58e3e44c9a2f4378e4218e1ac408afe03ca54d1b50fb0484",
+    "source climate_monthly": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89",
+    "source climate_seasonal": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e",
+    "contract expected_feature_contract.csv": "a2d1960bf75811a391ec4bd0549b4aaddccb1ce57ca9a08f3a3c28d2fb313bc8",
+    "contract expected_feature_contract_metadata.json": "8f3964364f89b866fc40f31524d38312aaab3202ca02f3886b5b64ade33e1260",
+    "contract expected_run_index.csv": "fdd65bc2005016f721995c173a28bcea59ec4580b42c70a43bbf7632b3a4097d"
+  },
+  "current_verification_identity": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "git_head": "928d08081376311b298358cbad5eb8b21ad7fc35",
+    "code_sha256": {
+      "scripts/postprocessing/verify_origin_safe_weather_oracle.py": "3f083bf58d44c0c36e40dd48cecbbce3ae0145df1a94a06026d919dca3592193",
+      "scripts/postprocessing/verify_origin_safe_climate_idp.py": "fffa4d143e5393d7e981a164a447b15664a4dc0ad1927d824fc7b21664bc2b63",
+      "scripts/modeling/run_deep_feature_weight_decay_forecasting.py": "67729cf9f55c442ba3e748bfadbd56e9ecfe2692861a5103ac7cb08a003dc184",
+      "scripts/preprocessing/build_origin_safe_weather_oracle_inputs.py": "8e96345ccccad7788e35c93d4b5b3d2cb74a9795c748f5cde9cec398b41f4841",
+      "src/ipcch/origin_safe.py": "629936a8de4973399a3dfa798b4a212bb8fefe9838d16a032c072c446101ea03",
+      "src/ipcch/weather_oracle.py": "65a93d45ec0f738ec9c6e8092e4c355f88149310054e4e1969ae24c2ffc55d81",
+      "src/ipcch/forecasting_weight_decay.py": "1a9f20e2d4b62d532baeb48f3538247dd7719a60cd06f7d75982be2076caaefc",
+      "scripts/postprocessing/verify_compact_climate_weather_oracle.py": "158ab55c470620ca427d15ce275cb02b9c965cdf74252d53dd448eebf0cfe052",
+      "src/ipcch/compact_features.py": "923cae26335f9994043c178a0920a7736e7e80dc9c51a5fffa8d406f07fdf324",
+      "src/ipcch/regional_point_metrics.py": "a10a5d847c8e6c5d724ffb0eb32b5ed98ff08a6d531d6574f9159efc913e5da4",
+      "scripts/preprocessing/build_compact_climate_weather_oracle_inputs.py": "fa10cee75402477e6f0f190c0881935a2891449ddbd6d3c3e5fe55c7419c1171",
+      "scripts/modeling/run_compact_climate_weather_oracle_suite.py": "b04ab8795da90351f5a0ae171488e52a11019d923c6704bbb30e3ddabc368149"
+    }
+  },
+  "manifest": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_manifest.json",
+  "manifest_sha256": "456360536a3929e1571d96ba9f16e2f0de54bc1b20019f797bbe62c0c89732ca",
+  "tolerances": {
+    "model_replay": "atol 1e-6, rtol 0",
+    "metric_replay": "atol 1e-12, identical undefined mask",
+    "independent_feature_replay": "rtol 1e-7, atol 1e-9, identical NA",
+    "csv_parsing": "float_precision=round_trip"
+  },
+  "passed": true
+}

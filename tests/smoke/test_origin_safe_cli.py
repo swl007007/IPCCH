@@ -264,3 +264,176 @@ def test_oracle_tiny_fit_records_oracle_fingerprint_and_exact_feature_order(tmp_
     booster = xgb.Booster()
     booster.load_model(str(out / "batches" / "2022" / "model_phase3_worse.ubj"))
     assert list(booster.feature_names) == meta["features"]
+
+
+# --------------------------------------------------------------------------- compact_climate_weather_oracle_v1 contract
+
+COMPACT_STATIC = ["AEZ_32000", "AEZ_34000", "AEZ_36000", "AEZ_38000", "AEZ_42000", "AEZ_7000", "crop", "elevation", "market_access",
+                  "popdensity", "range", "ruggedness", "slope", "AEZ_10000", "AEZ_12000", "AEZ_17000", "AEZ_19000", "AEZ_20000",
+                  "AEZ_25000", "AEZ_28000", "AEZ_30000", "AEZ_31000", "AEZ_33000", "AEZ_35000", "AEZ_4000", "AEZ_40000",
+                  "AEZ_43000", "AEZ_9000", "coastline_dist"]
+COMPACT_IDENT = ["lat", "lon", *(f"month_{m}" for m in range(1, 13)), *(f"year_{y}" for y in range(2014, 2027))]
+
+
+def approved_contract_dir() -> Path:
+    """The approved compact contract bytes (task directory, active or archived)."""
+    hits = sorted((REPO_ROOT / ".trellis" / "tasks").glob("**/10-08-compact-climate-weather-oracle/expected_feature_contract.csv"))
+    assert hits, "approved compact contract not found"
+    return hits[0].parent
+
+
+def write_compact_inputs(tmp_path: Path, horizon: int = 3, tamper_major: bool = False, extra_feature: str = None,
+                         stale_helper: bool = False) -> Path:
+    """Tiny compact manifest: parent-style labels/history/IDP plus the frozen 296/302-column schema."""
+    from ipcch import climate2015_features as cf
+    from ipcch import compact_features as cpf
+    from ipcch import weather_oracle as wo
+
+    legacy_path = write_inputs(tmp_path, horizon=horizon)
+    legacy = json.loads(legacy_path.read_text())
+    entry = legacy["horizons"][str(horizon)]
+    data = pd.read_csv(entry["dataset"]["path"], float_precision="round_trip")
+    keys = data[KEYS]
+    rng = np.random.default_rng(2)
+    areas = np.sort(keys["area_id"].unique())
+    first, n = 2017 * 12, 72
+    interim = cf.Grid(areas, first, n, {s: rng.normal(size=(len(areas), n)) + 5 for s in cpf.INTERIM_SOURCES})
+    climate = cf.Grid(areas, first, n, {s: rng.normal(size=(len(areas), n)) for s in cpf.CLIMATE_SOURCES})
+    seasons = pd.DataFrame([(a, y, s, f"{y}-{'03' if s == 's1' else '08'}-01", f"{y}-{'07' if s == 's1' else '10'}-01")
+                            for a in areas for y in range(2017, 2023) for s in ("s1", "s2")],
+                           columns=["admin_code", "season_year", "season", "gs_start_date", "gs_end_date_exclusive"])
+    for m in cpf.SEASON_METRICS:
+        seasons[m] = rng.normal(size=len(seasons))
+    ords = osf.month_ord(keys["year"], keys["month"])
+    monthly = cpf.monthly_block(interim, climate, keys, [horizon])[horizon]
+    season_block, season_ledger = cpf.completed_seasons(seasons, keys["area_id"].to_numpy(), ords - horizon)
+    season_ledger.insert(0, "area_id", keys["area_id"].to_numpy())
+    static = pd.DataFrame({c: keys["area_id"].map(dict(zip(areas, rng.normal(size=len(areas))))) for c in COMPACT_STATIC})
+    ident = pd.DataFrame({"lat": keys["area_id"] * 0.1, "lon": keys["area_id"] * 0.2,
+                          **{f"month_{m}": (keys["month"] == m).astype(float) for m in range(1, 13)},
+                          **{f"year_{y}": (keys["year"] == y).astype(float) for y in range(2014, 2027)}})
+    parent_features = COMPACT_STATIC + ["f1", "f2"] + COMPACT_IDENT + list(osf.HISTORY_FEATURES) + list(osf.IDP_FEATURES)
+    parent_path = tmp_path / "compact_parent_manifest.json"
+    parent_path.write_text(json.dumps({"horizons": {str(horizon): {"arms": {cpf.PARENT_ARM: {"features": parent_features}}}}}))
+    baseline = pd.concat([data[KEYS + ["overall_phase", *osf.SHARE_COLUMNS]], static, monthly, season_block, ident,
+                          data[list(osf.HISTORY_FEATURES + osf.IDP_FEATURES)]], axis=1)
+    if tamper_major:
+        baseline.loc[0, cpf.MAJOR] = 0.5  # not the ledger's classification of the selected season
+    raw, oracle_ledger = cpf.raw_oracle_block(climate, keys, horizon)
+    arms_data = {cpf.BASELINE_ARM: baseline, cpf.ORACLE_ARM: pd.concat([baseline, raw], axis=1)}
+    arms = {}
+    for arm, frame in arms_data.items():
+        features = cpf.run_features(parent_features, arm, horizon)
+        if extra_feature:
+            frame[extra_feature] = rng.normal(size=len(frame))
+            features = features + [extra_feature]
+        path = tmp_path / f"compact_{arm}.csv"
+        frame.to_csv(path, index=False)
+        arms[arm] = {"features": features, "feature_sha256": osf.list_sha256(features), "dataset": {"path": str(path), "sha256": osf.file_sha256(path)}}
+    season_path, oracle_path = tmp_path / "compact_season_ledger.csv", tmp_path / "compact_oracle_ledger.csv"
+    season_ledger.to_csv(season_path, index=False)
+    oracle_ledger.to_csv(oracle_path, index=False)
+    sources = {}
+    for name in ("interim", "climate_monthly", "climate_seasonal"):
+        path = tmp_path / f"source_{name}.csv"
+        path.write_text(f"tiny stand-in for {name}\n")
+        sources[name] = {"path": str(path), "sha256": osf.file_sha256(path)}
+    contract = {name: {"path": str(approved_contract_dir() / name), "sha256": digest} for name, digest in cpf.FROZEN_CONTRACT_SHA256.items()}
+    code = {rel: osf.file_sha256(REPO_ROOT / rel) for rel in cpf.HELPER_MODULES}
+    if stale_helper:
+        code["src/ipcch/compact_features.py"] = "0" * 64
+    manifest = {
+        "version": cpf.VERSION, "status": "COMPLETE", "cohort": legacy["cohort"], "code_sha256": code, "sources": sources,
+        "parent_manifest": {"path": str(parent_path), "sha256": osf.file_sha256(parent_path)},
+        "contract": {"files": contract},
+        "horizons": {str(horizon): {
+            "history_ledger": entry["history_ledger"], "idp_ledger": entry["idp_ledger"],
+            "season_ledger": {"path": str(season_path), "sha256": osf.file_sha256(season_path)},
+            "oracle_ledger": {"path": str(oracle_path), "sha256": osf.file_sha256(oracle_path)},
+            "arms": arms}},
+    }
+    path = tmp_path / "compact_manifest.json"
+    path.write_text(json.dumps(manifest))
+    return path
+
+
+def compact_args(manifest: Path, out: Path, arm: str = "compact_baseline", horizon: str = "3", *extra):
+    return ("--protocol", "origin-safe", "--origin-manifest", str(manifest), "--horizon", horizon, "--arm", arm,
+            "--out-dir", str(out), "--block-years", "2022", "--n-jobs", "2", *extra)
+
+
+def test_compact_dry_run_validates_both_arms_without_writing(tmp_path):
+    manifest = write_compact_inputs(tmp_path)
+    for arm, count in (("compact_baseline", 296), ("compact_weather_oracle", 302)):
+        result = run_cli(*compact_args(manifest, tmp_path / arm, arm, "3", "--dry-run"))
+        assert result.returncode == 0, result.stderr
+        assert f"{count} features" in result.stdout and "nothing written" in result.stdout
+        assert not (tmp_path / arm).exists()
+
+
+def test_compact_version_arm_horizon_and_namespace_gates(tmp_path):
+    compact = write_compact_inputs(tmp_path)
+    legacy_manifest = tmp_path / "manifest.json"
+    r = run_cli(*compact_args(compact, tmp_path / "a", "climate_safe_history_idp"))
+    assert r.returncode == 1 and "not allowed with manifest version" in r.stderr
+    r = run_cli(*compact_args(compact, tmp_path / "a", "climate_safe_history_idp_oracle"))
+    assert r.returncode == 1 and "not allowed with manifest version" in r.stderr
+    r = run_cli(*compact_args(legacy_manifest, tmp_path / "b", "compact_baseline"))
+    assert r.returncode == 1 and "not allowed with manifest version" in r.stderr
+    r = run_cli(*compact_args(compact, tmp_path / "c", "compact_weather_oracle", "0"))
+    assert r.returncode == 1 and "shared compact baseline" in r.stderr
+    for ns in ("origin_safe_climate_idp_v1", "origin_safe_weather_oracle_v1"):
+        r = run_cli(*compact_args(compact, tmp_path / ns / "runs" / "x"))
+        assert r.returncode == 1 and "legacy namespace" in r.stderr
+    assert run_cli(*origin_args(legacy_manifest, tmp_path / "legacy", "--dry-run")).returncode == 0  # legacy selection still works
+
+
+def test_compact_rejects_extra_diagnostic_column_and_season_ledger_drift(tmp_path):
+    (tmp_path / "x").mkdir()
+    extra = write_compact_inputs(tmp_path / "x", extra_feature="share_total_raw")
+    r = run_cli(*compact_args(extra, tmp_path / "run"))
+    assert r.returncode == 1 and "frozen compact schema" in r.stderr
+    (tmp_path / "y").mkdir()
+    tampered = write_compact_inputs(tmp_path / "y", tamper_major=True)
+    r = run_cli(*compact_args(tampered, tmp_path / "run2"))
+    assert r.returncode == 1 and "is_major" in r.stderr
+    assert not (tmp_path / "run").exists() and not (tmp_path / "run2").exists()
+
+
+def test_compact_gate_requires_build_helper_bytes_and_approved_contract(tmp_path):
+    (tmp_path / "x").mkdir()
+    stale = write_compact_inputs(tmp_path / "x", stale_helper=True)
+    r = run_cli(*compact_args(stale, tmp_path / "run", "compact_baseline", "3", "--dry-run"))
+    assert r.returncode == 1 and "differs from the code that built" in r.stderr
+    manifest = write_compact_inputs(tmp_path)
+    data = json.loads(manifest.read_text())
+    other = tmp_path / "other_contract.csv"
+    other.write_text("not the approved contract\n")
+    data["contract"]["files"]["expected_feature_contract.csv"] = {"path": str(other), "sha256": osf.file_sha256(other)}
+    manifest.write_text(json.dumps(data))
+    r = run_cli(*compact_args(manifest, tmp_path / "run", "compact_baseline", "3", "--dry-run"))
+    assert r.returncode == 1 and "approved contract" in r.stderr
+
+
+def test_compact_tiny_fit_saves_exact_order_and_refuses_a_changed_fingerprint(tmp_path):
+    import xgboost as xgb
+
+    manifest = write_compact_inputs(tmp_path)
+    out = tmp_path / "run"
+    result = run_cli(*compact_args(manifest, out, "compact_weather_oracle"))
+    assert result.returncode == 0, result.stderr
+    meta = json.loads((out / "run_metadata.json").read_text())
+    payload = meta["fingerprint_payload"]
+    assert payload["version"] == "compact_climate_weather_oracle_v1" and payload["runtime"]["xgboost"] == "3.2.0"
+    assert {"src/ipcch/forecasting_weight_decay.py", "scripts/modeling/run_deep_feature_weight_decay_forecasting.py"} <= set(payload["helper_sha256"])
+    assert set(payload["contract_sha256"]) == {"expected_feature_contract.csv", "expected_feature_contract_metadata.json", "expected_run_index.csv"}
+    assert len(meta["features"]) == 302 and meta["features"][-6:] == [f"oracle_{v}_o{k}" for k in (1, 2, 3)
+                                                                       for v in ("prcp_anom_month_ensmean", "tmean_anom_month_ensmean")]
+    for target in osf.CUMULATIVE_TARGETS:
+        booster = xgb.Booster()
+        booster.load_model(str(out / "batches" / "2022" / f"model_{target}.ubj"))
+        assert list(booster.feature_names) == meta["features"]
+    again = run_cli(*compact_args(manifest, out, "compact_weather_oracle"))
+    assert again.returncode == 0 and "verified existing batch" in again.stdout
+    changed = run_cli(*[a if a != "2" else "3" for a in compact_args(manifest, out, "compact_weather_oracle")])
+    assert changed.returncode == 1 and "different fingerprint" in changed.stderr

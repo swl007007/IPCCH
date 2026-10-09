@@ -1,0 +1,12 @@
+{
+  "date_local": "2026-10-08",
+  "stage": "implementation_before_real_fitting",
+  "runner": "Codex supervisor",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -B -m pytest -p no:cacheprovider tests/unit/test_compact_features.py tests/unit/test_compact_report.py tests/unit/test_regional_point_metrics.py tests/unit/test_origin_safe.py tests/unit/test_origin_safe_weather_oracle.py tests/unit/test_climate2015_features.py tests/unit/test_regional_prediction_evaluation.py tests/smoke/test_origin_safe_cli.py -q",
+  "exit_code": 0,
+  "passed": 93,
+  "seconds": 58.25,
+  "scope": "Compact formulas, report groups, regional point metrics, origin-safe/climate regressions and CLI version/schema/resume smoke checks; smoke tests use tiny synthetic fits.",
+  "real_experiment_fitting": "not started",
+  "input_verification": "pending after numerical repair and rebuild"
+}

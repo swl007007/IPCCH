@@ -1,0 +1,11 @@
+Rolling SD12 on the full real series of one area (pandas running sums vs per-window shift-centred vs exact Fraction):
+  WFP_Price area 4588 2024-11: pandas np.float64(5.5642656212723185e-06)  compact np.float64(0.0)  exact 0.0
+  sum_fatalities_violence area 4151 2025-06: pandas np.float64(9.73947920701992e-07)  compact np.float64(0.0)  exact 0.0
+  GPP_mean area 101055 2024-09: pandas np.float64(0.000203473638897249)  compact np.float64(0.0)  exact 0.0
+Same-month z of near-constant real cdd histories (old uncentred helper vs compact shift-centred vs exact Fraction):
+  area 101270 2023-11: prior ['np.float64(30.0)', 'np.float64(30.0)', 'np.float64(30.0)', 'np.float64(30.0)', 'np.float64(30.0)', 'np.float64(30.0)', 'np.float64(30.0)', 'np.float64(29.99999999999999)'] current np.float64(29.99999999999999)
+      old np.float64(-2.6457513110645907)  compact np.float64(-2.4748737341529163)  exact -2.4748737341529163
+  area 101274 2024-09: prior ['np.float64(10.820837152398871)', 'np.float64(11.644976708522938)', 'np.float64(14.95465475057804)', 'np.float64(13.19753502175704)', 'np.float64(22.1944737210553)', 'np.float64(15.659615865209725)', 'np.float64(17.897090542089988)', 'np.float64(15.015484220775704)', 'np.float64(14.592297143644366)'] current np.float64(10.582746172274936)
+      old np.float64(-1.3301013081215023)  compact np.float64(-1.3301013081215018)  exact -1.3301013081215018
+  area 101214 2023-01: prior ['np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.000000000000004)', 'np.float64(31.0)'] current np.float64(29.72512680866888)
+      old np.float64(-949414369509294.0)  compact np.float64(-1014966653938220.6)  exact -1014966653938220.6

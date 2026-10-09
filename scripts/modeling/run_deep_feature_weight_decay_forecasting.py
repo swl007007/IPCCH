@@ -14,6 +14,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 
+from ipcch import compact_features as cpf
 from ipcch import origin_safe as osf
 from ipcch import paths
 from ipcch import weather_oracle as wo
@@ -132,7 +133,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol", choices=("annual", "origin-safe"), default="annual", help="annual: legacy calendar-year holdouts (country scopes only). origin-safe: global fit per test year with labels <= Jan(Y) - max(H, 1), from a frozen input manifest.")
     parser.add_argument("--origin-manifest", help="origin-safe: input manifest written by build_origin_safe_climate_idp_inputs.py.")
     parser.add_argument("--horizon", type=int, choices=HORIZONS, help="origin-safe: forecast horizon H in months (row origin O = T - H).")
-    parser.add_argument("--arm", choices=sorted([*ARMS, *wo.ORACLE_ARMS]), help="origin-safe: feature arm recorded in the manifest (oracle arms only with an origin_safe_weather_oracle_v1 manifest).")
+    parser.add_argument("--arm", choices=sorted([*ARMS, *wo.ORACLE_ARMS, *cpf.ARMS]), help="origin-safe: feature arm recorded in the manifest (oracle arms only with an origin_safe_weather_oracle_v1 manifest, compact arms only with a compact_climate_weather_oracle_v1 manifest).")
     parser.add_argument("--block-years", type=int, nargs="+", help="origin-safe: subset of test years to fit (default: all test years).")
     parser.add_argument("--n-jobs", type=int, default=16, help="origin-safe: XGBoost threads per fit (recorded in the batch fingerprint).")
     return parser.parse_args()
@@ -893,9 +894,15 @@ def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
     if manifest.get("status") != "COMPLETE":
         raise ValueError(f"origin manifest status is {manifest.get('status')!r}, not COMPLETE")
     oracle = manifest.get("version") == wo.ORACLE_VERSION
+    compact = manifest.get("version") == cpf.VERSION
     if oracle != (args.arm in wo.ORACLE_ARMS):
         raise ValueError(f"arm {args.arm} is not allowed with manifest version {manifest.get('version')!r}: "
                          f"oracle arms {list(wo.ORACLE_ARMS)} require an {wo.ORACLE_VERSION} manifest and it allows no other arm")
+    if compact != (args.arm in cpf.ARMS):
+        raise ValueError(f"arm {args.arm} is not allowed with manifest version {manifest.get('version')!r}: "
+                         f"compact arms {list(cpf.ARMS)} require a {cpf.VERSION} manifest and it allows no other arm")
+    if compact:
+        return load_compact_inputs(args, manifest, manifest_path)
     if oracle and args.horizon not in wo.ORACLE_HORIZONS:
         raise ValueError(f"{wo.ORACLE_VERSION} fits only H in {wo.ORACLE_HORIZONS}; H={args.horizon} is the shared reference")
     if oracle and wo.PARENT_VERSION in Path(args.out_dir).resolve().parts:
@@ -965,6 +972,72 @@ def load_origin_inputs(args: argparse.Namespace) -> Dict[str, object]:
     if oracle:
         fingerprint_payload["oracle"] = {"version": wo.ORACLE_VERSION, "parent_manifest_sha256": manifest["parent_manifest"]["sha256"],
                                          "oracle_ledger_sha256": entry["oracle_ledger"]["sha256"], "code_sha256": osf.file_sha256(Path(wo.__file__))}
+    return {
+        "manifest": manifest, "manifest_path": manifest_path, "entry": entry, "features": features, "data": data,
+        "targets": targets, "share_valid": share_valid, "eval_key": eval_key,
+        "ords": osf.month_ord(data["year"], data["month"]),
+        "fingerprint": hashlib.sha256(json.dumps(fingerprint_payload, sort_keys=True).encode()).hexdigest(),
+        "fingerprint_payload": fingerprint_payload,
+    }
+
+
+def load_compact_inputs(args: argparse.Namespace, manifest: Mapping[str, object], manifest_path: Path) -> Dict[str, object]:
+    """compact_climate_weather_oracle_v1 prefit gate: frozen schema, per-arm dataset, parent history/IDP ledgers, season
+    and oracle ledgers, frozen cohort. Same return contract as :func:`load_origin_inputs`."""
+    if args.horizon not in cpf.ARM_HORIZONS[args.arm]:
+        raise ValueError(f"{cpf.VERSION} {args.arm} fits only H in {cpf.ARM_HORIZONS[args.arm]}; H0 oracle is the shared compact baseline")
+    out_parts = Path(args.out_dir).resolve().parts
+    if any(ns in out_parts for ns in cpf.LEGACY_NAMESPACES):
+        raise ValueError(f"compact runs must not write into a legacy namespace {cpf.LEGACY_NAMESPACES}: {args.out_dir}")
+    runtime = cpf.assert_frozen_environment(manifest, paths.PROJECT_ROOT, paths.CONFIG_DIR)
+    entry = manifest["horizons"].get(str(args.horizon))
+    if entry is None or args.arm not in entry["arms"]:
+        raise ValueError(f"manifest has no horizon {args.horizon} / arm {args.arm}")
+    arm_entry = entry["arms"][args.arm]
+    features = list(arm_entry["features"])
+    parent_ref = manifest["parent_manifest"]
+    if osf.file_sha256(parent_ref["path"]) != parent_ref["sha256"]:
+        raise ValueError("parent manifest sha256 differs from the compact manifest")
+    parent_features = json.loads(Path(parent_ref["path"]).read_text(encoding="utf-8"))["horizons"][str(args.horizon)]["arms"][cpf.PARENT_ARM]["features"]
+    if osf.list_sha256(features) != arm_entry["feature_sha256"] or features != cpf.run_features(parent_features, args.arm, args.horizon):
+        raise ValueError(f"{args.arm} H={args.horizon}: manifest features are not the frozen compact schema")
+    forbidden = osf.forbidden_features(features)
+    if forbidden:
+        raise ValueError(f"unsafe features in the fitted set: {forbidden}. {GLOBAL_ANNUAL_RETIRED}")
+    pinned = [("dataset", arm_entry["dataset"]), ("history ledger", entry["history_ledger"]), ("IDP ledger", entry["idp_ledger"]),
+              ("season ledger", entry["season_ledger"]), ("cohort", manifest["cohort"])]
+    if args.arm == cpf.ORACLE_ARM:
+        pinned.append(("oracle ledger", entry["oracle_ledger"]))
+    for label, item in pinned:
+        if not Path(item["path"]).exists():
+            raise FileNotFoundError(f"{label} missing: {item['path']}")
+        if osf.file_sha256(item["path"]) != item["sha256"]:
+            raise ValueError(f"{label} sha256 differs from the manifest: {item['path']}")
+    data = pd.read_csv(arm_entry["dataset"]["path"], float_precision="round_trip", low_memory=False)
+    expected_columns = list(osf.KEYS) + ["overall_phase", *osf.SHARE_COLUMNS] + features
+    if list(data.columns) != expected_columns:
+        raise ValueError("compact dataset columns are not keys + labels + the frozen feature order")
+    if data.duplicated(list(osf.KEYS)).any() or osf.keys_sha256(data) != manifest["cohort"]["label_keys_sha256"]:
+        raise ValueError("dataset keys differ from the frozen label keys")
+    osf.assert_history_ledger(data, pd.read_csv(entry["history_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    osf.assert_idp_ledger(data, pd.read_csv(entry["idp_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    cpf.assert_season_ledger(data, pd.read_csv(entry["season_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    if args.arm == cpf.ORACLE_ARM:
+        cpf.assert_oracle_ledger(data, pd.read_csv(entry["oracle_ledger"]["path"], float_precision="round_trip"), args.horizon)
+    targets = osf.normalized_cumulative_targets(data)
+    cohort = pd.read_csv(manifest["cohort"]["path"])
+    if not cohort[list(osf.KEYS)].equals(data[list(osf.KEYS)]):
+        raise ValueError("cohort file rows differ from the dataset rows")
+    share_valid = targets["share_valid"].to_numpy()
+    eval_key = cohort["eval_key"].to_numpy(dtype=bool)
+    if not np.array_equal(cohort["share_valid"].to_numpy(dtype=bool), share_valid):
+        raise ValueError("share validity differs from the frozen cohort")
+    if not np.array_equal(eval_key, share_valid & data["year"].isin(osf.TARGET_YEARS).to_numpy()) \
+            or osf.keys_sha256(data.loc[eval_key]) != manifest["cohort"]["eval_keys_sha256"]:
+        raise ValueError("evaluation keys differ from the frozen cohort")
+    params = {"seed": args.seed, "half_life_months": args.half_life_months, "phase_threshold": args.phase_threshold, "n_jobs": args.n_jobs}
+    fingerprint_payload = cpf.fingerprint_payload(manifest, osf.file_sha256(manifest_path), args.arm, args.horizon, params,
+                                                  cpf.fit_code_sha256(paths.PROJECT_ROOT), runtime)
     return {
         "manifest": manifest, "manifest_path": manifest_path, "entry": entry, "features": features, "data": data,
         "targets": targets, "share_valid": share_valid, "eval_key": eval_key,

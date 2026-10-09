@@ -1,0 +1,28 @@
+[run] compact_baseline H=0 (dry run)
+origin-safe dry run compact_baseline H=0: inputs and prefit gate passed; 296 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-12', '2022-12', '2023-12', '2024-12']; no fitting, nothing written
+
+[done] compact_baseline H=0 rc=0 status=DRY_RUN_OK 18.8s
+[run] compact_baseline H=3 (dry run)
+origin-safe dry run compact_baseline H=3: inputs and prefit gate passed; 296 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-10', '2022-10', '2023-10', '2024-10']; no fitting, nothing written
+
+[done] compact_baseline H=3 rc=0 status=DRY_RUN_OK 17.3s
+[run] compact_baseline H=6 (dry run)
+origin-safe dry run compact_baseline H=6: inputs and prefit gate passed; 296 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-07', '2022-07', '2023-07', '2024-07']; no fitting, nothing written
+
+[done] compact_baseline H=6 rc=0 status=DRY_RUN_OK 17.3s
+[run] compact_baseline H=12 (dry run)
+origin-safe dry run compact_baseline H=12: inputs and prefit gate passed; 296 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-01', '2022-01', '2023-01', '2024-01']; no fitting, nothing written
+
+[done] compact_baseline H=12 rc=0 status=DRY_RUN_OK 17.2s
+[run] compact_weather_oracle H=3 (dry run)
+origin-safe dry run compact_weather_oracle H=3: inputs and prefit gate passed; 302 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-10', '2022-10', '2023-10', '2024-10']; no fitting, nothing written
+
+[done] compact_weather_oracle H=3 rc=0 status=DRY_RUN_OK 17.4s
+[run] compact_weather_oracle H=6 (dry run)
+origin-safe dry run compact_weather_oracle H=6: inputs and prefit gate passed; 308 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-07', '2022-07', '2023-07', '2024-07']; no fitting, nothing written
+
+[done] compact_weather_oracle H=6 rc=0 status=DRY_RUN_OK 17.9s
+[run] compact_weather_oracle H=12 (dry run)
+origin-safe dry run compact_weather_oracle H=12: inputs and prefit gate passed; 308 features; blocks [2022, 2023, 2024, 2025] with fit cutoffs ['2021-01', '2022-01', '2023-01', '2024-01']; no fitting, nothing written
+
+[done] compact_weather_oracle H=12 rc=0 status=DRY_RUN_OK 17.7s
