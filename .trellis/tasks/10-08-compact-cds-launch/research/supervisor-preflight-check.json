@@ -1,0 +1,44 @@
+{
+  "status": "accepted_current_source_preflight",
+  "checked_utc": "2026-10-09T05:13:43.429188+00:00",
+  "preflight_sha256": "d476a352b3c63d344aeae6987f6eb735d7b163047c3732cbf0948848b6db04c8",
+  "source_report_passed": true,
+  "supervisor_spec_contract_byte_checks": true,
+  "independent_scout_scope": "preflight script/keyed report inspection, small source/helper/config/contract hash checks and independent old population cap/region arithmetic; no huge-source rescan",
+  "independent_scout_result": "No current source contradiction or false acceptance of weather/new matrices/models found. Source report passed is only current-source preflight.",
+  "observed": {
+    "n_areas": 6188,
+    "n_countries": 53,
+    "popdensity_na": 4880,
+    "n_zero_population": 6,
+    "capped_countries": 19,
+    "capped_areas": 4004,
+    "raw_population": 2106501620.657281,
+    "effective_population": 1429568874.4239516,
+    "region_codes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "schemas": [
+      296,
+      308
+    ],
+    "n_unique_runs": 5
+  },
+  "remaining_gates": [
+    "actual CDS retrieval/GRIB grid/member/year/time/packing and full overlap",
+    "new complete inference/training matrix values/NA/cutoff/prefix parity",
+    "all20 fitted orders/predictions/replay",
+    "population/report/map arithmetic and old-artifact after inventory"
+  ],
+  "implementation_checkpoint_accepted": false,
+  "training_authorized_by_supervisor": false,
+  "scientific_completion": "Not Executed"
+}

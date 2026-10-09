@@ -1,0 +1,50 @@
+{
+  "stage": "supervisor_real_input_checkpoint",
+  "passed": true,
+  "manifest": {
+    "path": "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/compact_cds_launch_v1_manifest.json",
+    "sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe"
+  },
+  "runs": {
+    "compact_baseline/0m": {
+      "areas": 6188,
+      "features": 296,
+      "fit_rows": 49532,
+      "popdensity_na": 4880
+    },
+    "compact_baseline/6m": {
+      "areas": 6188,
+      "features": 296,
+      "fit_rows": 49532,
+      "popdensity_na": 4880
+    },
+    "compact_baseline/12m": {
+      "areas": 6188,
+      "features": 296,
+      "fit_rows": 49532,
+      "popdensity_na": 4880
+    },
+    "compact_cds_weather/6m": {
+      "areas": 6188,
+      "features": 308,
+      "fit_rows": 49532,
+      "popdensity_na": 4880
+    },
+    "compact_cds_weather/12m": {
+      "areas": 6188,
+      "features": 308,
+      "fit_rows": 49532,
+      "popdensity_na": 4880
+    }
+  },
+  "history": "latest three phases independently reselected from pinned source through March2026",
+  "weather": "accepted full cube; exact keyed oracle substitution; both evidence comparisons preserved",
+  "population_raw": 2106501620.657281,
+  "future_perturbation": {
+    "features_checked": 233,
+    "changed_cells": 0,
+    "perturbed_source_months_after": "2026-04",
+    "perturbed_seasons_ending_after": "2026-05-01"
+  },
+  "fitting_gate": "eligible for sharedH0 pilot only"
+}

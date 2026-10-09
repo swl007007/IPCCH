@@ -1,0 +1,358 @@
+{
+  "checkpoint": "compact_cds_launch_v1 implementation/input checkpoint (Stage 3); NO FITTING performed",
+  "written_utc": "2026-10-09T06:55:38Z",
+  "manifest": {
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/compact_cds_launch_v1_manifest.json",
+    "sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+    "status": "COMPLETE",
+    "created_utc": "2026-10-09T06:49:46.118717+00:00",
+    "git_head": "b19d36d210bcb59ca090b9e1e961657225f44d39",
+    "elapsed_seconds": 263.8
+  },
+  "assembly_attempt3": {
+    "log": "results/launch/nowcasting_2026_04_compact_cds_v1/logs/assemble_attempt3.log",
+    "log_sha256": "b34ba58151bf76a6460c6d2329c4f46b7f64e6048e47981bbf5fc6adc95dc513",
+    "exit": 0,
+    "wall": "4:24.32",
+    "max_rss_kb": 2918120,
+    "interpreter": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "note": "launch line carried a -W pandas.errors filter that Python ignored (log notice only)"
+  },
+  "attempt1_byte_identity": {
+    "files": 11,
+    "all_identical": true,
+    "by_file": {
+      "training/fit_selection_compact_baseline_h0.csv": true,
+      "training/fit_selection_compact_baseline_h12.csv": true,
+      "training/fit_selection_compact_baseline_h6.csv": true,
+      "training/fit_selection_compact_cds_weather_h12.csv": true,
+      "training/fit_selection_compact_cds_weather_h6.csv": true,
+      "inference/inference_compact_baseline_h0.csv": true,
+      "inference/inference_compact_baseline_h12.csv": true,
+      "inference/inference_compact_baseline_h6.csv": true,
+      "inference/inference_compact_cds_weather_h12.csv": true,
+      "inference/inference_compact_cds_weather_h6.csv": true,
+      "ledgers/history_h0.csv": true
+    }
+  },
+  "superseded": {
+    "attempt1": "rejected exit 1 at history_h0 CSV round-trip check (object int/None IDs read back as float)",
+    "attempt2": "stopped SIGTERM exit 143 before ledgers (broader comparator superseded by read-back text dtype)"
+  },
+  "validate_only": {
+    "log": "results/launch/nowcasting_2026_04_compact_cds_v1/logs/validate_only_attempt3.log",
+    "log_sha256": "eceb2625600e8ae996a04a33a3ef8bf431dd93ddf00a83feb3b54a1a266cc3d2",
+    "exit": 0,
+    "wall": "0:45.06",
+    "written": "nothing"
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "code_sha256_manifest": {
+    "src/ipcch/compact_launch.py": "ed10b701bdfb86624fca4f0975c81e677819db048ed7473d0ade3c4efb4f992d",
+    "src/ipcch/cds_launch_weather.py": "be74e2a3f87d124b26c7fd7440dd5c52ad516dc1b8bcd5ff84aaf750cf755e33",
+    "scripts/preprocessing/build_compact_cds_launch_inputs.py": "21609b085a29db895e8ec73339fdfd69ecc11a2d3f231f727197f59ba880ad78",
+    "scripts/modeling/run_compact_cds_launch.py": "c58be4f4336bd3940c4bfe826796f3354a866d119283188a8651fbea08216db4",
+    "src/ipcch/compact_features.py": "923cae26335f9994043c178a0920a7736e7e80dc9c51a5fffa8d406f07fdf324",
+    "src/ipcch/climate2015_features.py": "e8da9de9224b1f5c42706d50fccd12f2173886079c4c7a711f152f900e9c22d5",
+    "src/ipcch/retained_feature_recipes.py": "cf1557e405d0aef3a62ee9af4286680465e8fae3f7661c959d321870423465ed",
+    "src/ipcch/weather_oracle.py": "65a93d45ec0f738ec9c6e8092e4c355f88149310054e4e1969ae24c2ffc55d81",
+    "src/ipcch/origin_safe.py": "629936a8de4973399a3dfa798b4a212bb8fefe9838d16a032c072c446101ea03",
+    "src/ipcch/forecasting_weight_decay.py": "1a9f20e2d4b62d532baeb48f3538247dd7719a60cd06f7d75982be2076caaefc",
+    "scripts/modeling/run_deep_feature_weight_decay_forecasting.py": "67729cf9f55c442ba3e748bfadbd56e9ecfe2692861a5103ac7cb08a003dc184",
+    "src/ipcch/launch_nowcasting.py": "4abd29978e5420e335b6331fc22961f924c7c0b395df482f84f89f88747a19c9",
+    "src/ipcch/launch_visualizations.py": "b0595c6916f3484f34f53d7f3885c9d517dd2ce20ea1fd2627036325e3575bc9",
+    "src/ipcch/alert_risk_maps.py": "1dec6b2fa4a0ed5171223e2f0883618306db7dcf43e383891fd0fcc00bb5ba3b",
+    "src/ipcch/plot_forecast_weather_phase3plus_maps.py": "258a46e46ffb00a91759b81dae4b40cab8894e718d249b00496af1728f91c69c"
+  },
+  "code_sha256_now_match": true,
+  "tests": {
+    "focused": "32 passed (tests/unit/test_compact_launch.py, tests/smoke/test_compact_cds_launch_cli.py, tests/unit/test_cds_launch_weather.py)",
+    "test_compact_launch_sha256": "bb0300c3b4946eed4a1b1cf0d4892bcbc67cb07e8770c5884b452669fe105379"
+  },
+  "contract": {
+    "expected_feature_contract.csv": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82",
+    "expected_feature_contract_metadata.json": "6295074fa8a94f45e75c695ea3997a8b6927f1b1b00bb8358ab290c4416de410",
+    "expected_run_index.csv": "25fff00d23b6a2df22f81900832f8b884909eb172d4bd07832544591cf87b616"
+  },
+  "plan": {
+    "origin": "2026-04",
+    "targets": {
+      "0": "2026-04",
+      "6": "2026-10",
+      "12": "2027-04"
+    },
+    "training_label_cutoff_exclusive": "2026-04-01",
+    "inference_ipc_history_max_month": "2026-03",
+    "weight_rule": "0.5 ** ((2026-04 - U) / 24) on the label month U"
+  },
+  "runs": {
+    "compact_baseline/0m": {
+      "arm": "compact_baseline",
+      "horizon": 0,
+      "training_arm": "compact_baseline",
+      "target_month": "2026-04",
+      "feature_count": 296,
+      "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+      "fit_rows": 49532,
+      "fit_keys_sha256": "1c55e51011491ff3c507374a0c570bfd2d0f22d961bf5fae93c3a5403ede3332",
+      "fit_label_months": [
+        "2014-01",
+        "2026-03"
+      ],
+      "inference_keys_sha256": "7426dff654fe832dfdcc1463025124b816183bf4452eddb62f8cc315d94940d2",
+      "weather_inference": "none",
+      "training_dataset_sha256": "92def8b5bdef5e217abebdadaa21fce490021551a792ed225a78406f61a58012",
+      "fit_selection_sha256": "bb08f69a128764bb9dbc7461f93217f8fcdbeb9a886f6469efaf18db105fbda7",
+      "inference_sha256": "e1881cd07e2222249a9f07af7292f5ec956a55a5ba2ceb4503b9ce34020671e1",
+      "inference_shape": [
+        6188,
+        299
+      ]
+    },
+    "compact_baseline/6m": {
+      "arm": "compact_baseline",
+      "horizon": 6,
+      "training_arm": "compact_baseline",
+      "target_month": "2026-10",
+      "feature_count": 296,
+      "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+      "fit_rows": 49532,
+      "fit_keys_sha256": "1c55e51011491ff3c507374a0c570bfd2d0f22d961bf5fae93c3a5403ede3332",
+      "fit_label_months": [
+        "2014-01",
+        "2026-03"
+      ],
+      "inference_keys_sha256": "14246385effb0db7e1edf942eca71199a724356b696cd9194e4f89eb81ba99e4",
+      "weather_inference": "none",
+      "training_dataset_sha256": "38b8e6d2ee49155e2c009695e322418e4f01be9656dceb5fa4c6c3ba729b5bd8",
+      "fit_selection_sha256": "bb08f69a128764bb9dbc7461f93217f8fcdbeb9a886f6469efaf18db105fbda7",
+      "inference_sha256": "ecebf09f684581aa6734573e3d6a8a0f71781a798f0051d00725b557b2029918",
+      "inference_shape": [
+        6188,
+        299
+      ]
+    },
+    "compact_baseline/12m": {
+      "arm": "compact_baseline",
+      "horizon": 12,
+      "training_arm": "compact_baseline",
+      "target_month": "2027-04",
+      "feature_count": 296,
+      "feature_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+      "fit_rows": 49532,
+      "fit_keys_sha256": "1c55e51011491ff3c507374a0c570bfd2d0f22d961bf5fae93c3a5403ede3332",
+      "fit_label_months": [
+        "2014-01",
+        "2026-03"
+      ],
+      "inference_keys_sha256": "a1fc6ee84ac1de0d088d4e22bd70d1d9c21923e092a2c8e768b5097e89d9c519",
+      "weather_inference": "none",
+      "training_dataset_sha256": "e442a40d37a259f31aaaea337fcfeffaeb593d1ff7108112dc8f69313f12a811",
+      "fit_selection_sha256": "bb08f69a128764bb9dbc7461f93217f8fcdbeb9a886f6469efaf18db105fbda7",
+      "inference_sha256": "c4fb4507156edb388d9152a7b15cad9987602d5bd47f5ae2e7f89434edb6e264",
+      "inference_shape": [
+        6188,
+        299
+      ]
+    },
+    "compact_cds_weather/6m": {
+      "arm": "compact_cds_weather",
+      "horizon": 6,
+      "training_arm": "compact_weather_oracle",
+      "target_month": "2026-10",
+      "feature_count": 308,
+      "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+      "fit_rows": 49532,
+      "fit_keys_sha256": "1c55e51011491ff3c507374a0c570bfd2d0f22d961bf5fae93c3a5403ede3332",
+      "fit_label_months": [
+        "2014-01",
+        "2026-03"
+      ],
+      "inference_keys_sha256": "14246385effb0db7e1edf942eca71199a724356b696cd9194e4f89eb81ba99e4",
+      "weather_inference": "CDS cube (accepted weather stage)",
+      "training_dataset_sha256": "fd31cf0f505fa3172d2c09b7823b1970194e8ea7d8c86de8fded2b1ecf58c636",
+      "fit_selection_sha256": "bb08f69a128764bb9dbc7461f93217f8fcdbeb9a886f6469efaf18db105fbda7",
+      "inference_sha256": "8599920a5b952bffe6bc2ad38fc0545ee4473f12c5664d5db78b05a9332dff47",
+      "inference_shape": [
+        6188,
+        311
+      ]
+    },
+    "compact_cds_weather/12m": {
+      "arm": "compact_cds_weather",
+      "horizon": 12,
+      "training_arm": "compact_weather_oracle",
+      "target_month": "2027-04",
+      "feature_count": 308,
+      "feature_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+      "fit_rows": 49532,
+      "fit_keys_sha256": "1c55e51011491ff3c507374a0c570bfd2d0f22d961bf5fae93c3a5403ede3332",
+      "fit_label_months": [
+        "2014-01",
+        "2026-03"
+      ],
+      "inference_keys_sha256": "a1fc6ee84ac1de0d088d4e22bd70d1d9c21923e092a2c8e768b5097e89d9c519",
+      "weather_inference": "CDS cube (accepted weather stage)",
+      "training_dataset_sha256": "aa7f299ca6c89d5243b91c6b1e045fc9dafeed386a9d89f390edc78d7502229d",
+      "fit_selection_sha256": "bb08f69a128764bb9dbc7461f93217f8fcdbeb9a886f6469efaf18db105fbda7",
+      "inference_sha256": "0b16d90d419f1a74660484773099742a6db3dc4503f3c632d4b07a1da075ca21",
+      "inference_shape": [
+        6188,
+        311
+      ]
+    }
+  },
+  "checks": {
+    "perturbation": {
+      "features_checked": 233,
+      "changed_cells": 0,
+      "perturbed_source_months_after": "2026-04",
+      "perturbed_seasons_ending_after": "2026-05-01"
+    },
+    "history_reference": {
+      "0": {
+        "rows_checked": 6188,
+        "history_values_present": 17771,
+        "observations_excluded_after_march": 2774
+      },
+      "6": {
+        "rows_checked": 6188,
+        "history_values_present": 17771,
+        "observations_excluded_after_march": 2774
+      },
+      "12": {
+        "rows_checked": 6188,
+        "history_values_present": 17771,
+        "observations_excluded_after_march": 2774
+      }
+    },
+    "idp_reference": {
+      "0": {
+        "rows_checked": 6188,
+        "idp_present": 5650
+      },
+      "6": {
+        "rows_checked": 6188,
+        "idp_present": 5650
+      },
+      "12": {
+        "rows_checked": 6188,
+        "idp_present": 5650
+      }
+    },
+    "cohort_areas": 6188,
+    "noncalendar_identical_across_targets": true,
+    "weather_prefix_equals_baseline": true,
+    "h0_identifier_equals_add_identifier_features": true,
+    "year_2027_flags_all_false": true,
+    "season_ledger_rows": 6188,
+    "population": {
+      "total": 2106501620.657281,
+      "zero_areas": [
+        3320,
+        3359,
+        3368,
+        3373,
+        3378,
+        3570
+      ]
+    },
+    "paired_training_identical": true
+  },
+  "ledgers": {
+    "history_h0": {
+      "sha256": "8aee4fd13d9265e28b9438be6e28dc2972247097734739651a2c0f8824709ee3",
+      "rows": 6188,
+      "columns": 17
+    },
+    "history_h6": {
+      "sha256": "e10243bc4b4858fe837d5e9b8dcc77219d0440de6945150e41b4563e683dde18",
+      "rows": 6188,
+      "columns": 17
+    },
+    "history_h12": {
+      "sha256": "4b2033e4cb17bb5dd5a251cc317b609d4016b86abab42d773a67b144f731e28d",
+      "rows": 6188,
+      "columns": 17
+    },
+    "idp_h0": {
+      "sha256": "cf4ad186f0b00bbf8fdf773d427b5917414136d333d6b99dc5814af0357c78c7",
+      "rows": 6188,
+      "columns": 8
+    },
+    "idp_h6": {
+      "sha256": "b0334eed931ef17a2f15269a0ffff1e35af81f5560580c1242f30bd5b35d0c63",
+      "rows": 6188,
+      "columns": 8
+    },
+    "idp_h12": {
+      "sha256": "56080b7c39de916d54814118c2c3991f9ad6501440242f710589d90641bdc9bd",
+      "rows": 6188,
+      "columns": 8
+    },
+    "season": {
+      "sha256": "40753e90e7febeb9895a63e94b39bb6e261c58fc89634f21b526f6c6b7a0eb4b",
+      "rows": 6188,
+      "columns": 17
+    },
+    "population": {
+      "sha256": "0c195fab6572914d1b50c039296489d19ea05a7c98076468d78d7d27dd59672c",
+      "rows": 6188,
+      "columns": 2
+    }
+  },
+  "weather": {
+    "cube_sha256": "8745e7afdbf0e65f36e1ad584ecfc147fb7d6ad5abc8ed16178af33b886e89a4",
+    "provenance_sha256": "408e8090af75fb8c7555a4ad09121fd7de9d81f6694b56327850afa3edff2f74",
+    "status": "ACCEPTED",
+    "temperature_convention": "end_inclusive",
+    "training_definition": "realized compact oracle (observed 1991-2020 declared reference)",
+    "inference_definition": "ECMWF system51 April 1 2026 initialization ensemble-mean anomalies vs the 1993-2016 system51 hindcast reference; true May-September official monthly anomalies (leads 2-6), true October constructed from original-frequency data and validated on September; fixed containing-cell point sampling; mm/month and degC difference",
+    "overlap_gate": {
+      "bounds_sha256": "8db6bda0961cfa5231bdebcb4a5400445ba1bdbc69136fc849234fbac7ac1f18",
+      "points": 6227,
+      "cells": 1398,
+      "tmean": {
+        "max_abs_diff_K": 0.0005514288509971266,
+        "bound_K": 0.002258778618408203,
+        "points_over_bound": 0,
+        "finite": true
+      },
+      "prcp": {
+        "max_abs_diff_m_per_s": 4.245035022865878e-12,
+        "bound_m_per_s": 9.603856249513631e-11,
+        "points_over_bound": 0,
+        "max_abs_diff_mm_per_month": 0.011003130779268356,
+        "finite": true
+      },
+      "diagnostic_start_inclusive_tmean_max_abs_diff_K": 0.013390422322402173,
+      "passed": true
+    },
+    "overlap_bounds": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/CDS_API/compact_cds_launch_v1/processed/overlap_bounds_frozen.json",
+      "sha256": "8db6bda0961cfa5231bdebcb4a5400445ba1bdbc69136fc849234fbac7ac1f18"
+    },
+    "temperature_convention_basis": "(month start 00, next month start 00] UTC 6-hourly instantaneous samples; empirically verified against the supplied system51 September absolute monthly ensemble mean and September anomaly products; official primary documents do not explicitly state endpoint inclusivity; the initial [start, end) window failed both checks and production attempt v2 was rejected",
+    "limitations": [
+      "Model anomalies (1993-2016 system51 reference) differ from the observed 1991-2020 training anomalies.",
+      "Temperature monthly window empirically verified on supplied September products, not an explicit published rule.",
+      "Accumulated tp has endpoint decreases beyond final-packing bounds (keyed diagnostic); upstream cause unverified; raw signed end-minus-start totals used unchanged.",
+      "Fixed containing-cell point sampling does not reproduce the observed export's spatial weights.",
+      "October is locally constructed (validated on September), not an official monthly product."
+    ]
+  },
+  "supervisor_independent": [
+    "research/supervisor-history-csv-refresh.json",
+    "research/supervisor-october-reduction-check.json",
+    "research/supervisor-input-acceptance.json"
+  ],
+  "fitting": "closed; awaiting supervisor authorization for the Codex Windows-Git implementation commit and the shared H0 pilot only"
+}

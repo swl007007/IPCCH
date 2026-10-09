@@ -1,0 +1,28 @@
+{
+  "empty_probe_false_pass": {
+    "files": {},
+    "problems": [],
+    "cell_identity_vs_official_anomaly": null,
+    "passed": true
+  },
+  "wrong_grid_accepted": {
+    "ni": 180,
+    "nj": 91,
+    "di": 2.0,
+    "dj": 2.0,
+    "north_edge": 91.0,
+    "west_edge": -1.0,
+    "first_lat": 90.0,
+    "first_lon": 0.0,
+    "last_lat": -90.0,
+    "last_lon": 358.0
+  },
+  "missing_cache_file_skipped": true,
+  "provider_success_not_saved_before_download_timeout": true,
+  "source_sha256": {
+    "scripts/preprocessing/build_compact_cds_launch_inputs.py": "791627794c579cb1f090baf1d4de7177b9609cc29dac0eaf8db64c079604dd35",
+    "/mnt/c/users/swl00/ifpri dropbox/weilun shi/google fund/analysis/2.source_code/step5_geo_rf_trial/ipcch/src/ipcch/cds_launch_weather.py": "2eafcb249004ba17a7a551382dac043854234a85d10cb69bed3479ef57b52d22"
+  },
+  "real_data_network_credentials_used": false,
+  "scope": "Synthetic source-boundary/recovery probes only; not scientific weather acceptance."
+}

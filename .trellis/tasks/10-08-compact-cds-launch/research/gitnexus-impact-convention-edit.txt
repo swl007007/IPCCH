@@ -1,0 +1,15 @@
+src/ipcch/cds_launch_weather.py:63:TEMPERATURE_CONVENTION = "start_inclusive"  # samples valid in [month start, next month start) UTC; frozen before overlap
+src/ipcch/cds_launch_weather.py:650:    sample_sets = {(m, c): set(temperature_sample_hours(FORECAST_YEAR, mo, c)) for m, mo in enumerate(months) for c in conventions}
+src/ipcch/cds_launch_weather.py:754:    sep_samples = temperature_sample_hours(FORECAST_YEAR, OVERLAP_MONTH, TEMPERATURE_CONVENTION)
+src/ipcch/cds_launch_weather.py:759:    frozen = {"frozen_utc": _now(), "month": "2026-09", "temperature_convention": TEMPERATURE_CONVENTION, "bounds": bounds,
+src/ipcch/cds_launch_weather.py:775:    t_con = constructed[("tmean", OVERLAP_MONTH, TEMPERATURE_CONVENTION)]["anomaly"][point_to_cell]
+src/ipcch/cds_launch_weather.py:804:                raw = constructed[("tmean", (y, m), TEMPERATURE_CONVENTION)]["anomaly"] if var == "tmean" else constructed[("prcp", (y, m))]["anomaly"]
+src/ipcch/cds_launch_weather.py:840:        "temperature_convention": TEMPERATURE_CONVENTION, "reference_period": REFERENCE_PERIOD,
+scripts/preprocessing/build_compact_cds_launch_inputs.py:120:    return cw.process_weather(root, load_points(), Path(args.input_root), log)
+tests/unit/test_cds_launch_weather.py:35:    sep = cw.temperature_sample_hours(2026, (2026, 9))
+tests/unit/test_cds_launch_weather.py:36:    oct_ = cw.temperature_sample_hours(2026, (2026, 10))
+tests/unit/test_cds_launch_weather.py:38:    assert cw.temperature_sample_hours(2026, (2026, 10), "end_inclusive")[-1] == 5136
+.trellis/tasks/10-08-compact-cds-launch/research/absolute_monthly_timestamp_probe.py:62:conv_steps = {c: set(cw.temperature_sample_hours(2026, (2026, 9), c)) for c in ("start_inclusive", "end_inclusive")}
+.trellis/tasks/10-08-compact-cds-launch/research/september_overlap_diagnostic.py:47:sep_steps = set(cw.temperature_sample_hours(cw.FORECAST_YEAR, sep, cw.TEMPERATURE_CONVENTION))
+.trellis/tasks/10-08-compact-cds-launch/research/september_overlap_diagnostic.py:48:sep_alt = set(cw.temperature_sample_hours(cw.FORECAST_YEAR, sep, "end_inclusive"))
+GitNexus impact(temperature_sample_hours / process_weather, upstream): 'Target not found' (new file not in the index); local callers by grep above.

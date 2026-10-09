@@ -1,0 +1,572 @@
+{
+  "version": "compact_cds_launch_v1",
+  "started_utc": "2026-10-09T05:05:36Z",
+  "checks": {
+    "configs": {
+      "forecasting_hyperparameters.json": "3742300661466f22eba8198e5d4f9c2a277615ba59562fbf27f251ecc932dd76",
+      "forecasting_hyperparameters_p3.json": "cdc0e55aa15bdda932465088568b9ee717d226208ffb32076f438fb274e6317b"
+    },
+    "compact_build_code_bytes_equal": true,
+    "contract": {
+      "rows": 308,
+      "unique": 308,
+      "runs": {
+        "compact_baseline/0m": {
+          "n": 296,
+          "schema_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "csv_projection_equals_metadata_and_compact_manifest": true
+        },
+        "compact_baseline/6m": {
+          "n": 296,
+          "schema_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "csv_projection_equals_metadata_and_compact_manifest": true
+        },
+        "compact_baseline/12m": {
+          "n": 296,
+          "schema_sha256": "e97388f848e7095bf0535f0cfee1a2d798e0c1863dee843462e60cf6a36f9909",
+          "csv_projection_equals_metadata_and_compact_manifest": true
+        },
+        "compact_cds_weather/6m": {
+          "n": 308,
+          "schema_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "csv_projection_equals_metadata_and_compact_manifest": true
+        },
+        "compact_cds_weather/12m": {
+          "n": 308,
+          "schema_sha256": "3e54c4496d92a76df4f99246a5e9117eccce8ee80a9e3eb8d2d9778c817a2a3e",
+          "csv_projection_equals_metadata_and_compact_manifest": true
+        }
+      }
+    },
+    "april_cohort": {
+      "rows": 6188,
+      "unique_areas": 6188,
+      "duplicate_keys": 0,
+      "population": {
+        "missing": 0,
+        "negative": 0,
+        "zero": 6,
+        "zero_area_ids": [
+          3320,
+          3359,
+          3368,
+          3373,
+          3378,
+          3570
+        ],
+        "nonfinite": 0,
+        "total": 2106501620.657281
+      },
+      "static_missing": {
+        "popdensity": 4880
+      },
+      "population_vs_old_launch_area_table": {
+        "both": 6188,
+        "only_new": 0,
+        "only_old": 0,
+        "max_abs_diff": 0.0
+      },
+      "static_parity_with_compact_april_rows": {
+        "compact_april_rows": 2774,
+        "numeric_and_na_equal": true
+      },
+      "country": {
+        "unmapped": 0,
+        "countries": 53,
+        "empty_iso3_areas": 31,
+        "empty_iso3_countries": [
+          "Cote d'Ivoire"
+        ],
+        "empty_country_code_countries": [
+          "Namibia"
+        ]
+      },
+      "country_reference": {
+        "rows": 53,
+        "names_one_to_one": true,
+        "namibia_lookup_code_used": [
+          "NA"
+        ],
+        "as_of": [
+          "2025/7/1"
+        ]
+      },
+      "country_cap": {
+        "capped_countries": 19,
+        "capped_areas": 4004,
+        "raw_total": 2106501620.657281,
+        "effective_total": 1429568874.4239516
+      },
+      "region": {
+        "columns": [
+          "area_id",
+          "region"
+        ],
+        "unmapped": 0,
+        "counts": {
+          "0": 1045,
+          "1": 858,
+          "2": 1059,
+          "3": 1100,
+          "4": 801,
+          "5": 365,
+          "6": 50,
+          "7": 904,
+          "8": 6
+        }
+      }
+    },
+    "coordinates": {
+      "identifier_april_rows": 6188,
+      "identifier_duplicates": 0,
+      "cohort_missing_identifier_coords": 0,
+      "cohort_missing_cds_points": 0,
+      "points_unique": true,
+      "points_finite": true,
+      "max_abs_lat_diff": 5.000089231543825e-11,
+      "max_abs_lon_diff": 5.000089231543825e-11,
+      "points_outside_cohort": 39
+    },
+    "source_grids": {
+      "interim_last_month": "2026-04",
+      "climate_last_month": "2026-08",
+      "cohort_areas_interim_span_ending_before_april": 0,
+      "noncohort_areas_in_interim": 39,
+      "reported_phase_rows_april_2026": 2774,
+      "reported_phase_rows_after_april_2026": 0,
+      "latest_reported_phase_month": "2026-04"
+    },
+    "geometry": {
+      ".shp": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.shp",
+        "sha256": "49ee44f49a2832b70f94a5df999018c4e9f3461cb96d8d79c83e308a4fbe24a0"
+      },
+      ".shx": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.shx",
+        "sha256": "a19d750a68eed012832c7c0027140543b49e85596452b85acf30eb53f073dca3"
+      },
+      ".dbf": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.dbf",
+        "sha256": "eca55302f2f494a08db401202f3efdf7b120d1e3c5f741d80117b0b4b5b97fde"
+      },
+      ".prj": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.prj",
+        "sha256": "5d3b39697820a6d6dfe49413bea38603f41331c162725fd1bd958941034a1c37"
+      },
+      ".cpg": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/ipcch_admin_geometry.cpg",
+        "sha256": "146d6789ffe033a5297c1ad046e6a62ee35319b86b021444f05b6ea2aa8a1f4a"
+      },
+      "rows": 6227,
+      "crs": "EPSG:4326",
+      "duplicate_area_ids": 0,
+      "cohort_unmatched": 0,
+      "geometry_outside_cohort": 39
+    }
+  },
+  "problems": [],
+  "deferred": [
+    "CDS provider retrieval, response identities, GRIB decoding, member/year/step completeness and September overlap validation (weather stage)",
+    "Original-frequency grid/longitude convention of the new GRIBs (checked on retrieval)"
+  ],
+  "git": {
+    "head": "b19d36d210bcb59ca090b9e1e961657225f44d39",
+    "branch": "task/compact-climate-weather-oracle",
+    "status_porcelain": "M .trellis/tasks/10-08-compact-cds-launch/task.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/preflight-checkpoint.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/preflight.py\n?? .trellis/tasks/10-08-compact-cds-launch/research/supervisor-handoff-check.json\n?? .trellis/tasks/10-08-compact-cds-launch/research/task-start.md"
+  },
+  "disk": {
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data",
+    "free_gb": 243.8,
+    "total_gb": 1555.1
+  },
+  "cds_credentials": {
+    "path": "/home/swl007007/.cdsapirc",
+    "exists": true,
+    "readable": true,
+    "contents_read": false
+  },
+  "runtime_model": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "3.0.3",
+    "sklearn": "1.8.0",
+    "xgboost": "3.2.0",
+    "executable": "/home/swl007007/.venvs/ipcch-geo/bin/python",
+    "python_build": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "runtime_cds": {
+    "python": "3.12.3",
+    "executable": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/CDS_API/.venv/bin/python",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "xarray": "2026.4.0",
+    "cfgrib": "0.9.15.1",
+    "eccodes_python": "2.47.1",
+    "eccodes_lib": "2.47.1",
+    "cdsapi": "0.7.7",
+    "ecmwf_datastores_client": "0.5.1",
+    "rasterio": "1.5.0"
+  },
+  "helper_sha256": {
+    "src/ipcch/compact_features.py": "923cae26335f9994043c178a0920a7736e7e80dc9c51a5fffa8d406f07fdf324",
+    "src/ipcch/climate2015_features.py": "e8da9de9224b1f5c42706d50fccd12f2173886079c4c7a711f152f900e9c22d5",
+    "src/ipcch/retained_feature_recipes.py": "cf1557e405d0aef3a62ee9af4286680465e8fae3f7661c959d321870423465ed",
+    "src/ipcch/weather_oracle.py": "65a93d45ec0f738ec9c6e8092e4c355f88149310054e4e1969ae24c2ffc55d81",
+    "src/ipcch/origin_safe.py": "629936a8de4973399a3dfa798b4a212bb8fefe9838d16a032c072c446101ea03",
+    "src/ipcch/forecasting_weight_decay.py": "1a9f20e2d4b62d532baeb48f3538247dd7719a60cd06f7d75982be2076caaefc",
+    "src/ipcch/launch_nowcasting.py": "4abd29978e5420e335b6331fc22961f924c7c0b395df482f84f89f88747a19c9",
+    "src/ipcch/launch_visualizations.py": "b0595c6916f3484f34f53d7f3885c9d517dd2ce20ea1fd2627036325e3575bc9",
+    "src/ipcch/alert_risk_maps.py": "1dec6b2fa4a0ed5171223e2f0883618306db7dcf43e383891fd0fcc00bb5ba3b",
+    "src/ipcch/plot_forecast_weather_phase3plus_maps.py": "258a46e46ffb00a91759b81dae4b40cab8894e718d249b00496af1728f91c69c",
+    "src/ipcch/paths.py": "29ca7698ffbf507ac17fcb487676de71602d6c4ece1f04bac1eb7c9a75210257",
+    "scripts/modeling/run_deep_feature_weight_decay_forecasting.py": "67729cf9f55c442ba3e748bfadbd56e9ecfe2692861a5103ac7cb08a003dc184",
+    "scripts/modeling/run_launch_nowcasting_2026_04.py": "14a1b94a0dcf402f71d792f97eabddbef4bbf2395d2291af1af9058394b23204"
+  },
+  "pinned": {
+    "compact_manifest": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_manifest.json",
+      "sha256": "456360536a3929e1571d96ba9f16e2f0de54bc1b20019f797bbe62c0c89732ca",
+      "expected": "456360536a3929e1571d96ba9f16e2f0de54bc1b20019f797bbe62c0c89732ca",
+      "match": true
+    },
+    "parent_manifest": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_manifest.json",
+      "sha256": "3b479c80498e9f2d6d20b88936fce468f297d2e0ccd6f0cb32c61a7470a209bf",
+      "expected": "3b479c80498e9f2d6d20b88936fce468f297d2e0ccd6f0cb32c61a7470a209bf",
+      "match": true
+    },
+    "interim": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/interim/IPCCH_2026_target_corrected_nino34_wbfood.csv",
+      "sha256": "a91719e8e603e11b58e3e44c9a2f4378e4218e1ac408afe03ca54d1b50fb0484",
+      "expected": "a91719e8e603e11b58e3e44c9a2f4378e4218e1ac408afe03ca54d1b50fb0484",
+      "match": true
+    },
+    "climate_monthly": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_monthly_2015_2026_MODELING_READY.csv",
+      "sha256": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89",
+      "expected": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89",
+      "match": true
+    },
+    "climate_seasonal": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_2015_2026_MODELING_READY.csv",
+      "sha256": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e",
+      "expected": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e",
+      "match": true
+    },
+    "comprehensive_april": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/features/forecasting_subset_IPCCH_2026_target_corrected_deep_features.csv",
+      "sha256": "60610cd601e4b0c700cc475903fe807f072f131a97c543dc22f169b2824917e4",
+      "expected": "60610cd601e4b0c700cc475903fe807f072f131a97c543dc22f169b2824917e4",
+      "match": true
+    },
+    "identifier_source": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/raw/IPCCH_2026_completed.csv",
+      "sha256": "ae696087c3bbb280537ae269a05924133acdb51060d31290523404fa8a717673",
+      "expected": "ae696087c3bbb280537ae269a05924133acdb51060d31290523404fa8a717673",
+      "match": true
+    },
+    "cds_points": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/spatial/unique_area_id_lat_lon.csv",
+      "sha256": "3bf8f115ec70cd1e1c907031309b797410a8024cdc1d39265be123ae636d2862",
+      "expected": "3bf8f115ec70cd1e1c907031309b797410a8024cdc1d39265be123ae636d2862",
+      "match": true
+    },
+    "country_lookup": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/country_area_id_lookup.csv",
+      "sha256": "e2baf6ae9481b42b127db5ce81f3c53ad784bb08ae56dfa56cea74e416b44c90",
+      "expected": "e2baf6ae9481b42b127db5ce81f3c53ad784bb08ae56dfa56cea74e416b44c90",
+      "match": true
+    },
+    "idp_admin0_monthly": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Processed_Dataset/IDP_DTM/output/idp_admin0_monthly.csv",
+      "sha256": "a1ebb82a8e14fc0fb8103d6086217b93da351fc4a8f7fcfbe9eaa44a9df602e1",
+      "expected": "a1ebb82a8e14fc0fb8103d6086217b93da351fc4a8f7fcfbe9eaa44a9df602e1",
+      "match": true
+    },
+    "country_population_reference": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch/nowcasting_2026_04/population_projection/countries_2025_population_merged.csv",
+      "sha256": "c348cc30cd2b5beae93a11974c4712a3dd6dd822ee902f5458a778effad389b0",
+      "expected": "c348cc30cd2b5beae93a11974c4712a3dd6dd822ee902f5458a778effad389b0",
+      "match": true
+    },
+    "region_map": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/data/reference/area_id_country_region_mapping.csv",
+      "sha256": "18ab5099ce2d1154fb5686183ee399124e18427cc1594923f7abe2769da1611d",
+      "expected": "18ab5099ce2d1154fb5686183ee399124e18427cc1594923f7abe2769da1611d",
+      "match": true
+    }
+  },
+  "manifest_consumed": {
+    "compact h0 compact_baseline dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_baseline_h0.csv",
+      "sha256": "92def8b5bdef5e217abebdadaa21fce490021551a792ed225a78406f61a58012",
+      "match": true
+    },
+    "compact h0 history_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_history_ledger_h0.csv",
+      "sha256": "389e8ab3d03e4c0cd289b6fd93d0dc281da609e3aa5a7b4d12b841677cdb1e99",
+      "match": true
+    },
+    "compact h0 idp_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_idp_ledger_h0.csv",
+      "sha256": "a29eb57aacb0a45fdd96cdff5ddc4c04b10299f02c1ce23b69f8b5889d9ba36c",
+      "match": true
+    },
+    "compact h0 season_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_season_ledger_h0.csv",
+      "sha256": "71e27a2836321a8a3a102a9b6efa0130a6092a219b0e64e960fecae5d09666b5",
+      "match": true
+    },
+    "compact h3 compact_baseline dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_baseline_h3.csv",
+      "sha256": "38cf35f7a864e8006c53468e28424c65c5399454ca5b6f1eb7b10de37d73a4c7",
+      "match": true
+    },
+    "compact h3 compact_weather_oracle dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_weather_oracle_h3.csv",
+      "sha256": "01802606985c8188e1f96932865e488a10e5f871202a6a6230736bf95c7380bb",
+      "match": true
+    },
+    "compact h3 history_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_history_ledger_h3.csv",
+      "sha256": "e901260d0636a6309fd0d28b9535a94df627d45e244d4f7b17fcb2f98b4cf19a",
+      "match": true
+    },
+    "compact h3 idp_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_idp_ledger_h3.csv",
+      "sha256": "68897dd9c63980aede8a701c17b66848701ca1aabf7403b94199a252f65d0614",
+      "match": true
+    },
+    "compact h3 season_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_season_ledger_h3.csv",
+      "sha256": "babb00511d98aa6355da2b694ff8d53560d38917724aefcfc537396ae2d1c5d1",
+      "match": true
+    },
+    "compact h3 oracle_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_oracle_ledger_h3.csv",
+      "sha256": "531ce9ae0df9ea23909f6704bb11f582edb8cf909ac4ea353e0e416434af3375",
+      "match": true
+    },
+    "compact h6 compact_baseline dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_baseline_h6.csv",
+      "sha256": "38b8e6d2ee49155e2c009695e322418e4f01be9656dceb5fa4c6c3ba729b5bd8",
+      "match": true
+    },
+    "compact h6 compact_weather_oracle dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_weather_oracle_h6.csv",
+      "sha256": "fd31cf0f505fa3172d2c09b7823b1970194e8ea7d8c86de8fded2b1ecf58c636",
+      "match": true
+    },
+    "compact h6 history_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_history_ledger_h6.csv",
+      "sha256": "a732045ec7d3d7b73b5a98e1e47c126323142abbe3ab3498238fe2d62a2bce3e",
+      "match": true
+    },
+    "compact h6 idp_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_idp_ledger_h6.csv",
+      "sha256": "dfd15b0078abcb22c71697cbfaa9ee4492afd27c1c65a71fc95ea810a41b486e",
+      "match": true
+    },
+    "compact h6 season_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_season_ledger_h6.csv",
+      "sha256": "eb4b1efca7ad71161b6647d66be8786d4c566119d49d9dca35634cb27453b56f",
+      "match": true
+    },
+    "compact h6 oracle_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_oracle_ledger_h6.csv",
+      "sha256": "519dfe19f1a1b80fcce5676f1447f415b4404f5ac9f7c2d717198e57c89d63f0",
+      "match": true
+    },
+    "compact h12 compact_baseline dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_baseline_h12.csv",
+      "sha256": "e442a40d37a259f31aaaea337fcfeffaeb593d1ff7108112dc8f69313f12a811",
+      "match": true
+    },
+    "compact h12 compact_weather_oracle dataset": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_compact_weather_oracle_h12.csv",
+      "sha256": "aa7f299ca6c89d5243b91c6b1e045fc9dafeed386a9d89f390edc78d7502229d",
+      "match": true
+    },
+    "compact h12 history_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_history_ledger_h12.csv",
+      "sha256": "1f3b91ff5b727e1fd2585a1940dfa621acea9ef391c3f8867046b33a49d84874",
+      "match": true
+    },
+    "compact h12 idp_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_idp_ledger_h12.csv",
+      "sha256": "3f9fbf6613348e0609c4627b0a3370d5318c12f73cd1b27a6660e2ce82325a08",
+      "match": true
+    },
+    "compact h12 season_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_season_ledger_h12.csv",
+      "sha256": "49259ed988f2c444552c97793f885496156b451785e577cddeb11b0f2619219c",
+      "match": true
+    },
+    "compact h12 oracle_ledger": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/compact_climate_weather_oracle_v1_oracle_ledger_h12.csv",
+      "sha256": "1cde2434f0878fd3eacd7d2138112d2deace717b20a3e5948aa794fbd3ab7559",
+      "match": true
+    },
+    "compact contract expected_feature_contract.csv": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/contract/expected_feature_contract.csv",
+      "sha256": "a2d1960bf75811a391ec4bd0549b4aaddccb1ce57ca9a08f3a3c28d2fb313bc8",
+      "match": true
+    },
+    "compact contract expected_feature_contract_metadata.json": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/contract/expected_feature_contract_metadata.json",
+      "sha256": "8f3964364f89b866fc40f31524d38312aaab3202ca02f3886b5b64ade33e1260",
+      "match": true
+    },
+    "compact contract expected_run_index.csv": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_climate_weather_oracle_v1/contract/expected_run_index.csv",
+      "sha256": "fdd65bc2005016f721995c173a28bcea59ec4580b42c70a43bbf7632b3a4097d",
+      "match": true
+    },
+    "compact/parent cohort": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/origin_safe_climate_idp_v1/origin_safe_climate_idp_v1_cohort_keys.csv",
+      "sha256": "136095f1070a30f41f6011ad85d8170618043e6f8a109a6452fd474593a21ec3",
+      "match": true
+    },
+    "compact source interim": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/interim/IPCCH_2026_target_corrected_nino34_wbfood.csv",
+      "sha256": "a91719e8e603e11b58e3e44c9a2f4378e4218e1ac408afe03ca54d1b50fb0484",
+      "match": true
+    },
+    "compact source climate_monthly": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_monthly_2015_2026_MODELING_READY.csv",
+      "sha256": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89",
+      "match": true
+    },
+    "compact source climate_seasonal": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_2015_2026_MODELING_READY.csv",
+      "sha256": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e",
+      "match": true
+    },
+    "parent input interim": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/interim/IPCCH_2026_target_corrected_nino34_wbfood.csv",
+      "sha256": "a91719e8e603e11b58e3e44c9a2f4378e4218e1ac408afe03ca54d1b50fb0484",
+      "match": true
+    },
+    "parent input climate_monthly": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_monthly_2015_2026_MODELING_READY.csv",
+      "sha256": "8082b72ea5fa5c30a7b975b89c1fbbb4530f27a9ce6c5ba4d0e1a4f923320c89",
+      "match": true
+    },
+    "parent input climate_seasonal": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/IPCCH_shared_folder/climate_2015_2026_MODELING_READY.csv",
+      "sha256": "f024a66c8979fb4a8c66fba1f04e7e69355fa75b499793d29001a146d8c2958e",
+      "match": true
+    },
+    "parent input idp_admin0_monthly": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Processed_Dataset/IDP_DTM/output/idp_admin0_monthly.csv",
+      "sha256": "a1ebb82a8e14fc0fb8103d6086217b93da351fc4a8f7fcfbe9eaa44a9df602e1",
+      "match": true
+    },
+    "parent input country_lookup": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/country_area_id_lookup.csv",
+      "sha256": "e2baf6ae9481b42b127db5ce81f3c53ad784bb08ae56dfa56cea74e416b44c90",
+      "match": true
+    },
+    "parent input identifier_source": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/raw/IPCCH_2026_completed.csv",
+      "sha256": "ae696087c3bbb280537ae269a05924133acdb51060d31290523404fa8a717673",
+      "match": true
+    },
+    "parent input scope_fs0": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_0m_model_ready.csv",
+      "sha256": "221a559e90d0b4d72a2d1855c0f6d614bdb6c10e2c4a7d3b9bf57683fcc151e5",
+      "match": true
+    },
+    "parent input scope_fs1": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_3m_model_ready.csv",
+      "sha256": "fa19b03d28f2429ed60fb449e479a837451117b41601e597c10eea59f6b663a3",
+      "match": true
+    },
+    "parent input scope_fs2": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_scope_6m_model_ready.csv",
+      "sha256": "5af7d7d1f587e3db3d1b3ff67bc56bb5ed583cceb452dbb2c0ac5c88b6d023d1",
+      "match": true
+    },
+    "parent input scope_fs3": {
+      "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/forecasting_subset_IPCCH_2026_target_corrected_deep_features_forecasting_ready.csv",
+      "sha256": "a5b452035f552a7c9c4c66cf9c89fef9997009e59305d271a13a0787d47362f2",
+      "match": true
+    }
+  },
+  "contract_sha256": {
+    "expected_feature_contract.csv": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82",
+    "expected_feature_contract_metadata.json": "6295074fa8a94f45e75c695ea3997a8b6927f1b1b00bb8358ab290c4416de410",
+    "expected_run_index.csv": "25fff00d23b6a2df22f81900832f8b884909eb172d4bd07832544591cf87b616"
+  },
+  "approved_spec_copy": {
+    "dir": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec",
+    "files": {
+      "prd.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/prd.md",
+        "sha256": "2fb72c7ab2b42da79283efad21ad0df6934dd0916ad0489875936993bf3e0a08"
+      },
+      "design.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/design.md",
+        "sha256": "fcb8f1f26f9b066ee742243d69fdcbb4dfe8b6eb9a0dc49be8b6f1165831e526"
+      },
+      "implement.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/implement.md",
+        "sha256": "24d3ebcf5aac4aae44fc08523963c5c0a9c4a9d3d6670e8da43dc75b110d54f0"
+      },
+      "discussion-notes.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/discussion-notes.md",
+        "sha256": "3447b7e532b4ab68d06a3c1f842f005858c49b59264aad2bf71928cd5cab36c6"
+      },
+      "expected_feature_contract.csv": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/expected_feature_contract.csv",
+        "sha256": "6a16ccd49085ab08cfb1747ea2e851879cab54b72e73158936a64c4568e7cb82"
+      },
+      "expected_feature_contract_metadata.json": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/expected_feature_contract_metadata.json",
+        "sha256": "6295074fa8a94f45e75c695ea3997a8b6927f1b1b00bb8358ab290c4416de410"
+      },
+      "expected_run_index.csv": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/expected_run_index.csv",
+        "sha256": "25fff00d23b6a2df22f81900832f8b884909eb172d4bd07832544591cf87b616"
+      },
+      "check.jsonl": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/check.jsonl",
+        "sha256": "487096952cb5d195eab1d2e9c1fffdfa9761c1d8ae990875bda67843bfe48eca"
+      },
+      "implement.jsonl": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/implement.jsonl",
+        "sha256": "487096952cb5d195eab1d2e9c1fffdfa9761c1d8ae990875bda67843bfe48eca"
+      },
+      "research/launch-input-findings.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/research__launch-input-findings.md",
+        "sha256": "fdf0b21fb96c4dcdbf8b4fc9652cdbcfa55188c05ce709640a89657630f2dbe3"
+      },
+      "research/contract-reading.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/research__contract-reading.md",
+        "sha256": "508d07fccc75dde1f85633d8c2a4f6a41f952ff13b16d2c04d4660a97efc299d"
+      },
+      "research/supervisor-execution-brief.md": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/research__supervisor-execution-brief.md",
+        "sha256": "e2d3e0a6cfc140a29437be1cdf7c67b1d88da5355d6382f589d38d4b337bc34f"
+      },
+      "research/executor-binding.json": {
+        "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/assembled_IPCCH/model_ready/compact_cds_launch_v1/approved_spec/research__executor-binding.json",
+        "sha256": "a7d46b2a121c7477d76b4557712600aefa1eb0924a3b33e867ebcbfdf69db9c0"
+      }
+    },
+    "source_task_dir": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/.trellis/tasks/10-08-compact-cds-launch",
+    "source_head": "b19d36d210bcb59ca090b9e1e961657225f44d39"
+  },
+  "old_artifact_inventory": {
+    "path": "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch/nowcasting_2026_04_compact_cds_v1/preflight/old_artifact_inventory_before.csv",
+    "files": 488,
+    "roots": [
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/results/launch",
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/2.source_code/Step5_Geo_RF_trial/IPCCH/reports/launch",
+      "/mnt/c/Users/swl00/IFPRI Dropbox/Weilun Shi/Google fund/Analysis/1.Source Data/CDS_API"
+    ],
+    "sha256": "38034e0b2f9a6ff2b21670b75bb406545b36b18efe47159b94275b41997f585d"
+  },
+  "passed": true,
+  "elapsed_seconds": 189.8
+}

@@ -1,0 +1,78 @@
+{
+  "mode": "DIAGNOSTIC timestamp probe (no acceptance)",
+  "monthly_file": {
+    "path": "../../../1.Source Data/CDS_API/c3s_seasonal_apr2026_all_leads.grib",
+    "sha256": "b657fcbef5dc1c0e3a12328c7664153a5d5d1097ddcc1b133e8c03f39abd939d"
+  },
+  "original_file": {
+    "path": "../../../1.Source Data/CDS_API/compact_cds_launch_v1/raw/bulk/original_tmean_2026.grib",
+    "sha256": "eb72973ac9be1e0b13e5b162b05686edf8dc1fd887f6766e54bff123f2060f7b"
+  },
+  "monthly_message": {
+    "centre": "ecmf",
+    "system": 51,
+    "method": 1,
+    "dataDate": 20260401,
+    "dataTime": 0,
+    "number": 0,
+    "marsType": "em",
+    "marsStream": "msmm",
+    "units": "K",
+    "forecastMonth": 6,
+    "verifyingMonth": 202609,
+    "averagingPeriod": 6,
+    "endStep": 4392,
+    "validityDate": 20261001,
+    "binaryScaleFactor": -9,
+    "decimalScaleFactor": 0,
+    "packingError": 0.00098419189453125,
+    "bitsPerValue": 16,
+    "message_index": 11
+  },
+  "monthly_is_ensemble_mean_compatible": true,
+  "bounds_frozen": {
+    "path": "../../../1.Source Data/CDS_API/compact_cds_launch_v1/diagnostic/absolute_probe_bounds_frozen.json",
+    "sha256": "61fa2ba8a510f7a1e9ab8abd28957ca1ca1ada189c6c2c71aefb30184926da3e",
+    "frozen_utc": "2026-10-09T06:26:29Z",
+    "bounds_K": {
+      "start_inclusive": 0.00208282570703125,
+      "end_inclusive": 0.00208282570703125
+    },
+    "monthly_message_error_K": 0.00098419189453125,
+    "max_6h_message_error_K": {
+      "start_inclusive": 0.0010986328125,
+      "end_inclusive": 0.0010986328125
+    },
+    "rule": "|ensemble mean of member monthly means - official monthly ensemble mean| <= max per-value bound of the 6-hourly messages used (max(half-step, packingError)) + the monthly message's bound + 1e-9 K",
+    "conventions": {
+      "start_inclusive": [
+        3672,
+        4386,
+        120
+      ],
+      "end_inclusive": [
+        3678,
+        4392,
+        120
+      ]
+    }
+  },
+  "start_inclusive": {
+    "bound_K": 0.00208282570703125,
+    "max_abs_diff_K": 0.08338913761707545,
+    "mean_signed_diff_K": 0.0003158036160542167,
+    "p99_abs_diff_K": 0.043923113056241615,
+    "points_over_bound": 5290,
+    "members": 51,
+    "samples_per_member": 120
+  },
+  "end_inclusive": {
+    "bound_K": 0.00208282570703125,
+    "max_abs_diff_K": 0.0012898239434662173,
+    "mean_signed_diff_K": -0.0002411362904972541,
+    "p99_abs_diff_K": 0.0012097202875338553,
+    "points_over_bound": 0,
+    "members": 51,
+    "samples_per_member": 120
+  }
+}

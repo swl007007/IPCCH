@@ -1,0 +1,22 @@
+{
+  "mode": "DIAGNOSTIC (no acceptance)",
+  "frozen_utc": "2026-10-09T06:15:25Z",
+  "bounds": {
+    "tmean_K": 0.002258778618408203,
+    "prcp_m_per_s": 9.603856249513631e-11
+  },
+  "inputs": {
+    "t_err": {
+      "forecast": 0.0010986328125,
+      "hindcast": 0.0010986328125
+    },
+    "p_total_err": {
+      "forecast": 0.00012207043619127944,
+      "hindcast": 0.00012207043619127944
+    },
+    "official_t": 6.151199340820312e-05,
+    "official_p": 1.8474111129762605e-12
+  },
+  "rule": "production rule unchanged: cds_launch_weather.overlap_bounds with September-only samples/endpoints",
+  "code_sha256": "edcb8c7d54f90a4518383b4521efca7039da79fe18e1ff7536eab6b39f42af80"
+}

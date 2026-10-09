@@ -1,0 +1,23 @@
+{
+  "stage": "supervisor_implementation_and_real_inputs",
+  "accepted": true,
+  "recorded_utc": "2026-10-09T06:58:16.507691+00:00",
+  "manifest_sha256": "b2e73812cb8adc34356447b5785db10e6cb04481c303e97550421488f6c5cafe",
+  "evidence": [
+    "implementation-checkpoint.md",
+    "input-checkpoint.json",
+    "supervisor-input-acceptance.json",
+    "supervisor-october-reduction-check.json",
+    "supervisor-history-csv-refresh.json"
+  ],
+  "validation": "actual assembly3 exit0; validate-only exit0;32 focused tests; independently read complete real five-run matrices/fit selections and source-reselected histories",
+  "gitnexus_staged_detect_changes": {
+    "changed_files": 50,
+    "risk": "low",
+    "affected_indexed_processes": 0,
+    "limitation": "new modules not indexed; existing frozen helper pins and staged file scope independently checked"
+  },
+  "scope": "same branch; new version only; no audit enrollment; no frozen helper/config edits",
+  "authorized_next": "Windows Git implementation commit followed by shared compact_baseline/0m pilot only",
+  "remaining_four_fits": "closed pending pilot reload/schema/replay acceptance"
+}

@@ -1,0 +1,15 @@
+{
+  "stage": "supervisor_csv_missing_id_refresh",
+  "recorded_utc": "2026-10-09T06:48:14.508821+00:00",
+  "passed": true,
+  "checks": [
+    "numeric object IDs with true missing retain spelling",
+    "literalNA remains text",
+    "01 cannot become1",
+    "one-ULP numeric difference still rejected"
+  ],
+  "code_sha256": {
+    "src/ipcch/compact_launch.py": "ed10b701bdfb86624fca4f0975c81e677819db048ed7473d0ade3c4efb4f992d",
+    "tests/unit/test_compact_launch.py": "bb0300c3b4946eed4a1b1cf0d4892bcbc67cb07e8770c5884b452669fe105379"
+  }
+}

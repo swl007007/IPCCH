@@ -1,0 +1,17 @@
+{
+  "stage": "supervisor_end_inclusive_weather_refresh",
+  "created_utc": "2026-10-09T06:29:35.521590+00:00",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_cds_launch_weather.py -q",
+  "exit_code": 0,
+  "stdout": "...............                                                          [100%]\n15 passed in 0.25s\n",
+  "stderr": "",
+  "before_sha256": {
+    "src/ipcch/cds_launch_weather.py": "be74e2a3f87d124b26c7fd7440dd5c52ad516dc1b8bcd5ff84aaf750cf755e33",
+    "tests/unit/test_cds_launch_weather.py": "b3652e84db09d16796e98a0f48d016acf15fc9231f17e257e501d6c3d5d5f773"
+  },
+  "after_sha256": {
+    "src/ipcch/cds_launch_weather.py": "be74e2a3f87d124b26c7fd7440dd5c52ad516dc1b8bcd5ff84aaf750cf755e33",
+    "tests/unit/test_cds_launch_weather.py": "b3652e84db09d16796e98a0f48d016acf15fc9231f17e257e501d6c3d5d5f773"
+  },
+  "code_changed_during_test": false
+}

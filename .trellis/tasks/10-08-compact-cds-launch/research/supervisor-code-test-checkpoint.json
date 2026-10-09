@@ -1,0 +1,21 @@
+{
+  "stage": "non_fitting_code_test_checkpoint",
+  "recorded_utc": "2026-10-09 05:48:40 UTC",
+  "status": "accepted_current_code_test_snapshot_only",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_cds_launch_weather.py tests/unit/test_compact_launch.py tests/smoke/test_compact_cds_launch_cli.py -q",
+  "exit_code": 0,
+  "result": "32 passed in 7.33s",
+  "source_snapshot_changed_during_tests": false,
+  "code_sha256": {
+    "src/ipcch/cds_launch_weather.py": "2fedc6e2514853b44ee140d4de56e46b460c7602909ea7b128c6ef738cc663c3",
+    "src/ipcch/compact_launch.py": "13d3abf460e0364dd4a3cf517b920002057994560fb2199e8cf22c4e17d753b4",
+    "scripts/preprocessing/build_compact_cds_launch_inputs.py": "21609b085a29db895e8ec73339fdfd69ecc11a2d3f231f727197f59ba880ad78",
+    "scripts/modeling/run_compact_cds_launch.py": "c58be4f4336bd3940c4bfe826796f3354a866d119283188a8651fbea08216db4",
+    "tests/unit/test_cds_launch_weather.py": "b78012e9117c6c6a3661aac10136fd9a4b7de46344c874dcef4a5106972c0b2b",
+    "tests/unit/test_compact_launch.py": "a7d509cd48bcb31e638bb18b414bda7da6f40cccd86baa5da8638d361f65ea9a",
+    "tests/smoke/test_compact_cds_launch_cli.py": "c130592f94c5cfd9a4ba9792e8afec76fd67d99afa1a932c8dcd54f5020c96a7"
+  },
+  "reviewed_resolutions": ["probe completeness and identity", "grid and cached-byte checks", "provider status persistence", "per-message time and unit semantics", "September-only quantization bounds", "literal NA round trip", "March-only IPC history", "future-source perturbation invariance", "all-component four-level arithmetic verifier", "finite model replay checks", "continuous-map key types and real seven-map synthetic smoke"],
+  "not_accepted": ["full CDS retrieval", "actual September overlap", "October anomaly cube", "production input matrices", "production fitting", "final production tables and maps", "A1-A9 final acceptance"],
+  "heavy_fitting_gate": "closed_pending_complete_weather_and_input_checkpoint"
+}

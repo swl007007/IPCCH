@@ -3,7 +3,7 @@
   "name": "compact-cds-launch",
   "title": "Plan compact-feature launch with oracle training and CDS inference",
   "description": "Execute the approved compact oracle-training/CDS-inference April2026-origin launch for April/October2026 and April2027 population summaries/maps on the current branch.",
-  "status": "planning",
+  "status": "in_progress",
   "dev_type": null,
   "scope": null,
   "package": null,

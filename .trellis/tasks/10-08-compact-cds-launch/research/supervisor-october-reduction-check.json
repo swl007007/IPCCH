@@ -1,0 +1,18 @@
+{
+  "stage": "supervisor_saved_october_aggregate_reduction",
+  "passed": true,
+  "points": 6227,
+  "forecast_members": 51,
+  "hindcast_years": 24,
+  "hindcast_members_per_year": 25,
+  "temperature_samples": 124,
+  "formula": "October end-inclusive124 samples; rawP(5136)-P(4392); members->equal-year hindcast mean->forecast anomaly",
+  "runtime": "frozen model interpreter",
+  "errors": {
+    "october_temperature_max_abs_diff": 0.0,
+    "october_precipitation_max_abs_diff": 0.0
+  },
+  "cube_sha256": "8745e7afdbf0e65f36e1ad584ecfc147fb7d6ad5abc8ed16178af33b886e89a4",
+  "aggregates_sha256": "ff1660868b81d54ea2d272dba2f8c38c69456e281479552f34bb436143578928",
+  "limitations": "Independent reduction of saved aggregate arrays; not a second full raw-GRIB decode"
+}

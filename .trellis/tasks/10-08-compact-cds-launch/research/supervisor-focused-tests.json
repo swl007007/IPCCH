@@ -1,0 +1,19 @@
+{
+  "stage": "implementation_focused_tests_only",
+  "recorded_utc": "2026-10-09 05:38:54 UTC",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_cds_launch_weather.py tests/unit/test_compact_launch.py tests/smoke/test_compact_cds_launch_cli.py -q",
+  "exit_code": 0,
+  "result": "31 passed in 5.76s",
+  "source_snapshot_changed_during_tests": false,
+  "code_sha256": {
+    "src/ipcch/cds_launch_weather.py": "2fedc6e2514853b44ee140d4de56e46b460c7602909ea7b128c6ef738cc663c3",
+    "src/ipcch/compact_launch.py": "b8f9c48fecccbe7380590e7ab71175bf8dc1abec62df8af251d37cc689ffefa9",
+    "scripts/preprocessing/build_compact_cds_launch_inputs.py": "21609b085a29db895e8ec73339fdfd69ecc11a2d3f231f727197f59ba880ad78",
+    "scripts/modeling/run_compact_cds_launch.py": "c58be4f4336bd3940c4bfe826796f3354a866d119283188a8651fbea08216db4",
+    "tests/unit/test_cds_launch_weather.py": "b78012e9117c6c6a3661aac10136fd9a4b7de46344c874dcef4a5106972c0b2b",
+    "tests/unit/test_compact_launch.py": "8c2378b5d12cd9f95ad65784a4b9eef20f87a5b1a6f32aec07039d910c7a10ad",
+    "tests/smoke/test_compact_cds_launch_cli.py": "c130592f94c5cfd9a4ba9792e8afec76fd67d99afa1a932c8dcd54f5020c96a7"
+  },
+  "not_certified_by_this_check": ["full CDS retrieval", "September overlap", "October anomaly cube", "production matrices", "production fitting", "final tables and maps", "A1-A9 final acceptance"],
+  "heavy_fitting_gate": "closed_pending_complete_weather_and_input_checkpoint"
+}

@@ -1,0 +1,53 @@
+{
+  "mode": "DIAGNOSTIC (no acceptance; no cube)",
+  "bounds_sha256": "769458525feb838bbf8e57e9f21673300286dfe6fb0fb7c0c1aed2f69d9b2af3",
+  "points": 6227,
+  "completeness": {
+    "temperature_samples_ok": true,
+    "precip_endpoints_ok": true
+  },
+  "tmean": {
+    "bound_K": 0.002258778618408203,
+    "max_abs_diff_K": 0.013390422322402173,
+    "p99_abs_diff_K": 0.010506199281962836,
+    "points_over_bound": 3250,
+    "max_ratio_to_bound": 5.928169415663504,
+    "diagnostic_end_inclusive_max_abs_diff_K": 0.0005514288509971266
+  },
+  "prcp": {
+    "bound_m_per_s": 9.603856249513631e-11,
+    "max_abs_diff_m_per_s": 4.245035022865878e-12,
+    "points_over_bound": 0,
+    "max_ratio_to_bound": 0.044201359459965464,
+    "max_abs_diff_mm_per_month": 0.011003130779268356,
+    "bound_mm_per_month": 0.24893195398739332
+  },
+  "september_member_totals_negative_count_at_points": {
+    "2026": 2736,
+    "1993": 996,
+    "1994": 576,
+    "1995": 665,
+    "1996": 588,
+    "1997": 782,
+    "1998": 746,
+    "1999": 399,
+    "2000": 855,
+    "2001": 419,
+    "2002": 1161,
+    "2003": 500,
+    "2004": 851,
+    "2005": 501,
+    "2006": 359,
+    "2007": 364,
+    "2008": 902,
+    "2009": 493,
+    "2010": 891,
+    "2011": 1221,
+    "2012": 659,
+    "2013": 933,
+    "2014": 1201,
+    "2015": 746,
+    "2016": 839
+  },
+  "elapsed_s": 218.1
+}

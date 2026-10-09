@@ -1,0 +1,16 @@
+{
+  "recorded_utc": "2026-10-09 05:58:49 UTC",
+  "status": "accepted_weather_identity_code_test_refresh_only",
+  "prior_code_test_evidence": "research/supervisor-code-test-checkpoint.json",
+  "change": "Assert and report actual ECMWF centre ecmf, method 1 and system 51 per message",
+  "command": "PYTHONPATH=src /home/swl007007/.venvs/ipcch-geo/bin/python -m pytest tests/unit/test_cds_launch_weather.py -q",
+  "exit_code": 0,
+  "result": "15 passed in 0.35s",
+  "weather_code_sha256": "edcb8c7d54f90a4518383b4521efca7039da79fe18e1ff7536eab6b39f42af80",
+  "weather_test_sha256": "9556db24b4a128b8b1e8fcef6f789cd462eaf8e8199c518e49a5f8f899555b5f",
+  "changed_files_stable_before_and_after_tests": true,
+  "retrieval_observation": {"recorded_requests": 28, "downloaded_records": 28, "actual_final_files": 28, "recorded_bytes": 5443386544, "states": {"successful": 28}, "bulk_exit": 0},
+  "full_weather_accepted": false,
+  "pending": ["Full-file metadata/member/time/grid validation", "September overlap against frozen bounds", "October cube", "Real production input build", "Pilot and remaining fits", "Final A1-A9 acceptance"],
+  "heavy_fitting_gate": "closed"
+}

@@ -1,0 +1,25 @@
+{
+  "frozen_utc": "2026-10-09T06:26:29Z",
+  "bounds_K": {
+    "start_inclusive": 0.00208282570703125,
+    "end_inclusive": 0.00208282570703125
+  },
+  "monthly_message_error_K": 0.00098419189453125,
+  "max_6h_message_error_K": {
+    "start_inclusive": 0.0010986328125,
+    "end_inclusive": 0.0010986328125
+  },
+  "rule": "|ensemble mean of member monthly means - official monthly ensemble mean| <= max per-value bound of the 6-hourly messages used (max(half-step, packingError)) + the monthly message's bound + 1e-9 K",
+  "conventions": {
+    "start_inclusive": [
+      3672,
+      4386,
+      120
+    ],
+    "end_inclusive": [
+      3678,
+      4392,
+      120
+    ]
+  }
+}

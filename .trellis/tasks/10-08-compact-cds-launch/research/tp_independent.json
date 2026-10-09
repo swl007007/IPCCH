@@ -1,0 +1,155 @@
+{
+ "original_prcp_2026": {
+  "cfgrib_dims": [
+   "number",
+   "step",
+   "latitude",
+   "longitude"
+  ],
+  "shape": [
+   1,
+   51,
+   3,
+   76,
+   221
+  ],
+  "steps_h": [
+   3672,
+   4392,
+   5136
+  ],
+  "valid_time_sample": [
+   "2026-09-01T00:00",
+   "2026-10-01T00:00",
+   "2026-11-01T00:00"
+  ],
+  "worst_inc_3672_4392_m": -0.00015237834304571152,
+  "worst_inc_4392_5136_m": -0.0001658736728131771,
+  "cells_with_decrease_below_minus_1.22e-4": 1103,
+  "times": [
+   "2026-04-01"
+  ],
+  "worst_case": {
+   "year": 2026,
+   "member": 33,
+   "cell_lat": 17.5,
+   "cell_lon": 16.5,
+   "cfgrib_values": [
+    0.0057373046875,
+    0.005859375,
+    0.005693501327186823
+   ],
+   "eccodes_values": [
+    0.0057373046875,
+    0.005859375,
+    0.005693501138011925
+   ],
+   "readers_agree": false,
+   "eccodes_detail": {
+    "3672": {
+     "value": 0.0057373046875,
+     "E": -13,
+     "ref": 0.0,
+     "lattice_k": 47.0,
+     "on_lattice": true,
+     "half_step": 6.103515625e-05
+    },
+    "4392": {
+     "value": 0.005859375,
+     "E": -13,
+     "ref": 0.0,
+     "lattice_k": 48.0,
+     "on_lattice": true,
+     "half_step": 6.103515625e-05
+    },
+    "5136": {
+     "value": 0.005693501138011925,
+     "E": -13,
+     "ref": 7.826676301192492e-05,
+     "lattice_k": 46.0,
+     "on_lattice": true,
+     "half_step": 6.103515625e-05
+    }
+   },
+   "min_true_pre_packing_decrease_m": -4.380354948807508e-05
+  }
+ },
+ "original_prcp_hindcast": {
+  "cfgrib_dims": [
+   "number",
+   "time",
+   "step",
+   "latitude",
+   "longitude"
+  ],
+  "shape": [
+   24,
+   25,
+   3,
+   76,
+   221
+  ],
+  "steps_h": [
+   3672,
+   4392,
+   5136
+  ],
+  "valid_time_sample": [
+   "1993-09-01T00:00",
+   "1993-10-01T00:00",
+   "1993-11-01T00:00"
+  ],
+  "worst_inc_3672_4392_m": -0.00014849647413939238,
+  "worst_inc_4392_5136_m": -0.00016520661301910877,
+  "cells_with_decrease_below_minus_1.22e-4": 13808,
+  "times": [
+   "1993-04-01",
+   "1994-04-01",
+   "1995-04-01"
+  ],
+  "worst_case": {
+   "year": 2010,
+   "member": 24,
+   "cell_lat": 25.5,
+   "cell_lon": 33.5,
+   "cfgrib_values": [
+    0.002047164598479867,
+    0.002127864398062229,
+    0.0019626577850431204
+   ],
+   "eccodes_values": [
+    0.002047164598479867,
+    0.002127864383510314,
+    0.001962657828698866
+   ],
+   "readers_agree": false,
+   "eccodes_detail": {
+    "3672": {
+     "value": 0.002047164598479867,
+     "E": -14,
+     "ref": 0.00015507475472986698,
+     "lattice_k": 31.0,
+     "on_lattice": true,
+     "half_step": 3.0517578125e-05
+    },
+    "4392": {
+     "value": 0.002127864383510314,
+     "E": -13,
+     "ref": 0.00017473938351031393,
+     "lattice_k": 16.0,
+     "on_lattice": true,
+     "half_step": 6.103515625e-05
+    },
+    "5136": {
+     "value": 0.001962657828698866,
+     "E": -13,
+     "ref": 0.00013160314119886607,
+     "lattice_k": 15.0,
+     "on_lattice": true,
+     "half_step": 6.103515625e-05
+    }
+   },
+   "min_true_pre_packing_decrease_m": -4.313624231144786e-05
+  }
+ }
+}
