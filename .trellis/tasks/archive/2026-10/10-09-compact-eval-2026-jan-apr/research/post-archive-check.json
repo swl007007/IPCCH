@@ -1,0 +1,20 @@
+{
+  "mode": "read-only archived-spec fallback; no fit, report or full verification rerun",
+  "passed": true,
+  "scopes": [
+    {
+      "scope": "global",
+      "durable_spec_copies_read": 6,
+      "expected_2026_runs": 7,
+      "script_sha256": "cbc1f88b2758cf4c2ec87c83257fc6f7f269d54018bd13f98138389da18db678",
+      "task_status": "completed"
+    },
+    {
+      "scope": "SOM",
+      "durable_spec_copies_read": 6,
+      "expected_2026_runs": 7,
+      "script_sha256": "cbc1f88b2758cf4c2ec87c83257fc6f7f269d54018bd13f98138389da18db678",
+      "task_status": "completed"
+    }
+  ]
+}

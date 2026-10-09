@@ -9,7 +9,7 @@
 - Approved-plan commit: `16d2e92a8948e7f235541a6facb452e375ac4f5d` (planning files only).
 - Executor verified in Herdr: name `somalia-local-executor`, pane `w11:p4`, terminal `term_65d6ae54981a13`, Claude session `579e6ba5-f2a2-483c-b465-4b2e3cca1ed3`; visible UI confirms `Opus 5.5 (1M context)`. Dispatch delivered and working activity observed; executor remains in this same session.
 - Audit policy: user explicitly requested no Trellis audit.
-- Current outcome: coordinator accepted A1-A8 after final execution and independent protection/publication checks; ordinary final evidence commit and archival are next.
+- Current outcome: coordinator accepted A1-A8 after final execution and independent protection/publication checks. Accepted evidence committed as `affadd8`; ordinary Trellis archival completed with task status `completed` at `.trellis/tasks/archive/2026-10/10-09-compact-eval-2026-jan-apr`.
 
 ## Completed planning work
 
@@ -26,9 +26,9 @@
 - Corrected real no-write preflight passed for global and SOM with exit 0. Coordinator checked both saved outputs, all 14 run records, current script hashes, exact old schema counts and absent output roots. Source-freeze barrier was then released after implementation commit `60578219e89d2f4e8aa17c644703200096a4f22b`.
 - Independent coordinator protection baseline: 961 files, 6,090,454,088 bytes, in `research/supervisor-protected-before.json`.
 
-## Completed execution and remaining wrap-up
+## Completed execution
 
-Heavy fitting, new model/metric replay, report/codebook generation and final A1-A8 acceptance have completed. Ordinary final evidence commit, task archival and journal recording remain. Details are in the execution section and `research/supervisor-acceptance.json`; no Trellis audit is part of acceptance.
+Heavy fitting, new model/metric replay, report/codebook generation, final A1-A8 acceptance, evidence commit and ordinary task archival have completed. The session journal records the work commits. Details are in the execution section and `research/supervisor-acceptance.json`; no Trellis audit is part of acceptance.
 
 ## Preserved unrelated work
 
@@ -58,3 +58,4 @@ This ledger records operations and evidence, not approval authority. Reconcile w
 - Independent original protection recheck: 961 files / 6,090,454,088 bytes, zero changed/missing/added (`research/supervisor-protected-after.json`).
 - Read-only scouts checked 48 selected numerical delta cells and complete final publication inventories (86 global / 84 SOM records), current reporting hashes/status, exact new model counts and separate old/new lineage. No discrepancies. Coordinator spot-checked current hashes and six absolute 2026 accuracy pairs.
 - All approved A1-A8 accepted. Both expanded and original pooled results retained; all absolute/delta/regional/undefined/report/codebook outputs present. No launch/CDS changes or Trellis audit.
+- Post-archive read-only check invokes the actual entrypoint's `spec_files` / `expected_runs` with the old live task path absent; both scopes successfully read all six manifest-bound approved copies and seven expected 2026 runs (`research/post-archive-check.json`). No fitting/report regeneration/full replay was repeated.
