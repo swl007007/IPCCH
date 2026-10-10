@@ -20,6 +20,10 @@ When updating Spec Kit artifacts, use the current implementation plus explicit u
 
 Current feature baselines to preserve: Spec002 alert-risk maps are single-scope CLI runs (`--scope global` or an ISO3 such as `SOM`) and global/Somalia deliverables require separate invocations; Spec005 launch scopes are `0`, `3`, `6`, and `12` months, with April 2026 + `12m` targeting April 2027; Spec006 phase-3 SHAP runs one selected `--fs` per invocation, and full four-scope 96-row/four-heatmap deliverables are assembled across `fs0`/`fs1`/`fs2`/`fs3` runs or downstream aggregation.
 
+## Local MLflow registration (IPCCH Forecasting)
+
+After any new model fit or result change that should be browsable, register it incrementally in the shared local MLflow store with `IPCCHMLflow/` (contract: `.trellis/spec/backend/local-mlflow-registration.md`; commands: `IPCCHMLflow/README.md`). New fit: add a new `source_key` to `IPCCHMLflow/sources.json` (plus vocabulary/extractor if needed), then plan, backup, snapshot, import, verify, dashboard, dashboard-verify and compare. Evaluation-only change: freeze the imported snapshot (`"frozen": true`) and add a `revision_of` entry that reuses its registered versions. Port 5000 needs `--live`; never edit SQL or rebuild the shared store. Record failures and rerun the same command to resume. Excluded families (Nigeria Sep18, `climate2015_v1`) and models fitted before September 2026 stay out. This is an agent workflow, not a watcher or a hook on training scripts.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 

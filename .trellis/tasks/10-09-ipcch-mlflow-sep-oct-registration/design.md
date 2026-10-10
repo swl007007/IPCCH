@@ -150,3 +150,9 @@ coding. C1 reviews code diff and offline/scratch checks before any live writes.
 C2 reviews initial live result, artifact downloads, existing-store preservation,
 repeat/no-op and resume evidence before final acceptance. These are supervisor
 checkpoints, never Trellis audit jobs. Executor pauses at each boundary.
+
+## User scope correction (2026-10-09)
+
+Per the user's C1 instruction, lineage/provenance completeness is disclosed (README "Lineage limits", status texts)
+rather than gated. Functional readback stays proportionate: values, dataset/model associations, artifacts, versions.
+Evaluation-only updates use `frozen` + `revision_of` (see IPCCHMLflow/README.md) and reuse registered versions.

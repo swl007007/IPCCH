@@ -225,6 +225,10 @@ IPCCH/
 - Do not execute heavy model-training notebook cells unless explicitly requested; use import checks, CLI `--help`, and small smoke tests for validation.
 - Classifier workflows must expose class mapping via CLI or config, preferably `--phase-class-map`, rather than requiring notebook cell edits.
 
+### Local MLflow registration (IPCCH Forecasting)
+
+After any new model fit or result change that should be browsable, register it incrementally in the shared local MLflow store with `IPCCHMLflow/` (contract: `.trellis/spec/backend/local-mlflow-registration.md`; commands: `IPCCHMLflow/README.md`). New fit: add a new `source_key` to `IPCCHMLflow/sources.json` (plus vocabulary/extractor if needed), then plan, backup, snapshot, import, verify, dashboard, dashboard-verify and compare. Evaluation-only change: freeze the imported snapshot (`"frozen": true`) and add a `revision_of` entry that reuses its registered versions. Port 5000 needs `--live`; never edit SQL or rebuild the shared store. Record failures and rerun the same command to resume. Excluded families (Nigeria Sep18, `climate2015_v1`) and models fitted before September 2026 stay out. This is an agent workflow, not a watcher or a hook on training scripts.
+
 <!-- SPECKIT START -->
 For additional context about the active feature, read the current plan:
 `specs/007-nowcasting-grouped-shap/plan.md`

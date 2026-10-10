@@ -19,6 +19,7 @@ This directory contains guidelines for backend development. Fill in each file wi
 | [Error Handling](./error-handling.md) | Error types, handling strategies | To fill |
 | [Quality Guidelines](./quality-guidelines.md) | Temporal-leakage rules, global/Somalia-local compact/CDS contracts, lineage and testing | Filled (2026-10-09) |
 | [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
+| [Local MLflow Registration](./local-mlflow-registration.md) | IPCCH Forecasting MLflow catalog: snapshots, datasets, revisions, preservation | Filled (2026-10-09) |
 
 ---
 

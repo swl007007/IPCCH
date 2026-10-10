@@ -95,3 +95,12 @@ No model training, model repair, rescoring, new conclusions, serving, background
 watcher, autostart, external/cloud service, reference-store rebuild, modification
 of Food_Crisis_Cluster, push/merge, or Trellis audit. Existing unrelated dirty
 files must be preserved and excluded from task commits.
+
+## User scope correction (2026-10-09, during C1)
+
+The user stated that data provenance is not to be treated as a blocker ("不把数据溯源当做blocker"). Source-lineage
+completeness (full descriptor provenance, historical missing fit-timestamp evidence, retained audit debt) is a
+disclosure item, not a C1/C2 gate. Concrete importer defects (wrong values or dataset associations where saved data
+exist, omitted support numbers, resume duplicates, non-idempotent repeats, broken backup/download) are still fixed.
+Saved truth is reused directly; no expanded scientific reconstruction. Old store and source files stay preserved;
+no retraining; no Trellis audit.

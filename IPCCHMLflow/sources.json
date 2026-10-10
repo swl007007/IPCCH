@@ -1,0 +1,592 @@
+{
+ "schema_version": "ipcch-forecasting-sources-v1",
+ "contract": "IPCCHMLflow/README.md; .trellis/spec/backend/local-mlflow-registration.md",
+ "eligibility": "models actually fitted in September-October 2026; Nigeria Sep18 and climate2015_v1 families excluded",
+ "forbidden_content": [
+  "climate2015_v1",
+  "climate2015_masked",
+  "nigeria_weather_land",
+  "nigeria_identifier"
+ ],
+ "expected": {
+  "registered_models": 112,
+  "model_versions": 126,
+  "detailed_children": 190,
+  "dashboard_rows": 174,
+  "booster_files": 2458,
+  "fit_units_new": 584,
+  "datasets": 512,
+  "metrics": 50446,
+  "na": 2846
+ },
+ "sources": [
+  {
+   "source_key": "somalia_oracle_v1",
+   "root": "results/experiments/somalia_oracle/v1",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "somalia_v1",
+   "families": [
+    "somalia_oracle_information"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2025-2026",
+   "eval_group": "Somalia oracle cohort",
+   "status_text": "Archived Trellis task 09-24-somalia-flood-food-crisis: evidence status Ready, validation executed; the audit outcome stays in the task archive. This catalog claims no audit pass.",
+   "fit_date_evidence": "run manifest git HEAD f576e69 (committed 2026-09-24T19:59-04:00, run 3,614 s); task evidence cites run commit a0c792e; task 09-24 archive. No minute-level fit timestamp is recorded.",
+   "cited": [
+    {
+     "path": "reports/somalia_oracle/v1/summary.md",
+     "role": "cited_report",
+     "sha256": "6e420feb438b92b69163b71ab1bfc9b97072145e8ae12aac9a7b0ad72d3c3827"
+    },
+    {
+     "path": "reports/somalia_oracle/v1/calibration_diagnostics.md",
+     "role": "cited_report",
+     "sha256": "e8072fd970597050bf282d0c9812e598e8101aa70fc5e685f31284b2dd535ce9"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "somalia_oracle_v2_q3",
+   "root": "results/experiments/somalia_oracle/v2_q3",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "somalia_v2",
+   "families": [
+    "somalia_q3_optimization"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2025-2026",
+   "eval_group": "Somalia q3 cohort",
+   "reference_source": "somalia_oracle_v1",
+   "status_text": "Archived Trellis task 09-25-somalia-auc-r2-optimization: validation executed; its manual spot and close audits of completion 1ad393e returned incomplete with major evidence-retention findings (evidence.md audit history). This catalog claims no audit pass.",
+   "fit_date_evidence": "run manifest git HEAD d75378d (committed 2026-09-25T15:20-04:00, run 562 s); task 09-25 archive.",
+   "cited": [
+    {
+     "path": "reports/somalia_oracle/v2_q3/summary.md",
+     "role": "cited_report",
+     "sha256": "abf217ad7f7a58e3f003319c3bda0c1216340be7554e59e3943c9cb1a9c7edd8"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "somalia_oracle_v3_validity",
+   "root": "results/experiments/somalia_oracle/v3_validity",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "somalia_v3",
+   "families": [
+    "somalia_validity_observed",
+    "somalia_validity_augmented"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2025-2026",
+   "eval_group": "Somalia validity cohort",
+   "status_text": "Archived Trellis task 09-25-somalia-validity-label-augmentation: validation executed; the user instructed closing the task and skipping the audit, a user waiver rather than an audit pass. This catalog claims no audit pass.",
+   "fit_date_evidence": "run manifest git HEAD 1f3bfce (committed 2026-09-25T23:47-04:00, run 695 s); task 09-25 archive.",
+   "cited": [
+    {
+     "path": "reports/somalia_oracle/v3_validity/summary.md",
+     "role": "cited_report",
+     "sha256": "5cc1405580dd2d7c9c4f9b3febcdac595ffb469c8559336773392765b94693e5"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "somalia_oracle_v4_calibrated_d",
+   "root": "results/experiments/somalia_oracle/v4_calibrated_d",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "somalia_v4",
+   "families": [
+    "somalia_calibrated_observed",
+    "somalia_calibrated_augmented"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2022-2026",
+   "eval_group": "Somalia calibrated cohort",
+   "status_text": "Archived Trellis task 09-30-somalia-v4-calibrated-d: full production run and independent replay executed; major and minor audit debt and a user waiver are retained (evidence.md:84-103), not an audit pass. The augmented-label 2023 6-month slot (696 of 2013 required final predictions unavailable) and its pooled result are incomplete; 2026 3-month and 6-month slots are empty cohorts in both settings.",
+   "fit_date_evidence": "run manifest git HEAD a787257 (committed 2026-10-01T07:10-04:00, run 5,301 s); task 09-30 archive.",
+   "cited": [
+    {
+     "path": "reports/somalia_oracle/v4_calibrated_d/summary.md",
+     "role": "cited_report",
+     "sha256": "82e399a685fe5f8b10bb0a862f84df1c45a9bdaee4099aa5eb16bda639abc953"
+    },
+    {
+     "path": "reports/somalia_oracle/v4_calibrated_d/results_summary.txt",
+     "role": "cited_report",
+     "sha256": "4f1c45491e80123407ebb7e93e6887a57a8668641642964a3ac44a720ba4ba27"
+    }
+   ],
+   "diagnostics_globs": [
+    "alert_map_2026_04/**"
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "origin_safe_climate_idp_v1",
+   "root": "results/experiments/origin_safe_climate_idp_v1",
+   "stage": "historical",
+   "model_scope": "global",
+   "format": "modern_runs",
+   "metrics_format": "metrics_overall",
+   "families": [
+    "origin_safe_climate_global"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2022-2025",
+   "eval_group": "global origin-safe cohort",
+   "status_text": "Archived Trellis task 10-06-global-origin-safe-climate-idp: close audit round 1 returned major findings, fixed without re-audit by user decision (evidence.md). This catalog claims no audit pass.",
+   "fit_date_evidence": "logs/suite_ledger.jsonl: 12 runs COMPLETE, 2026-10-06T22:00:58Z to 22:59:41Z.",
+   "cited": [],
+   "exclude_reports_note": "reports/origin_safe_climate_idp_v1/report.md is not uploaded: lines 132-171 carry excluded climate2015_v1 results.",
+   "diagnostics_globs": [
+    "timing_audit/**"
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "origin_safe_weather_oracle_v1",
+   "root": "results/experiments/origin_safe_weather_oracle_v1",
+   "stage": "historical",
+   "model_scope": "global",
+   "format": "modern_runs",
+   "metrics_format": "metrics_overall",
+   "families": [
+    "origin_safe_weather_global"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot 2022-2025",
+   "eval_group": "global origin-safe cohort",
+   "extends": null,
+   "region3": {
+    "predictions": "region3/region3_predictions.csv",
+    "metrics": "region3/region3_metrics.csv",
+    "intervals": "region3/region3_paired_intervals.csv",
+    "global_comparison": "verification/global_comparison_baseline_first.csv",
+    "reference_source": "origin_safe_climate_idp_v1"
+   },
+   "status_text": "Archived Trellis task 10-07-origin-safe-no-weather-oracle-baseline: close-audit job 1ea2dae5e84cf231ee2de9a8 done 2026-10-07T21:57:05Z with one minor reproducibility finding and gate open 0 (PROGRESS.md).",
+   "fit_date_evidence": "logs/suite_ledger.jsonl: 6 oracle runs COMPLETE (one rc=-9 attempt retried), 2026-10-07T20:04:25Z to 20:38:59Z.",
+   "cited": [
+    {
+     "path": "reports/origin_safe_weather_oracle_v1/global_report.md",
+     "role": "cited_report",
+     "sha256": "8bd5b742a1f393151742221daec4234a17c1fc48d7a5ebda2a68408c98f2d554"
+    },
+    {
+     "path": "reports/origin_safe_weather_oracle_v1/region3_report.md",
+     "role": "cited_report",
+     "sha256": "9e848b66ccc1c2b1cd16545904953df97eaf52bc67f9ac4d13becfdd252d271e"
+    },
+    {
+     "path": "reports/origin_safe_weather_oracle_v1/model_run_codebook/IPCCH_climate_weather_oracle_model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "83c3b0c5f6d057b7cd3ee47f4d415dc53c52422cfb654d062a6c518696f5c1ab"
+    },
+    {
+     "path": "reports/origin_safe_weather_oracle_v1/model_run_codebook/IPCCH_climate_weather_oracle_model_run_codebook_metadata.json",
+     "role": "cited_report",
+     "sha256": "a2583f81f8fa63e238945795198d7d398924a689cfc1f1cf44eb8fa15c49ac0e"
+    },
+    {
+     "path": "reports/origin_safe_weather_oracle_v1/model_run_codebook/IPCCH_climate_weather_oracle_model_run_index.csv",
+     "role": "cited_report",
+     "sha256": "b2b3a24a473d49bf2f0dbb2c7506818f4cfb63d3a16700f50dd5d4824c1ca615"
+    }
+   ],
+   "diagnostics_globs": [
+    "reference_preflight/**"
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "compact_global_original",
+   "root": "results/experiments/compact_climate_weather_oracle_v1",
+   "stage": "historical",
+   "model_scope": "global",
+   "format": "modern_runs",
+   "metrics_format": "metrics_overall",
+   "families": [
+    "compact_climate_global"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot original 2022-2025",
+   "training_qualifier": "",
+   "eval_group": "global origin-safe cohort",
+   "h0_aliases": [
+    {
+     "arm": "compact_weather_oracle",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-08-compact-climate-weather-oracle: supervisor accepted the repaired checkpoint; evidence 'Validation Status: Executed and passed'; no additional Trellis audit.",
+   "fit_date_evidence": "logs/suite_ledger.jsonl: 7 runs COMPLETE (after a PARTIAL pilot), 2026-10-09T02:26:47Z to 02:42:53Z.",
+   "cited": [
+    {
+     "path": "reports/compact_climate_weather_oracle_v1/report.md",
+     "role": "cited_report",
+     "sha256": "bb526a86b782c26acfb43e272ba43470d8578be955c026efcce8e47a8ef3210d"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "d3946f2509d9e60d8b6590a75c47c4fdd3da9ffc93d6473694c34d99249060dd"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1/model_run_codebook/expected_vs_actual_inputs.csv",
+     "role": "cited_report",
+     "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1/model_run_codebook/model_run_index.csv",
+     "role": "cited_report",
+     "sha256": "734129be190e3bf7cd982ec4b67966d31fdad8b65a22c3f938caa28bd34e2cec"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    },
+    {
+     "glob": "superseded_build1/**",
+     "reason": "superseded pre-fit input build (no fitted model)"
+    }
+   ]
+  },
+  {
+   "source_key": "compact_somalia_original",
+   "root": "results/experiments/compact_climate_weather_oracle_v1_somalia_local",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "modern_runs",
+   "metrics_format": "long",
+   "families": [
+    "compact_climate_somalia"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "snapshot original 2022-2025",
+   "training_qualifier": "",
+   "eval_group": "Somalia-local compact cohort",
+   "h0_aliases": [
+    {
+     "arm": "compact_weather_oracle",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-09-somalia-local-compact-cds-test: Codex supervisor accepted A1-A9 at 2026-10-09T19:03:26Z (research/supervisor-final-acceptance.json); no audit by user override, which is not an audit pass.",
+   "fit_date_evidence": "task 10-09-somalia-local-compact-cds-test execution record; accepted 2026-10-09T19:03:26Z. No in-root fit ledger timestamp.",
+   "cited": [
+    {
+     "path": "reports/compact_climate_weather_oracle_v1_somalia_local/report.md",
+     "role": "cited_report",
+     "sha256": "c862bada781d07c7f81bd369625bc25ad054cfaeef8243e9054e0e3c95f80cc3"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1_somalia_local/model_run_codebook/IPCCH_compact_climate_weather_oracle_somalia_local_model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "05e1cf151739111c4300e909fdd42bcf980ef752ec145878f8f0d2234171cc5c"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1_somalia_local/model_run_codebook/expected_vs_actual_inputs.csv",
+     "role": "cited_report",
+     "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_v1_somalia_local/model_run_codebook/model_run_index.csv",
+     "role": "cited_report",
+     "sha256": "d605d391dfb425e3647771319d900c4dde79ea23236ca1464f28c22f9cce88f3"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ],
+   "metrics_long": "report/som_metrics_long.csv",
+   "deltas": [
+    "report/som_oracle_minus_baseline_deltas.csv"
+   ]
+  },
+  {
+   "source_key": "compact_global_2026_extension",
+   "root": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1",
+   "stage": "historical",
+   "model_scope": "global",
+   "format": "modern_runs",
+   "metrics_format": "long",
+   "families": [
+    "compact_climate_global"
+   ],
+   "snapshot_role": "extension",
+   "snapshot_label": "snapshot extended 2022-2026",
+   "training_qualifier": "extended 2022-2026",
+   "eval_group": "global origin-safe cohort",
+   "h0_aliases": [
+    {
+     "arm": "compact_weather_oracle",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-09-compact-eval-2026-jan-apr: coordinator accepted A1-A8 after final execution and independent protection/publication checks (research/final-execution-evidence.md); no Trellis audit.",
+   "fit_date_evidence": "task 10-09-compact-eval-2026-jan-apr final execution evidence: --scope global --approve-training rc 0 (2026-10-09).",
+   "cited": [
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/report.md",
+     "role": "cited_report",
+     "sha256": "a88209b3c957f4395749140c54782f51a7b9c955eacef647ed58708b32fa0d71"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "0904d7f33b9054ac5095eb0aea1407450c3871087d96bdd360eb66862ccc926d"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/expected_vs_actual_inputs.csv",
+     "role": "cited_report",
+     "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1/model_run_codebook/model_run_index.csv",
+     "role": "cited_report",
+     "sha256": "e65b1e7f652c67350d80d5c5a2c3450f547c32a995ff687d7454b3ea8bac9cfa"
+    },
+    {
+     "path": "data/reference/area_id_country_region_mapping.csv",
+     "role": "region_membership",
+     "sha256": "18ab5099ce2d1154fb5686183ee399124e18427cc1594923f7abe2769da1611d"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ],
+   "extends": "compact_global_original",
+   "supersedes": "compact_global_original",
+   "metrics_long": "report/all_metrics_long.csv",
+   "deltas": [
+    "report/global_deltas.csv",
+    "report/regional_deltas.csv"
+   ],
+   "region_map": "data/reference/area_id_country_region_mapping.csv"
+  },
+  {
+   "source_key": "compact_somalia_2026_extension",
+   "root": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local",
+   "stage": "historical",
+   "model_scope": "somalia_local",
+   "format": "modern_runs",
+   "metrics_format": "long",
+   "families": [
+    "compact_climate_somalia"
+   ],
+   "snapshot_role": "extension",
+   "snapshot_label": "snapshot extended 2022-2026",
+   "training_qualifier": "extended 2022-2026",
+   "eval_group": "Somalia-local compact cohort",
+   "h0_aliases": [
+    {
+     "arm": "compact_weather_oracle",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-09-compact-eval-2026-jan-apr: coordinator accepted A1-A8 after final execution and independent protection/publication checks (research/final-execution-evidence.md); no Trellis audit.",
+   "fit_date_evidence": "task 10-09-compact-eval-2026-jan-apr final execution evidence: --scope SOM --approve-training rc 0 (2026-10-09).",
+   "cited": [
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/report.md",
+     "role": "cited_report",
+     "sha256": "96ddfbab48e60770094a726fb4ea8b4fa04a33f4949586971bd400b39fa601db"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/IPCCH_compact_climate_weather_oracle_eval_2026_jan_apr_somalia_local_model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "92369c5990b9d79c5c3cfec07d9688f78a54813a1b423b1f2c17640adaf540ca"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/expected_vs_actual_inputs.csv",
+     "role": "cited_report",
+     "sha256": "84080e7e928784ce4f1ef203e3177fb4f8b9ef809a5e1b3f63a54fbf39ba13d1"
+    },
+    {
+     "path": "reports/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/model_run_codebook/model_run_index.csv",
+     "role": "cited_report",
+     "sha256": "3ff4a3eee6800818b5dac3701bb61b65ccc50b00818e3fea0e94adc1395e98fc"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ],
+   "extends": "compact_somalia_original",
+   "supersedes": "compact_somalia_original",
+   "metrics_long": "report/som_metrics_long.csv",
+   "deltas": [
+    "report/som_oracle_minus_baseline_deltas.csv"
+   ]
+  },
+  {
+   "source_key": "compact_global_launch",
+   "root": "results/launch/nowcasting_2026_04_compact_cds_v1",
+   "stage": "launch",
+   "model_scope": "global",
+   "format": "launch",
+   "families": [
+    "compact_launch_global"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "origin 2026-04",
+   "inference_scope_label": "global",
+   "summaries": [
+    {
+     "file": "population/global_population_summary.csv",
+     "kind": "summary",
+     "unit": "global"
+    },
+    {
+     "file": "population/global_population_paired_differences.csv",
+     "kind": "difference",
+     "unit": "global"
+    },
+    {
+     "file": "population/regional_population_summary.csv",
+     "kind": "summary",
+     "unit": "region"
+    },
+    {
+     "file": "population/region_population_paired_differences.csv",
+     "kind": "difference",
+     "unit": "region"
+    },
+    {
+     "file": "population/country_population_summary.csv",
+     "kind": "summary",
+     "unit": "country"
+    },
+    {
+     "file": "population/country_population_paired_differences.csv",
+     "kind": "difference",
+     "unit": "country"
+    }
+   ],
+   "h0_aliases": [
+    {
+     "arm": "compact_cds_weather",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-08-compact-cds-launch: supervisor accepted A1-A9 on 2026-10-09 UTC (research/supervisor-final-acceptance.md); no additional audit.",
+   "fit_date_evidence": "task 10-08-compact-cds-launch execution and acceptance records (2026-10-09 UTC). No minute-level timestamp is used.",
+   "cited": [
+    {
+     "path": "reports/launch/nowcasting_2026_04_compact_cds_v1/launch_summary.md",
+     "role": "cited_report",
+     "sha256": "d558425409bd73e5bd29a8809e21a52f34fd35de2f92a85d67fad9aa1ae19993"
+    },
+    {
+     "path": "reports/launch/nowcasting_2026_04_compact_cds_v1/model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "e563cbf06095a13f57bc9975902a43f28199b5fdadb319b74b51a9a8b4946297"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  },
+  {
+   "source_key": "compact_somalia_launch",
+   "root": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local",
+   "stage": "launch",
+   "model_scope": "somalia_local",
+   "format": "launch",
+   "families": [
+    "compact_launch_somalia"
+   ],
+   "snapshot_role": "original",
+   "snapshot_label": "origin 2026-04",
+   "inference_scope_label": "Somalia-local",
+   "summaries": [
+    {
+     "file": "population/som_population_summary.csv",
+     "kind": "summary",
+     "unit": "som"
+    },
+    {
+     "file": "population/som_population_paired_differences.csv",
+     "kind": "difference",
+     "unit": "som"
+    }
+   ],
+   "h0_aliases": [
+    {
+     "arm": "compact_cds_weather",
+     "of": "compact_baseline"
+    }
+   ],
+   "status_text": "Archived Trellis task 10-09-somalia-local-compact-cds-test: Codex supervisor accepted A1-A9 at 2026-10-09T19:03:26Z (research/supervisor-final-acceptance.json); no audit by user override, which is not an audit pass.",
+   "fit_date_evidence": "task 10-09-somalia-local-compact-cds-test execution record; accepted 2026-10-09T19:03:26Z.",
+   "cited": [
+    {
+     "path": "reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/launch_summary.md",
+     "role": "cited_report",
+     "sha256": "f03a23f6c88a4e39f1afa87f6e7874e2578fb191da00a3377e1f56b20904d84b"
+    },
+    {
+     "path": "reports/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/model_run_codebook_en.csv",
+     "role": "cited_report",
+     "sha256": "3381a159a86c2359b2550adbe4eaa603c5b6d75fed1fb14f088f37f552d3e9a4"
+    }
+   ],
+   "exclude": [
+    {
+     "glob": "**/*.pid",
+     "reason": "process id file of a past run; no content value"
+    }
+   ]
+  }
+ ]
+}

@@ -79,6 +79,91 @@ counts and reconcile any change from C0; no unexplained count relaxation.
 
 Pending supervisor review; no live-write release yet.
 
+Implementation diff baseline is `c9dcef1` (reviewed C0 evidence/spec correction).
+Early naming.py review findings sent to executor while C1 proceeds:
+- q3 optimization description must not define actual crisis as q3 >= 0.20.
+  `somalia_oracle/data.py:175` defines actual crisis from phase >=3;
+  `q3eval.py:78-89` thresholds predicted q3_final and evaluates against that truth.
+- Launch description must say no scoring truth is attached to these saved
+  summaries, rather than claiming no actual labels exist (April H0 has actuals).
+- Region cohort helpers must reject unknown region vocabulary instead of
+  accepting any `region_*_global_model` string.
+- extract.py must reconstruct exact phase-persistence keys, not use count-only
+  identity with the parent hash. Source rule is data.py:365-386 and saved v2 label
+  ledger + row-provenance origin; v3 saves persistence_available explicitly.
+- Reporting period role must not change dataset identity for identical Compact
+  original-primary and extension-original keys/truth; keep the role on the view.
+- Duplicate equal metric values must still check matching dataset association
+  and retain their source locators, not silently mask different cohort bindings.
+
+Naming/extract initial versions were read by supervisor; executor is applying
+these findings. Final code/test verification is still pending at the C1 gate.
+
+At approximately C1 minute 10 the executor briefly showed an API connection
+retry; the same session was retained, with no replacement or production writes.
+
+
+C1 second review (read-only probes + supervisor spot checks; sent to executor):
+- v4 copy truth was nulled after joining the label ledger; dataset identity must
+  retain actual copied labels as well as copy provenance. Mutating a copy label
+  must alter the digest.
+- Southern Africa contrast metrics had no dataset association; bind role/lead.
+- v2/v3 omitted finite within-month AUC support counts; v1 zero n_rows became NA.
+- Existing-store artifact namespace comparison mixed str/int experiment IDs.
+- Restore check skipped directory contents, allowing zero actual downloads;
+  recurse and compare downloaded content with the backup hashes. Scratch server
+  must not accept another already healthy process on its requested port.
+- Dashboard resume skipped old-row retirement after a crash at completion;
+  unchanged dashboard also wrote status tags before verification.
+- Deep readback omitted dataset descriptors/input tags, full external model and
+  registered-version identity/status fields, reference versions and row.json.
+- Source conflict preflight followed a possible experiment-description write.
+All are C1 repair/verification obligations, not authorization for live writes.
+
 ## C2
 
 Pending supervisor review; no completion/acceptance claim.
+
+## User scope correction during C1
+
+User explicitly instructed: “不把数据溯源当做blocker，不然没问没了了”。
+This supersedes earlier strict provenance gates: missing/incomplete historical
+lineage and exhaustive descriptor-proof gaps are disclosed, not blockers. No
+additional lineage archaeology or user clarification. Checkpoints gate practical
+import correctness, successful recoverable registration, no unintended duplicates,
+and preservation of existing objects/source files. Fix available-data mapping bugs
+proportionately, document residual limitations, and converge on live execution.
+Sent to the existing Herdr executor; no scope reset or audit workflow.
+
+### C1 verification scope and progress
+
+- The 27 focused extraction/catalog tests passed (executor output: 55.33 s).
+  Supervisor inspected the scratch tests covering import interruption/resume,
+  unchanged store digest on no-op, corrupt artifact detection, source conflict,
+  original/extended versions, result-only updates and existing-object preservation.
+- Supervisor personally read the maintenance README/spec and matching AGENTS/CLAUDE
+  diff. Requested one practical follow-up: preservation comparison must allow
+  intended retirement of our own dashboard rows during later maintenance, while
+  retaining protection for existing reference and detailed records.
+- Backup/restore report `/tmp/ipcch-c1/rehearsal/restore-check.json` reports success:
+  2,223 artifacts restored; six HTTP downloads matched backup hashes on port5091.
+- Full real-source scratch import/repeat was deliberately skipped after supervisor
+  adjustment: all-source offline planning plus passing scratch fixture integration
+  suffice at C1; complete real-source readback/repeat runs once at live C2.
+- Readable naming, value correctness, recovery, no-op and preservation remain gates;
+  historical provenance incompleteness does not.
+
+### C1 accepted; C2 released
+
+Supervisor reviewed C1-report, final maintenance README/spec and matching agent
+guidance, targeted implementation fixes, and focused test evidence (27 passed
+after the maintenance correction, 66.20 s). Counts frozen: 112 models, 126
+versions, 12 parents, 190 children, 174 latest rows, 512 datasets, 50,446 finite
+detailed metrics, 2,846 NA records. Sources unchanged; training code untouched.
+C1 accepted under the user's explicit nonblocking-provenance scope.
+
+C2 is authorized: retain a durable verified backup; refresh current-store baseline;
+import the 12 sources into the isolated IPCCH Forecasting namespaces; verify
+values/artifacts/counts, repeat as no-op, compare existing records/artifacts.
+Supervisor performs browser checks. No retraining, audit, push, merge or archival.
+Executor stops for C2 review after evidence is saved.
