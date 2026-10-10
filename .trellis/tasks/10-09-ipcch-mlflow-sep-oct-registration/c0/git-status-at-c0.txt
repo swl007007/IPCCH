@@ -1,0 +1,5 @@
+ M .trellis/tasks/archive/2026-10/10-08-compact-cds-launch/research/final_verify_attempt1/superseded_figures/crisis_categorical_compact_cds_weather_12m_2027-04.png
+ M AGENTS.md
+?? .trellis/tasks/10-09-ipcch-mlflow-sep-oct-registration/c0/
+?? .trellis/tasks/10-09-ipcch-mlflow-sep-oct-registration/supervisor-checkpoints.md
+b7fca5c8f7d39fd8eea83257ba3134521b24414d

@@ -1,0 +1,84 @@
+# Supervisor checkpoint record
+
+## Dispatch
+
+- User explicitly authorized execution after the completed grill, using Herdr,
+  idle Claude Opus 5.5 (1M), Codex supervision/diff review, and no Trellis audit.
+- Reviewed specification checkpoint: commit `b7fca5c`, branch
+  `task/ipcch-mlflow-sep-oct-registration`.
+- Task manifests validated (three entries each); all 12 source roots and all 12
+  fitting-date evidence paths exist. CSV expected booster sum = 2458.
+- GitNexus detect_changes before spec commit reported only the pre-existing
+  generated AGENTS timestamp section, zero affected processes, low risk.
+- Native task activation changed planning to in_progress; no audit wrapper used.
+- Herdr environment verified. Executor `w11:p6`, terminal `term_65d6ebf0b04a47`,
+  Claude session `074d329d-6842-4b1d-b871-37fb52cec8c7`, same IPCCH cwd. UI explicitly
+  showed `Opus 5.5 (1M context)` and idle before dispatch; subsequent get/read
+  confirmed working on C0. Herdr prompt's 55-second timeout was only a wait
+  timeout; delivery and work were independently confirmed. Prompt was not resent.
+- Executor may prepare C0 evidence only until supervisor release. Integration
+  coding follows C0; live MLflow writes follow C1. No commit/push/merge/archive
+  by executor without checkpoint instructions.
+
+## C0
+
+Reviewed; source inventory, naming layout and alias policy accepted for C1.
+Live MLflow writes remain prohibited until C1 review/release.
+
+Early findings sent to executor:
+- Reference final README:117-120 and import spec:134-137 require `zz_prov.*`
+  (readable tags created first). Updated task PRD/design/naming to the final
+  delivered convention; original reference PRD `_prov.*` wording was superseded.
+- Preview 5a incorrectly said 6-month 2026 labels through 2025-12. Current
+  extension weather-oracle/6m run metadata `new_batch.fit_label_cutoff_month`
+  is `2025-07`; fitted input count is 308 for this lead.
+- Preview cohort `region3_east_africa_global_model` mislabels region3.
+  `evaluate_region3_saved_predictions.py:1,279` says Southern Africa.
+- Existing baseline digest does not yet cover all object fields or isolate old
+  rows from new ones; C1/C2 preservation verification must compare complete old
+  object state (including descriptions/tags/dataset and logged-model associations,
+  full metric histories) against the fresh backup, not only counts/latest metrics.
+
+Verification: `supervisor-c0-checks.json` checks every member reference against
+the source path/SHA inventory and independently rehashes one booster in each of
+the 12 sources. 2458 unique fitted booster paths, 126 versions, 112 distinct
+registered-model identities, 224 reused original members, 1255 mapped metric
+entries; all assertions passed. This is not a numerical model replay.
+
+Executor's C0 U1–U12 resolutions (implementation choices within approved scope):
+- U1: final `zz_prov.*` convention as corrected above.
+- U2: accept eight H0 alias views without duplicate registered models; selected
+  v2 remains a registered recipe referencing its actual residual members.
+- U3: keep v3 metric-only baselines in both label-setting families, provided
+  identical keys/truth/definitions are checked before sharing dataset identity.
+- U4: 412 evaluation candidates are provisional, not a frozen digest count.
+  C1 must derive full key/truth/definition identities and freeze exact counts
+  before live release; same name/different identity must fail or be explicitly
+  disambiguated in the readable vocabulary.
+- U5: the eight unclassified map/timing/reference files may be preserved as
+  included-source diagnostics/ledgers; no plot-data-as-performance logging.
+- U6/U7: preserve both manifest and execution commit evidence and date evidence
+  from the tasks. Do not invent minute-level timestamps when absent.
+- U8: leaky diagnostics only in detailed diagnostic namespaces, not dashboard.
+- U9: quote acceptance/conclusions only where source evidence supports them;
+  lifecycle completion/waiver is not scientific acceptance or an audit pass.
+- U10: share training descriptors only for identical complete pool identity
+  including scope, truth/label role and feature/schema or explicit arm variants.
+  A baseline child must not misleadingly claim it trained on the oracle's 308
+  columns. The proposed 45(+8) count may change for truthful descriptor identities.
+- U11: external codebooks/report tables need explicit paths AND SHA/role entries
+  in the final source fingerprint/inventory. Do not upload the mixed report.
+- U12: full experiment/model prefix isolates the shared service.
+
+C1 tests must preserve v4 required cohort vs available scored-row support for
+incomplete slots; missing predictions cannot silently shrink a dataset or make
+an incomplete score look complete. Final C1 plan must give exact metric/dataset
+counts and reconcile any change from C0; no unexplained count relaxation.
+
+## C1
+
+Pending supervisor review; no live-write release yet.
+
+## C2
+
+Pending supervisor review; no completion/acceptance claim.

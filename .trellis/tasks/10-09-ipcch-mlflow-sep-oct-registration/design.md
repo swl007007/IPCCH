@@ -80,7 +80,7 @@ Do not equate 2,000+ boosters with 2,000+ model versions.
 `naming.md` is the explicit mapping contract. Implement vocabulary centrally and
 fail on unmapped scientific identifiers, rather than leaking raw shorthand.
 Use compact readable tags (family, arm, arm_role, lead_months, model_scope,
-stage, label_setting where relevant, source_status) and `_prov.*` for machine
+stage, label_setting where relevant, source_status) and `zz_prov.*` for machine
 identity. Do not mark scientific status passed just because catalog import passed.
 
 Dashboard is wide, one row per currently displayed family/arm/lead snapshot.

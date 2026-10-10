@@ -1,0 +1,73 @@
+{
+  "check": "C0 supervisor member identity and twelve current source-byte samples",
+  "passed": true,
+  "member_rows": 2902,
+  "unique_fitted_boosters": 2458,
+  "model_versions": 126,
+  "registered_model_names": 112,
+  "reused_original_members": 224,
+  "metric_map_rows": 1255,
+  "samples": [
+    {
+      "source_key": "compact_global_2026_extension",
+      "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/0m/batches/2026/model_phase2_worse.ubj",
+      "sha256": "305e50e60388f4b151be6f1f9a26cdf1c02258dd4e59f03cc6405289a2996369"
+    },
+    {
+      "source_key": "compact_global_launch",
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/model_phase2_worse.ubj",
+      "sha256": "b9436dddd07ebbba3be094d671bbb291002c6db9d78a7019c30774dff99b1b6b"
+    },
+    {
+      "source_key": "compact_global_original",
+      "path": "results/experiments/compact_climate_weather_oracle_v1/runs/compact_baseline/0m/batches/2022/model_phase2_worse.ubj",
+      "sha256": "8d4371114182d28bfc7dd0a7c11e9b43f4e1cf48832bf4cc297bc5b932c19e43"
+    },
+    {
+      "source_key": "compact_somalia_2026_extension",
+      "path": "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/0m/batches/2026/model_phase2_worse.ubj",
+      "sha256": "d174141cc629746b7250b8fd184d5f7d669807ba89f8b6c9fc0ade176c00d6c5"
+    },
+    {
+      "source_key": "compact_somalia_launch",
+      "path": "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/model_phase2_worse.ubj",
+      "sha256": "1b72bcd2c26df0957a13b0724558b7e23f0dd34c1313b7c4d4a8756d626d8192"
+    },
+    {
+      "source_key": "compact_somalia_original",
+      "path": "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_baseline/0m/batches/2022/model_phase2_worse.ubj",
+      "sha256": "39f19cbaf0fafae692c395e3bf7c62a674f100830b289ef867d5dfbb7b543d1e"
+    },
+    {
+      "source_key": "origin_safe_climate_idp_v1",
+      "path": "results/experiments/origin_safe_climate_idp_v1/runs/climate_no_history/0m/batches/2022/model_phase2_worse.ubj",
+      "sha256": "bac37d0d66689c68e93605fe3b6b0f183f4b97773d8697333f55a5806d76f3dd"
+    },
+    {
+      "source_key": "origin_safe_weather_oracle_v1",
+      "path": "results/experiments/origin_safe_weather_oracle_v1/runs/climate_safe_history_idp_oracle/12m/batches/2022/model_phase2_worse.ubj",
+      "sha256": "479a1bb2944dce4542ddd659d24dc4739dd807cf4c0900b2443ad3f496c60563"
+    },
+    {
+      "source_key": "somalia_oracle_v1",
+      "path": "results/experiments/somalia_oracle/v1/models/y2025_h00_o2025-04_A_q2.ubj",
+      "sha256": "bfa42e4a1f8ec12abd3b23891e30271762f764396c6c669b49114a1cff4716df"
+    },
+    {
+      "source_key": "somalia_oracle_v2_q3",
+      "path": "results/experiments/somalia_oracle/v2_q3/models/y2025_h00_o2025-04_A_q2.ubj",
+      "sha256": "90da69f932c96472a447798237002ccec63276d8c1f9195bae0592eda2c18e58"
+    },
+    {
+      "source_key": "somalia_oracle_v3_validity",
+      "path": "results/experiments/somalia_oracle/v3_validity/models/y2025_h00_o2025-04_original_D_direct_q2.ubj",
+      "sha256": "68abeb04e803edaed4f626fe8666b0dfc55be8ca373db3c7c3009653c0a4bfb0"
+    },
+    {
+      "source_key": "somalia_oracle_v4_calibrated_d",
+      "path": "results/experiments/somalia_oracle/v4_calibrated_d/models/augmented_y2022_h00_o2022-01_q2.ubj",
+      "sha256": "69f87002ebba8c464a6c7caba417872afba471960e1601ffa060568c696e6ec3"
+    }
+  ],
+  "limits": "Not MLflow import, full model replay or audit; C1 dataset identities still pending"
+}

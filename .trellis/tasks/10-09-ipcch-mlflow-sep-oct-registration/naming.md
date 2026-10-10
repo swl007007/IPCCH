@@ -5,6 +5,11 @@ D3–D17, adapted explicitly for 0-month, this repository's distinct arms, label
 settings, launch inference and model snapshots. Do not force GeoXGB partition
 roles onto IPCCH feature-set arms. Centralize mappings; unknown values fail.
 
+Reference final-delivery correction: use `zz_prov.*`, with readable tags written
+first. The archived PRD originally said `_prov.*`, but the final README:117-120
+and local-mlflow-import.md:134-137 supersede it after the tag-order fix. This
+task follows that final delivered convention, as requested by the user.
+
 ## Objects
 
 | Object | Name |
@@ -66,7 +71,7 @@ output views are not automatically separate fitted-model registry entries.
 | `period` | actual target support span; enumerate sparse months in descriptor |
 | `period_role` | primary / original / year_2022 ... year_2026, or named saved subset |
 | `source_status` | source-grounded scientific completion status; never importer success |
-| `_prov.*` | original IDs/paths, snapshot identity, hashes, code/importer version, import state |
+| `zz_prov.*` | original IDs/paths, snapshot identity, hashes, code/importer version, import state |
 
 Descriptions and NA documents carry per-slot status even when the child has mixed
 complete/empty/incomplete slots. Avoid one falsely reassuring top-level status.

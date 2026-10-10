@@ -1,0 +1,312 @@
+{
+ "source_roots": 12,
+ "source_files_hashed": 3626,
+ "source_bytes": 3967875573,
+ "booster_files": 2458,
+ "booster_distinct_sha256": 1938,
+ "booster_files_by_source": {
+  "compact_global_2026_extension": 28,
+  "compact_global_launch": 20,
+  "compact_global_original": 112,
+  "compact_somalia_2026_extension": 28,
+  "compact_somalia_launch": 20,
+  "compact_somalia_original": 112,
+  "origin_safe_climate_idp_v1": 192,
+  "origin_safe_weather_oracle_v1": 96,
+  "somalia_oracle_v1": 300,
+  "somalia_oracle_v2_q3": 400,
+  "somalia_oracle_v3_validity": 524,
+  "somalia_oracle_v4_calibrated_d": 626
+ },
+ "booster_distinct_sha_by_source": {
+  "compact_global_2026_extension": 28,
+  "compact_global_launch": 20,
+  "compact_global_original": 112,
+  "compact_somalia_2026_extension": 28,
+  "compact_somalia_launch": 20,
+  "compact_somalia_original": 112,
+  "origin_safe_climate_idp_v1": 192,
+  "origin_safe_weather_oracle_v1": 96,
+  "somalia_oracle_v1": 300,
+  "somalia_oracle_v2_q3": 384,
+  "somalia_oracle_v3_validity": 296,
+  "somalia_oracle_v4_calibrated_d": 402
+ },
+ "unresolved_file_roles": [
+  "results/experiments/somalia_oracle/v4_calibrated_d/alert_map_2026_04/somalia_alert_2026_04_h0_augmented_q3raw_areas.csv",
+  "results/experiments/somalia_oracle/v4_calibrated_d/alert_map_2026_04/somalia_alert_2026_04_h0_augmented_q3raw_summary.json",
+  "results/experiments/origin_safe_climate_idp_v1/timing_audit/label_tripwire.csv",
+  "results/experiments/origin_safe_climate_idp_v1/timing_audit/timing_audit.csv",
+  "results/experiments/origin_safe_climate_idp_v1/timing_audit/timing_audit_summary.json",
+  "results/experiments/origin_safe_weather_oracle_v1/reference_preflight/artifact_inventory.csv",
+  "results/experiments/origin_safe_weather_oracle_v1/reference_preflight/metrics_replay.csv",
+  "results/experiments/origin_safe_weather_oracle_v1/reference_preflight/verification_summary.json"
+ ],
+ "files_mentioning_excluded_families": [
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/feature_classification_h0.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/feature_classification_h12.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/feature_classification_h3.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/feature_classification_h6.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/origin_safe_climate_idp_v1_manifest_copy.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/source_support_h0.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/source_support_h12.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/source_support_h3.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/input_checks/source_support_h6.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/timing_audit/timing_audit.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/verification/feature_timing_classes.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_climate_idp_v1/verification/missingness_carrier_tail.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/origin_safe_weather_oracle_v1/input_checks/origin_safe_weather_oracle_v1_manifest_copy.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/input_checks/compact_climate_weather_oracle_v1_manifest_copy.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/logs/launch_records.jsonl",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_baseline/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_weather_oracle/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_weather_oracle/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/runs/compact_weather_oracle/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1/superseded_build1/input_checks/compact_climate_weather_oracle_v1_manifest_copy.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/inputs/parent_contract/expected_feature_contract.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/preflight/frozen_inventory_before.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_baseline/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_weather_oracle/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_weather_oracle/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_v1_somalia_local/runs/compact_weather_oracle/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/preflight/protected_inventory_before.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1/runs/compact_weather_oracle/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/preflight/protected_inventory_before.csv",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/3m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/experiments/compact_climate_weather_oracle_eval_2026_jan_apr_v1_somalia_local/runs/compact_weather_oracle/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1/runs/compact_cds_weather/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/inputs/parent_contract/expected_feature_contract.csv",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/preflight/frozen_inventory_before.csv",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/0m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_baseline/6m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/12m/run_metadata.json",
+   "climate2015"
+  ],
+  [
+   "results/launch/nowcasting_2026_04_compact_cds_v1_somalia_local/runs/compact_cds_weather/6m/run_metadata.json",
+   "climate2015"
+  ]
+ ],
+ "actual_fits_saved": 2458,
+ "member_rows_by_kind": {
+  "fitted": 2458,
+  "reused_from_original_snapshot": 224,
+  "alias_selected_recipe": 100,
+  "alias_shared_h0_baseline": 80,
+  "alias_h0_clone_of_B": 40
+ },
+ "registered_models": 112,
+ "model_versions": 126,
+ "registered_models_by_family": {
+  "compact_climate_global": 7,
+  "compact_climate_somalia": 7,
+  "compact_launch_global": 5,
+  "compact_launch_somalia": 5,
+  "origin_safe_climate_global": 12,
+  "origin_safe_weather_global": 6,
+  "somalia_calibrated_augmented": 4,
+  "somalia_calibrated_observed": 4,
+  "somalia_oracle_information": 15,
+  "somalia_q3_optimization": 23,
+  "somalia_validity_augmented": 12,
+  "somalia_validity_observed": 12
+ },
+ "version_member_refs_total": 2782
+}

@@ -1,0 +1,44 @@
+{
+ "detailed_parents": 12,
+ "detailed_children": 190,
+ "children_by_kind": {
+  "fitted": 126,
+  "metric_only": 52,
+  "alias_h0_shared": 8,
+  "metric_only_reference_to_other_source": 4
+ },
+ "children_by_source": {
+  "compact_global_2026_extension": 8,
+  "compact_global_launch": 6,
+  "compact_global_original": 8,
+  "compact_somalia_2026_extension": 8,
+  "compact_somalia_launch": 6,
+  "compact_somalia_original": 8,
+  "origin_safe_climate_idp_v1": 12,
+  "origin_safe_weather_oracle_v1": 10,
+  "somalia_oracle_v1": 24,
+  "somalia_oracle_v2_q3": 44,
+  "somalia_oracle_v3_validity": 48,
+  "somalia_oracle_v4_calibrated_d": 8
+ },
+ "dashboard_rows_latest": 174,
+ "dashboard_rows_by_family": {
+  "compact_climate_global": 8,
+  "compact_climate_somalia": 8,
+  "compact_launch_global": 6,
+  "compact_launch_somalia": 6,
+  "origin_safe_climate_global": 12,
+  "origin_safe_weather_global": 10,
+  "somalia_calibrated_augmented": 4,
+  "somalia_calibrated_observed": 4,
+  "somalia_oracle_information": 24,
+  "somalia_q3_optimization": 44,
+  "somalia_validity_augmented": 24,
+  "somalia_validity_observed": 24
+ },
+ "eval_dataset_candidate_rows": 557,
+ "eval_dataset_unique_keys(truth_group,lead,period,cohort)": 412,
+ "same_key_different_n": 0,
+ "launch_inference_descriptors": 10,
+ "training_pool_descriptors_proposed": "one per family x lead (see report)"
+}

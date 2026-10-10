@@ -47,7 +47,7 @@ naming** standard, not its superseded October 7–8 naming or stale AGENTS text.
    Mark 2022–2025 weights reused and only 2026 fits new.
 8. Use English readable names, tags and descriptions, with explicit vocabulary
    mappings. Lead display is `0-month` etc.; `lead_months` tag is `00/03/06/12`,
-   parameter numeric. Technical IDs/hashes/importer identities use `_prov.*`.
+   parameter numeric. Technical IDs/hashes/importer identities use `zz_prov.*`.
    Descriptions use What / Compare with / Status / Caveats + original; parent
    descriptions may add supported research question and accepted conclusion.
 9. Preserve scientific caveats. Somalia v4 augmented 2023 6-month and its pooled
