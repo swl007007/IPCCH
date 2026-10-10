@@ -1,0 +1,9 @@
+{
+  "http_status": 200,
+  "rows": 100,
+  "response_bytes": 2946272,
+  "response_mib": 2.81,
+  "elapsed_seconds": 0.412,
+  "has_next_page": true,
+  "description": "Uncompressed JSON response for first 100 active dashboard rows; not browser transfer timing."
+}

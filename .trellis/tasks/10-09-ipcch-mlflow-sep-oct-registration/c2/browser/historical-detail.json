@@ -1,0 +1,196 @@
+{
+  "browser_ok": true,
+  "console_errors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "focused_element": {
+    "selector": "html > body",
+    "tag": "body",
+    "text": "3.17.0 GenAI Model training IPCCH Forecasting - detailed runs Runs Models Traces Model registry Docs Settings IPCCH Fore"
+  },
+  "interactive_elements": [
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/",
+      "selector": "div > aside > div:nth-of-type(1) > div > a",
+      "tag": "a",
+      "text": "MLflow"
+    },
+    {
+      "aria_name": "Toggle sidebar",
+      "selector": "div > div > aside > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(2)",
+      "tag": "div",
+      "text": "GenAI"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(3)",
+      "tag": "div",
+      "text": "Model training"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments",
+      "selector": "aside > nav > ul > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - detailed runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments/3/runs",
+      "selector": "aside > nav > ul > li:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments/3/models",
+      "selector": "aside > nav > ul > li:nth-of-type(4) > a",
+      "tag": "a",
+      "text": "Models"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments/3/traces",
+      "selector": "aside > nav > ul > li:nth-of-type(5) > a",
+      "tag": "a",
+      "text": "Traces"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/models",
+      "selector": "aside > nav > ul > li:nth-of-type(6) > a",
+      "tag": "a",
+      "text": "Model registry"
+    },
+    {
+      "href": "https://www.mlflow.org/docs/latest/ml/",
+      "selector": "aside > nav > div > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Docs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/settings/general?returnTo=%2Fexperiments%2F3%2Fruns%2Fa3b70652efae42f18161cc502e6b394b",
+      "selector": "aside > nav > div > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Settings"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments/3/runs",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(1) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - detailed runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=history#/experiments/3/runs",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(2) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "aria_name": "Open header dropdown menu",
+      "selector": "div:nth-of-type(2) > div > div > div:nth-of-type(2) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > div > div > div",
+      "tag": "div",
+      "text": "Overview Model metrics System metrics Traces Artifacts"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-overview",
+      "tag": "button",
+      "text": "Overview",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-model-metrics",
+      "tag": "button",
+      "text": "Model metrics",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-system-metrics",
+      "tag": "button",
+      "text": "System metrics",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-evaluations",
+      "tag": "button",
+      "text": "Traces",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-artifacts",
+      "tag": "button",
+      "text": "Artifacts",
+      "type": "button"
+    },
+    {
+      "aria_name": "Edit description",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(1) > h4 > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "aria_name": "Expand description",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(1) > div > button",
+      "tag": "button",
+      "text": "Show more",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > div:nth-of-type(1) > span > input",
+      "tag": "input",
+      "type": "text"
+    },
+    {
+      "selector": "div:nth-of-type(1) > div > div > div:nth-of-type(2) > div",
+      "tag": "div",
+      "text": "Metric Value original.all_scored.binary.accuracy 0.7786917213260061 original.all_scored.binary.count.observed_negative 1"
+    },
+    {
+      "aria_name": "Resize Column",
+      "selector": "div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div",
+      "tag": "div",
+      "type": "button"
+    }
+  ],
+  "network_errors": [],
+  "page_errors": [],
+  "page_id": "81D108B3CCD430BFE90844702739FEC5",
+  "page_size": {
+    "height": 799,
+    "width": 1484
+  },
+  "pages": [
+    {
+      "active": true,
+      "page_id": "81D108B3CCD430BFE90844702739FEC5",
+      "title": "Run a3b70652efae42f18161cc502e6b394b - MLflow",
+      "url": "http://127.0.0.1:5000/?check=history#/experiments/3/runs/a3b70652efae42f18161cc502e6b394b"
+    }
+  ],
+  "screenshot": {
+    "archive": false,
+    "artifact_id": "6d28629c3ce0c01abdcad7649584a8d3",
+    "expires_at": "2026-10-11T01:30:07Z",
+    "filename": "browser-screenshot.png",
+    "height": 799,
+    "mime_type": "image/png",
+    "sha256": "bb34ee13808755d2371b0980bb2ea8e6ff19cb19c4a9754fe58b7942723c6666",
+    "size_bytes": 127882,
+    "url": "https://agent.weilunshi.com/artifacts/public/6d28629c3ce0c01abdcad7649584a8d3/browser-screenshot.png?expires=1791682207&sig=c2abef4a976625a3a6a81cc8208c6d8262175852354a5a925a3b64f317314c36",
+    "width": 1484
+  },
+  "session_id": "browser-12b6c75a32fe9e7aef7782bd",
+  "text": "3.17.0 GenAI Model training IPCCH Forecasting - detailed runs Runs Models Traces Model registry Docs Settings IPCCH Forecasting - detailed runs Runs Compact climate global historical | baseline | 6-month Overview Model metrics System metrics Traces Artifacts Description Compact climate global historical | baseline | 6-month What: Compact baseline inputs (296). Family: Compact climate global historical (compact inputs; original 2022-2025 and extended 2022-2026 Jan-Apr snapshots). 6-month lead (forecast origin = target month minus 6). Fitted inputs: 296. 2022-2025 annual fits reused unchanged from snapshot compact_global_original; the 2026 fit is new (fit origin 2025-07, label cutoff 2025-07). Role: baseline (comparison reference). Compare with: the family's baseline arm at the same lead on the same evaluation dataset (same keys, truth and definition); compare values only within one dataset. Status: Source status: Archived Trellis task 10-09-compact-eval-2026-jan-apr: coordinator accepted A1-A8 after final execution and independent protection/publication checks (research/final-execution-evidence.md); no Trellis audit. Slot status: 67 slot(s) complete; year_2022.region_palestine_global_model: complete_with_undefined_metrics; year_2026.region_mali_global_model: complete_with_undefined_metrics; year_2026.region_west_africa_global_model: complete_with_undefined_metrics. Caveats + original: Reported overall phase and normalized phase-3-or-worse share of the frozen global origin-safe cohort. Undefined source values are not logged; view/na.json lists them with the source reason. Metric keys read ..; view/evaluation_view.json maps every key to the source file, row and column. External catalog descriptor of saved XGBoost boosters: the weights are downloadable from the detailed parent run (members.json lists every member and its bundle); there is no MLflow prediction wrapper and nothing was retrained. Source snapshot: compact_global_2026_extension. MLflow times are registration times, not fit times. Show more Metrics (1024) Metric Value original.all_scored.binary.accuracy 0.7786917213260061 original.all_scored.binary.count.observed_negative 14416 original.all_scored.binary.count.observed_positive 13789 original.all_scored.binary.count.predicted_positive 16475 original.all_scored.binary.count.tp 12011 original.all_scored.binary.f2 0.8383939914282922 original.all_scored.binary.precision 0.7290440060698027 original.all_scored.binary.recall 0.8710566393502067 original.all_scored.five_class.accuracy 0.6302783194469066 original.all_scored.five_class.ordinal_mae 0.3792235419251906 original.all_scored.n_areas 6015 original.all_scored.n_rows 28205 original.all_scored.share_phase3plus_mae 0.09550833008550554 original.all_scored.share_phase3plus_n_distinct_truth 6971 original.all_scored.share_phase3plus_r2 0.4601855311868902 original.region_asia_global_model.binary.accuracy 0.9013259327782918 original.region_asia_global_model.binary.count.observed_negative 301 original.region_asia_global_model.binary.count.observed_positive 2942 original.region_asia_global_model.binary.count.predicted_positive 3104 original.region_asia_global_model.binary.count.tp 2863 original.region_asia_global_model.binary.f2 0.9625470683162989 original.region_asia_global_model.binary.precision 0.9223582474226805 original.region_asia_global_model.binary.recall 0.9731475186947655 original.region_asia_global_model.five_class.accuracy 0.7246376811594203 original.region_asia_global_model.five_class.ordinal_mae 0.2769041011409189 original.region_asia_global_model.n_areas 1045 original.region_asia_global_model.n_rows 3243 original.region_asia_global_model.share_phase3plus_mae 0.1038701717071125 original.region_asia_global_model.share_phase3plus_n_distinct_truth 50 original.region_asia_global_model.share_phase3plus_r2 0.2174868457362018 original.region_central_africa_global_model.binary.accuracy 0.7939853184939616 original.region_central_africa_global_model.binary.count.observed_negative 1580 original.region_central_africa_global_model.binary.count.observed_positive 2643 original.region_central_africa_global_model.binary.count.predicted_positive 3175 original.region_central_africa_global_model.binary.count.tp 2474 original.region_central_africa_global_model.binary.f2 0.8998326907688949 original.region_central_africa_global_model.binary.precision 0.7792125984251969 original.region_central_africa_global_model.binary.recall 0.936057510404843 original.region_central_africa_global_model.five_class.accuracy 0.7025811034809377 original.region_central_africa_global_model.five_class.ordinal_mae 0.3004972768174284 original.region_central_africa_global_model.n_areas 832 original.region_central_africa_global_model.n_rows 4223 original.region_central_africa_global_model.share_phase3plus_mae 0.10188640565810154 original.region_central_africa_global_model.share_phase3plus_n_distinct_truth 1010 original.region_central_africa_global_model.share_phase3plus_r2 0.2965743480450662 original.region_east_africa_global_model.binary.accuracy 0.7818349186867137 original.region_east_africa_global_model.binary.count.observed_negative 1228 original.region_east_africa_global_model.binary.count.observed_positive 2031 original.region_east_africa_global_model.binary.count.predicted_positive 2452 original.region_east_africa_global_model.binary.count.tp 1886 original.region_east_africa_global_model.binary.f2 0.891641452344932 original.region_east_africa_global_model.binary.precision 0.7691680261011419 original.region_east_africa_global_model.binary.recall 0.9286065977351059 original.region_east_africa_global_model.five_class.accuracy 0.6544952439398588 original.region_east_africa_global_model.five_class.ordinal_mae 0.3525621356244247 original.region_east_africa_global_model.n_areas 731 original.region_east_africa_global_model.n_rows 3259 original.region_east_africa_global_model.share_phase3plus_mae 0.11050205632813133 original.region_east_africa_global_model.share_phase3plus_n_distinct_truth 65 original.region_east_africa_global_model.share_phase3plus_r2 0.5415129014181774 original.region_latin_america_global_model.binary.accuracy 0.6708037825059102 original.region_latin_america_global_model.binary.count.observed_negative 821 original.region_latin_america_global_model.binary.count.observed_positive 871 original.region_latin_america_global_model.binary.count.predicted_positive 1218 original.region_latin_america_global_model.binary.count.tp 766 original.region_latin_america_global_model.binary.f2 0.8145470012760526 original.region_latin_america_global_model.binary.precision 0.6288998357963875 original.region_latin_america_global_model.binary.recall 0.8794489092996556 original.region_latin_america_global_model.five_class.accuracy 0.5591016548463357 original.region_latin_america_global_model.five_class.ordinal_mae 0.4521276595744681 original.region_latin_america_global_model.n_areas 366 original.region_latin_america_global_model.n_rows 1692 original.region_latin_america_global_model.share_phase3plus_mae 0.09665185121867814 original.region_latin_america_global_model.share_phase3plus_n_distinct_truth 70 original.region_latin_america_global_model.share_phase3plus_r2 0.45859904797850803 original.region_mali_global_model.binary.accuracy 0.9387096774193548 original.region_mali_global_model.binary.count.observed_negative 285 original.region_mali_global_model.binary.count.observed_positive 25 original.region_mali_global_model.binary.count.predicted_positive 18 original.region_mali_global_model.binary.count.tp 12 original.region_mali_global_model.binary.f2 0.5084745762711864 original.region_mali_global_model.binary.precision 0.6666666666666666 original.region_mali_global_model.binary.recall 0.48 original.region_mali_global_model.five_class.accuracy 0.44516129032258067 original.region_mali_global_model.five_class.ordinal_mae 0.5580645161290323 original.region_mali_global_model.n_areas 50 original.region_mali_global_model.n_rows 310 original.region_mali_global_model.share_phase3plus_mae 0.04795450214645574 original.region_mali_global_model.share_phase3plus_n_distinct_truth 242 original.region_mali_global_model.share_phase3plus_r2 0.3778695706585372 original.region_palestine_global_model.binary.accuracy 1 original.region_palestine_global_model.binary.count.observed_negative 0 original.region_palestine_global_model.binary.count.observed_positive 29 original.region_palestine_global_model.binary.count.predicted_positive 29 original.region_palestine_global_model.binary.count.tp 29 original.region_palestine_global_model.binary.f2 1 original.region_palestine_global_model.binary.precision 1 original.region_palestine_global_model.binary.recall 1 original.region_palestine_global_model.five_class.accuracy 0.3448275862068966 original.region_palestine_global_model.five_class.ordinal_mae 0.6551724137931034 original.region_palestine_global_model.n_areas 6 original.region_palestine_global_model.n_rows 29 original.region_palestine_global_model.share_phase",
+  "title": "Run a3b70652efae42f18161cc502e6b394b - MLflow",
+  "url": "http://127.0.0.1:5000/?check=history#/experiments/3/runs/a3b70652efae42f18161cc502e6b394b",
+  "viewport": {
+    "height": 799,
+    "width": 1484
+  }
+}

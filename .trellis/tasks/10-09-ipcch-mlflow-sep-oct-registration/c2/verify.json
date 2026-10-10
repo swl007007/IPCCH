@@ -1,0 +1,62 @@
+[
+ {
+  "source": "compact_global_original",
+  "children": 8,
+  "metrics": 360
+ },
+ {
+  "source": "compact_global_2026_extension",
+  "children": 8,
+  "metrics": 9803
+ },
+ {
+  "source": "compact_global_launch",
+  "children": 6,
+  "metrics": 17766
+ },
+ {
+  "source": "compact_somalia_original",
+  "children": 8,
+  "metrics": 758
+ },
+ {
+  "source": "compact_somalia_2026_extension",
+  "children": 8,
+  "metrics": 1062
+ },
+ {
+  "source": "compact_somalia_launch",
+  "children": 6,
+  "metrics": 282
+ },
+ {
+  "source": "origin_safe_climate_idp_v1",
+  "children": 12,
+  "metrics": 540
+ },
+ {
+  "source": "origin_safe_weather_oracle_v1",
+  "children": 10,
+  "metrics": 3880
+ },
+ {
+  "source": "somalia_oracle_v1",
+  "children": 24,
+  "metrics": 5140
+ },
+ {
+  "source": "somalia_oracle_v2_q3",
+  "children": 44,
+  "metrics": 5568
+ },
+ {
+  "source": "somalia_oracle_v3_validity",
+  "children": 48,
+  "metrics": 3822
+ },
+ {
+  "source": "somalia_oracle_v4_calibrated_d",
+  "children": 8,
+  "metrics": 1465
+ }
+]

@@ -13,9 +13,9 @@ session 074d329d-6842-4b1d-b871-37fb52cec8c7, same IPCCH working directory.
 |---|---|---|
 | Spec | component-complete | Persisted after user authorized start; validate and activate task |
 | C0 inventory/naming | ACCEPTED by supervisor (see supervisor-checkpoints.md C0) | `c0/C0-report.md`, `c0/naming-preview.md` + CSV/JSON evidence; supervisor early-review items 1-5 applied; executor STOPPED, no C1 code, no live writes |
-| C1 offline code/tests | executor-complete, awaiting supervisor review | c1/C1-report.md; 27 tests passed; all-source plan with frozen counts; backup + restore-check ok; STOPPED, no live writes |
-| C2 live import/readback | pending | Backup, import, verify, idempotency, browser and preservation |
-| Final diff/docs | pending | Supervisor accepts after evidence; no automatic push/merge |
+| C1 offline code/tests | ACCEPTED by supervisor; implementation commit 142229b | c1/C1-report.md |
+| C2 live import/readback | ACCEPTED in substance by supervisor | c2/C2-report.md: 12 sources imported and verified, 174 dashboard rows, repeat no-op with identical store, old-store compare ok |
+| Final diff/docs | executor docs finalized; supervisor owns the scoped commit, archive and journal | README live links, checklists ticked, C2 report finalized |
 
 Pre-existing dirty: old superseded compact launch PNG; AGENTS generated memory
 timestamp (2026-10-09 7:30pm EDT). Preserve; exclude unrelated hunks from commits.
@@ -74,3 +74,24 @@ Report: c1/C1-report.md (files, commands, frozen counts 112/126/190/174, dataset
 proposed C2 sequence). Evidence: c1/plan-result.json, c1/restore-check.json, c1/backup-log.txt.
 Tests: 27 passed. Supervisor findings 1-10, the revision path and the compare allowance for dashboard retirement are done.
 Full real-source scratch import was cancelled per supervisor; it runs once in C2. Executor stopped at C1.
+
+## C2 (executor, 2026-10-10 01:24-01:36Z)
+
+The live baseline was identical to the C1 backup, which was moved to ~/ipcch-mlflow-backups/20261010-before-ipcch-forecasting.
+One-plan driver c2/c2_driver.py: import 12/12 (112 models, 126 versions, 190 children, 50,446 metrics), deep verify ok,
+dashboard 174 rows ok, unchanged repeat = no-op (store identical), old-store compare ok (0 problems).
+100-row dashboard payload 2,946,272 bytes. Staging tars (3.7 GB) can be deleted. Executor stopped at C2.
+
+## Final (executor)
+
+C2 accepted in substance (supervisor-counts.json, browser evidence, downloads, payload). Executor finalized:
+c2/C2-report.md status, prd/implement checklists (supervisor-owned review/commit items left open), README live links,
+task.json notes. No further MLflow access, tests or investigations. Commit/archive/journal: supervisor. No audit.
+
+## Final supervisor acceptance
+
+C0/C1/C2 accepted. Full implementation scope and final diff reviewed; 27 tests passed,
+live import/readback/no-op/preservation and browser/download checks passed.
+AGENTS and CLAUDE maintenance guidance is synchronized. Source lineage limitations
+are nonblocking as the user instructed. Native archive/journal follows the final
+evidence commit. No retraining, source repair, merge, push, or Trellis audit.

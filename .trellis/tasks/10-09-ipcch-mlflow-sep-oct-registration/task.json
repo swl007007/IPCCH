@@ -1,8 +1,8 @@
 {
   "id": "ipcch-mlflow-sep-oct-registration",
   "name": "ipcch-mlflow-sep-oct-registration",
-  "title": "IPCCH September–October model registration and MLflow maintenance",
-  "description": "Plan MLflow registration of September–October 2026 IPCCH historical and launch models following Food_Crisis_Cluster conventions, then document ongoing registration and maintenance in AGENTS.md and CLAUDE.md.",
+  "title": "IPCCH September\u2013October model registration and MLflow maintenance",
+  "description": "Plan MLflow registration of September\u2013October 2026 IPCCH historical and launch models following Food_Crisis_Cluster conventions, then document ongoing registration and maintenance in AGENTS.md and CLAUDE.md.",
   "status": "in_progress",
   "dev_type": "backend",
   "scope": "mlflow",
@@ -15,16 +15,17 @@
   "branch": "task/ipcch-mlflow-sep-oct-registration",
   "base_branch": "main",
   "worktree_path": null,
-  "commit": null,
+  "commit": "142229b",
   "pr_url": null,
   "subtasks": [],
   "children": [],
   "parent": null,
   "relatedFiles": [],
-  "notes": "User authorized supervisor-executor implementation via Herdr Claude Opus 5.5 (1M); no Trellis audit. Source/naming grill complete. Checkpoints C0/C1/C2 in implement.md.",
+  "notes": "User authorized supervisor-executor implementation via Herdr Claude Opus 5.5 (1M); no Trellis audit. Source/naming grill complete. Checkpoints C0/C1/C2 in implement.md. C0/C1 accepted; C2 live import accepted in substance (12 sources, 112 models, 126 versions, 202 detailed + 174 dashboard runs); evidence in c0/ c1/ c2/. Final supervisor acceptance: 27 tests, live readback/no-op/preservation and browser/download checks passed; native archive after final evidence commit.",
   "meta": {
     "execution_mode": "herdr-supervisor-executor",
     "trellis_audit": "explicitly_waived",
-    "audit_pass": false
+    "audit_pass": false,
+    "c2": "accepted"
   }
 }

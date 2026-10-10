@@ -65,28 +65,30 @@ naming** standard, not its superseded October 7–8 naming or stale AGENTS text.
 
 ## Acceptance
 
-- [ ] Reviewed source/model/metric inventory has an explicit inclusion decision,
+Evidence: c0/C0-report.md, c1/C1-report.md, c2/C2-report.md and the supervisor's c2/supervisor-*.json/md and browser/.
+
+- [x] Reviewed source/model/metric inventory has an explicit inclusion decision,
       fitting-date evidence, recipe membership and expected object counts.
-- [ ] Names/tags/descriptions pass the explicit mappings in `naming.md`, including
+- [x] Names/tags/descriptions pass the explicit mappings in `naming.md`, including
       0-month, scope, label setting, oracle limitations and source status.
-- [ ] Every imported finite value equals its saved value and maps to a source
+- [x] Every imported finite value equals its saved value and maps to a source
       path/key. NA status/reason preserved; no invented metrics or CIs.
-- [ ] Evaluation dataset identity binds sorted keys, truth, definition, actual
+- [x] Evaluation dataset identity binds sorted keys, truth, definition, actual
       supported period and cohort. Same name implies same digest; each historical
       metric is associated with its correct evaluation dataset.
-- [ ] Downloaded model bundles match original member hashes and include the
+- [x] Downloaded model bundles match original member hashes and include the
       associated schema/recipe/calibration information. Aliases/reuse do not
       inflate distinct fitting counts or conceal a missing required member.
-- [ ] Latest Compact rows include both pooled windows, while original versions
+- [x] Latest Compact rows include both pooled windows, while original versions
       and annual fit provenance remain browsable.
-- [ ] Initial and repeated registration, interruption recovery, source-change
+- [x] Initial and repeated registration, interruption recovery, source-change
       rejection and append-only new snapshots are verified. Repeating a completed
       unchanged import is a deep-verified no-op, without duplicate objects.
-- [ ] Existing MLflow objects/artifacts are unchanged; backup and isolated restore
+- [x] Existing MLflow objects/artifacts are unchanged; backup and isolated restore
       evidence exist. Source data, fitted outputs and frozen scripts are unchanged.
-- [ ] Browser checks cover dashboard, a detailed run, model versions and Inputs;
+- [x] Browser checks cover dashboard, a detailed run, model versions and Inputs;
       descriptions, filters and 100-row payload size are checked and reported.
-- [ ] Maintenance CLI/docs and both agent guidance files agree; focused tests,
+- [x] Maintenance CLI/docs and both agent guidance files agree; focused tests,
       offline/scratch integration and supervisor checkpoint evidence pass.
 
 ## Exclusions

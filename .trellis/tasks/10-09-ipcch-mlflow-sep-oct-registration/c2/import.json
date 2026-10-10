@@ -1,0 +1,12 @@
+{
+ "experiments_created": 1,
+ "parent_runs_created": 12,
+ "artifacts_uploaded": 768,
+ "children_created": 190,
+ "logged_models_created": 126,
+ "metrics_logged": 50446,
+ "dataset_inputs_logged": 1356,
+ "registered_models_created": 112,
+ "model_versions_created": 126,
+ "sources_imported": 12
+}

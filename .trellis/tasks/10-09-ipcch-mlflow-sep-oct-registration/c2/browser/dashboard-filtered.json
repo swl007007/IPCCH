@@ -1,0 +1,221 @@
+{
+  "browser_ok": true,
+  "console_errors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "focused_element": {
+    "selector": "html > body",
+    "tag": "body",
+    "text": "3.17.0 GenAI Model training IPCCH Forecasting - dashboard Runs Models Traces Model registry Docs Settings Experiments IP"
+  },
+  "interactive_elements": [
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/",
+      "selector": "div > aside > div:nth-of-type(1) > div > a",
+      "tag": "a",
+      "text": "MLflow"
+    },
+    {
+      "aria_name": "Toggle sidebar",
+      "selector": "div > div > aside > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(2)",
+      "tag": "div",
+      "text": "GenAI"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(3)",
+      "tag": "div",
+      "text": "Model training"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments",
+      "selector": "aside > nav > ul > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - dashboard"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments/4/runs?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments/4/models?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(4) > a",
+      "tag": "a",
+      "text": "Models"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments/4/traces?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(5) > a",
+      "tag": "a",
+      "text": "Traces"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/models",
+      "selector": "aside > nav > ul > li:nth-of-type(6) > a",
+      "tag": "a",
+      "text": "Model registry"
+    },
+    {
+      "href": "https://www.mlflow.org/docs/latest/ml/",
+      "selector": "aside > nav > div > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Docs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/settings/general?returnTo=%2Fexperiments%2F4%2Fruns%3FworkflowType%3Dmachine_learning%26startTime%3DALL%26searchFilter%3Dtags.family%2520%253D%2520'compact_climate_global'",
+      "selector": "aside > nav > div > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Settings"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments",
+      "selector": "div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Experiments"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=filter#/experiments/4",
+      "selector": "div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - dashboard"
+    },
+    {
+      "selector": "div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > span",
+      "tag": "span",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:ra\\:",
+      "tag": "button",
+      "text": "Views",
+      "type": "button"
+    },
+    {
+      "aria_name": "Open header dropdown menu",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "main > div > div:nth-of-type(2) > div > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "main > div > div:nth-of-type(2) > div > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(2) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(3) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "#rc_select_0",
+      "tag": "input",
+      "text": "tags.family = 'compact_climate_global'",
+      "type": "search"
+    },
+    {
+      "selector": "span > span > span:nth-of-type(2) > div > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "aria_name": "More details",
+      "selector": "span > span > span:nth-of-type(2) > div > span",
+      "tag": "span",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(1)",
+      "tag": "button",
+      "text": "All time",
+      "type": "button"
+    },
+    {
+      "aria_name": "State, selected option: Active",
+      "selector": "div:nth-of-type(1) > div > div:nth-of-type(1) > div:nth-of-type(3) > button",
+      "tag": "button",
+      "text": "State: Active",
+      "type": "button"
+    },
+    {
+      "aria_name": "Datasets, multiselectable, 0 options selected",
+      "selector": "div:nth-of-type(1) > div > div:nth-of-type(1) > div:nth-of-type(4) > button",
+      "tag": "button",
+      "text": "Datasets",
+      "type": "button"
+    },
+    {
+      "aria_name": "Sort: Created",
+      "selector": "#radix-\\:rk\\:",
+      "tag": "button",
+      "text": "Sort: Created",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(3)",
+      "tag": "button",
+      "text": "Columns",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(4)",
+      "tag": "button",
+      "text": "Expand rows",
+      "type": "button"
+    }
+  ],
+  "network_errors": [],
+  "page_errors": [],
+  "page_id": "81D108B3CCD430BFE90844702739FEC5",
+  "page_size": {
+    "height": 799,
+    "width": 1484
+  },
+  "pages": [
+    {
+      "active": true,
+      "page_id": "81D108B3CCD430BFE90844702739FEC5",
+      "title": "Runs - Experiment 4 - MLflow",
+      "url": "http://127.0.0.1:5000/?check=filter#/experiments/4/runs?workflowType=machine_learning&startTime=ALL&searchFilter=tags.family%20%3D%20'compact_climate_global'"
+    }
+  ],
+  "screenshot": {
+    "archive": false,
+    "artifact_id": "04c065516e33b51001a2749ce0816940",
+    "expires_at": "2026-10-11T01:33:48Z",
+    "filename": "browser-screenshot.png",
+    "height": 799,
+    "mime_type": "image/png",
+    "sha256": "6ef6b9315286027173815113cacaa74e7e5e2e47083a9726249ce0e6930916eb",
+    "size_bytes": 89799,
+    "url": "https://agent.weilunshi.com/artifacts/public/04c065516e33b51001a2749ce0816940/browser-screenshot.png?expires=1791682428&sig=4a5011a8299b2dc83e5bfac850d1a052af82c4dcf67919ccb7c571e6fd6e8439",
+    "width": 1484
+  },
+  "session_id": "browser-12b6c75a32fe9e7aef7782bd",
+  "text": "3.17.0 GenAI Model training IPCCH Forecasting - dashboard Runs Models Traces Model registry Docs Settings Experiments IPCCH Forecasting - dashboard Runs Views IPCCH Forecasting - dashboard: one row per family x arm x lead for the latest source snapshot. Start here; each row links to its detailed run, evaluation datasets and model version. Vocabulary: family, arm, arm_role (baseline / candidate / diagnostic), lead_months (00, 03, 06, 12), model_scope (global / somalia_local), stage (historical / launch), label_setting, source_status. Metric keys read <period_role>.<cohort>.<metric>: primary, original (compact pooled 2022-2025), pooled, year_YYYY; cohorts such as all_scored, primary, share_history_subset, region_<name>_global_model (scores of a global model on a region's areas, not local fits). Metrics: five_class.* (exact five IPC phases), binary.* (phase 3+ vs 1-2), share_phase3plus_*, n_rows; saved contrasts *.delta.<A>_minus_<B>.*. Launch rows hold prediction_summary.* and paired_difference.* values (predictions, not accuracy). Comparability: compare values only on the same evaluation dataset (run Inputs; one name = one digest). 2026 compact support is January-April only. Weather oracles use realized future weather. No global best-model ranking is implied. Filters: tags.lead_months = '06'; tags.family = 'compact_climate_global'; tags.stage = 'launch'; tags.model_scope = 'somalia_local'; tags.arm_role = 'candidate'. All time State: Active Datasets Sort: Created Columns Expand rows Group by New run Run Name Created Dataset Duration Source Models Pin run #277c43 Compact climate global historical | weather_oracle | 12-month 1 minute ago Pin run #9e102c Compact climate global historical | weather_oracle | 6-month 1 minute ago Pin run #8ddda8 Compact climate global historical | weather_oracle | 3-month 1 minute ago Pin run #3ba65e Compact climate global historical | weather_oracle | 0-month 1 minute ago Pin run #c82d4c Compact climate global historical | baseline | 12-month 1 minute ago Pin run #8a63bf Compact climate global historical | baseline | 6-month 1 minute ago Pin run #be501e Compact climate global historical | baseline | 3-month 1 minute ago Pin run #137dae Compact climate global historical | baseline | 0-month 1 minute ago IPCCH Forecasting eval | 12-month | 2022-01..2022-09 | region_central_africa_global_model (global origin-safe cohort) (3de25f7a69b755c6d783ab0bccb45187) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2022-09 | region_west_africa_global_model (global origin-safe cohort) (dfc253b0229544195c9e75ce7ac691a3) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2022-10 | region_somalia_global_model (global origin-safe cohort) (39ff8a863e6161c50a793f360037c160) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2022-11 | region_asia_global_model (global origin-safe cohort) (edf60b56906c27ef1b9970e08b154d2f) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2022-12 | all_scored (global origin-safe cohort) (78ded447f89537eb38ef8ed17f658e03) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2025-09 | region_west_africa_global_model (global origin-safe cohort) (df03cdfc1f6a53a12b604588a3173b14) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2025-10 | region_central_africa_global_model (global origin-safe cohort) (b26f01d18d7455ad7562e1ffdb6cbe69) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2025-10 | region_somalia_global_model (global origin-safe cohort) (00d5d126ac0e5647e50814b27b7880c8) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2025-12 | all_scored (global origin-safe cohort) (802664d2fefa287c4b9b81359b294525) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2025-12 | region_asia_global_model (global origin-safe cohort) (00e8adb0ed3e0a62a21f4aad507b5ecb) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2026-04 | all_scored (global origin-safe cohort) (c3a5374139e4b87ea7a359d3c0ea4cd2) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2026-04 | region_asia_global_model (global origin-safe cohort) (0cdc490d42460626e43c669044d3210c) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2026-04 | region_central_africa_global_model (global origin-safe cohort) (54a3b84fc72e0606ab53b74f73bba1a1) Evaluation , IPCCH Forecasting eval | 12-month | 2022-01..2026-04 | region_somalia_global_model (global origin-safe cohort) (0790d835cb018533a6cec70ad039ef4c) Evaluation , IPCCH Forecasting eval | 12-month | 2022-02..2022-10 | region_east_africa_global_model (global origin-safe cohort) (4c00847b22f2b9928a7ba092e660218b) Evaluation , IPCCH Forecasting eval | 12-month | 2022-02..2025-10 | region_east_africa_global_model (global origin-safe cohort) (1acfed3bb4107a5fa6688befb7f7fce0) Evaluation , IPCCH Forecasting eval | 12-month | 2022-02..2026-04 | region_east_africa_global_model (global origin-safe cohort) (82fb20c87d954f3d3b42cecf9dafee78) Evaluation , IPCCH Forecasting eval | 12-month | 2022-03..2022-12 | region_latin_america_global_model (global origin-safe cohort) (8880ad691a38b504105d5657baa47532) Evaluation , IPCCH Forecasting eval | 12-month | 2022-03..2025-10 | region_latin_america_global_model (global origin-safe cohort) (64cb2734eff87cceecc5f57dd24b1e1f) Evaluation , IPCCH Forecasting eval | 12-month | 2022-03..2026-03 | region_latin_america_global_model (global origin-safe cohort) (72d169307532afffb925f501237a457b) Evaluation , IPCCH Forecasting eval | 12-month | 2022-04..2022-11 | region_southern_africa_global_model (global origin-safe cohort) (a95b2e12193b74e0a289eaf1543156ee) Evaluation , IPCCH Forecasting eval | 12-month | 2022-04..2025-12 | region_southern_africa_global_model (global origin-safe cohort) (014fdd2f2484d5b0e26ebd551f63bd44) Evaluation , IPCCH Forecasting eval | 12-month | 2022-04..2026-04 | region_southern_africa_global_model (global origin-safe cohort) (f89fe9e17daf72836e84b0ebbc6e9669) Evaluation , IPCCH Forecasting eval | 12-month | 2022-09..2022-09 | region_mali_global_model (global origin-safe cohort) (0c65ed0f5932e3d5122ca6f75fbd2046) Evaluation , IPCCH Forecasting eval | 12-month | 2022-09..2025-09 | region_mali_global_model (global origin-safe cohort) (3a3a2959d06fdd06143c111f63c3c2d7) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-08 | region_somalia_global_model (global origin-safe cohort) (33e885f55fab821154131bfb01d751f1) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-09 | region_central_africa_global_model (global origin-safe cohort) (ef3136090d9ee21a1093c6730fe04113) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-09 | region_mali_global_model (global origin-safe cohort) (b56edc262277c1ed9c42a2dedeacf127) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-09 | region_west_africa_global_model (global origin-safe cohort) (c4c27031e1e412817aa806c1741cf9ca) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-11 | region_asia_global_model (global origin-safe cohort) (1d21c4a9a4fe63398141b1216857a364) Evaluation , IPCCH Forecasting eval | 12-month | 2023-01..2023-12 | all_scored (global origin-safe cohort) (39ff4ace4bbf8bc13e14086998f3e5d4) Evaluation , IPCCH Forecasting eval | 12-month | 2023-02..2023-11 | region_east_africa_global_model (global origin-safe cohort) (d8d9f69d09d8f77eb18bca22cb65ce1a) Evaluation , IPCCH Forecasting eval | 12-month | 2023-02..2023-12 | region_latin_america_global_model (global origin-safe cohort) (976923b30cd6d6bc5676a721411596b8) Evaluation , IPCCH Forecasting eval | 12-month | 2023-05..2023-10 | region_southern_africa_global_model (global origin-safe cohort) (e86ad819ed6e9519c1c441d51d07cded) Evaluation , IPCCH Forecasting eval | 12-month | 2023-11..2023-11 | region_palestine_global_model (global origin-safe cohort) (63aae6c771938b6aa0cf75e0c6bd08d5) Evaluation , IPCCH Forecasting eval | 12-month | 2023-11..2025-12 | region_palestine_global_model (global origin-safe cohort) (c78143cebec948cca0c359fc7a27138a) Evaluation , IPCCH Forecasting eval | 12-month | 2023-11..2026-04 | region_palestine_global_model (global origin-safe cohort) (08676c93d62b7ff9cd3070a34c18186b) Evaluation , IPCCH Forecasting eval | 12-month | 2024-01..2024-07 | region_somalia_global_model (global origin-safe cohort) (ace3f47dcd25a829bf12778f9a565c41) Evaluation , IPCCH Forecasting eval | 12-month | 2024-01..2024-09 | region_central_africa_global_model (global origin-safe cohort) (ee6a7987f1e9ca9139d9ea6f9138c7f2) Evaluation , IPCCH Forecasting eval | 12-month | 2024-01..2024-09 | region_mali_global_model (global origin-safe cohort) (abffd33888fef003af71373a280af7c2) Evaluation , IPCCH Forecasting eval | 12-month | 2024-01..2024-09 | region_west_africa_global_model (global origin-safe cohort) (c730aa0f886c23751e3f686a4e8924c6) Evaluation , IPCCH Forecasting eval | 12-month | 2024-01..2024-12 | all_scored (global origin-safe cohort) (2ffd5ffd9f5f520af24d046693d4c73c) Evaluation , IPCCH Forecasting eval | 12-month | 2024-02..2024-09 | region_palestine_global_model (global origin-safe cohort) (84e22037f3ecc9a2d80c0dbb03fd7cef) Evaluation , IPCCH Forecasting eval | 12-month | 2024-02..2024-11 | region_asia_global_model (global origin-safe cohort) (798b2239aa12ae9789a5ded2b61eca84) Evaluation , IPCCH Forecasting eval | 12-month | 2024-02..2024-11 | region_east_africa_global_model (global origin-safe cohort) (70d10f58b3038aaa5a9da564245a4414) Evaluation , IPCCH Forecasting eval | 12-month | 2024-03..2024-12 | region_latin_america_global_model (global origin-safe cohort) (50ab9cd46dfb81e6392c6e3a8c135ef3) Evaluation , IPCCH Forecasting eval | 12-month | 2024-04..2024-09 | region_southern_africa_global_model (global origin-safe cohort) (8b6d643b38583c05ca71c35dfeb65ac0) Evaluation , IPCCH Forecasting eval | 12-month | 2025-01..2025-09 | region_mali_global_model (global origin-safe cohort) (7fc046f20df5c30dcb081b030790bbf9) Evaluation , IPCCH Forecasting eval | 12-month | 2025-01..2025-09 | region_we",
+  "title": "Runs - Experiment 4 - MLflow",
+  "url": "http://127.0.0.1:5000/?check=filter#/experiments/4/runs?workflowType=machine_learning&startTime=ALL&searchFilter=tags.family%20%3D%20'compact_climate_global'",
+  "viewport": {
+    "height": 799,
+    "width": 1484
+  }
+}

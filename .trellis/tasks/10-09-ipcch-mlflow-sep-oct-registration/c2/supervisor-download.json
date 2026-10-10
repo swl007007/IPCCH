@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "registered_model": "IPCCH Forecasting Compact climate global historical | baseline | 6-month",
+  "version": 2,
+  "run_id": "a3b70652efae42f18161cc502e6b394b",
+  "http_downloads": [
+    {
+      "parent_run": "7a1d7d874be54be892ebf69091d72f35",
+      "downloaded_bytes": 130949120,
+      "members_checked": 8,
+      "sha256": "77b49060b16b3865bfa706c1004eac61e87226be233ff15c4be21d135203a068"
+    },
+    {
+      "parent_run": "50994de27b5641a0bbbc514ec37e347e",
+      "downloaded_bytes": 450887680,
+      "members_checked": 28,
+      "sha256": "7ddb7d7349fca92fb2dd931db4d7f6baa456310019b36e327ad90fe22e9dc61d"
+    }
+  ]
+}

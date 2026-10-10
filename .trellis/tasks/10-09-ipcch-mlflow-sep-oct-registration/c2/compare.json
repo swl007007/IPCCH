@@ -1,0 +1,30 @@
+{
+ "ok": true,
+ "problems": [],
+ "n_problems": 0,
+ "added_rows": {
+  "datasets": 1010,
+  "experiment_tags": 5,
+  "experiments": 2,
+  "input_tags": 7600,
+  "inputs": 2766,
+  "latest_metrics": 81510,
+  "logged_model_metrics": 79592,
+  "logged_model_params": 1008,
+  "logged_model_tags": 2394,
+  "logged_models": 126,
+  "metrics": 81510,
+  "model_version_tags": 504,
+  "model_versions": 126,
+  "params": 1298,
+  "registered_model_tags": 784,
+  "registered_models": 112,
+  "runs": 376,
+  "tags": 9714
+ },
+ "artifacts": {
+  "checked": 2223
+ },
+ "before_digest": "62e85b88688c21551952c410d32c0fb4a6b8ca9fbd7d9e24fc3918f8dfc9ad9d",
+ "after_digest": "fdaf760d73ea89b4635437d84fb57a319791c772b9ce23aaa4d27d1bc94eeeda"
+}

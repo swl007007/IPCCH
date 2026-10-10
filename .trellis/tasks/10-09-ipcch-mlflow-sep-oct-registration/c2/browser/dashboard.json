@@ -1,0 +1,245 @@
+{
+  "browser_ok": true,
+  "console_errors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "focused_element": {
+    "selector": "html > body",
+    "tag": "body",
+    "text": "3.17.0 GenAI Model training IPCCH Forecasting - dashboard Runs Models Traces Model registry Docs Settings Experiments IP"
+  },
+  "interactive_elements": [
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/",
+      "selector": "div > aside > div:nth-of-type(1) > div > a",
+      "tag": "a",
+      "text": "MLflow"
+    },
+    {
+      "aria_name": "Toggle sidebar",
+      "selector": "div > div > aside > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(2)",
+      "tag": "div",
+      "text": "GenAI"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(3)",
+      "tag": "div",
+      "text": "Model training"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments",
+      "selector": "aside > nav > ul > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - dashboard"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments/4/runs?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments/4/models?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(4) > a",
+      "tag": "a",
+      "text": "Models"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments/4/traces?startTime=ALL&workflowType=machine_learning",
+      "selector": "aside > nav > ul > li:nth-of-type(5) > a",
+      "tag": "a",
+      "text": "Traces"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/models",
+      "selector": "aside > nav > ul > li:nth-of-type(6) > a",
+      "tag": "a",
+      "text": "Model registry"
+    },
+    {
+      "href": "https://www.mlflow.org/docs/latest/ml/",
+      "selector": "aside > nav > div > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Docs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/settings/general?returnTo=%2Fexperiments%2F4%2Fruns%3FworkflowType%3Dmachine_learning%26startTime%3DALL",
+      "selector": "aside > nav > div > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Settings"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments",
+      "selector": "div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Experiments"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=dashboard#/experiments/4",
+      "selector": "div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - dashboard"
+    },
+    {
+      "selector": "div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > span",
+      "tag": "span",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:ra\\:",
+      "tag": "button",
+      "text": "Views",
+      "type": "button"
+    },
+    {
+      "aria_name": "Open header dropdown menu",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "main > div > div:nth-of-type(2) > div > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "main > div > div:nth-of-type(2) > div > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(2) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "div:nth-of-type(1) > label:nth-of-type(3) > span:nth-of-type(2) > div > span",
+      "tag": "span"
+    },
+    {
+      "selector": "#rc_select_0",
+      "tag": "input",
+      "type": "search"
+    },
+    {
+      "aria_name": "More details",
+      "selector": "span:nth-of-type(1) > span > span:nth-of-type(2) > div > span",
+      "tag": "span",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(1)",
+      "tag": "button",
+      "text": "All time",
+      "type": "button"
+    },
+    {
+      "aria_name": "State, selected option: Active",
+      "selector": "div:nth-of-type(1) > div > div:nth-of-type(1) > div:nth-of-type(3) > button",
+      "tag": "button",
+      "text": "State: Active",
+      "type": "button"
+    },
+    {
+      "aria_name": "Datasets, multiselectable, 0 options selected",
+      "selector": "div:nth-of-type(1) > div > div:nth-of-type(1) > div:nth-of-type(4) > button",
+      "tag": "button",
+      "text": "Datasets",
+      "type": "button"
+    },
+    {
+      "aria_name": "Sort: Created",
+      "selector": "#radix-\\:rk\\:",
+      "tag": "button",
+      "text": "Sort: Created",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(3)",
+      "tag": "button",
+      "text": "Columns",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > button:nth-of-type(4)",
+      "tag": "button",
+      "text": "Expand rows",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:rn\\:",
+      "tag": "button",
+      "text": "Group by",
+      "type": "button"
+    },
+    {
+      "aria_name": "More options",
+      "selector": "#radix-\\:rp\\:",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:rr\\:",
+      "tag": "button",
+      "text": "New run",
+      "type": "button"
+    },
+    {
+      "selector": "div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+      "tag": "div"
+    },
+    {
+      "selector": "div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+      "tag": "div"
+    },
+    {
+      "selector": "div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3)",
+      "tag": "div"
+    }
+  ],
+  "network_errors": [],
+  "page_errors": [],
+  "page_id": "81D108B3CCD430BFE90844702739FEC5",
+  "page_size": {
+    "height": 799,
+    "width": 1484
+  },
+  "pages": [
+    {
+      "active": true,
+      "page_id": "81D108B3CCD430BFE90844702739FEC5",
+      "title": "Runs - Experiment 4 - MLflow",
+      "url": "http://127.0.0.1:5000/?check=dashboard#/experiments/4/runs?workflowType=machine_learning&startTime=ALL"
+    }
+  ],
+  "screenshot": {
+    "archive": false,
+    "artifact_id": "0f91f253476ebe53dd46795b18f139bc",
+    "expires_at": "2026-10-11T01:33:25Z",
+    "filename": "browser-screenshot.png",
+    "height": 799,
+    "mime_type": "image/png",
+    "sha256": "cbb86106b98f87e57f6063f8c244e502e7ee4953437df40fcbcfa8d99585edca",
+    "size_bytes": 124316,
+    "url": "https://agent.weilunshi.com/artifacts/public/0f91f253476ebe53dd46795b18f139bc/browser-screenshot.png?expires=1791682405&sig=b899cc6b6dcff6705ad78a87ff6da601ce890fa20218d7ff09710805cd536c5f",
+    "width": 1484
+  },
+  "session_id": "browser-12b6c75a32fe9e7aef7782bd",
+  "text": "3.17.0 GenAI Model training IPCCH Forecasting - dashboard Runs Models Traces Model registry Docs Settings Experiments IPCCH Forecasting - dashboard Runs Views IPCCH Forecasting - dashboard: one row per family x arm x lead for the latest source snapshot. Start here; each row links to its detailed run, evaluation datasets and model version. Vocabulary: family, arm, arm_role (baseline / candidate / diagnostic), lead_months (00, 03, 06, 12), model_scope (global / somalia_local), stage (historical / launch), label_setting, source_status. Metric keys read <period_role>.<cohort>.<metric>: primary, original (compact pooled 2022-2025), pooled, year_YYYY; cohorts such as all_scored, primary, share_history_subset, region_<name>_global_model (scores of a global model on a region's areas, not local fits). Metrics: five_class.* (exact five IPC phases), binary.* (phase 3+ vs 1-2), share_phase3plus_*, n_rows; saved contrasts *.delta.<A>_minus_<B>.*. Launch rows hold prediction_summary.* and paired_difference.* values (predictions, not accuracy). Comparability: compare values only on the same evaluation dataset (run Inputs; one name = one digest). 2026 compact support is January-April only. Weather oracles use realized future weather. No global best-model ranking is implied. Filters: tags.lead_months = '06'; tags.family = 'compact_climate_global'; tags.stage = 'launch'; tags.model_scope = 'somalia_local'; tags.arm_role = 'candidate'. All time State: Active Datasets Sort: Created Columns Expand rows Group by New run Run Name Created Dataset Duration Source Models Pin run #8acaff Somalia validity observed-label historical | share_persistence | 12-month 24 seconds ago Pin run #e65b77 Somalia validity observed-label historical | share_persistence | 6-month 24 seconds ago Pin run #277c43 Somalia validity observed-label historical | share_persistence | 3-month 24 seconds ago Pin run #3ba65e Somalia validity observed-label historical | share_persistence | 0-month 25 seconds ago Pin run #277c43 Somalia validity observed-label historical | share_history_selected | 12-month 25 seconds ago Pin run #a6630c Somalia validity observed-label historical | share_history_selected | 6-month 25 seconds ago Pin run #445461 Somalia validity observed-label historical | share_history_selected | 3-month 26 seconds ago Pin run #c83243 Somalia validity observed-label historical | share_history_selected | 0-month 26 seconds ago Pin run #f2be88 Somalia validity observed-label historical | share_history_residual | 12-month 26 seconds ago Pin run #115026 Somalia validity observed-label historical | share_history_residual | 6-month 26 seconds ago Pin run #0e538b Somalia validity observed-label historical | share_history_residual | 3-month 27 seconds ago Pin run #3ba65e Somalia validity observed-label historical | share_history_residual | 0-month 27 seconds ago Pin run #137dae Somalia validity observed-label historical | share_history_direct | 12-month 27 seconds ago Pin run #b45091 Somalia validity observed-label historical | share_history_direct | 6-month 28 seconds ago Pin run #c83243 Somalia validity observed-label historical | share_history_direct | 3-month 28 seconds ago Pin run #e65b77 Somalia validity observed-label historical | share_history_direct | 0-month 28 seconds ago Pin run #0e538b Somalia validity observed-label historical | phase_persistence | 12-month 28 seconds ago Pin run #93320b Somalia validity observed-label historical | phase_persistence | 6-month 29 seconds ago Pin run #4299e0 Somalia validity observed-label historical | phase_persistence | 3-month 29 seconds ago Pin run #8acaff Somalia validity observed-label historical | phase_persistence | 0-month 29 seconds ago Pin run #f792a6 Somalia validity observed-label historical | always_crisis | 12-month 29 seconds ago Pin run #8acaff Somalia validity observed-label historical | always_crisis | 6-month 29 seconds ago Pin run #308613 Somalia validity observed-label historical | always_crisis | 3-month 30 seconds ago Pin run #04867d Somalia validity observed-label historical | always_crisis | 0-month 30 seconds ago Pin run #137dae Somalia validity augmented-training historical | share_persistence | 12-month 30 seconds ago Pin run #308613 Somalia validity augmented-training historical | share_persistence | 6-month 30 seconds ago Pin run #c82d4c Somalia validity augmented-training historical | share_persistence | 3-month 30 seconds ago Pin run #137dae Somalia validity augmented-training historical | share_persistence | 0-month 31 seconds ago Pin run #4299e0 Somalia validity augmented-training historical | share_history_selected | 12-month 31 seconds ago Pin run #8a63bf Somalia validity augmented-training historical | share_history_selected | 6-month 31 seconds ago Pin run #4299e0 Somalia validity augmented-training historical | share_history_selected | 3-month 31 seconds ago Pin run #a6630c Somalia validity augmented-training historical | share_history_selected | 0-month 32 seconds ago Pin run #8acaff Somalia validity augmented-training historical | share_history_residual | 12-month 32 seconds ago Pin run #115026 Somalia validity augmented-training historical | share_history_residual | 6-month 32 seconds ago Pin run #f2be88 Somalia validity augmented-training historical | share_history_residual | 3-month 32 seconds ago Pin run #f792a6 Somalia validity augmented-training historical | share_history_residual | 0-month 33 seconds ago Pin run #de7921 Somalia validity augmented-training historical | share_history_direct | 12-month 33 seconds ago Pin run #8396a5 Somalia validity augmented-training historical | share_history_direct | 6-month 33 seconds ago Pin run #445461 Somalia validity augmented-training historical | share_history_direct | 3-month 34 seconds ago Pin run #1f272d Somalia validity augmented-training historical | share_history_direct | 0-month 34 seconds ago Pin run #4299e0 Somalia validity augmented-training historical | phase_persistence | 12-month 34 seconds ago Pin run #f792a6 Somalia validity augmented-training historical | phase_persistence | 6-month 35 seconds ago Pin run #445461 Somalia validity augmented-training historical | phase_persistence | 3-month 35 seconds ago Pin run #8acaff Somalia validity augmented-training historical | phase_persistence | 0-month 35 seconds ago Pin run #115026 Somalia validity augmented-training historical | always_crisis | 12-month 35 seconds ago Pin run #8396a5 Somalia validity augmented-training historical | always_crisis | 6-month 35 seconds ago Pin run #115026 Somalia validity augmented-training historical | always_crisis | 3-month 36 seconds ago Pin run #445461 Somalia validity augmented-training historical | always_crisis | 0-month 36 seconds ago Pin run #3ba65e Somalia q3 optimization historical | weather_oracle | 12-month 36 seconds ago Pin run #b45091 Somalia q3 optimization historical | weather_oracle | 6-month 36 seconds ago Pin run #434a93 Somalia q3 optimization historical | weather_oracle | 3-month 37 seconds ago Pin run #9e102c Somalia q3 optimization historical | weather_oracle | 0-month 37 seconds ago Pin run #277c43 Somalia q3 optimization historical | share_persistence | 12-month 37 seconds ago Pin run #8ddda8 Somalia q3 optimization historical | share_persistence | 6-month 37 seconds ago Pin run #445461 Somalia q3 optimization historical | share_persistence | 3-month 38 seconds ago Pin run #93320b Somalia q3 optimization historical | share_persistence | 0-month 38 seconds ago Pin run #8acaff Somalia q3 optimization historical | share_history_selected | 12-month 38 seconds ago Pin run #115026 Somalia q3 optimization historical | share_history_selected | 6-month 38 seconds ago Pin run #b45091 Somalia q3 optimization historical | share_history_selected | 3-month 39 seconds ago Pin run #e65b77 Somalia q3 optimization historical | share_history_selected | 0-month 39 seconds ago Pin run #8a63bf Somalia q3 optimization historical | share_history_residual | 12-month 39 seconds ago Pin run #c82d4c Somalia q3 optimization historical | share_history_residual | 6-month 40 seconds ago Pin run #04867d Somalia q3 optimization historical | share_history_residual | 3-month 40 seconds ago Pin run #0e538b Somalia q3 optimization historical | share_history_residual | 0-month 40 seconds ago Pin run #b45091 Somalia q3 optimization historical | share_history_direct | 12-month 41 seconds ago Pin run #b45091 Somalia q3 optimization historical | share_history_direct | 6-month 41 seconds ago Pin run #115026 Somalia q3 optimization historical | share_history_direct | 3-month 41 seconds ago Pin run #5f7281 Somalia q3 optimization historical | share_history_direct | 0-month 42 seconds ago Pin run #3ba65e Somalia q3 optimization historical | seasonal_climate | 12-month 42 seconds ago Pin run #a6630c Somalia q3 optimization historical | seasonal_climate | 6-month 42 seconds ago Pin run #facb66 Somalia q3 optimization historical | seasonal_climate | 3-month 42 seconds ago Pin r",
+  "title": "Runs - Experiment 4 - MLflow",
+  "url": "http://127.0.0.1:5000/?check=dashboard#/experiments/4/runs?workflowType=machine_learning&startTime=ALL",
+  "viewport": {
+    "height": 799,
+    "width": 1484
+  }
+}

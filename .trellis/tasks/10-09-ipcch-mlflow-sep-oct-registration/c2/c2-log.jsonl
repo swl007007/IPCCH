@@ -1,0 +1,12 @@
+{"utc": "2026-10-10T01:24:27Z", "step": "baseline_vs_c1_backup", "identical": true, "live_digest": "62e85b88688c21551952c410d32c0fb4a6b8ca9fbd7d9e24fc3918f8dfc9ad9d", "backup_digest": "62e85b88688c21551952c410d32c0fb4a6b8ca9fbd7d9e24fc3918f8dfc9ad9d", "live_artifacts": 2223, "backup": "/tmp/ipcch-c1/rehearsal/backup"}
+{"utc": "2026-10-10T01:24:27Z", "step": "backup_moved", "dest": "/home/swl007007/ipcch-mlflow-backups/20261010-before-ipcch-forecasting"}
+{"utc": "2026-10-10T01:24:27Z", "step": "backup_manifest", "db_sha256": "7bd1d168d3c9d6f695f5db6c5bca766ef68928ebada15947ea9c9aef3790c9e2", "artifact_files": 2223}
+{"utc": "2026-10-10T01:24:27Z", "step": "before_snapshot_saved", "path": "/home/swl007007/ipcch-mlflow-backups/20261010-ipcch-forecasting-before-snapshot.json", "digest": "62e85b88688c21551952c410d32c0fb4a6b8ca9fbd7d9e24fc3918f8dfc9ad9d"}
+{"utc": "2026-10-10T01:25:49Z", "step": "plan", "registered_models": 112, "model_versions": 126, "detailed_children": 190, "dashboard_rows": 174, "booster_files": 2458, "fit_units_new": 584, "datasets": 512, "metrics": 50446, "na": 2846}
+{"utc": "2026-10-10T01:31:14Z", "step": "import", "experiments_created": 1, "parent_runs_created": 12, "artifacts_uploaded": 768, "children_created": 190, "logged_models_created": 126, "metrics_logged": 50446, "dataset_inputs_logged": 1356, "registered_models_created": 112, "model_versions_created": 126, "sources_imported": 12}
+{"utc": "2026-10-10T01:32:02Z", "step": "verify", "sources": 12, "children": 190, "metrics": 50446}
+{"utc": "2026-10-10T01:33:12Z", "step": "dashboard", "experiments_created": 1, "rows_created": 174, "artifacts_uploaded": 174}
+{"utc": "2026-10-10T01:33:23Z", "step": "dashboard_verify", "rows": 174}
+{"utc": "2026-10-10T01:36:29Z", "step": "repeat", "import_": {"sources_noop": 12}, "dashboard": {"dashboard_noop": 1}, "store_identical": true}
+{"utc": "2026-10-10T01:36:30Z", "step": "compare", "ok": true, "n_problems": 0, "added_rows": {"datasets": 1010, "experiment_tags": 5, "experiments": 2, "input_tags": 7600, "inputs": 2766, "latest_metrics": 81510, "logged_model_metrics": 79592, "logged_model_params": 1008, "logged_model_tags": 2394, "logged_models": 126, "metrics": 81510, "model_version_tags": 504, "model_versions": 126, "params": 1298, "registered_model_tags": 784, "registered_models": 112, "runs": 376, "tags": 9714}, "artifacts_checked": 2223}
+{"utc": "2026-10-10T01:36:30Z", "step": "done", "seconds": 749}

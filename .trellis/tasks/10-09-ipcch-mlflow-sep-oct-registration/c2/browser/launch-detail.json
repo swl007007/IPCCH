@@ -1,0 +1,312 @@
+{
+  "browser_ok": true,
+  "console_errors": [],
+  "focused_element": {
+    "selector": "html > body",
+    "tag": "body",
+    "text": "3.17.0 GenAI Model training IPCCH Forecasting - detailed runs Runs Models Traces Model registry Docs Settings IPCCH Fore"
+  },
+  "interactive_elements": [
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/",
+      "selector": "div > aside > div:nth-of-type(1) > div > a",
+      "tag": "a",
+      "text": "MLflow"
+    },
+    {
+      "aria_name": "Toggle sidebar",
+      "selector": "div > div > aside > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(2)",
+      "tag": "div",
+      "text": "GenAI"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(3)",
+      "tag": "div",
+      "text": "Model training"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments",
+      "selector": "aside > nav > ul > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - detailed runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs",
+      "selector": "aside > nav > ul > li:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/models",
+      "selector": "aside > nav > ul > li:nth-of-type(4) > a",
+      "tag": "a",
+      "text": "Models"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/traces",
+      "selector": "aside > nav > ul > li:nth-of-type(5) > a",
+      "tag": "a",
+      "text": "Traces"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/models",
+      "selector": "aside > nav > ul > li:nth-of-type(6) > a",
+      "tag": "a",
+      "text": "Model registry"
+    },
+    {
+      "href": "https://www.mlflow.org/docs/latest/ml/",
+      "selector": "aside > nav > div > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Docs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/settings/general?returnTo=%2Fexperiments%2F3%2Fruns%2F0138c9615c4c4af5986ec890a9e30384",
+      "selector": "aside > nav > div > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Settings"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(1) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting - detailed runs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(2) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Runs"
+    },
+    {
+      "aria_name": "Open header dropdown menu",
+      "selector": "div:nth-of-type(2) > div > div > div:nth-of-type(2) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > div > div > div",
+      "tag": "div",
+      "text": "Overview Model metrics System metrics Traces Artifacts"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-overview",
+      "tag": "button",
+      "text": "Overview",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-model-metrics",
+      "tag": "button",
+      "text": "Model metrics",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-system-metrics",
+      "tag": "button",
+      "text": "System metrics",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-evaluations",
+      "tag": "button",
+      "text": "Traces",
+      "type": "button"
+    },
+    {
+      "selector": "#radix-\\:r8\\:-trigger-artifacts",
+      "tag": "button",
+      "text": "Artifacts",
+      "type": "button"
+    },
+    {
+      "aria_name": "Edit description",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(1) > h4 > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "aria_name": "Expand description",
+      "selector": "div > div:nth-of-type(1) > div:nth-of-type(1) > div > button",
+      "tag": "button",
+      "text": "Show more",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > div:nth-of-type(1) > span > input",
+      "tag": "input",
+      "type": "text"
+    },
+    {
+      "selector": "div:nth-of-type(1) > div > div > div:nth-of-type(2) > div",
+      "tag": "div",
+      "text": "Metric Value prediction_summary.all_inference_areas.prediction_summary.n_areas 6188 prediction_summary.all_inference_are"
+    },
+    {
+      "aria_name": "Resize Column",
+      "selector": "div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(1) > div",
+      "tag": "div",
+      "type": "button"
+    },
+    {
+      "aria_name": "Resize Column",
+      "selector": "div:nth-of-type(2) > div > div:nth-of-type(1) > div:nth-of-type(2) > div",
+      "tag": "div",
+      "type": "button"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(2) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.n_areas"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(3) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.n_capped_areas"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(4) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.n_zero_population_areas"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(5) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.p3plus"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(6) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.p4plus"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(7) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase1"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(8) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase2"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(9) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase3"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(10) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase4"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(11) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase5"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(12) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.p3plus"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(13) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.p4plus"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(14) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase1"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(15) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase2"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(16) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase3"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(17) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase4"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(18) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase5"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(19) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_effective"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384/model-metrics",
+      "selector": "div > div:nth-of-type(20) > div:nth-of-type(1) > span > a",
+      "tag": "a",
+      "text": "prediction_summary.all_inference_areas.prediction_summary.population_raw"
+    }
+  ],
+  "network_errors": [],
+  "page_errors": [],
+  "page_id": "81D108B3CCD430BFE90844702739FEC5",
+  "page_size": {
+    "height": 799,
+    "width": 1484
+  },
+  "pages": [
+    {
+      "active": true,
+      "page_id": "81D108B3CCD430BFE90844702739FEC5",
+      "title": "Run 0138c9615c4c4af5986ec890a9e30384 - MLflow",
+      "url": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384"
+    }
+  ],
+  "screenshot": {
+    "archive": false,
+    "artifact_id": "cc41c6c00f7327e6283968890340ee68",
+    "expires_at": "2026-10-11T01:28:45Z",
+    "filename": "browser-screenshot.png",
+    "height": 799,
+    "mime_type": "image/png",
+    "sha256": "3a32c733bc1376f785f5d275d0f96b9b33a3ecd08b7ac9da22bcaaf899110cf7",
+    "size_bytes": 130606,
+    "url": "https://agent.weilunshi.com/artifacts/public/cc41c6c00f7327e6283968890340ee68/browser-screenshot.png?expires=1791682125&sig=bed39f48b76d9c8986c15b5cfe7af726e6101c931c56229490577db20d883c23",
+    "width": 1484
+  },
+  "session_id": "browser-12b6c75a32fe9e7aef7782bd",
+  "text": "3.17.0 GenAI Model training IPCCH Forecasting - detailed runs Runs Models Traces Model registry Docs Settings IPCCH Forecasting - detailed runs Runs Compact climate global launch | baseline | 6-month Overview Model metrics System metrics Traces Artifacts Description Compact climate global launch | baseline | 6-month What: Compact baseline inputs (296). Family: Compact climate global launch (origin 2026-04; targets 2026-04, 2026-10, 2027-04; CDS forecasts at inference). 6-month lead (forecast origin = target month minus 6). Fitted inputs: 296. Role: baseline (comparison reference). Compare with: the family's baseline arm at the same lead on the same evaluation dataset (same keys, truth and definition); compare values only within one dataset. Status: Source status: Archived Trellis task 10-08-compact-cds-launch: supervisor accepted A1-A9 on 2026-10-09 UTC (research/supervisor-final-acceptance.md); no additional audit. Slot status: prediction_summary.all_inference_areas: prediction_summary_only; prediction_summary.country_afghanistan: prediction_summary_only; prediction_summary.country_angola: prediction_summary_only; prediction_summary.country_bangladesh: prediction_summary_only; prediction_summary.country_benin: prediction_summary_only; prediction_summary.country_burkina_faso: prediction_summary_only; prediction_summary.country_burundi: prediction_summary_only; prediction_summary.country_cabo_verde: prediction_summary_only; prediction_summary.country_cameroon: prediction_summary_only; prediction_summary.country_central_african_republic: prediction_summary_only; prediction_summary.country_chad: prediction_summary_only; prediction_summary.country_cote_d_ivoire: prediction_summary_only; … 51 more non-complete slots in view/na.json. Caveats + original: These saved prediction-summary records have no attached scoring truth; this catalog computes no scores (actual April 2026 reports may exist for some areas but are not part of these records). Undefined source values are not logged; view/na.json lists them with the source reason. Metric keys read ..; view/evaluation_view.json maps every key to the source file, row and column. External catalog descriptor of saved XGBoost boosters: the weights are downloadable from the detailed parent run (members.json lists every member and its bundle); there is no MLflow prediction wrapper and nothing was retrained. Source snapshot: compact_global_launch. MLflow times are registration times, not fit times. Show more Metrics (2079) Metric Value prediction_summary.all_inference_areas.prediction_summary.n_areas 6188 prediction_summary.all_inference_areas.prediction_summary.n_capped_areas 4004 prediction_summary.all_inference_areas.prediction_summary.n_zero_population_areas 6 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.p3plus 307396483.46252316 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.p4plus 61832481.32552487 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase1 628018033.4688712 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase2 494154357.4925572 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase3 245564002.1369983 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase4 60414952.603951216 prediction_summary.all_inference_areas.prediction_summary.population_count_effective.phase5 1417528.7215736478 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.p3plus 471476030.7528275 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.p4plus 94959787.77011125 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase1 900146247.5821571 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase2 734879342.3222964 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase3 376516242.98271626 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase4 92696711.6849484 prediction_summary.all_inference_areas.prediction_summary.population_count_raw.phase5 2263076.0851628566 prediction_summary.all_inference_areas.prediction_summary.population_effective 1429568874.4239516 prediction_summary.all_inference_areas.prediction_summary.population_raw 2106501620.657281 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.p3plus 0.21502740368937406 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.p4plus 0.04325253748298096 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.phase1 0.4393058947383229 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.phase2 0.345666701572303 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.phase3 0.17177486620639312 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.phase4 0.04226095970947575 prediction_summary.all_inference_areas.prediction_summary.population_share_effective.phase5 0.0009915777735052078 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.p3plus 0.22381944838272438 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.p4plus 0.045079380352188586 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.phase1 0.42731808926939685 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.phase2 0.3488624623478788 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.phase3 0.17874006803053577 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.phase4 0.04400505120714064 prediction_summary.all_inference_areas.prediction_summary.population_share_raw.phase5 0.0010743291450479495 prediction_summary.country_afghanistan.prediction_summary.n_areas 140 prediction_summary.country_afghanistan.prediction_summary.n_capped_areas 140 prediction_summary.country_afghanistan.prediction_summary.n_zero_population_areas 0 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.p3plus 11517940.215223841 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.p4plus 2516996.996302599 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.phase1 15381672.447792148 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.phase2 14752292.786984004 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.phase3 9000943.21892124 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.phase4 2466386.2924199733 prediction_summary.country_afghanistan.prediction_summary.population_count_effective.phase5 50610.703882626 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.p3plus 42985069.81623579 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.p4plus 9393458.34338665 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.phase1 57404557.73376026 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.phase2 55055706.45000395 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.phase3 33591611.47284914 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.phase4 9204578.682684118 prediction_summary.country_afghanistan.prediction_summary.population_count_raw.phase5 188879.66070253088 prediction_summary.country_afghanistan.prediction_summary.population_effective 41651905.449999996 prediction_summary.country_afghanistan.prediction_summary.population_raw 155445334 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.p3plus 0.27652853070672284 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.p4plus 0.060429336163841676 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.phase1 0.36929096716251547 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.phase2 0.3541805021307616 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.phase3 0.21609919454288115 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.phase4 0.05921424880263128 prediction_summary.country_afghanistan.prediction_summary.population_share_effective.phase5 0.0012150873612104104 prediction_summary.country_afghanistan.prediction_summary.population_share_raw.p3plus 0.27652853070672284 prediction_summary.country_afghanistan.prediction_summary.population_share_raw.p4plus 0.06042933616384169 prediction_summary.country_afghanistan.prediction_summary.population_share_raw.phase1 0.3692909671625155 prediction_summary.cou",
+  "title": "Run 0138c9615c4c4af5986ec890a9e30384 - MLflow",
+  "url": "http://127.0.0.1:5000/?check=run#/experiments/3/runs/0138c9615c4c4af5986ec890a9e30384",
+  "viewport": {
+    "height": 799,
+    "width": 1484
+  }
+}

@@ -1,0 +1,244 @@
+{
+  "browser_ok": true,
+  "console_errors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "focused_element": {
+    "selector": "html > body",
+    "tag": "body",
+    "text": "3.17.0 GenAI Model training Home Experiments Model registry Docs Settings Registered Models IPCCH Forecasting Compact cl"
+  },
+  "interactive_elements": [
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/",
+      "selector": "div > aside > div:nth-of-type(1) > div > a",
+      "tag": "a",
+      "text": "MLflow"
+    },
+    {
+      "aria_name": "Toggle sidebar",
+      "selector": "div > div > aside > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(2)",
+      "tag": "div",
+      "text": "GenAI"
+    },
+    {
+      "selector": "div > div > aside > div:nth-of-type(2) > div:nth-of-type(3)",
+      "tag": "div",
+      "text": "Model training"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/",
+      "selector": "aside > nav > ul > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Home"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/experiments",
+      "selector": "aside > nav > ul > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Experiments"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/models",
+      "selector": "aside > nav > ul > li:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Model registry"
+    },
+    {
+      "href": "https://www.mlflow.org/docs/latest/ml/",
+      "selector": "aside > nav > div > li:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Docs"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/settings/general?returnTo=%2Fmodels%2FIPCCH%2520Forecasting%2520Compact%2520climate%2520global%2520historical%2520%257C%2520baseline%2520%257C%25206-month%2Fversions%2F2",
+      "selector": "aside > nav > div > li:nth-of-type(2) > a",
+      "tag": "a",
+      "text": "Settings"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/models",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(1) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "Registered Models"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/models/IPCCH%20Forecasting%20Compact%20climate%20global%20historical%20%7C%20baseline%20%7C%206-month",
+      "selector": "div:nth-of-type(1) > div > span:nth-of-type(2) > span:nth-of-type(1) > a",
+      "tag": "a",
+      "text": "IPCCH Forecasting Compact climate global historical | baseline | 6-month"
+    },
+    {
+      "aria_name": "Open header dropdown menu",
+      "selector": "div:nth-of-type(2) > div > div > div:nth-of-type(1) > button",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div > div > div:nth-of-type(2) > div > button",
+      "tag": "button",
+      "text": "Promote model",
+      "type": "button"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/experiments/3/runs/a3b70652efae42f18161cc502e6b394b",
+      "selector": "div > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Compact climate global historical | baseline | 6-month"
+    },
+    {
+      "href": "http://127.0.0.1:5000/?check=model#/experiments/3/models/m-abf04d589de14f5aba3cf9e98c9bce03",
+      "selector": "div > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(3) > a",
+      "tag": "a",
+      "text": "Compact climate global historical | baseline | 6-month | snapshot extended 2022-2026"
+    },
+    {
+      "selector": "div > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(3) > button",
+      "tag": "button",
+      "text": "Add",
+      "type": "button"
+    },
+    {
+      "selector": "div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(3) > div > span",
+      "tag": "span"
+    },
+    {
+      "aria_name": "New model registry UI",
+      "selector": "#dubois-switch-17915958248421812296278510851",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "div:nth-of-type(2) > div > div:nth-of-type(5) > div > div:nth-of-type(1)",
+      "tag": "div",
+      "text": "Description Edit"
+    },
+    {
+      "selector": "div:nth-of-type(5) > div > div:nth-of-type(1) > span > button",
+      "tag": "button",
+      "text": "Edit",
+      "type": "button"
+    },
+    {
+      "selector": "div > div:nth-of-type(6) > div > div > div:nth-of-type(1)",
+      "tag": "div",
+      "text": "Tags"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(2) > td:nth-of-type(3) > span > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(2) > td:nth-of-type(3) > span > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(3) > td:nth-of-type(3) > span > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(3) > td:nth-of-type(3) > span > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(4) > td:nth-of-type(3) > span > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(4) > td:nth-of-type(3) > span > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(5) > td:nth-of-type(3) > span > button:nth-of-type(1)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "selector": "tbody > tr:nth-of-type(5) > td:nth-of-type(3) > span > button:nth-of-type(2)",
+      "tag": "button",
+      "type": "button"
+    },
+    {
+      "aria_name": "tag name",
+      "selector": "#name",
+      "tag": "input",
+      "type": "text"
+    },
+    {
+      "aria_name": "tag value",
+      "selector": "#value",
+      "tag": "input",
+      "type": "text"
+    },
+    {
+      "selector": "div:nth-of-type(3) > div > div > div > button",
+      "tag": "button",
+      "text": "Add",
+      "type": "submit"
+    },
+    {
+      "selector": "div:nth-of-type(2) > div > div:nth-of-type(7) > div > div:nth-of-type(1)",
+      "tag": "div",
+      "text": "Schema"
+    },
+    {
+      "selector": "div > div:nth-of-type(2) > div > div > div",
+      "tag": "div",
+      "text": "Name Type Inputs (1) Outputs (1)"
+    },
+    {
+      "selector": "body > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button",
+      "tag": "button",
+      "text": "MLflow Assistant",
+      "type": "button"
+    }
+  ],
+  "network_errors": [],
+  "page_errors": [],
+  "page_id": "81D108B3CCD430BFE90844702739FEC5",
+  "page_size": {
+    "height": 799,
+    "width": 1484
+  },
+  "pages": [
+    {
+      "active": true,
+      "page_id": "81D108B3CCD430BFE90844702739FEC5",
+      "title": "IPCCH Forecasting Compact climate global historical | baseline | 6-month v2 - MLflow",
+      "url": "http://127.0.0.1:5000/?check=model#/models/IPCCH%20Forecasting%20Compact%20climate%20global%20historical%20%7C%20baseline%20%7C%206-month/versions/2"
+    }
+  ],
+  "screenshot": {
+    "archive": false,
+    "artifact_id": "e5b1b65ba7f35544f3ba6eb3ea1d323d",
+    "expires_at": "2026-10-11T01:30:25Z",
+    "filename": "browser-screenshot.png",
+    "height": 799,
+    "mime_type": "image/png",
+    "sha256": "98f5673c1cb824cd5b333182bd6dc90fdd0c8bc7a6080372318ad7d97ce7ecea",
+    "size_bytes": 71561,
+    "url": "https://agent.weilunshi.com/artifacts/public/e5b1b65ba7f35544f3ba6eb3ea1d323d/browser-screenshot.png?expires=1791682225&sig=4b4c12c8100c97395279963e032c4880f554d285653ffc6414ae066657d7936b",
+    "width": 1484
+  },
+  "session_id": "browser-12b6c75a32fe9e7aef7782bd",
+  "text": "3.17.0 GenAI Model training Home Experiments Model registry Docs Settings Registered Models IPCCH Forecasting Compact climate global historical | baseline | 6-month Version 2 Promote model Registered At : 10/09/2026, 09:26:21 PM Last Modified : 10/09/2026, 09:26:21 PM Source Run : Compact climate global historical | baseline | 6-month Source Model : Compact climate global historical | baseline | 6-month | snapshot extended 2022-2026 Aliases : Add Stage (deprecated) : None New model registry UI Description Edit Snapshot snapshot extended 2022-2026 (compact_global_2026_extension): 20 booster members, 4 fitted in this snapshot from 1 fit unit(s). 16 boosters are reused unchanged from snapshot compact_global_original. External catalog descriptor of saved XGBoost boosters: the weights are downloadable from the detailed parent run (members.json lists every member and its bundle); there is no MLflow prediction wrapper and nothing was retrained. Tags Name Value Actions snapshot snapshot extended 2022-2026 zz_prov.import_fingerprint d3b9f966e989fd6e2d3615cbb9cb24d483ef03124e081761503d7d3e5b43e062 zz_prov.source_key compact_global_2026_extension zz_prov.version_key compact_climate_global/baseline/06@compact_global_2026_extension Add Schema Name Type Inputs (1) Outputs (1) MLflow Assistant",
+  "title": "IPCCH Forecasting Compact climate global historical | baseline | 6-month v2 - MLflow",
+  "url": "http://127.0.0.1:5000/?check=model#/models/IPCCH%20Forecasting%20Compact%20climate%20global%20historical%20%7C%20baseline%20%7C%206-month/versions/2",
+  "viewport": {
+    "height": 799,
+    "width": 1484
+  }
+}

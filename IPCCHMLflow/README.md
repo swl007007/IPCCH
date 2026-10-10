@@ -7,7 +7,7 @@ loaded. MLflow times are registration times, not fit times.
 
 | Item | Value |
 |---|---|
-| URL | http://localhost:5000 (127.0.0.1 only; started with FCC `IPCCHMLflow/manage.sh start`) |
+| URL | http://localhost:5000 (127.0.0.1 only; started with FCC `IPCCHMLflow/manage.sh start`); dashboard http://localhost:5000/#/experiments/4, detailed runs http://localhost:5000/#/experiments/3 (IDs as registered 2026-10-10) |
 | Python | `/home/swl007007/.venvs/ipcch-mlflow/bin/python` (MLflow 3.17.0) |
 | Store | `/home/swl007007/.local/share/ipcch-mlflow/`; this catalog's plans/cache/staging under `ipcch-forecasting/` |
 | Sources | `sources.json` (12 explicit snapshots, cited files with SHA256, exclusions, frozen counts) |

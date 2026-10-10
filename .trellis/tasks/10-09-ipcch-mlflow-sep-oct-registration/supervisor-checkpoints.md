@@ -167,3 +167,35 @@ import the 12 sources into the isolated IPCCH Forecasting namespaces; verify
 values/artifacts/counts, repeat as no-op, compare existing records/artifacts.
 Supervisor performs browser checks. No retraining, audit, push, merge or archival.
 Executor stops for C2 review after evidence is saved.
+
+## C2 accepted / final supervisor result
+
+C2 live driver finished successfully (749 seconds). All 12 sources imported and
+read back: 112 registered models / 126 external versions, 12+190 detailed runs,
+174 dashboard rows, 512 distinct detailed dataset names, 50,446 detailed metrics.
+Supervisor independently queried live counts/names and confirmed no unfinished runs
+(`c2/supervisor-counts.json`).
+
+Unchanged repeat returned sources_noop=12 and dashboard_noop=1 with identical full
+store/artefact state. Existing-store comparison returned ok=true, zero problems;
+all 2,223 prior artifact hashes and pre-existing database records were preserved.
+Durable backup: `/home/swl007007/ipcch-mlflow-backups/20261010-before-ipcch-forecasting`.
+Its row/artifact contents matched the fresh pre-import live baseline; successful
+C1 isolated restore evidence therefore applies to this retained backup.
+
+Supervisor inspected dashboard/filter, launch and historical details, registry
+version2 and dataset drawer. Screenshots, actual HTTP bundle-download checks
+(36 referenced members) and 100-row payload measurement are in c2/. See
+`c2/supervisor-browser.md` for the minor Markdown-template display limitation.
+The user-requested naming/tag conventions and scope distinctions are present.
+
+C1+C2 accepted. Historical lineage limitations and source scientific caveats are
+disclosed, not blockers. No numerical model replay, training, or Trellis audit.
+Final code commit142229b contains the tested implementation and matching guidance;
+final evidence/docs commit and native task archival/journal remain for closeout.
+
+Final diff review: after tested implementation142229b, only the live links and
+task evidence/checklists changed. No new product logic; no further tests needed.
+Native archive is invoked with --no-commit because the local archive helper stages
+the whole archive subtree; supervisor stages only this task's move so the unrelated
+dirty PNG cannot enter the commit. Other unrelated timestamp change is preserved.

@@ -1,0 +1,27 @@
+{
+ "totals": {
+  "registered_models": 112,
+  "model_versions": 126,
+  "detailed_children": 190,
+  "dashboard_rows": 174,
+  "booster_files": 2458,
+  "fit_units_new": 584,
+  "datasets": 512,
+  "metrics": 50446,
+  "na": 2846
+ },
+ "fingerprints": {
+  "compact_global_original": "d1b14bada93d7876f3d176d6b7c5d46742d1ba8a85677d635016a01147cf36bf",
+  "compact_global_2026_extension": "d3b9f966e989fd6e2d3615cbb9cb24d483ef03124e081761503d7d3e5b43e062",
+  "compact_global_launch": "904d4eaeb5b77128713579550681f9f9e9112d827c0c37513922a45fa820dfc8",
+  "compact_somalia_original": "c7554973ea93a892c6046db3b9f09e63653eeaddfd00ed3fcf055506393e1d87",
+  "compact_somalia_2026_extension": "7dbfcee0f95917c086f25ac444762c9fa37f6feb28cbf394031e2a0ee347c053",
+  "compact_somalia_launch": "ee0f7d50a2b1443a5f1375f53db1eb3a318ebfc4322f35c7463915360557891f",
+  "origin_safe_climate_idp_v1": "928d52f00f2c2289230222cc91c6b5a607d5526bfb7bcaefe819c1738f6b37db",
+  "origin_safe_weather_oracle_v1": "6168d8ce2cc79aae2ca051b2defc6ef04c4200ffccb692b00784442520743116",
+  "somalia_oracle_v1": "21a0b32c58ab344a4286c6db25e28612fed8f8691cde9e2e1bea783dea67e548",
+  "somalia_oracle_v2_q3": "78b07f4539e4c3ca27822133dc9a1a13693d3126331da4dad3e6529761ee1abd",
+  "somalia_oracle_v3_validity": "ce7a7ebf3164fe3f29ec33b9844c644e1c8986951b3c0ead7b1654705ff93326",
+  "somalia_oracle_v4_calibrated_d": "0e45d86e93fd4fdfe4c71b10c06d9bce7ec6d7a54a4044c5a1de82a7643dc5c6"
+ }
+}
