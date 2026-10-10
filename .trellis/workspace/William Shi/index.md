@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 7
+- **Total Sessions**: 8
 - **Last Active**: 2026-10-09
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~241 | Active |
+| `journal-1.md` | ~266 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 8 | 2026-10-09 | IPCCH MLflow registration accepted | `b7fca5c`, `c9dcef1`, `142229b`, `c230dc8` | `task/ipcch-mlflow-sep-oct-registration` |
 | 7 | 2026-10-09 | Complete global and Somalia compact 2026 Jan-Apr evaluation | `16d2e92`, `6057821`, `affadd8` | `task/compact-climate-weather-oracle` |
 | 6 | 2026-10-09 | Somalia local compact historical and CDS launch accepted | `e563b0b`, `3aff3c6` | `task/compact-climate-weather-oracle` |
 | 5 | 2026-10-09 | Compact CDS launch accepted | `58dd9cd`, `414ae4c` | `task/compact-climate-weather-oracle` |

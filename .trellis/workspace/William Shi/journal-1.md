@@ -239,3 +239,28 @@ Approved spec executed by Herdr Claude Opus 5.5 (1M), supervised by Codex, witho
 ### Status
 
 [OK] **Completed**
+
+
+## Session 8: IPCCH MLflow registration accepted
+<!-- trellis-session: v=2 fp=041d9cb7a92d0317 -->
+
+**Date**: 2026-10-09
+**Task**: IPCCH MLflow registration accepted
+**Branch**: `task/ipcch-mlflow-sep-oct-registration`
+
+### Summary
+
+Herdr Opus 5.5 (1M) executor, Codex supervisor: C0/C1/C2 accepted; 112 models, 126 versions, 202 detailed and 174 dashboard runs imported to isolated IPCCH Forecasting namespaces. 27 tests passed; live value readback, no-op repeat, unchanged prior records and 2223 artifact hashes, browser and HTTP downloads verified. AGENTS/CLAUDE incremental maintenance added. Provenance limitations disclosed as nonblocking per user. No training, push, merge or Trellis audit.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b7fca5c` | docs(mlflow): freeze IPCCH registration scope and supervisor checkpoints |
+| `c9dcef1` | docs(mlflow): record reviewed source inventory and readable catalog plan |
+| `142229b` | feat(mlflow): add IPCCH forecasting catalog and maintenance |
+| `c230dc8` | docs(mlflow): accept live catalog and record supervisor verification |
+
+### Status
+
+[OK] **Completed**
