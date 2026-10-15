@@ -235,6 +235,51 @@ For additional context about the active feature, read the current plan:
 <!-- SPECKIT END -->
 
 <!-- gitnexus:start -->
+
+### MLflow principles: model cards, tags and assistant (shared local store, since 2026-10-14)
+
+The local MLflow store (`/home/swl007007/.local/share/ipcch-mlflow`, http://127.0.0.1:5000, basic-auth, optional tunnel
+https://mlflow.weilunshi.com) serves both projects. MLflow here is for research version and feature management and a
+temporary internal dashboard; keep raw data, scripts and small metadata/results, not model packages or full-store backups.
+
+- **Experiments** (IDs fixed): `IPCCH detailed runs` (1), `IPCCH dashboard` (2), `IPCCH forecasting detailed runs` (3),
+  `IPCCH forecasting dashboard` (4). Detailed runs are the source records; dashboards hold one row and one external
+  (not loadable) logged model per family x arm x lead (x seed or snapshot). Every logged model lives in its project's
+  dashboard and is registered (`IPCCH <...>` / `IPCCH Forecasting <...>`).
+- **Model card = logged-model description** (`mlflow.note.content`, <= 8000 chars, English, written for the AI assistant).
+  It is generated, never hand-edited, from `Food_Crisis_Cluster/IPCCHMLflow/model_cards.json` by `model_cards.py`. Sections in
+  order: `## card`, `## identity`, `## summary`, `## status`, `## catalog`, `## data`, `## features` (feature_set, n_features,
+  groups with counts, construction and example columns), `## feature_engineering`, `## architecture` (+ arm difference),
+  `## settings` (exact hyperparameters, window/refit/weights/threshold, plus the setting selected at this lead),
+  `## environment`, `## evaluation`, `## observed` (forecasting params such as n_inputs), `## sources`.
+  The registered-model description is the short card (<= 5000 chars: no feature engineering/evaluation/environment);
+  version descriptions are left as registered.
+- **Facts rules** (`model_cards.json`, one entry per family with per-arm overrides, values may be per lead as `{"3": ...}`
+  or contain `{H}`): every fact comes from the run's own archived config/report/manifest/runtime record and cites it in
+  `sources`; anything not recorded is written as "not recorded", never inferred from current code or lock files.
+- **Human tags** (same on logged and registered models, model names unchanged
+  `<family title> | <arm> | <lead>[ | window] | seed N|snapshot ...`):
+  `project` (IPCCH / IPCCH forecasting), `model_type`, `feature_set` (short code: `compact296`, `compact296+ae128`,
+  `rich561`, `rich561+mask561`, `rich601`, `origin_safe870+oracle12`, `somalia_D1009`, ...), `n_features` (exact model
+  input count at that lead), `target`, `role` (baseline / candidate / diagnostic / oracle / comparison), `status` (short
+  accepted conclusion), `scope`. Logged models also carry `card.feature_list` =
+  `label=<runs:/RUN_ID/artifact/path | /abs/local/file[.tar!member]>#column[?col=value&col~H]` (`;`-separated blocks,
+  `@header` = header columns after the key, `~` = JSON list contains the lead); its total length must equal `n_features`.
+- **New or changed model**: register it with its importer, add/adjust its family and arm in `model_cards.json` (with
+  sources), then `model_cards.py plan` -> review -> `apply --plan-fingerprint FP` -> `verify` (credentials:
+  `MLFLOW_TRACKING_USERNAME/PASSWORD`). The IPCCH dashboard writer (`summary_catalog.py`) builds the same cards and tags.
+- **Lookup**: `ipcch-model families|search|get|registered|features` (read-only; installed by `IPCCHMLflow/manage.sh start`;
+  `get` accepts words from the model name).
+  UI assistant = Gemini 3.8 Flash via the MLflow AI Gateway (Vertex AI, project manuel-remote-sensing), local and tunnel,
+  running only read-only `mlflow`/`ipcch-model` commands as the READ-only user `assistant` (`IPCCHMLflow/assistant_patch.py`,
+  MLflow 3.17.0 only).
+- **IPCCH forecasting importer (this repo)**: on 2026-10-14 the experiments were renamed (`IPCCH Forecasting - detailed runs`
+  -> `IPCCH forecasting detailed runs`, `IPCCH Forecasting - dashboard` -> `IPCCH forecasting dashboard`) and the forecasting
+  logged models were moved from the detailed experiment to the dashboard by a one-off SQL change (IDs and versions
+  unchanged). `IPCCHMLflow/naming.py` here still uses the old names and placement: update it before the next registration,
+  then run `Food_Crisis_Cluster/IPCCHMLflow/model_cards.py plan|apply|verify` for the new models. Under the research
+  storage policy the pre-registration full-store backup is optional.
+
 # GitNexus — Code Intelligence
 
 This project is indexed by GitNexus as **IPCCH** (3579 symbols, 5533 relationships, 163 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
